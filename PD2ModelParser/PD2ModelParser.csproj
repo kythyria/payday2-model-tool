@@ -49,9 +49,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
+    <Compile Include="FullModelData.cs" />
     <Compile Include="NewObjImporter.cs" />
-    <Compile Include="ObjImporter.cs" />
+    <Compile Include="ModelReader.cs" />
     <Compile Include="FileManager.cs" />
+    <Compile Include="ObjWriter.cs" />
     <Compile Include="UI\Form1.cs">
       <SubType>Form</SubType>
     </Compile>

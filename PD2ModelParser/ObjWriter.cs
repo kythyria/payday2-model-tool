@@ -1,229 +1,37 @@
-﻿
-using Nexus;
+﻿using Nexus;
 using PD2ModelParser.Sections;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using static PD2ModelParser.Tags;
 
 namespace PD2ModelParser
 {
-    class ObjImporter
+    class ObjWriter
     {
-        public static uint animation_data_tag = 0x5DC011B8; // Animation data
-        public static uint author_tag = 0x7623C465; // Author tag
-        public static uint material_group_tag = 0x29276B1D; // Material Group
-        public static uint material_tag = 0x3C54609C; // Material
-        public static uint object3D_tag = 0x0FFCD100; // Object3D
-        public static uint model_data_tag = 0x62212D88; // Model data
-        public static uint geometry_tag = 0x7AB072D3; // Geometry
-        public static uint topology_tag = 0x4C507A13; // Topology
-        public static uint passthroughGP_tag = 0xE3A3B1CA; // PassthroughGP
-        public static uint topologyIP_tag = 0x03B634BD;  // TopologyIP
-        public static uint quatLinearRotationController_tag = 0x648A206C; // QuatLinearRotationController
-        public static uint quatBezRotationController_tag = 0x197345A5; // QuatBezRotationController
-        public static uint skinbones_tag = 0x65CC1825; // SkinBones
-        public static uint bones_tag = 0xEB43C77; // Bones
-        public static uint light_tag = 0xFFA13B80; //Light
-        public static uint lightSet_tag = 0x33552583; //LightSet
-        public static uint linearVector3Controller_tag = 0x26A5128C; //LinearVector3Controller
-        public static uint linearFloatController_tag = 0x76BF5B66; //LinearFloatController
-        public static uint lookAtConstrRotationController = 0x679D695B; //LookAtConstrRotationController
-        public static uint camera_tag = 0x46BF31A7; //Camera
 
-        public List<SectionHeader> sections = new List<SectionHeader>();
-        public Dictionary<UInt32, object> parsed_sections = new Dictionary<UInt32, object>();
-        public byte[] leftover_data = null;
-
-        public void Open(string filepath, string rp = null)
+        public static void ExportFile(FullModelData data, string filepath)
         {
-            StaticStorage.hashindex.Load();
+            GenerateOutputInfo(data, "outinfo.txt");
 
-            Console.WriteLine("Loading: " + filepath);
+            ExportObj(data, filepath.Replace(".model", ".obj")); // TODO configure output file
 
-            uint offset = 0;
+            ExportPatternUVObj(data, filepath.Replace(".model", "_pattern_uv.obj")); // TODO configure output file
+        }
 
-            using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
-            {
-                using (BinaryReader br = new BinaryReader(fs))
-                {
-                    int random = br.ReadInt32();
-                    offset += 4;
-                    int filesize = br.ReadInt32();
-                    offset += 4;
-                    int sectionCount;
-                    if (random == -1)
-                    {
-                        sectionCount = br.ReadInt32();
-                        offset += 4;
-                    }
-                    else
-                        sectionCount = random;
-
-                    Console.WriteLine("Size: " + filesize + " bytes, Sections: " + sectionCount);
-
-                    for (int x = 0; x < sectionCount; x++)
-                    {
-                        SectionHeader sectionHead = new SectionHeader(br);
-                        sections.Add(sectionHead);
-                        Console.WriteLine(sectionHead);
-                        offset += sectionHead.size + 12;
-                        Console.WriteLine("Next offset: " + offset);
-                        fs.Position = (long)offset;
-                    }
-
-
-                    foreach (SectionHeader sh in sections)
-                    {
-                        object section = new object();
-
-                        fs.Position = sh.offset + 12;
-
-                        if (sh.type == animation_data_tag)
-                        {
-                            Console.WriteLine("Animation Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new Animation(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == author_tag)
-                        {
-                            Console.WriteLine("Author Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new Author(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == material_group_tag)
-                        {
-                            Console.WriteLine("Material Group Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new Material_Group(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == material_tag)
-                        {
-                            Console.WriteLine("Material Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new Material(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == object3D_tag)
-                        {
-                            Console.WriteLine("Object 3D Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new Object3D(br, sh);
-
-                            if ((section as Object3D).hashname == 4921176767231919846)
-                                Console.WriteLine();
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == geometry_tag)
-                        {
-                            Console.WriteLine("Geometry Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new Geometry(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == model_data_tag)
-                        {
-                            Console.WriteLine("Model Data Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new Model(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == topology_tag)
-                        {
-                            Console.WriteLine("Topology Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new Topology(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == passthroughGP_tag)
-                        {
-                            Console.WriteLine("passthroughGP Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new PassthroughGP(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == topologyIP_tag)
-                        {
-                            Console.WriteLine("TopologyIP Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new TopologyIP(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == bones_tag)
-                        {
-                            Console.WriteLine("Bones Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new Bones(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == skinbones_tag)
-                        {
-                            Console.WriteLine("SkinBones Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new SkinBones(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == quatLinearRotationController_tag)
-                        {
-                            Console.WriteLine("QuatLinearRotationController Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new QuatLinearRotationController(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else if (sh.type == linearVector3Controller_tag)
-                        {
-                            Console.WriteLine("QuatLinearRotationController Tag at " + sh.offset + " Size: " + sh.size);
-
-                            section = new LinearVector3Controller(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-                        else
-                        {
-                            Console.WriteLine("UNKNOWN Tag at " + sh.offset + " Size: " + sh.size);
-                            fs.Position = sh.offset;
-
-                            section = new Unknown(br, sh);
-
-                            Console.WriteLine(section);
-                        }
-
-                        parsed_sections.Add(sh.id, section);
-                    }
-
-                    if (fs.Position < fs.Length)
-                        leftover_data = br.ReadBytes((int)(fs.Length - fs.Position));
-
-                    br.Close();
-                }
-                fs.Close();
-            }
-
-            if (rp != null)
-            {
-                this.updateRP(rp);
-            }
-
+        private static void GenerateOutputInfo(FullModelData data, string path)
+        {
+            List<SectionHeader> sections = data.sections;
+            Dictionary<UInt32, object> parsed_sections = data.parsed_sections;
+            byte[] leftover_data = data.leftover_data;
 
             //Generate outinfo.txt - Used for research and debug purposes
-            using (FileStream fs = new FileStream("outinfo.txt", FileMode.Create, FileAccess.Write))
+            using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write))
             {
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
@@ -403,17 +211,22 @@ namespace PD2ModelParser
                 }
                 fs.Close();
             }
+        }
 
+        private static void ExportObj(FullModelData data, string path)
+        {
+            List<SectionHeader> sections = data.sections;
+            Dictionary<UInt32, object> parsed_sections = data.parsed_sections;
+            byte[] leftover_data = data.leftover_data;
 
             //Generate obj
             ushort maxfaces = 0;
             UInt32 uvcount = 0;
             UInt32 normalcount = 0;
-            string newfolder = "";//@"c:/Program Files (x86)/Steam/SteamApps/common/PAYDAY 2/models/";
 
-            Directory.CreateDirectory(Path.GetDirectoryName((newfolder + filepath).Replace(".model", ".obj")));
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
 
-            using (FileStream fs = new FileStream((newfolder + filepath).Replace(".model", ".obj"), FileMode.Create, FileAccess.Write))
+            using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write))
             {
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
@@ -501,15 +314,23 @@ namespace PD2ModelParser
                 }
                 fs.Close();
             }
+        }
 
-            //Pattern UV
-            maxfaces = 0;
-            uvcount = 0;
-            normalcount = 0;
+        // Please don't ask what this does
+        private static void ExportPatternUVObj(FullModelData data, string path)
+        {
+            List<SectionHeader> sections = data.sections;
+            Dictionary<UInt32, object> parsed_sections = data.parsed_sections;
+            byte[] leftover_data = data.leftover_data;
 
-            Directory.CreateDirectory(Path.GetDirectoryName((newfolder + filepath).Replace(".model", "_pattern_uv.obj")));
+            //Generate obj
+            ushort maxfaces = 0;
+            UInt32 uvcount = 0;
+            UInt32 normalcount = 0;
 
-            using (FileStream fs = new FileStream((newfolder + filepath).Replace(".model", "_pattern_uv.obj"), FileMode.Create, FileAccess.Write))
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write))
             {
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
@@ -597,27 +418,6 @@ namespace PD2ModelParser
                 }
                 fs.Close();
             }
-
-
-
-        }
-
-        public bool updateRP(string rp)
-        {
-            ulong rp_hash = Hash64.HashString(rp);
-            foreach (object section in this.parsed_sections.Values)
-            {
-                if (section is Object3D)
-                {
-                    if ((section as Object3D).hashname == rp_hash)
-                    {
-                        StaticStorage.rp_id = (section as Object3D).id;
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
     }
 }

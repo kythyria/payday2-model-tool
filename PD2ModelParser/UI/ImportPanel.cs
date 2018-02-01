@@ -12,6 +12,8 @@ namespace PD2ModelParser.UI
 {
     public partial class ImportPanel : UserControl
     {
+        private FullModelData model;
+
         public ImportPanel()
         {
             InitializeComponent();
@@ -26,28 +28,31 @@ namespace PD2ModelParser.UI
             openFileDialog.CheckFileExists = true;
             if (openFileDialog.ShowDialog() != DialogResult.OK) return;
 
-            ObjImporter importer = new ObjImporter();
             inputFileBox.Text = openFileDialog.FileName;
-            importer.Open(openFileDialog.FileName, this.rootPoint_combobox.Text);
+            model = ModelReader.Open(openFileDialog.FileName, rootPoint_combobox.Text);
 
             this.rootPoint_combobox.Items.Clear();
             this.rootPoint_combobox.Items.AddRange(StaticStorage.objects_list.ToArray());
+
+            exportBttn.Enabled = true;
         }
 
         private void rootPoint_combobox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            MessageBox.Show("root_point configuration temporarally unavailable");
+            //MessageBox.Show("root_point configuration temporarally unavailable");
             //if (Form1.fm.updateRP(this.rootPoint_combobox.Text))
             //{
             //    MessageBox.Show("Set model root_point successfully");
             //    return;
             //}
             //MessageBox.Show("Failed setting model root_point!");
+
+            model = ModelReader.Open(inputFileBox.Text, rootPoint_combobox.Text);
         }
 
         private void exportBttn_Click(object sender, EventArgs e)
         {
-            // TODO
+            ObjWriter.ExportFile(model, inputFileBox.Text);
         }
     }
 }

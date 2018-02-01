@@ -84,6 +84,7 @@
             // 
             // exportBttn
             // 
+            this.exportBttn.Enabled = false;
             this.exportBttn.Location = new System.Drawing.Point(9, 67);
             this.exportBttn.Name = "exportBttn";
             this.exportBttn.Size = new System.Drawing.Size(274, 23);
