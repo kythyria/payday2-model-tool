@@ -1,0 +1,24 @@
+First of all, a warning. The code in this program is messy to the extremes possible. Sorry for that.
+
+Second of all, this tool isn't complete and by no means is ready for public use.
+
+Names:
+Pretty much all proper names are hashed in these files. (Use hashlist.txt in 'bundle tools' folder to reverse find proper names)
+
+
+3D Data:
+Verts, UVs, Normals, etc (every item in Geometry section) all have the same count. Also, they are all arranged by facelist. So, facelist is reused for all of those items.
+
+
+Object 3D section:
+I believe is for bones and such. Because you can create a skeleton from them. Example: https://dl.dropboxusercontent.com/u/30675690/Payday2/models/bones_bulldozer.jpeg (It seems to be a linked list)
+
+
+Topology/Geometry/Passthrough:
+Any section that uses these will link to their ID.
+
+
+Importing 3d verts/faces/normals/uvs:
+The process that is in place is probably incorrect. But it looks at each face, and tries to organize UVs and Normals to be arranged by the facelist. This way, the facelist can be used for all items in 3d data.
+
+Other sections like animations and some unknowns, I have not looked into.
