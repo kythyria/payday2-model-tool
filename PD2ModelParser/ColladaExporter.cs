@@ -103,6 +103,7 @@ namespace PD2ModelParser
         {
             string VERT_ID = "vertices-" + id;
             string NORM_ID = "norms-" + id;
+            string UV_ID = "uv-" + id;
             string RAW_VERT_ID = "vert_raw-" + id;
 
             PassthroughGP passthrough_section = (PassthroughGP)parsed_sections[model_data.passthroughGP_ID];
@@ -111,39 +112,41 @@ namespace PD2ModelParser
 
             int vertlen = geometry_section.verts.Count;
             int normlen = geometry_section.normals.Count;
+            int uvlen = geometry_section.uvs.Count;
 
             triangles triangles = new triangles();
 
+            List<InputLocalOffset> inputs = new List<InputLocalOffset>();
+
+            inputs.Add(new InputLocalOffset
+            {
+                semantic = "VERTEX",
+                source = "#" + VERT_ID,
+                offset = 0,
+            });
+
             if (normlen > 0)
             {
-                triangles.input = new InputLocalOffset[]
+                inputs.Add(new InputLocalOffset
                 {
-                    new InputLocalOffset
-                    {
-                        semantic = "VERTEX",
-                        source = "#" + VERT_ID,
-                        offset = 0,
-                    },
-                    new InputLocalOffset
-                    {
-                        semantic = "NORMAL",
-                        source = "#" + NORM_ID,
-                        offset = 1,
-                    }
-                };
+                    semantic = "NORMAL",
+                    source = "#" + NORM_ID,
+                    offset = 0,
+                });
             }
-            else
+
+            if (uvlen > 0)
             {
-                triangles.input = new InputLocalOffset[]
+                inputs.Add(new InputLocalOffset
                 {
-                    new InputLocalOffset
-                    {
-                        semantic = "VERTEX",
-                        source = "#" + VERT_ID,
-                        offset = 0,
-                    }
-                };
+                    semantic = "TEXCOORD",
+                    source = "#" + UV_ID,
+                    offset = 0,
+                    set = 1, // IDK what this does or why we need it
+                });
             }
+
+            triangles.input = inputs.ToArray();
 
             mesh mesh = new mesh
             {
@@ -163,6 +166,8 @@ namespace PD2ModelParser
                 }
             };
 
+            triangles.p = "\n"; // Start on a newline
+
             foreach (Face face in topology_section.facelist)
             {
                 if (!face.BoundsCheck(vertlen))
@@ -175,23 +180,29 @@ namespace PD2ModelParser
                     throw new Exception("Norm Out Of Bounds!");
                 }
 
-                triangles.p += face.a + " " + face.b + " " + face.c + " ";  // Vertices
+                if (uvlen > 0 && !face.BoundsCheck(uvlen))
+                {
+                    throw new Exception("UV Out Of Bounds!");
+                }
 
-                if (normlen > 0)
-                    triangles.p += face.a + " " + face.b + " " + face.c + " ";  // Normals
+                triangles.p += face.a + " " + face.b + " " + face.c;  // Vertices
+
+                triangles.p += "\n";
 
                 triangles.count++;
             }
 
+            List<source> sources = new List<source>();
+
+            sources.Add(GenerateSource(RAW_VERT_ID, geometry_section.verts));
+
             if (normlen > 0)
-                mesh.source = new source[] {
-                    GenerateSource(RAW_VERT_ID, geometry_section.verts),
-                    GenerateSource(NORM_ID, geometry_section.normals)
-                };
-            else
-                mesh.source = new source[] {
-                    GenerateSource(RAW_VERT_ID, geometry_section.verts)
-                };
+                sources.Add(GenerateSource(NORM_ID, geometry_section.normals));
+
+            if (uvlen > 0)
+                sources.Add(GenerateSourceTex(UV_ID, geometry_section.uvs));
+
+            mesh.source = sources.ToArray();
 
             return new geometry
             {
@@ -206,9 +217,24 @@ namespace PD2ModelParser
             return GenerateSource(name, new string[] { "X", "Y", "Z" }, vecs, VecToFloats);
         }
 
+        private static source GenerateSource(string name, List<Vector2D> vecs)
+        {
+            return GenerateSource(name, new string[] { "X", "Y" }, vecs, VecToFloats);
+        }
+
+        private static source GenerateSourceTex(string name, List<Vector2D> vecs)
+        {
+            return GenerateSource(name, new string[] { "S", "T" }, vecs, VecToFloats);
+        }
+
         private static double[] VecToFloats(Vector3D vec)
         {
             return new double[] { vec.X, vec.Y, vec.Z };
+        }
+
+        private static double[] VecToFloats(Vector2D vec)
+        {
+            return new double[] { vec.X, vec.Y };
         }
 
         private static source GenerateSource<T>(string id, string[] paramnames, List<T> list, Func<T, double[]> converter)
