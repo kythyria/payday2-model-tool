@@ -159,12 +159,12 @@ namespace PD2ModelParser
                                 {
                                     Face face = new Face();
                                     if (obj.verts.Count > 0)
-                                        face.x = (ushort)(Convert.ToUInt16(faces[x].Split('/')[0]) - prevMaxVerts - 1);
+                                        face.a = (ushort)(Convert.ToUInt16(faces[x].Split('/')[0]) - prevMaxVerts - 1);
                                     if (obj.uv.Count > 0)
-                                        face.y = (ushort)(Convert.ToUInt16(faces[x].Split('/')[1]) - prevMaxUvs - 1);
+                                        face.b = (ushort)(Convert.ToUInt16(faces[x].Split('/')[1]) - prevMaxUvs - 1);
                                     if (obj.normals.Count > 0)
-                                        face.z = (ushort)(Convert.ToUInt16(faces[x].Split('/')[2]) - prevMaxNorms - 1);
-                                    if (face.x < 0 || face.y < 0 || face.z < 0)
+                                        face.c = (ushort)(Convert.ToUInt16(faces[x].Split('/')[2]) - prevMaxNorms - 1);
+                                    if (face.a < 0 || face.b < 0 || face.c < 0)
                                         throw new Exception();
                                     obj.faces.Add(face);
                                 }
@@ -232,7 +232,7 @@ namespace PD2ModelParser
 
                         foreach (Face called_f in called_faces)
                         {
-                            if (called_f.x == f.x && called_f.y != f.y)
+                            if (called_f.a == f.a && called_f.b != f.b)
                             {
                                 duplicate_verts.Add(x_f);
                                 broken = true;
@@ -252,7 +252,7 @@ namespace PD2ModelParser
                         foreach (KeyValuePair<int, Face> pair in done_faces)
                         {
                             Face f = pair.Value;
-                            if (f.x == obj.faces[dupe].x && f.y == obj.faces[dupe].y)
+                            if (f.a == obj.faces[dupe].a && f.b == obj.faces[dupe].b)
                             {
                                 replacedF = pair.Key;
                             }
@@ -261,17 +261,17 @@ namespace PD2ModelParser
                         Face new_face = new Face();
                         if (replacedF > -1)
                         {
-                            new_face.x = obj.faces[replacedF].x;
-                            new_face.y = obj.faces[replacedF].y;
-                            new_face.z = obj.faces[dupe].z;
+                            new_face.a = obj.faces[replacedF].a;
+                            new_face.b = obj.faces[replacedF].b;
+                            new_face.c = obj.faces[dupe].c;
 
                         }
                         else
                         {
-                            new_face.x = (ushort)obj.verts.Count;
-                            new_face.y = obj.faces[dupe].y;
-                            new_face.z = obj.faces[dupe].z;
-                            obj.verts.Add(obj.verts[obj.faces[dupe].x]);
+                            new_face.a = (ushort)obj.verts.Count;
+                            new_face.b = obj.faces[dupe].b;
+                            new_face.c = obj.faces[dupe].c;
+                            obj.verts.Add(obj.verts[obj.faces[dupe].a]);
 
                             done_faces.Add(dupe, obj.faces[dupe]);
                         }
@@ -375,24 +375,24 @@ namespace PD2ModelParser
                         //UV
                         if (obj.uv.Count > 0)
                         {
-                            if (new_arranged_UV[f1.x].Equals(sentinel))
-                                new_arranged_UV[f1.x] = obj.uv[f1.y];
-                            if (new_arranged_UV[f2.x].Equals(sentinel))
-                                new_arranged_UV[f2.x] = obj.uv[f2.y];
-                            if (new_arranged_UV[f3.x].Equals(sentinel))
-                                new_arranged_UV[f3.x] = obj.uv[f3.y];
+                            if (new_arranged_UV[f1.a].Equals(sentinel))
+                                new_arranged_UV[f1.a] = obj.uv[f1.b];
+                            if (new_arranged_UV[f2.a].Equals(sentinel))
+                                new_arranged_UV[f2.a] = obj.uv[f2.b];
+                            if (new_arranged_UV[f3.a].Equals(sentinel))
+                                new_arranged_UV[f3.a] = obj.uv[f3.b];
                         }
                         //normal
                         if (obj.normals.Count > 0)
                         {
-                            new_arranged_Normals[f1.x] = obj.normals[f1.z];
-                            new_arranged_Normals[f2.x] = obj.normals[f2.z];
-                            new_arranged_Normals[f3.x] = obj.normals[f3.z];
+                            new_arranged_Normals[f1.a] = obj.normals[f1.c];
+                            new_arranged_Normals[f2.a] = obj.normals[f2.c];
+                            new_arranged_Normals[f3.a] = obj.normals[f3.c];
                         }
                         Face new_f = new Face();
-                        new_f.x = f1.x;
-                        new_f.y = f2.x;
-                        new_f.z = f3.x;
+                        new_f.a = f1.a;
+                        new_f.b = f2.a;
+                        new_f.c = f3.a;
 
                         new_faces.Add(new_f);
                     }
@@ -483,7 +483,7 @@ namespace PD2ModelParser
 
                             foreach (Face called_f in called_faces)
                             {
-                                if (called_f.x == f.x && called_f.y != f.y)
+                                if (called_f.a == f.a && called_f.b != f.b)
                                 {
                                     duplicate_verts.Add(x_f);
                                     broken = true;
@@ -503,7 +503,7 @@ namespace PD2ModelParser
                             foreach (KeyValuePair<int, Face> pair in done_faces)
                             {
                                 Face f = pair.Value;
-                                if (f.x == obj.faces[dupe].x && f.y == obj.faces[dupe].y)
+                                if (f.a == obj.faces[dupe].a && f.b == obj.faces[dupe].b)
                                 {
                                     replacedF = pair.Key;
                                 }
@@ -512,17 +512,17 @@ namespace PD2ModelParser
                             Face new_face = new Face();
                             if (replacedF > -1)
                             {
-                                new_face.x = obj.faces[replacedF].x;
-                                new_face.y = obj.faces[replacedF].y;
-                                new_face.z = obj.faces[dupe].z;
+                                new_face.a = obj.faces[replacedF].a;
+                                new_face.b = obj.faces[replacedF].b;
+                                new_face.c = obj.faces[dupe].c;
 
                             }
                             else
                             {
-                                new_face.x = (ushort)obj.verts.Count;
-                                new_face.y = obj.faces[dupe].y;
-                                new_face.z = obj.faces[dupe].z;
-                                obj.verts.Add(obj.verts[obj.faces[dupe].x]);
+                                new_face.a = (ushort)obj.verts.Count;
+                                new_face.b = obj.faces[dupe].b;
+                                new_face.c = obj.faces[dupe].c;
+                                obj.verts.Add(obj.verts[obj.faces[dupe].a]);
 
                                 done_faces.Add(dupe, obj.faces[dupe]);
                             }
@@ -628,24 +628,24 @@ namespace PD2ModelParser
                             //UV
                             if (obj.uv.Count > 0)
                             {
-                                if (new_arranged_UV[f1.x].Equals(sentinel))
-                                    new_arranged_UV[f1.x] = obj.uv[f1.y];
-                                if (new_arranged_UV[f2.x].Equals(sentinel))
-                                    new_arranged_UV[f2.x] = obj.uv[f2.y];
-                                if (new_arranged_UV[f3.x].Equals(sentinel))
-                                    new_arranged_UV[f3.x] = obj.uv[f3.y];
+                                if (new_arranged_UV[f1.a].Equals(sentinel))
+                                    new_arranged_UV[f1.a] = obj.uv[f1.b];
+                                if (new_arranged_UV[f2.a].Equals(sentinel))
+                                    new_arranged_UV[f2.a] = obj.uv[f2.b];
+                                if (new_arranged_UV[f3.a].Equals(sentinel))
+                                    new_arranged_UV[f3.a] = obj.uv[f3.b];
                             }
                             //normal
                             if (obj.normals.Count > 0)
                             {
-                                new_arranged_Normals[f1.x] += obj.normals[f1.z];
-                                new_arranged_Normals[f2.x] += obj.normals[f2.z];
-                                new_arranged_Normals[f3.x] += obj.normals[f3.z];
+                                new_arranged_Normals[f1.a] += obj.normals[f1.c];
+                                new_arranged_Normals[f2.a] += obj.normals[f2.c];
+                                new_arranged_Normals[f3.a] += obj.normals[f3.c];
                             }
                             Face new_f = new Face();
-                            new_f.x = f1.x;
-                            new_f.y = f2.x;
-                            new_f.z = f3.x;
+                            new_f.a = f1.a;
+                            new_f.b = f2.a;
+                            new_f.c = f3.a;
 
                             new_faces.Add(new_f);
                         }
@@ -735,19 +735,19 @@ namespace PD2ModelParser
 
             foreach (Face f in faces)
             {
-                Vector3D P0 = verts[f.x];
-                Vector3D P1 = verts[f.y];
-                Vector3D P2 = verts[f.z];
+                Vector3D P0 = verts[f.a];
+                Vector3D P1 = verts[f.b];
+                Vector3D P2 = verts[f.c];
 
-                Vector2D UV0 = uvs[f.x];
-                Vector2D UV1 = uvs[f.y];
-                Vector2D UV2 = uvs[f.z];
+                Vector2D UV0 = uvs[f.a];
+                Vector2D UV1 = uvs[f.b];
+                Vector2D UV2 = uvs[f.c];
 
 
-                float u02 = (uvs[f.z].X - uvs[f.x].X);
-                float v02 = (uvs[f.z].Y - uvs[f.x].Y);
-                float u01 = (uvs[f.y].X - uvs[f.x].X);
-                float v01 = (uvs[f.y].Y - uvs[f.x].Y);
+                float u02 = (uvs[f.c].X - uvs[f.a].X);
+                float v02 = (uvs[f.c].Y - uvs[f.a].Y);
+                float u01 = (uvs[f.b].X - uvs[f.a].X);
+                float v01 = (uvs[f.b].Y - uvs[f.a].Y);
                 float dot00 = u02 * u02 + v02 * v02;
                 float dot01 = u02 * u01 + v02 * v01;
                 float dot11 = u01 * u01 + v01 * v01;
@@ -760,35 +760,35 @@ namespace PD2ModelParser
                     v = (dot00 * u01 - dot01 * u02) / d;
                 }
 
-                Vector3D tangent = verts[f.z] * u + verts[f.y] * v - verts[f.x] * (u + v);
+                Vector3D tangent = verts[f.c] * u + verts[f.b] * v - verts[f.a] * (u + v);
 
                 //vert1
-                if (!parsed.Contains(f.x))
+                if (!parsed.Contains(f.a))
                 {
-                    binormals[f.x] = Vector3D.Cross(tangent, normals[f.x]);
-                    binormals[f.x].Normalize();
-                    tangents[f.x] = Vector3D.Cross(binormals[f.x], normals[f.x]);
-                    tangents[f.x].Normalize();
-                    parsed.Add(f.x);
+                    binormals[f.a] = Vector3D.Cross(tangent, normals[f.a]);
+                    binormals[f.a].Normalize();
+                    tangents[f.a] = Vector3D.Cross(binormals[f.a], normals[f.a]);
+                    tangents[f.a].Normalize();
+                    parsed.Add(f.a);
                 }
 
                 //vert2
-                if (!parsed.Contains(f.y))
+                if (!parsed.Contains(f.b))
                 {
-                    binormals[f.y] = Vector3D.Cross(tangent, normals[f.y]);
-                    binormals[f.y].Normalize();
-                    tangents[f.y] = Vector3D.Cross(binormals[f.y], normals[f.y]);
-                    tangents[f.y].Normalize();
-                    parsed.Add(f.y);
+                    binormals[f.b] = Vector3D.Cross(tangent, normals[f.b]);
+                    binormals[f.b].Normalize();
+                    tangents[f.b] = Vector3D.Cross(binormals[f.b], normals[f.b]);
+                    tangents[f.b].Normalize();
+                    parsed.Add(f.b);
                 }
                 //vert3
-                if (!parsed.Contains(f.z))
+                if (!parsed.Contains(f.c))
                 {
-                    binormals[f.z] = Vector3D.Cross(tangent, normals[f.z]);
-                    binormals[f.z].Normalize();
-                    tangents[f.z] = Vector3D.Cross(binormals[f.z], normals[f.z]);
-                    tangents[f.z].Normalize();
-                    parsed.Add(f.z);
+                    binormals[f.c] = Vector3D.Cross(tangent, normals[f.c]);
+                    binormals[f.c].Normalize();
+                    tangents[f.c] = Vector3D.Cross(binormals[f.c], normals[f.c]);
+                    tangents[f.c].Normalize();
+                    parsed.Add(f.c);
                 }
 
             }

@@ -168,12 +168,12 @@ namespace PD2ModelParser
                                 {
                                     Face face = new Face();
                                     if (obj.verts.Count > 0)
-                                        face.x = (ushort)(Convert.ToUInt16(faces[x].Split('/')[0]) - prevMaxVerts - 1);
+                                        face.a = (ushort)(Convert.ToUInt16(faces[x].Split('/')[0]) - prevMaxVerts - 1);
                                     if (obj.uv.Count > 0)
-                                        face.y = (ushort)(Convert.ToUInt16(faces[x].Split('/')[1]) - prevMaxUvs - 1);
+                                        face.b = (ushort)(Convert.ToUInt16(faces[x].Split('/')[1]) - prevMaxUvs - 1);
                                     if (obj.normals.Count > 0)
-                                        face.z = (ushort)(Convert.ToUInt16(faces[x].Split('/')[2]) - prevMaxNorms - 1);
-                                    if (face.x < 0 || face.y < 0 || face.z < 0)
+                                        face.c = (ushort)(Convert.ToUInt16(faces[x].Split('/')[2]) - prevMaxNorms - 1);
+                                    if (face.a < 0 || face.b < 0 || face.c < 0)
                                         throw new Exception();
                                     obj.faces.Add(face);
                                 }
@@ -243,12 +243,12 @@ namespace PD2ModelParser
                         //UV
                         if (obj.uv.Count > 0)
                         {
-                            if (new_arranged_UV[topology_section.facelist[fcount / 3 + 0].x].Equals(sentinel))
-                                new_arranged_UV[topology_section.facelist[fcount / 3 + 0].x] = obj.uv[f1.y];
-                            if (new_arranged_UV[topology_section.facelist[fcount / 3 + 0].y].Equals(sentinel))
-                                new_arranged_UV[topology_section.facelist[fcount / 3 + 0].y] = obj.uv[f2.y];
-                            if (new_arranged_UV[topology_section.facelist[fcount / 3 + 0].z].Equals(sentinel))
-                                new_arranged_UV[topology_section.facelist[fcount / 3 + 0].z] = obj.uv[f3.y];
+                            if (new_arranged_UV[topology_section.facelist[fcount / 3 + 0].a].Equals(sentinel))
+                                new_arranged_UV[topology_section.facelist[fcount / 3 + 0].a] = obj.uv[f1.b];
+                            if (new_arranged_UV[topology_section.facelist[fcount / 3 + 0].b].Equals(sentinel))
+                                new_arranged_UV[topology_section.facelist[fcount / 3 + 0].b] = obj.uv[f2.b];
+                            if (new_arranged_UV[topology_section.facelist[fcount / 3 + 0].c].Equals(sentinel))
+                                new_arranged_UV[topology_section.facelist[fcount / 3 + 0].c] = obj.uv[f3.b];
                         }
                     }
 
@@ -384,12 +384,12 @@ namespace PD2ModelParser
                                 {
                                     Face face = new Face();
                                     if (obj.verts.Count > 0)
-                                        face.x = (ushort)(Convert.ToUInt16(f.Split('/')[0]) - prevMaxVerts - 1);
+                                        face.a = (ushort)(Convert.ToUInt16(f.Split('/')[0]) - prevMaxVerts - 1);
                                     if (obj.uv.Count > 0)
-                                        face.y = (ushort)(Convert.ToUInt16(f.Split('/')[1]) - prevMaxUvs - 1);
+                                        face.b = (ushort)(Convert.ToUInt16(f.Split('/')[1]) - prevMaxUvs - 1);
                                     if (obj.normals.Count > 0)
-                                        face.z = (ushort)(Convert.ToUInt16(f.Split('/')[2]) - prevMaxNorms - 1);
-                                    if (face.x < 0 || face.y < 0 || face.z < 0)
+                                        face.c = (ushort)(Convert.ToUInt16(f.Split('/')[2]) - prevMaxNorms - 1);
+                                    if (face.a < 0 || face.b < 0 || face.c < 0)
                                         throw new Exception();
                                     obj.faces.Add(face);
                                 }

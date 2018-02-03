@@ -7,11 +7,17 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
+    /** A triangular face */
     public class Face
     {
-        public ushort x;
-        public ushort y;
-        public ushort z;
+        /** The index of the first vertex in this face */
+        public ushort a;
+
+        /** The index of the second vertex in this face */
+        public ushort b;
+
+        /** The index of the third (last) vertex in this face */
+        public ushort c;
     }
     
     class Topology
@@ -53,9 +59,9 @@ namespace PD2ModelParser.Sections
             for (int x = 0; x < this.count1 / 3; x++)
             {
                 Face face = new Face();
-                face.x = instream.ReadUInt16();
-                face.y = instream.ReadUInt16();
-                face.z = instream.ReadUInt16();
+                face.a = instream.ReadUInt16();
+                face.b = instream.ReadUInt16();
+                face.c = instream.ReadUInt16();
                 this.facelist.Add(face);
             }
             this.count2 = instream.ReadUInt32();
@@ -91,9 +97,9 @@ namespace PD2ModelParser.Sections
             List<Face> facelist = this.facelist;
             foreach (Face face in facelist)
             {
-                outstream.Write(face.x);
-                outstream.Write(face.y);
-                outstream.Write(face.z);
+                outstream.Write(face.a);
+                outstream.Write(face.b);
+                outstream.Write(face.c);
             }
             outstream.Write(this.count2);
             outstream.Write(this.items2);

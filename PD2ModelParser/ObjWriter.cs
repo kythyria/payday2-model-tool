@@ -94,14 +94,14 @@ namespace PD2ModelParser
                                     Face f = topology_section.facelist[fcount];
 
                                     //unknown_20
-                                    arranged_unknown20[f.x] = norm_binorms[topology_section.facelist[fcount].x];
-                                    arranged_unknown20[f.y] = norm_binorms[topology_section.facelist[fcount].y];
-                                    arranged_unknown20[f.z] = norm_binorms[topology_section.facelist[fcount].z];
+                                    arranged_unknown20[f.a] = norm_binorms[topology_section.facelist[fcount].a];
+                                    arranged_unknown20[f.b] = norm_binorms[topology_section.facelist[fcount].b];
+                                    arranged_unknown20[f.c] = norm_binorms[topology_section.facelist[fcount].c];
 
                                     //unknown_21
-                                    arranged_unknown21[f.x] = norm_tangents[topology_section.facelist[fcount].x];
-                                    arranged_unknown21[f.y] = norm_tangents[topology_section.facelist[fcount].y];
-                                    arranged_unknown21[f.z] = norm_tangents[topology_section.facelist[fcount].z];
+                                    arranged_unknown21[f.a] = norm_tangents[topology_section.facelist[fcount].a];
+                                    arranged_unknown21[f.b] = norm_tangents[topology_section.facelist[fcount].b];
+                                    arranged_unknown21[f.c] = norm_tangents[topology_section.facelist[fcount].c];
 
                                 }
                                 norm_binorms = arranged_unknown20.ToList();
@@ -197,7 +197,7 @@ namespace PD2ModelParser
                             sw.WriteLine("Faces (f1, f2, f3)");
                             foreach (Face face in topology_section.facelist)
                             {
-                                sw.WriteLine((face.x + 1) + " " + (face.y + 1) + " " + (face.z + 1));
+                                sw.WriteLine((face.a + 1) + " " + (face.b + 1) + " " + (face.c + 1));
                             }
 
                             sw.WriteLine();
@@ -273,31 +273,31 @@ namespace PD2ModelParser
                             foreach (Face face in topology_section.facelist)
                             {
                                 //x
-                                sw.Write("f " + (maxfaces + face.x + 1));
+                                sw.Write("f " + (maxfaces + face.a + 1));
                                 sw.Write('/');
                                 if (geometry_section.uvs.Count > 0)
-                                    sw.Write((uvcount + face.x + 1));
+                                    sw.Write((uvcount + face.a + 1));
                                 sw.Write('/');
                                 if (geometry_section.normals.Count > 0)
-                                    sw.Write((normalcount + face.x + 1));
+                                    sw.Write((normalcount + face.a + 1));
 
                                 //y
-                                sw.Write(" " + (maxfaces + face.y + 1));
+                                sw.Write(" " + (maxfaces + face.b + 1));
                                 sw.Write('/');
                                 if (geometry_section.uvs.Count > 0)
-                                    sw.Write((uvcount + face.y + 1));
+                                    sw.Write((uvcount + face.b + 1));
                                 sw.Write('/');
                                 if (geometry_section.normals.Count > 0)
-                                    sw.Write((normalcount + face.y + 1));
+                                    sw.Write((normalcount + face.b + 1));
 
                                 //z
-                                sw.Write(" " + (maxfaces + face.z + 1));
+                                sw.Write(" " + (maxfaces + face.c + 1));
                                 sw.Write('/');
                                 if (geometry_section.uvs.Count > 0)
-                                    sw.Write((uvcount + face.z + 1));
+                                    sw.Write((uvcount + face.c + 1));
                                 sw.Write('/');
                                 if (geometry_section.normals.Count > 0)
-                                    sw.Write((normalcount + face.z + 1));
+                                    sw.Write((normalcount + face.c + 1));
 
                                 sw.WriteLine();
                             }
@@ -377,31 +377,31 @@ namespace PD2ModelParser
                             foreach (Face face in topology_section.facelist)
                             {
                                 //x
-                                sw.Write("f " + (maxfaces + face.x + 1));
+                                sw.Write("f " + (maxfaces + face.a + 1));
                                 sw.Write('/');
                                 if (geometry_section.pattern_uvs.Count > 0)
-                                    sw.Write((uvcount + face.x + 1));
+                                    sw.Write((uvcount + face.a + 1));
                                 sw.Write('/');
                                 if (geometry_section.normals.Count > 0)
-                                    sw.Write((normalcount + face.x + 1));
+                                    sw.Write((normalcount + face.a + 1));
 
                                 //y
-                                sw.Write(" " + (maxfaces + face.y + 1));
+                                sw.Write(" " + (maxfaces + face.b + 1));
                                 sw.Write('/');
                                 if (geometry_section.pattern_uvs.Count > 0)
-                                    sw.Write((uvcount + face.y + 1));
+                                    sw.Write((uvcount + face.b + 1));
                                 sw.Write('/');
                                 if (geometry_section.normals.Count > 0)
-                                    sw.Write((normalcount + face.y + 1));
+                                    sw.Write((normalcount + face.b + 1));
 
                                 //z
-                                sw.Write(" " + (maxfaces + face.z + 1));
+                                sw.Write(" " + (maxfaces + face.c + 1));
                                 sw.Write('/');
                                 if (geometry_section.pattern_uvs.Count > 0)
-                                    sw.Write((uvcount + face.z + 1));
+                                    sw.Write((uvcount + face.c + 1));
                                 sw.Write('/');
                                 if (geometry_section.normals.Count > 0)
-                                    sw.Write((normalcount + face.z + 1));
+                                    sw.Write((normalcount + face.c + 1));
 
                                 sw.WriteLine();
                             }
