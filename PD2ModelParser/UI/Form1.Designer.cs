@@ -84,9 +84,9 @@ namespace PD2ModelParser
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(350, 124);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(180, 13);
+            this.label3.Size = new System.Drawing.Size(222, 13);
             this.label3.TabIndex = 6;
-            this.label3.Text = "Credit to PoueT and I am not a spy...";
+            this.label3.Text = "Credit to ZNixian, PoueT and I am not a spy...";
             // 
             // exportBttn
             // 
