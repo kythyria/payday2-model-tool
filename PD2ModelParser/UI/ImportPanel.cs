@@ -52,7 +52,7 @@ namespace PD2ModelParser.UI
 
         private void exportBttn_Click(object sender, EventArgs e)
         {
-            ObjWriter.ExportFile(model, inputFileBox.Text);
+            ColladaExporter.ExportFile(model, inputFileBox.Text);
         }
     }
 }

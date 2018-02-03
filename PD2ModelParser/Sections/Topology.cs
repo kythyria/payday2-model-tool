@@ -18,6 +18,21 @@ namespace PD2ModelParser.Sections
 
         /** The index of the third (last) vertex in this face */
         public ushort c;
+
+        public Face OffsetBy(int offset)
+        {
+            return new Face
+            {
+                a = (ushort)(a + offset),
+                b = (ushort)(b + offset),
+                c = (ushort)(c + offset)
+            };
+        }
+
+        public bool BoundsCheck(int vertlen)
+        {
+            return a >= 0 && b >= 0 && c >= 0 && a < vertlen && b < vertlen && c < vertlen;
+        }
     }
     
     class Topology
