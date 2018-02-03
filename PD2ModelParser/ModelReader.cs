@@ -161,6 +161,8 @@ namespace PD2ModelParser
                         }
                         else if (sh.type == bones_tag)
                         {
+                            // I'm not sure this tag section ever appears in the model itself - instead, always at the start of a skinbones section
+
                             Console.WriteLine("Bones Tag at " + sh.offset + " Size: " + sh.size);
 
                             section = new Bones(br, sh);

@@ -36,23 +36,11 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
-        public Bones(BinaryReader instream, SectionHeader section)
+        public Bones(BinaryReader instream, SectionHeader section) : this(instream)
         {
             this.id = section.id;
             this.size = section.size;
 
-            this.count = instream.ReadUInt32();
-
-            for(int x = 0; x < this.count; x++)
-            {
-                Bone bone = new Bone();
-                bone.vert_count = instream.ReadUInt32();
-                for(int y = 0; y < bone.vert_count; y++)
-                    bone.verts.Add(instream.ReadUInt32());
-                bones.Add(bone);
-            }
-
-            this.remaining_data = null;
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
                 remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
         }
