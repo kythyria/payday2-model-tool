@@ -166,7 +166,7 @@ namespace PD2ModelParser
                 }
             };
 
-            triangles.p = "\n"; // Start on a newline
+            StringBuilder facesData = new StringBuilder("\n"); // Start on a newline
 
             foreach (Face face in topology_section.facelist)
             {
@@ -185,12 +185,15 @@ namespace PD2ModelParser
                     throw new Exception("UV Out Of Bounds!");
                 }
 
-                triangles.p += face.a + " " + face.b + " " + face.c;  // Vertices
-
-                triangles.p += "\n";
+                // This set is used for the Vertices, Normals and UVs, as they all have the same indexes
+                // A bit inefficent in terms of storage space, but easier to implement as that's how it's
+                // handled inside the Diesel model files and making a index remapper thing would be a pain.
+                facesData.AppendFormat("%f %f %f\n", face.a, face.b, face.c);
 
                 triangles.count++;
             }
+
+            triangles.p = facesData.ToString();
 
             List<source> sources = new List<source>();
 
