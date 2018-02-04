@@ -188,7 +188,7 @@ namespace PD2ModelParser
                 // This set is used for the Vertices, Normals and UVs, as they all have the same indexes
                 // A bit inefficent in terms of storage space, but easier to implement as that's how it's
                 // handled inside the Diesel model files and making a index remapper thing would be a pain.
-                facesData.AppendFormat("%f %f %f\n", face.a, face.b, face.c);
+                facesData.AppendFormat("{0} {1} {2}\n", face.a, face.b, face.c);
 
                 triangles.count++;
             }
