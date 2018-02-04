@@ -60,7 +60,7 @@ namespace PD2ModelParser
 
                     geometries.Add(geom);
 
-                    nodes.Add(new node
+                    node root_node = new node
                     {
                         id = "model-" + model_id,
                         name = "Model " + model_id,
@@ -74,9 +74,72 @@ namespace PD2ModelParser
                                 name = "Model Geom" + model_id
                             }
                         }
-                    });
+                    };
 
-                    model_id++;
+                    nodes.Add(root_node);
+
+                    if (model_data.skinbones_ID == 0)
+                        continue;
+
+                    node bone_root_node = new node
+                    {
+                        id = "model-" + model_id + "-boneroot",
+                        name = "Model " + model_id + " Bones",
+                        type = NodeType.NODE,
+                    };
+                    root_node.node1 = new node[] { bone_root_node };
+
+                    SkinBones sb = (SkinBones)parsed_sections[model_data.skinbones_ID];
+                    //Console.WriteLine(sb.bones);
+                    //Console.WriteLine(sb);
+
+                    Dictionary<UInt32, node> bones = new Dictionary<UInt32, node>();
+
+                    foreach (UInt32 id in sb.objects)
+                    {
+                        Object3D obj = (Object3D)parsed_sections[id];
+                        string bonename = StaticStorage.hashindex.GetString(obj.hashname);
+                        //Console.WriteLine(bonename);
+
+                        bones[id] = new node
+                        {
+                            id = "model-" + model_id + "-bone-" + bonename,
+                            name = "Model " + model_id + " " + bonename,
+                            type = NodeType.JOINT,
+                            Items = new object[]
+                            {
+                                new matrix
+                                {
+                                    Values = null
+                                }
+                            }
+                        };
+                    }
+
+                    foreach (var nod in bones)
+                    {
+                        Object3D obj = (Object3D)parsed_sections[nod.Key];
+
+                        node parent = bone_root_node;
+
+                        if (bones.ContainsKey(obj.parentID))
+                        {
+                            parent = bones[obj.parentID];
+                        }
+
+                        if (parent.node1 == null)
+                        {
+                            parent.node1 = new node[1];
+                        }
+                        else
+                        {
+                            node[] children = parent.node1;
+                            Array.Resize(ref children, children.Length + 1);
+                            parent.node1 = children;
+                        }
+
+                        parent.node1[parent.node1.Length - 1] = nod.Value;
+                    }
                 }
             }
 
