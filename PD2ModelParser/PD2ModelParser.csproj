@@ -51,7 +51,7 @@
   <ItemGroup>
     <Compile Include="ColladaExporter.cs" />
     <Compile Include="collada_schema_1_4.cs" />
-    <Compile Include="Constants.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="FullModelData.cs" />
     <Compile Include="NewObjImporter.cs" />
     <Compile Include="ModelReader.cs" />
