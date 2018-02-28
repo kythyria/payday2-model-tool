@@ -49,14 +49,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ColladaExporter.cs" />
+    <Compile Include="Exporters\ColladaExporter.cs" />
     <Compile Include="collada_schema_1_4.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="FullModelData.cs" />
     <Compile Include="NewObjImporter.cs" />
     <Compile Include="ModelReader.cs" />
     <Compile Include="FileManager.cs" />
-    <Compile Include="ObjWriter.cs" />
+    <Compile Include="Exporters\ObjWriter.cs" />
     <Compile Include="UI\Form1.cs">
       <SubType>Form</SubType>
     </Compile>

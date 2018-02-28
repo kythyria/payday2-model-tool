@@ -52,6 +52,8 @@ namespace PD2ModelParser
             {
                 if (sectionheader.type == model_data_tag)
                 {
+                    model_id++;
+
                     Model model_data = (Model)parsed_sections[sectionheader.id];
                     if (model_data.version == 6)
                         continue;
@@ -81,39 +83,81 @@ namespace PD2ModelParser
                     if (model_data.skinbones_ID == 0)
                         continue;
 
+                    SkinBones sb = (SkinBones)parsed_sections[model_data.skinbones_ID];
+                    //Console.WriteLine(sb.bones);
+                    //Console.WriteLine(sb);
+
                     node bone_root_node = new node
                     {
                         id = "model-" + model_id + "-boneroot",
                         name = "Model " + model_id + " Bones",
                         type = NodeType.NODE,
+                        /*Items = new object[]
+                            {
+                                new matrix
+                                {
+                                    sid = "transform", // Apparently Blender really wants this
+                                    Values = MathUtil.Serialize(sb.unknown_matrix)
+                                }
+                            },
+                        ItemsElementName = new ItemsChoiceType2[]
+                            {
+                                ItemsChoiceType2.matrix
+                            }*/
                     };
                     root_node.node1 = new node[] { bone_root_node };
 
-                    SkinBones sb = (SkinBones)parsed_sections[model_data.skinbones_ID];
-                    //Console.WriteLine(sb.bones);
-                    //Console.WriteLine(sb);
-
                     Dictionary<UInt32, node> bones = new Dictionary<UInt32, node>();
 
+                    int i = 0;
                     foreach (UInt32 id in sb.objects)
                     {
                         Object3D obj = (Object3D)parsed_sections[id];
                         string bonename = StaticStorage.hashindex.GetString(obj.hashname);
-                        //Console.WriteLine(bonename);
+                        Console.WriteLine(bonename);
+
+                        Matrix3D transform = sb.rotations[i];
+
+                        Matrix3D adjustedTransform = transform;
+                        adjustedTransform.Translation = adjustedTransform.Transform(adjustedTransform.Translation);
+
+
+                        //transform = new Matrix3D();
+                        //transform.Translation = obj.position;
+
+                        if (obj.parentID != 0)
+                        {
+                            Object3D parent = (Object3D)parsed_sections[obj.parentID];
+                            //transform.Invert();
+                            //Console.WriteLine(parent.rotation.Translation);
+                            //transform = parent.rotation * transform;
+
+                            //transform.Translation -= parent.position;
+                        }
+
+                        //Console.WriteLine(transform.Translation);
+                        //Console.WriteLine(obj.position);
 
                         bones[id] = new node
                         {
                             id = "model-" + model_id + "-bone-" + bonename,
-                            name = "Model " + model_id + " " + bonename,
+                            name = bonename,
                             type = NodeType.JOINT,
                             Items = new object[]
                             {
                                 new matrix
                                 {
-                                    Values = null
+                                    sid = "transform", // Apparently Blender really wants this
+                                    Values = MathUtil.Serialize(adjustedTransform)
                                 }
+                            },
+                            ItemsElementName = new ItemsChoiceType2[]
+                            {
+                                ItemsChoiceType2.matrix
                             }
                         };
+
+                        i++;
                     }
 
                     foreach (var nod in bones)
