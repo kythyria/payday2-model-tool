@@ -22,7 +22,7 @@ namespace PD2ModelParser
 
             Console.WriteLine("Loading: " + filepath);
 
-            Read(data, filepath, rp);
+            Read(data, filepath);
 
             if (rp != null)
             {
@@ -32,7 +32,7 @@ namespace PD2ModelParser
             return data;
         }
 
-        private static void Read(FullModelData data, string filepath, string rp = null)
+        private static void Read(FullModelData data, string filepath)
         {
             List<SectionHeader> sections = data.sections;
             Dictionary<UInt32, object> parsed_sections = data.parsed_sections;
