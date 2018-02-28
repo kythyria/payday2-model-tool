@@ -49,18 +49,29 @@ namespace PD2ModelParser
         public static Matrix3D ReadMatrix(BinaryReader instream)
         {
             Matrix3D m;
+
+            // Yes, the matricies appear to be written top-down in colums, this isn't the field names being wrong
+            // This is how a multidimensional array is layed out in memory.
+
+            // First column
             m.M11 = instream.ReadSingle();
             m.M12 = instream.ReadSingle();
             m.M13 = instream.ReadSingle();
             m.M14 = instream.ReadSingle();
+
+            // Second column
             m.M21 = instream.ReadSingle();
             m.M22 = instream.ReadSingle();
             m.M23 = instream.ReadSingle();
             m.M24 = instream.ReadSingle();
+
+            // Third column
             m.M31 = instream.ReadSingle();
             m.M32 = instream.ReadSingle();
             m.M33 = instream.ReadSingle();
             m.M34 = instream.ReadSingle();
+
+            // Fourth column
             m.M41 = instream.ReadSingle();
             m.M42 = instream.ReadSingle();
             m.M43 = instream.ReadSingle();
