@@ -346,6 +346,14 @@ namespace PD2ModelParser.Sections
                     }
                 }
 
+                else if (head.item_type == 5)
+                {
+                    for (int x = 0; x < this.vert_count; x++)
+                    {
+                        this.vertex_colors[x].StreamWrite(outstream);
+                    }
+                }
+
                 else if (head.item_type == 8)
                 {
                     for (int x = 0; x < this.vert_count; x++)
