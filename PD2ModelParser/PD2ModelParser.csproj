@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +34,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Nexus">
@@ -52,6 +54,7 @@
     <Compile Include="Exporters\ColladaExporter.cs" />
     <Compile Include="collada_schema_1_4.cs" />
     <Compile Include="Exporters\DieselExporter.cs" />
+    <Compile Include="Hash64.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="FullModelData.cs" />
     <Compile Include="NewObjImporter.cs" />

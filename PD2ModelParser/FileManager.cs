@@ -14,16 +14,6 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser
 {
-    class Hash64
-    {
-        [DllImport("hash64.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern ulong Hash(byte[] k, ulong length, ulong level);
-        public static ulong HashString(string input, ulong level = 0)
-        {
-            return Hash(UTF8Encoding.UTF8.GetBytes(input), (ulong)UTF8Encoding.UTF8.GetByteCount(input), level);
-        }
-    }
-
     /// <summary>
     ///     The static storage.
     /// </summary>

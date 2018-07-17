@@ -6,16 +6,6 @@ using System.Text;
 
 namespace PD2Bundle
 {
-    class Hash64
-    {
-        [DllImport("hash64.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern ulong Hash(byte[] k, ulong length, ulong level);
-        public static ulong HashString(string input, ulong level = 0)
-        {
-            return Hash(UTF8Encoding.UTF8.GetBytes(input), (ulong)UTF8Encoding.UTF8.GetByteCount(input), level);
-        }
-    }
-
     public class KnownIndex
     {
         private Dictionary<ulong, string> hashes = new Dictionary<ulong, string>();
@@ -52,7 +42,7 @@ namespace PD2Bundle
                     string line = sr.ReadLine();
                     while (line != null)
                     {
-                        ulong hash = Hash64.HashString(line);
+                        ulong hash = PD2ModelParser.Hash64.HashString(line);
                         this.CheckCollision(this.hashes, hash, line);
                         this.hashes[hash] = line;
                         line = sr.ReadLine();
