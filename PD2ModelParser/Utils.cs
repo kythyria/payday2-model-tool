@@ -19,7 +19,7 @@ namespace PD2ModelParser
         public static uint geometry_tag = 0x7AB072D3; // Geometry
         public static uint topology_tag = 0x4C507A13; // Topology
         public static uint passthroughGP_tag = 0xE3A3B1CA; // PassthroughGP
-        public static uint topologyIP_tag = 0x03B634BD;  // TopologyIP
+        public static uint topologyIP_tag = 0x03B634BD; // TopologyIP
         public static uint quatLinearRotationController_tag = 0x648A206C; // QuatLinearRotationController
         public static uint quatBezRotationController_tag = 0x197345A5; // QuatBezRotationController
         public static uint skinbones_tag = 0x65CC1825; // SkinBones
@@ -98,6 +98,187 @@ namespace PD2ModelParser
             outstream.Write(matrix.M42);
             outstream.Write(matrix.M43);
             outstream.Write(matrix.M44);
+        }
+    }
+
+    public static class MatrixExtensions
+    {
+        /**
+         * Multiply each field of two vectors together, same as
+         * the SSE function _mm_mul_ps.
+         */
+        public static Vector4D MultEach(this Vector4D a, Vector4D b)
+        {
+            return new Vector4D
+            {
+                X = a.X * b.X,
+                Y = a.Y * b.Y,
+                Z = a.Z * b.Z,
+                W = a.W * b.W
+            };
+        }
+
+        /**
+         * Return a vector with all four variables set to a single variable from this vector.
+         *
+         * For example, Vector4D(9, 8, 7, 6).DupedField(2) would return Vector4D(7, 7, 7, 7)
+         *
+         * This is very similar to SSE's _mm_shuffle_epi32
+         */
+        public static Vector4D DupedField(this Vector4D a, int field)
+        {
+            float v;
+
+            switch (field)
+            {
+                case 0:
+                    v = a.X;
+                    break;
+                case 1:
+                    v = a.Y;
+                    break;
+                case 2:
+                    v = a.Z;
+                    break;
+                case 3:
+                    v = a.W;
+                    break;
+                default:
+                    throw new ArgumentException("Illegal field " + field + " - must be 0-3 inclusive");
+            }
+
+            return new Vector4D
+            {
+                X = v,
+                Y = v,
+                Z = v,
+                W = v
+            };
+        }
+
+        /**
+         * Get a single column from this matrix, expressed as a vector.
+         *
+         * Note: the order of the column placement is 0-1-2-3 into X-Y-Z-W (so
+         * 'W' is the last not first value).
+         */
+        public static Vector4D GetColumn(this Matrix3D this_, int column)
+        {
+            if (column < 0 || column >= 4)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "Column must be between 0-3 inclusive (real value " + column + ")");
+            }
+
+            return new Vector4D
+            {
+                X = this_[0, column],
+                Y = this_[1, column],
+                Z = this_[2, column],
+                W = this_[3, column]
+            };
+        }
+
+        /**
+         * Return a copy of this matrix with the specified column set
+         * to a value. See GetColumn for more information.
+         */
+        public static Matrix3D WithColumn(this Matrix3D this_, int column, Vector4D value)
+        {
+            if (column < 0 || column >= 4)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "Column must be between 0-3 inclusive (real value " + column + ")");
+            }
+
+            this_[0, column] = value.X;
+            this_[1, column] = value.Y;
+            this_[2, column] = value.Z;
+            this_[3, column] = value.W;
+
+            return this_;
+        }
+
+        /**
+         * Multiply two vectors the same way Diesel does. This is a bit confusing, see the decompiled
+         * code in 'decompiled matrix parsing' and 'decompiled matrix parsing 2' (in the
+         * Research Notes directory). This is much cleaned up code originally produced by HexRays
+         * from dsl::SkinBones::post_load in the GNU+Linux binary.
+         *
+         * This has been tested against the PAYDAY 2 GNU+Linux binary, and in all cases produced the correct
+         * results. To repeat this, I'd recommend breaking after the first _mm_load_si128 call in
+         * dsl::SkinBones::post_load and reading $xmm0 through $xmm3 (or $rsi+0xE0 through $rsi+0x110), which
+         * represent the output values of the multiplication (originally performed in dsl::Object3D::post_load).
+         * The input values are stored at $rsi+0xA0 through $rsi+0xD0, and the others are stored in the parent object
+         * pointed to by $rsi+0x130, whose values are at 0xE0 through 0x110.
+         *
+         * In any case, this was an awful lot of work.
+         *
+         * See https://github.com/blt4linux/research for the relevant headers.
+         */
+        public static Matrix3D MultDiesel(this Matrix3D a, Matrix3D b)
+        {
+            // TODO cleanup
+            Matrix3D result = Matrix3D.Identity;
+
+            for (int i = 0; i < 4; i++)
+            {
+                Vector4D bas = a.GetColumn(i);
+                /*Vector4D outcol = new Vector4D {
+                    X = bas[0] * b.GetColumn(0)[0] + bas[1] * b.GetColumn(1)[0] + bas[2] * b.GetColumn(2)[0],
+                    Y = bas[0] * b.GetColumn(0)[1] + bas[1] * b.GetColumn(1)[1] + bas[2] * b.GetColumn(2)[1],
+                    Z = bas[0] * b.GetColumn(0)[2] + bas[1] * b.GetColumn(1)[2] + bas[2] * b.GetColumn(2)[2],
+                    W = 0
+                };*/
+
+                Vector4D outcol;
+
+                if (i == 3)
+                {
+                    outcol =
+                        bas.DupedField(2).MultEach(b.GetColumn(2)) +
+                        bas.DupedField(1).MultEach(b.GetColumn(1)) +
+                        bas.DupedField(0).MultEach(b.GetColumn(0)) +
+                        b.GetColumn(3);
+
+                    outcol.W = 1;
+                }
+                else
+                {
+                    /*outcol =
+                        new Vector4D(bas[2], bas[2], bas[2], bas[2]).MultEach(b.GetColumn(2)) +
+                        new Vector4D(bas[1], bas[1], bas[1], bas[1]).MultEach(b.GetColumn(1)) +
+                        new Vector4D(bas[0], bas[0], bas[0], bas[0]).MultEach(b.GetColumn(0))
+                        ;*/
+                    outcol =
+                        bas.DupedField(2).MultEach(b.GetColumn(2)) +
+                        bas.DupedField(1).MultEach(b.GetColumn(1)) +
+                        bas.DupedField(0).MultEach(b.GetColumn(0))
+                        ;
+
+                    outcol.W = 0;
+                }
+
+                result = result.WithColumn(i, outcol);
+            }
+
+            return result;
+
+            // Old system:
+            /*Matrix3D result = Matrix3D.Identity;
+
+            for (int i = 0; i < 4; i++)
+            {
+                Vector4D vec = (a.GetColumn(0) * b[i, 2]) + (a.GetColumn(1) * b[i, 1]) + (a.GetColumn(2) * b[i, 0]);
+                if(i == 3)
+                {
+                    // Add the transform bit
+                    vec += a.GetColumn(3);
+                }
+                result = result.WithColumn(i, vec);
+            }
+
+            return result;*/
         }
     }
 }
