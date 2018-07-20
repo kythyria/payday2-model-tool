@@ -1,0 +1,39 @@
+mat44 parent_mat = parent->mat; // v6-v7-v8-v9
+
+v10 = this->deserialized_mat[0];
+v22 = (
+		({v10[2], v10[2], v10[2], v10[2]} * parent_mat[2]) +
+		({v10[1], v10[1], v10[1], v10[1]} * parent_mat[1]) +
+		({v10[0], v10[0], v10[0], v10[0]} * parent_mat[0])
+	);
+v11 = this->deserialized_mat.data[1];
+v21 = (
+		({v11[2], v11[2], v11[2], v11[2]} * parent_mat[2]) +
+		({v11[1], v11[1], v11[1], v11[1]} * parent_mat[1]) +
+		({v11[0], v11[0], v11[0], v11[0]} * parent_mat[0])
+	);
+v12 = this->deserialized_mat.data[2];
+v20 = (
+		({v12[2], v12[2], v12[2], v12[2]} * parent_mat[2]) +
+		({v12[1], v12[1], v12[1], v12[1]} * parent_mat[1]) +
+		({v12[0], v12[0], v12[0], v12[0]} * parent_mat[0])
+	);
+v13 = this->deserialized_mat.data[3];
+v19 = (
+		({v13[2], v13[2], v13[2], v13[2]} * parent_mat[2]) +
+		({v13[1], v13[1], v13[1], v13[1]} * parent_mat[1]) +
+		({v13[0], v13[0], v13[0], v13[0]} * parent_mat[0]) +
+		parent_mat[3]
+	);
+
+v22.m128_i32[3] = 0;
+v21.m128_i32[3] = 0;
+v20.m128_i32[3] = 0;
+v19.m128_i32[3] = 1065353216;
+v14 = v21;
+v15 = v20;
+v16 = v19;
+this->mat.data[0] = v22;
+this->mat.data[1] = v14;
+this->mat.data[2] = v15;
+this->mat.data[3] = v16;
