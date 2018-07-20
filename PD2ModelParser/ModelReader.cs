@@ -206,6 +206,15 @@ namespace PD2ModelParser
                         parsed_sections.Add(sh.id, section);
                     }
 
+                    foreach(uint id in parsed_sections.Keys)
+                    {
+                        if (parsed_sections[id] is ISection)
+                        {
+                            ISection obj = (ISection) parsed_sections[id];
+                            obj.PostLoad(id, parsed_sections);
+                        }
+                    }
+
                     if (fs.Position < fs.Length)
                         leftover_data = br.ReadBytes((int)(fs.Length - fs.Position));
 
