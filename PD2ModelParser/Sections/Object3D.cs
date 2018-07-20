@@ -18,7 +18,6 @@ namespace PD2ModelParser.Sections
         public UInt32 count;
         public List<uint> child_ids = new List<uint>();
         public Matrix3D rotation = new Matrix3D(); //4x4 Rotation Matrix
-        public Vector3D position = new Vector3D(); //Actual position of the object
         public UInt32 parentID; //ID of parent object
 
         public byte[] remaining_data = null;
@@ -35,7 +34,6 @@ namespace PD2ModelParser.Sections
                                         0.0f, 1.0f, 0.0f, 0.0f,
                                         0.0f, 0.0f, 1.0f, 0.0f, 
                                         0.0f, 0.0f, 0.0f, 0.0f);
-            this.position = new Vector3D(0.0f, 0.0f, 0.0f);
             this.parentID = parent;
         }
 
@@ -82,9 +80,9 @@ namespace PD2ModelParser.Sections
             this.rotation.M43 = instream.ReadSingle();
             this.rotation.M44 = instream.ReadSingle();
 
-            this.position.X = instream.ReadSingle();
-            this.position.Y = instream.ReadSingle();
-            this.position.Z = instream.ReadSingle();
+            this.rotation.M41 = instream.ReadSingle();
+            this.rotation.M42 = instream.ReadSingle();
+            this.rotation.M43 = instream.ReadSingle();
 
             this.parentID = instream.ReadUInt32();
 
@@ -133,9 +131,9 @@ namespace PD2ModelParser.Sections
             outstream.Write(this.rotation.M42);
             outstream.Write(this.rotation.M43);
             outstream.Write(this.rotation.M44);
-            outstream.Write(this.position.X);
-            outstream.Write(this.position.Y);
-            outstream.Write(this.position.Z);
+            outstream.Write(this.rotation.M41); // Write the position out again, as for some reason
+            outstream.Write(this.rotation.M42); // it's not stored in the main matrix
+            outstream.Write(this.rotation.M43);
             outstream.Write(this.parentID);
 
             if (this.remaining_data != null)
@@ -148,7 +146,7 @@ namespace PD2ModelParser.Sections
             Quaternion rot = new Quaternion();
             Vector3D translation = new Vector3D();
             this.rotation.Decompose(out scale, out rot, out translation);
-            return "[Object3D] ID: " + this.id + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " count: " + this.count + " children: " + this.child_ids.Count + " mat.scale: " + scale + " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "] mat.position: " + position + " position: [" + this.position.X + " " + this.position.Y + " " + this.position.Z + "] Parent ID: " + this.parentID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[Object3D] ID: " + this.id + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " count: " + this.count + " children: " + this.child_ids.Count + " mat.scale: " + scale + " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "] Parent ID: " + this.parentID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
     }
