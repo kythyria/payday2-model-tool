@@ -20,7 +20,7 @@ namespace PD2ModelParser.Sections
         public UInt32 count;
         public List<UInt32> objects = new List<UInt32>();
         public List<Matrix3D> rotations = new List<Matrix3D>();
-        public Matrix3D unknown_matrix = new Matrix3D();
+        public Matrix3D global_transform = new Matrix3D();
 
         public byte[] remaining_data = null;
 
@@ -38,7 +38,7 @@ namespace PD2ModelParser.Sections
             {
                 this.rotations.Add(MathUtil.ReadMatrix(instream));
             }
-            this.unknown_matrix = MathUtil.ReadMatrix(instream);
+            this.global_transform = MathUtil.ReadMatrix(instream);
 
             this.remaining_data = null;
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
@@ -73,7 +73,7 @@ namespace PD2ModelParser.Sections
             {
                 MathUtil.WriteMatrix(outstream, matrix);
             }
-            MathUtil.WriteMatrix(outstream, unknown_matrix);
+            MathUtil.WriteMatrix(outstream, global_transform);
 
             if (this.remaining_data != null)
                 outstream.Write(this.remaining_data);
@@ -95,7 +95,7 @@ namespace PD2ModelParser.Sections
                 rotations_string += rotation + ", ";
             }
 
-            return "[SkinBones] ID: " + this.id + " size: " + this.size + " bones: [ " + this.bones + " ] object3D_section_id: " + this.object3D_section_id + " count: " + this.count + " objects count: " + this.objects.Count + " objects:[ " + objects_string + " ] rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ] unknown_matrix: " + this.unknown_matrix + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[SkinBones] ID: " + this.id + " size: " + this.size + " bones: [ " + this.bones + " ] object3D_section_id: " + this.object3D_section_id + " count: " + this.count + " objects count: " + this.objects.Count + " objects:[ " + objects_string + " ] rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ] unknown_matrix: " + this.global_transform + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
     }
 }
