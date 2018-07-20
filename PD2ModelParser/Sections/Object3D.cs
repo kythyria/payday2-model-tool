@@ -39,49 +39,12 @@ namespace PD2ModelParser.Sections
             this.parentID = parent;
         }
 
-        public Object3D(BinaryReader instream, SectionHeader section)
+        public Object3D(BinaryReader instream, SectionHeader section) : this(instream)
         {
             this.id = section.id;
             this.size = section.size;
-
-            this.hashname = instream.ReadUInt64();
             StaticStorage.objects_list.Add(StaticStorage.hashindex.GetString(this.hashname));
 
-            this.count = instream.ReadUInt32();
-
-            for (int x = 0; x < this.count; x++)
-            {
-                Vector3D item = new Vector3D();
-                item.X = instream.ReadSingle();
-                item.Y = instream.ReadSingle();
-                item.Z = instream.ReadSingle();
-                this.items.Add(item);
-            }
-
-            this.rotation.M11 = instream.ReadSingle();
-            this.rotation.M12 = instream.ReadSingle();
-            this.rotation.M13 = instream.ReadSingle();
-            this.rotation.M14 = instream.ReadSingle();
-            this.rotation.M21 = instream.ReadSingle();
-            this.rotation.M22 = instream.ReadSingle();
-            this.rotation.M23 = instream.ReadSingle();
-            this.rotation.M24 = instream.ReadSingle();
-            this.rotation.M31 = instream.ReadSingle();
-            this.rotation.M32 = instream.ReadSingle();
-            this.rotation.M33 = instream.ReadSingle();
-            this.rotation.M34 = instream.ReadSingle();
-            this.rotation.M41 = instream.ReadSingle();
-            this.rotation.M42 = instream.ReadSingle();
-            this.rotation.M43 = instream.ReadSingle();
-            this.rotation.M44 = instream.ReadSingle();
-
-            this.position.X = instream.ReadSingle();
-            this.position.Y = instream.ReadSingle();
-            this.position.Z = instream.ReadSingle();
-
-            this.parentID = instream.ReadUInt32();
-
-            this.remaining_data = null;
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
                 remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
         }
