@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    class Object3D
+    class Object3D : ISection
     {
         private static uint object3D_tag = 0x0FFCD100; // Object3D
         public UInt32 id;
@@ -21,6 +21,11 @@ namespace PD2ModelParser.Sections
         public UInt32 parentID; //ID of parent object
 
         public byte[] remaining_data = null;
+
+        // Non-written fields
+        private bool has_post_loaded;
+        public Matrix3D world_transform;
+        public Object3D parent;
 
         public Object3D(string object_name, uint parent)
         {
@@ -113,7 +118,7 @@ namespace PD2ModelParser.Sections
             foreach (uint item in this.child_ids)
             {
                 outstream.Write(item);
-                outstream.Write((ulong) 0); // Bit to skip
+                outstream.Write((ulong) 0); // Bit to skip - the PD2 binary does the exact same thing
             }
             outstream.Write(this.rotation.M11);
             outstream.Write(this.rotation.M12);
@@ -147,6 +152,30 @@ namespace PD2ModelParser.Sections
             Vector3D translation = new Vector3D();
             this.rotation.Decompose(out scale, out rot, out translation);
             return "[Object3D] ID: " + this.id + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " count: " + this.count + " children: " + this.child_ids.Count + " mat.scale: " + scale + " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "] Parent ID: " + this.parentID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+        }
+
+        public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)
+        {
+            if (parentID == 0)
+            {
+                parent = null;
+                world_transform = rotation;
+            }
+            else
+            {
+                parent = (Object3D) parsed_sections[parentID];
+                world_transform = rotation.MultDiesel(parent.CheckWorldTransform(parentID, parsed_sections));
+            }
+
+            has_post_loaded = true;
+        }
+
+        private Matrix3D CheckWorldTransform(uint id, Dictionary<uint, object> parsed_sections)
+        {
+            if (!has_post_loaded)
+                PostLoad(id, parsed_sections);
+
+            return world_transform;
         }
 
     }
