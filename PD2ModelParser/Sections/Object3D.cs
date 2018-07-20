@@ -16,7 +16,7 @@ namespace PD2ModelParser.Sections
 
         public UInt64 hashname; //Hashed object root point name (see hashlist.txt)
         public UInt32 count;
-        public List<Vector3D> items = new List<Vector3D>();
+        public List<uint> child_ids = new List<uint>();
         public Matrix3D rotation = new Matrix3D(); //4x4 Rotation Matrix
         public Vector3D position = new Vector3D(); //Actual position of the object
         public UInt32 parentID; //ID of parent object
@@ -30,7 +30,7 @@ namespace PD2ModelParser.Sections
 
             this.hashname = Hash64.HashString(object_name);
             this.count = 0;
-            this.items = new List<Vector3D>();
+            this.child_ids = new List<uint>();
             this.rotation = new Matrix3D(1.0f, 0.0f, 0.0f, 0.0f,
                                         0.0f, 1.0f, 0.0f, 0.0f,
                                         0.0f, 0.0f, 1.0f, 0.0f, 
@@ -51,18 +51,20 @@ namespace PD2ModelParser.Sections
 
         public Object3D(BinaryReader instream)
         {
+            // In Object3D::load
             this.hashname = instream.ReadUInt64();
+
+            // in dsl::ParamBlock::load
             this.count = instream.ReadUInt32();
 
             for (int x = 0; x < this.count; x++)
             {
-                Vector3D item = new Vector3D();
-                item.X = instream.ReadSingle();
-                item.Y = instream.ReadSingle();
-                item.Z = instream.ReadSingle();
-                this.items.Add(item);
+                uint item = instream.ReadUInt32(); // This is a reference thing, probably not important
+                instream.ReadUInt64(); // Skip eight bytes, as per PD2
+                this.child_ids.Add(item);
             }
 
+            // In Object3D::load
             this.rotation.M11 = instream.ReadSingle();
             this.rotation.M12 = instream.ReadSingle();
             this.rotation.M13 = instream.ReadSingle();
@@ -110,11 +112,10 @@ namespace PD2ModelParser.Sections
         {
             outstream.Write(this.hashname);
             outstream.Write(this.count);
-            foreach (Vector3D item in this.items)
+            foreach (uint item in this.child_ids)
             {
-                outstream.Write(item.X);
-                outstream.Write(item.Y);
-                outstream.Write(item.Z);
+                outstream.Write(item);
+                outstream.Write((ulong) 0); // Bit to skip
             }
             outstream.Write(this.rotation.M11);
             outstream.Write(this.rotation.M12);
@@ -147,7 +148,7 @@ namespace PD2ModelParser.Sections
             Quaternion rot = new Quaternion();
             Vector3D translation = new Vector3D();
             this.rotation.Decompose(out scale, out rot, out translation);
-            return "[Object3D] ID: " + this.id + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " count: " + this.count + " items: " + this.items.Count + " mat.scale: " + scale + " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "] mat.position: " + position + " position: [" + this.position.X + " " + this.position.Y + " " + this.position.Z + "] Parent ID: " + this.parentID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[Object3D] ID: " + this.id + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " count: " + this.count + " children: " + this.child_ids.Count + " mat.scale: " + scale + " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "] mat.position: " + position + " position: [" + this.position.X + " " + this.position.Y + " " + this.position.Z + "] Parent ID: " + this.parentID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
     }
