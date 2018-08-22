@@ -217,181 +217,9 @@ namespace PD2ModelParser
                     Geometry geometry_section = (Geometry)parsed_sections[passthrough_section.geometry_section];
                     Topology topology_section = (Topology)parsed_sections[passthrough_section.topology_section];
 
-                    List<Face> called_faces = new List<Face>();
-                    List<int> duplicate_verts = new List<int>();
-                    Dictionary<int, Face> dup_faces = new Dictionary<int, Face>();
-
-                    bool broken = false;
-                    for (int x_f = 0; x_f < obj.faces.Count; x_f++)
-                    {
-                        Face f = obj.faces[x_f];
-                        broken = false;
-
-                        foreach (Face called_f in called_faces)
-                        {
-                            if (called_f.a == f.a && called_f.b != f.b)
-                            {
-                                duplicate_verts.Add(x_f);
-                                broken = true;
-                                break;
-                            }
-                        }
-
-                        if (!broken)
-                            called_faces.Add(f);
-                    }
-
-                    Dictionary<int, Face> done_faces = new Dictionary<int, Face>();
-
-                    foreach (int dupe in duplicate_verts)
-                    {
-                        int replacedF = -1;
-                        foreach (KeyValuePair<int, Face> pair in done_faces)
-                        {
-                            Face f = pair.Value;
-                            if (f.a == obj.faces[dupe].a && f.b == obj.faces[dupe].b)
-                            {
-                                replacedF = pair.Key;
-                            }
-                        }
-
-                        Face new_face = new Face();
-                        if (replacedF > -1)
-                        {
-                            new_face.a = obj.faces[replacedF].a;
-                            new_face.b = obj.faces[replacedF].b;
-                            new_face.c = obj.faces[dupe].c;
-
-                        }
-                        else
-                        {
-                            new_face.a = (ushort)obj.verts.Count;
-                            new_face.b = obj.faces[dupe].b;
-                            new_face.c = obj.faces[dupe].c;
-                            obj.verts.Add(obj.verts[obj.faces[dupe].a]);
-
-                            done_faces.Add(dupe, obj.faces[dupe]);
-                        }
-
-                        obj.faces[dupe] = new_face;
-                    }
-
-                    Vector3D new_Model_data_bounds_min = new Vector3D();// Z (max), X (low), Y (low)
-                    Vector3D new_Model_data_bounds_max = new Vector3D();// Z (low), X (max), Y (max)
-
-                    foreach (Vector3D vert in obj.verts)
-                    {
-                        //Z
-                        // Note these were previously broken
-                        if (vert.Z < new_Model_data_bounds_min.Z)
-                            new_Model_data_bounds_min.Z = vert.Z;
-
-                        if (vert.Z > new_Model_data_bounds_max.Z)
-                            new_Model_data_bounds_max.Z = vert.Z;
-
-                        //X
-                        if (vert.X < new_Model_data_bounds_min.X)
-                            new_Model_data_bounds_min.X = vert.X;
-                        if (vert.X > new_Model_data_bounds_max.X)
-                            new_Model_data_bounds_max.X = vert.X;
-
-                        //Y
-                        if (vert.Y < new_Model_data_bounds_min.Y)
-                            new_Model_data_bounds_min.Y = vert.Y;
-
-                        if (vert.Y > new_Model_data_bounds_max.Y)
-                            new_Model_data_bounds_max.Y = vert.Y;
-                    }
-
-                    //Arrange UV and Normals
-                    List<Vector2D> new_arranged_Geometry_UVs = new List<Vector2D>();
-                    List<Vector3D> new_arranged_Geometry_normals = new List<Vector3D>();
-                    List<Vector3D> new_arranged_Geometry_unknown20 = new List<Vector3D>();
-                    List<Vector3D> new_arranged_Geometry_unknown21 = new List<Vector3D>();
-                    List<int> added_uvs = new List<int>();
-                    List<int> added_normals = new List<int>();
-
-                    Vector2D[] new_arranged_UV = new Vector2D[obj.verts.Count];
-                    for (int x = 0; x < new_arranged_UV.Length; x++)
-                        new_arranged_UV[x] = new Vector2D(100f, 100f);
-                    Vector2D sentinel = new Vector2D(100f, 100f);
-                    Vector3D[] new_arranged_Normals = new Vector3D[obj.verts.Count];
-                    Vector3D[] new_arranged_unknown20 = new Vector3D[obj.verts.Count];
-                    Vector3D[] new_arranged_unknown21 = new Vector3D[obj.verts.Count];
-
-                    List<Face> new_faces = new List<Face>();
-
-                    for (int fcount = 0; fcount < obj.faces.Count; fcount += 3)
-                    {
-                        Face f1 = obj.faces[fcount + 0];
-                        Face f2 = obj.faces[fcount + 1];
-                        Face f3 = obj.faces[fcount + 2];
-
-                        //UV
-                        if (obj.uv.Count > 0)
-                        {
-                            if (new_arranged_UV[f1.a].Equals(sentinel))
-                                new_arranged_UV[f1.a] = obj.uv[f1.b];
-                            if (new_arranged_UV[f2.a].Equals(sentinel))
-                                new_arranged_UV[f2.a] = obj.uv[f2.b];
-                            if (new_arranged_UV[f3.a].Equals(sentinel))
-                                new_arranged_UV[f3.a] = obj.uv[f3.b];
-                        }
-                        //normal
-                        if (obj.normals.Count > 0)
-                        {
-                            new_arranged_Normals[f1.a] = obj.normals[f1.c];
-                            new_arranged_Normals[f2.a] = obj.normals[f2.c];
-                            new_arranged_Normals[f3.a] = obj.normals[f3.c];
-                        }
-                        Face new_f = new Face();
-                        new_f.a = f1.a;
-                        new_f.b = f2.a;
-                        new_f.c = f3.a;
-
-                        new_faces.Add(new_f);
-                    }
-
-                    List<Vector3D> obj_verts = obj.verts;
-                    ComputeTangentBasis(ref new_faces, ref obj_verts, ref new_arranged_UV, ref new_arranged_Normals, ref new_arranged_unknown20, ref new_arranged_unknown21);
-
-                    List<ModelItem> new_Model_items2 = new List<ModelItem>();
-
-                    foreach (ModelItem modelitem in model_data_section.items)
-                    {
-                        ModelItem new_model_item = new ModelItem();
-                        new_model_item.unknown1 = modelitem.unknown1;
-                        new_model_item.vertCount = (uint)new_faces.Count;
-                        new_model_item.unknown2 = modelitem.unknown2;
-                        new_model_item.faceCount = (uint)obj.verts.Count;
-                        new_model_item.material_id = modelitem.material_id;
-
-                        new_Model_items2.Add(new_model_item);
-                    }
-
-                    model_data_section.items = new_Model_items2;
-                    geometry_section.vert_count = (uint)obj.verts.Count;
-                    geometry_section.verts = obj.verts;
-                    topology_section.facelist = new_faces;
-                    geometry_section.uvs = new_arranged_UV.ToList();
-                    geometry_section.normals = new_arranged_Normals.ToList();
-
-                    if (model_data_section.version != 6)
-                    {
-                        model_data_section.bounds_min = new_Model_data_bounds_min;
-                        model_data_section.bounds_max = new_Model_data_bounds_max;
-                    }
-
-                    geometry_section.vert_count = (uint)obj.verts.Count;
-                    geometry_section.verts = obj.verts;
-                    geometry_section.normals = new_arranged_Normals.ToList();
-                    geometry_section.uvs = new_arranged_UV.ToList();
-                    geometry_section.unknown20 = new_arranged_unknown20.ToList();
-                    geometry_section.unknown21 = new_arranged_unknown21.ToList();
-
-                    topology_section.count1 = (uint)(new_faces.Count * 3);
-                    topology_section.facelist = new_faces;
-
+                    AddObject(false, obj,
+                        model_data_section, passthrough_section,
+                        geometry_section, topology_section);
                 }
 
 
@@ -411,186 +239,8 @@ namespace PD2ModelParser
 
                         Model newModel = new Model(obj, newPassGP.id, newTopoIP.id, newMatG.id);
 
-                        List<Face> called_faces = new List<Face>();
-                        List<int> duplicate_verts = new List<int>();
-                        Dictionary<int, Face> dup_faces = new Dictionary<int, Face>();
-
-                        bool broken = false;
-                        for (int x_f = 0; x_f < obj.faces.Count; x_f++)
-                        {
-                            Face f = obj.faces[x_f];
-                            broken = false;
-
-                            foreach (Face called_f in called_faces)
-                            {
-                                if (called_f.a == f.a && called_f.b != f.b)
-                                {
-                                    duplicate_verts.Add(x_f);
-                                    broken = true;
-                                    break;
-                                }
-                            }
-
-                            if (!broken)
-                                called_faces.Add(f);
-                        }
-
-                        Dictionary<int, Face> done_faces = new Dictionary<int, Face>();
-
-                        foreach (int dupe in duplicate_verts)
-                        {
-                            int replacedF = -1;
-                            foreach (KeyValuePair<int, Face> pair in done_faces)
-                            {
-                                Face f = pair.Value;
-                                if (f.a == obj.faces[dupe].a && f.b == obj.faces[dupe].b)
-                                {
-                                    replacedF = pair.Key;
-                                }
-                            }
-
-                            Face new_face = new Face();
-                            if (replacedF > -1)
-                            {
-                                new_face.a = obj.faces[replacedF].a;
-                                new_face.b = obj.faces[replacedF].b;
-                                new_face.c = obj.faces[dupe].c;
-
-                            }
-                            else
-                            {
-                                new_face.a = (ushort)obj.verts.Count;
-                                new_face.b = obj.faces[dupe].b;
-                                new_face.c = obj.faces[dupe].c;
-                                obj.verts.Add(obj.verts[obj.faces[dupe].a]);
-
-                                done_faces.Add(dupe, obj.faces[dupe]);
-                            }
-
-                            obj.faces[dupe] = new_face;
-                        }
-
-                        Vector3D new_Model_data_bounds_min = new Vector3D();// Z (max), X (low), Y (low)
-                        Vector3D new_Model_data_bounds_max = new Vector3D();// Z (low), X (max), Y (max)
-
-                        foreach (Vector3D vert in obj.verts)
-                        {
-                            //Z
-                            // Note these were previously broken
-                            if (vert.Z < new_Model_data_bounds_min.Z)
-                                new_Model_data_bounds_min.Z = vert.Z;
-
-                            if (vert.Z > new_Model_data_bounds_max.Z)
-                                new_Model_data_bounds_max.Z = vert.Z;
-
-                            //X
-                            if (vert.X < new_Model_data_bounds_min.X)
-                                new_Model_data_bounds_min.X = vert.X;
-                            if (vert.X > new_Model_data_bounds_max.X)
-                                new_Model_data_bounds_max.X = vert.X;
-
-                            //Y
-                            if (vert.Y < new_Model_data_bounds_min.Y)
-                                new_Model_data_bounds_min.Y = vert.Y;
-
-                            if (vert.Y > new_Model_data_bounds_max.Y)
-                                new_Model_data_bounds_max.Y = vert.Y;
-                        }
-
-                        //Arrange UV and Normals
-                        List<Vector2D> new_arranged_Geometry_UVs = new List<Vector2D>();
-                        List<Vector3D> new_arranged_Geometry_normals = new List<Vector3D>();
-                        List<Vector3D> new_arranged_Geometry_unknown20 = new List<Vector3D>();
-                        List<Vector3D> new_arranged_Geometry_unknown21 = new List<Vector3D>();
-                        List<int> added_uvs = new List<int>();
-                        List<int> added_normals = new List<int>();
-
-                        Vector2D[] new_arranged_UV = new Vector2D[obj.verts.Count];
-                        for (int x = 0; x < new_arranged_UV.Length; x++)
-                            new_arranged_UV[x] = new Vector2D(100f, 100f);
-                        Vector2D sentinel = new Vector2D(100f, 100f);
-                        Vector3D[] new_arranged_Normals = new Vector3D[obj.verts.Count];
-                        for (int x = 0; x < new_arranged_Normals.Length; x++)
-                            new_arranged_Normals[x] = new Vector3D(0f, 0f, 0f);
-                        Vector3D[] new_arranged_unknown20 = new Vector3D[obj.verts.Count];
-                        Vector3D[] new_arranged_unknown21 = new Vector3D[obj.verts.Count];
-
-                        List<Face> new_faces = new List<Face>();
-
-                        for (int fcount = 0; fcount < obj.faces.Count; fcount += 3)
-                        {
-                            Face f1 = obj.faces[fcount + 0];
-                            Face f2 = obj.faces[fcount + 1];
-                            Face f3 = obj.faces[fcount + 2];
-
-                            //UV
-                            if (obj.uv.Count > 0)
-                            {
-                                if (new_arranged_UV[f1.a].Equals(sentinel))
-                                    new_arranged_UV[f1.a] = obj.uv[f1.b];
-                                if (new_arranged_UV[f2.a].Equals(sentinel))
-                                    new_arranged_UV[f2.a] = obj.uv[f2.b];
-                                if (new_arranged_UV[f3.a].Equals(sentinel))
-                                    new_arranged_UV[f3.a] = obj.uv[f3.b];
-                            }
-                            //normal
-                            if (obj.normals.Count > 0)
-                            {
-                                new_arranged_Normals[f1.a] += obj.normals[f1.c];
-                                new_arranged_Normals[f2.a] += obj.normals[f2.c];
-                                new_arranged_Normals[f3.a] += obj.normals[f3.c];
-                            }
-                            Face new_f = new Face();
-                            new_f.a = f1.a;
-                            new_f.b = f2.a;
-                            new_f.c = f3.a;
-
-                            new_faces.Add(new_f);
-                        }
-
-                        for (int x = 0; x < new_arranged_Normals.Length; x++)
-                            new_arranged_Normals[x].Normalize();
-
-                        List<Vector3D> obj_verts = obj.verts;
-                        ComputeTangentBasis(ref new_faces, ref obj_verts, ref new_arranged_UV, ref new_arranged_Normals, ref new_arranged_unknown20, ref new_arranged_unknown21);
-
-                        List<ModelItem> new_Model_items2 = new List<ModelItem>();
-
-                        foreach (ModelItem modelitem in newModel.items)
-                        {
-                            ModelItem new_model_item = new ModelItem();
-                            new_model_item.unknown1 = modelitem.unknown1;
-                            new_model_item.vertCount = (uint)new_faces.Count;
-                            new_model_item.unknown2 = modelitem.unknown2;
-                            new_model_item.faceCount = (uint)obj.verts.Count;
-                            new_model_item.material_id = modelitem.material_id;
-
-                            new_Model_items2.Add(new_model_item);
-                        }
-
-                        newModel.items = new_Model_items2;
-                        newGeom.vert_count = (uint)obj.verts.Count;
-                        newGeom.verts = obj.verts;
-                        newTopo.facelist = new_faces;
-                        newGeom.uvs = new_arranged_UV.ToList();
-                        newGeom.normals = new_arranged_Normals.ToList();
-
-                        if (newModel.version != 6)
-                        {
-                            newModel.bounds_min = new_Model_data_bounds_min;
-                            newModel.bounds_max = new_Model_data_bounds_max;
-                        }
-
-                        newGeom.vert_count = (uint)obj.verts.Count;
-                        newGeom.verts = obj.verts;
-                        newGeom.normals = new_arranged_Normals.ToList();
-                        newGeom.uvs = new_arranged_UV.ToList();
-                        newGeom.unknown20 = new_arranged_unknown20.ToList();
-                        newGeom.unknown21 = new_arranged_unknown21.ToList();
-
-                        newTopo.count1 = (uint)(new_faces.Count * 3);
-                        newTopo.facelist = new_faces;
-
+                        AddObject(true, obj,
+                            newModel, newPassGP, newGeom, newTopo);
 
                         //Add new sections
                         parsed_sections.Add(newMat.id, newMat);
@@ -616,6 +266,188 @@ namespace PD2ModelParser
                 return false;
             }
             return true;
+        }
+
+        private static void AddObject(bool is_new, obj_data obj,
+            Model model_data_section, PassthroughGP passthrough_section,
+            Geometry geometry_section, Topology topology_section)
+        {
+            List<Face> called_faces = new List<Face>();
+            List<int> duplicate_verts = new List<int>();
+            Dictionary<int, Face> dup_faces = new Dictionary<int, Face>();
+
+            bool broken = false;
+            for (int x_f = 0; x_f < obj.faces.Count; x_f++)
+            {
+                Face f = obj.faces[x_f];
+                broken = false;
+
+                foreach (Face called_f in called_faces)
+                {
+                    if (called_f.a == f.a && called_f.b != f.b)
+                    {
+                        duplicate_verts.Add(x_f);
+                        broken = true;
+                        break;
+                    }
+                }
+
+                if (!broken)
+                    called_faces.Add(f);
+            }
+
+            Dictionary<int, Face> done_faces = new Dictionary<int, Face>();
+
+            foreach (int dupe in duplicate_verts)
+            {
+                int replacedF = -1;
+                foreach (KeyValuePair<int, Face> pair in done_faces)
+                {
+                    Face f = pair.Value;
+                    if (f.a == obj.faces[dupe].a && f.b == obj.faces[dupe].b)
+                    {
+                        replacedF = pair.Key;
+                    }
+                }
+
+                Face new_face = new Face();
+                if (replacedF > -1)
+                {
+                    new_face.a = obj.faces[replacedF].a;
+                    new_face.b = obj.faces[replacedF].b;
+                    new_face.c = obj.faces[dupe].c;
+
+                }
+                else
+                {
+                    new_face.a = (ushort)obj.verts.Count;
+                    new_face.b = obj.faces[dupe].b;
+                    new_face.c = obj.faces[dupe].c;
+                    obj.verts.Add(obj.verts[obj.faces[dupe].a]);
+
+                    done_faces.Add(dupe, obj.faces[dupe]);
+                }
+
+                obj.faces[dupe] = new_face;
+            }
+
+            Vector3D new_Model_data_bounds_min = new Vector3D();// Z (max), X (low), Y (low)
+            Vector3D new_Model_data_bounds_max = new Vector3D();// Z (low), X (max), Y (max)
+
+            foreach (Vector3D vert in obj.verts)
+            {
+                //Z
+                // Note these were previously broken
+                if (vert.Z < new_Model_data_bounds_min.Z)
+                    new_Model_data_bounds_min.Z = vert.Z;
+
+                if (vert.Z > new_Model_data_bounds_max.Z)
+                    new_Model_data_bounds_max.Z = vert.Z;
+
+                //X
+                if (vert.X < new_Model_data_bounds_min.X)
+                    new_Model_data_bounds_min.X = vert.X;
+                if (vert.X > new_Model_data_bounds_max.X)
+                    new_Model_data_bounds_max.X = vert.X;
+
+                //Y
+                if (vert.Y < new_Model_data_bounds_min.Y)
+                    new_Model_data_bounds_min.Y = vert.Y;
+
+                if (vert.Y > new_Model_data_bounds_max.Y)
+                    new_Model_data_bounds_max.Y = vert.Y;
+            }
+
+            //Arrange UV and Normals
+            List<Vector2D> new_arranged_Geometry_UVs = new List<Vector2D>();
+            List<Vector3D> new_arranged_Geometry_normals = new List<Vector3D>();
+            List<Vector3D> new_arranged_Geometry_unknown20 = new List<Vector3D>();
+            List<Vector3D> new_arranged_Geometry_unknown21 = new List<Vector3D>();
+            List<int> added_uvs = new List<int>();
+            List<int> added_normals = new List<int>();
+
+            Vector2D[] new_arranged_UV = new Vector2D[obj.verts.Count];
+            for (int x = 0; x < new_arranged_UV.Length; x++)
+                new_arranged_UV[x] = new Vector2D(100f, 100f);
+            Vector2D sentinel = new Vector2D(100f, 100f);
+            Vector3D[] new_arranged_Normals = new Vector3D[obj.verts.Count];
+            for (int x = 0; x < new_arranged_Normals.Length; x++)
+                new_arranged_Normals[x] = new Vector3D(0f, 0f, 0f);
+            Vector3D[] new_arranged_unknown20 = new Vector3D[obj.verts.Count];
+            Vector3D[] new_arranged_unknown21 = new Vector3D[obj.verts.Count];
+
+            List<Face> new_faces = new List<Face>();
+
+            for (int fcount = 0; fcount < obj.faces.Count; fcount += 3)
+            {
+                Face f1 = obj.faces[fcount + 0];
+                Face f2 = obj.faces[fcount + 1];
+                Face f3 = obj.faces[fcount + 2];
+
+                //UV
+                if (obj.uv.Count > 0)
+                {
+                    if (new_arranged_UV[f1.a].Equals(sentinel))
+                        new_arranged_UV[f1.a] = obj.uv[f1.b];
+                    if (new_arranged_UV[f2.a].Equals(sentinel))
+                        new_arranged_UV[f2.a] = obj.uv[f2.b];
+                    if (new_arranged_UV[f3.a].Equals(sentinel))
+                        new_arranged_UV[f3.a] = obj.uv[f3.b];
+                }
+
+                //normal
+                if (obj.normals.Count > 0)
+                {
+                    new_arranged_Normals[f1.a] = obj.normals[f1.c];
+                    new_arranged_Normals[f2.a] = obj.normals[f2.c];
+                    new_arranged_Normals[f3.a] = obj.normals[f3.c];
+                }
+
+                Face new_f = new Face();
+                new_f.a = f1.a;
+                new_f.b = f2.a;
+                new_f.c = f3.a;
+
+                new_faces.Add(new_f);
+            }
+
+            for (int x = 0; x < new_arranged_Normals.Length; x++)
+                new_arranged_Normals[x].Normalize();
+
+            List<Vector3D> obj_verts = obj.verts;
+            ComputeTangentBasis(ref new_faces, ref obj_verts, ref new_arranged_UV, ref new_arranged_Normals, ref new_arranged_unknown20, ref new_arranged_unknown21);
+
+            List<ModelItem> new_Model_items2 = new List<ModelItem>();
+
+            foreach (ModelItem modelitem in model_data_section.items)
+            {
+                ModelItem new_model_item = new ModelItem();
+                new_model_item.unknown1 = modelitem.unknown1;
+                new_model_item.vertCount = (uint)new_faces.Count;
+                new_model_item.unknown2 = modelitem.unknown2;
+                new_model_item.faceCount = (uint)obj.verts.Count;
+                new_model_item.material_id = modelitem.material_id;
+
+                new_Model_items2.Add(new_model_item);
+            }
+
+            model_data_section.items = new_Model_items2;
+
+            if (model_data_section.version != 6)
+            {
+                model_data_section.bounds_min = new_Model_data_bounds_min;
+                model_data_section.bounds_max = new_Model_data_bounds_max;
+            }
+
+            geometry_section.vert_count = (uint)obj.verts.Count;
+            geometry_section.verts = obj.verts;
+            geometry_section.normals = new_arranged_Normals.ToList();
+            geometry_section.uvs = new_arranged_UV.ToList();
+            geometry_section.unknown20 = new_arranged_unknown20.ToList();
+            geometry_section.unknown21 = new_arranged_unknown21.ToList();
+
+            topology_section.count1 = (uint)(new_faces.Count * 3);
+            topology_section.facelist = new_faces;
         }
 
         private static void ComputeTangentBasis(ref List<Face> faces, ref List<Vector3D> verts, ref Vector2D[] uvs, ref Vector3D[] normals, ref Vector3D[] tangents, ref Vector3D[] binormals)
