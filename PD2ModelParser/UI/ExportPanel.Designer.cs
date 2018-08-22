@@ -1,6 +1,6 @@
 ﻿namespace PD2ModelParser.UI
 {
-    partial class ImportPanel
+    partial class ExportPanel
     {
         /// <summary> 
         /// Required designer variable.

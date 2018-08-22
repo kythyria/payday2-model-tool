@@ -94,11 +94,11 @@
     <Compile Include="Sections\Topology.cs" />
     <Compile Include="Sections\TopologyIP.cs" />
     <Compile Include="Sections\Unknown.cs" />
-    <Compile Include="UI\ImportPanel.cs">
+    <Compile Include="UI\ExportPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI\ImportPanel.Designer.cs">
-      <DependentUpon>ImportPanel.cs</DependentUpon>
+    <Compile Include="UI\ExportPanel.Designer.cs">
+      <DependentUpon>ExportPanel.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -109,8 +109,8 @@
     <EmbeddedResource Include="UI\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\ImportPanel.resx">
-      <DependentUpon>ImportPanel.cs</DependentUpon>
+    <EmbeddedResource Include="UI\ExportPanel.resx">
+      <DependentUpon>ExportPanel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

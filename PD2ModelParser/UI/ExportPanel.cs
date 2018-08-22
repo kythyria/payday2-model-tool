@@ -10,11 +10,11 @@ using System.Windows.Forms;
 
 namespace PD2ModelParser.UI
 {
-    public partial class ImportPanel : UserControl
+    public partial class ExportPanel : UserControl
     {
         private FullModelData model;
 
-        public ImportPanel()
+        public ExportPanel()
         {
             InitializeComponent();
         }

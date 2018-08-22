@@ -62,7 +62,7 @@ namespace PD2ModelParser
             this.mainTabs = new System.Windows.Forms.TabControl();
             this.importTab = new System.Windows.Forms.TabPage();
             this.exportTab = new System.Windows.Forms.TabPage();
-            this.importPanel1 = new PD2ModelParser.UI.ImportPanel();
+            this.exportPanel1 = new PD2ModelParser.UI.ExportPanel();
             this.mainTabs.SuspendLayout();
             this.importTab.SuspendLayout();
             this.exportTab.SuspendLayout();
@@ -166,7 +166,7 @@ namespace PD2ModelParser
             // 
             // exportTab
             // 
-            this.exportTab.Controls.Add(this.importPanel1);
+            this.exportTab.Controls.Add(this.exportPanel1);
             this.exportTab.Location = new System.Drawing.Point(4, 22);
             this.exportTab.Name = "exportTab";
             this.exportTab.Padding = new System.Windows.Forms.Padding(3);
@@ -175,15 +175,15 @@ namespace PD2ModelParser
             this.exportTab.Text = "Export";
             this.exportTab.UseVisualStyleBackColor = true;
             // 
-            // importPanel1
+            // exportPanel1
             // 
-            this.importPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.exportPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.importPanel1.Location = new System.Drawing.Point(0, 0);
-            this.importPanel1.Name = "importPanel1";
-            this.importPanel1.Size = new System.Drawing.Size(619, 212);
-            this.importPanel1.TabIndex = 14;
+            this.exportPanel1.Location = new System.Drawing.Point(0, 0);
+            this.exportPanel1.Name = "exportPanel1";
+            this.exportPanel1.Size = new System.Drawing.Size(619, 212);
+            this.exportPanel1.TabIndex = 14;
             // 
             // Form1
             // 
@@ -209,6 +209,6 @@ namespace PD2ModelParser
         private TabControl mainTabs;
         private TabPage importTab;
         private TabPage exportTab;
-        private UI.ImportPanel importPanel1;
+        private UI.ExportPanel exportPanel1;
     }
 }
