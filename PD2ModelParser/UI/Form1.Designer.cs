@@ -59,7 +59,13 @@ namespace PD2ModelParser
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.addNewObjects_checkbox = new System.Windows.Forms.CheckBox();
+            this.mainTabs = new System.Windows.Forms.TabControl();
+            this.importTab = new System.Windows.Forms.TabPage();
+            this.exportTab = new System.Windows.Forms.TabPage();
             this.importPanel1 = new PD2ModelParser.UI.ImportPanel();
+            this.mainTabs.SuspendLayout();
+            this.importTab.SuspendLayout();
+            this.exportTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // label2
@@ -81,8 +87,9 @@ namespace PD2ModelParser
             // 
             // label3
             // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(350, 124);
+            this.label3.Location = new System.Drawing.Point(413, 253);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(222, 13);
             this.label3.TabIndex = 6;
@@ -128,37 +135,80 @@ namespace PD2ModelParser
             this.addNewObjects_checkbox.Text = "Add new objects";
             this.addNewObjects_checkbox.UseVisualStyleBackColor = true;
             // 
+            // mainTabs
+            // 
+            this.mainTabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.mainTabs.Controls.Add(this.importTab);
+            this.mainTabs.Controls.Add(this.exportTab);
+            this.mainTabs.Location = new System.Drawing.Point(12, 12);
+            this.mainTabs.Name = "mainTabs";
+            this.mainTabs.SelectedIndex = 0;
+            this.mainTabs.Size = new System.Drawing.Size(627, 238);
+            this.mainTabs.TabIndex = 14;
+            // 
+            // importTab
+            // 
+            this.importTab.Controls.Add(this.exportBttn);
+            this.importTab.Controls.Add(this.textBox2);
+            this.importTab.Controls.Add(this.addNewObjects_checkbox);
+            this.importTab.Controls.Add(this.label2);
+            this.importTab.Controls.Add(this.button4);
+            this.importTab.Controls.Add(this.button3);
+            this.importTab.Location = new System.Drawing.Point(4, 22);
+            this.importTab.Name = "importTab";
+            this.importTab.Padding = new System.Windows.Forms.Padding(3);
+            this.importTab.Size = new System.Drawing.Size(619, 212);
+            this.importTab.TabIndex = 0;
+            this.importTab.Text = "Import";
+            this.importTab.UseVisualStyleBackColor = true;
+            // 
+            // exportTab
+            // 
+            this.exportTab.Controls.Add(this.importPanel1);
+            this.exportTab.Location = new System.Drawing.Point(4, 22);
+            this.exportTab.Name = "exportTab";
+            this.exportTab.Padding = new System.Windows.Forms.Padding(3);
+            this.exportTab.Size = new System.Drawing.Size(619, 212);
+            this.exportTab.TabIndex = 1;
+            this.exportTab.Text = "Export";
+            this.exportTab.UseVisualStyleBackColor = true;
+            // 
             // importPanel1
             // 
-            this.importPanel1.Location = new System.Drawing.Point(353, 12);
+            this.importPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.importPanel1.Location = new System.Drawing.Point(0, 0);
             this.importPanel1.Name = "importPanel1";
-            this.importPanel1.Size = new System.Drawing.Size(302, 109);
-            this.importPanel1.TabIndex = 13;
+            this.importPanel1.Size = new System.Drawing.Size(619, 212);
+            this.importPanel1.TabIndex = 14;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(667, 172);
-            this.Controls.Add(this.importPanel1);
-            this.Controls.Add(this.addNewObjects_checkbox);
-            this.Controls.Add(this.button4);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.exportBttn);
+            this.ClientSize = new System.Drawing.Size(651, 275);
+            this.Controls.Add(this.mainTabs);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.textBox2);
             this.Name = "Form1";
             this.ShowIcon = false;
             this.Text = "Diesel Model Tool v1.03";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.mainTabs.ResumeLayout(false);
+            this.importTab.ResumeLayout(false);
+            this.importTab.PerformLayout();
+            this.exportTab.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
+        private TabControl mainTabs;
+        private TabPage importTab;
+        private TabPage exportTab;
         private UI.ImportPanel importPanel1;
     }
 }
