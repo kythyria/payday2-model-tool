@@ -132,12 +132,15 @@ namespace PD2ModelParser.Sections
                 //this.unknown9 = instream.ReadUInt32();
                 this.material_group_section_id = instream.ReadUInt32();
                 this.unknown10 = instream.ReadUInt32();
-                this.bounds_min.Z = instream.ReadSingle();
+
+                // Order: maxX, minX, minY, minZ, maxX, maxY - Don't ask why.
+                this.bounds_max.Z = instream.ReadSingle();
                 this.bounds_min.X = instream.ReadSingle();
                 this.bounds_min.Y = instream.ReadSingle();
-                this.bounds_max.Z = instream.ReadSingle();
+                this.bounds_min.Z = instream.ReadSingle();
                 this.bounds_max.X = instream.ReadSingle();
                 this.bounds_max.Y = instream.ReadSingle();
+
                 this.unknown11 = instream.ReadUInt32();
                 this.unknown12 = instream.ReadUInt32();
                 this.unknown13 = instream.ReadUInt32();
@@ -198,12 +201,15 @@ namespace PD2ModelParser.Sections
                 //outstream.Write(this.unknown9);
                 outstream.Write(this.material_group_section_id);
                 outstream.Write(this.unknown10);
-                outstream.Write(this.bounds_min.Z); // Z (max)
+
+                // Order: maxX, minX, minY, minZ, maxX, maxY - Don't ask why.
+                outstream.Write(this.bounds_max.Z); // Z (low)
                 outstream.Write(this.bounds_min.X); // X (low)
                 outstream.Write(this.bounds_min.Y); // Y (low)
-                outstream.Write(this.bounds_max.Z); // Z (low)
+                outstream.Write(this.bounds_min.Z); // Z (max)
                 outstream.Write(this.bounds_max.X); // X (max)
                 outstream.Write(this.bounds_max.Y); // Y (max)
+
                 outstream.Write(this.unknown11);
                 outstream.Write(this.unknown12);
                 outstream.Write(this.unknown13);
