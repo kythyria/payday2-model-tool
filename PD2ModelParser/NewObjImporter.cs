@@ -282,67 +282,25 @@ namespace PD2ModelParser
                     foreach (Vector3D vert in obj.verts)
                     {
                         //Z
-                        if (new_Model_data_bounds_min.Z == null)
-                        {
+                        // Note these were previously broken
+                        if (vert.Z < new_Model_data_bounds_min.Z)
                             new_Model_data_bounds_min.Z = vert.Z;
-                        }
-                        else
-                        {
-                            if (vert.Z > new_Model_data_bounds_min.Z)
-                                new_Model_data_bounds_min.Z = vert.Z;
-                        }
 
-                        if (new_Model_data_bounds_max.Z == null)
-                        {
+                        if (vert.Z > new_Model_data_bounds_max.Z)
                             new_Model_data_bounds_max.Z = vert.Z;
-                        }
-                        else
-                        {
-                            if (vert.Z < new_Model_data_bounds_max.Z)
-                                new_Model_data_bounds_max.Z = vert.Z;
-                        }
 
                         //X
-                        if (new_Model_data_bounds_min.X == null)
-                        {
+                        if (vert.X < new_Model_data_bounds_min.X)
                             new_Model_data_bounds_min.X = vert.X;
-                        }
-                        else
-                        {
-                            if (vert.X < new_Model_data_bounds_min.X)
-                                new_Model_data_bounds_min.X = vert.X;
-                        }
-
-                        if (new_Model_data_bounds_max.X == null)
-                        {
+                        if (vert.X > new_Model_data_bounds_max.X)
                             new_Model_data_bounds_max.X = vert.X;
-                        }
-                        else
-                        {
-                            if (vert.X > new_Model_data_bounds_max.X)
-                                new_Model_data_bounds_max.X = vert.X;
-                        }
 
                         //Y
-                        if (new_Model_data_bounds_min.Y == null)
-                        {
+                        if (vert.Y < new_Model_data_bounds_min.Y)
                             new_Model_data_bounds_min.Y = vert.Y;
-                        }
-                        else
-                        {
-                            if (vert.Y < new_Model_data_bounds_min.Y)
-                                new_Model_data_bounds_min[2] = vert.Y;
-                        }
 
-                        if (new_Model_data_bounds_max.Y == null)
-                        {
+                        if (vert.Y > new_Model_data_bounds_max.Y)
                             new_Model_data_bounds_max.Y = vert.Y;
-                        }
-                        else
-                        {
-                            if (vert.Y > new_Model_data_bounds_max.Y)
-                                new_Model_data_bounds_max.Y = vert.Y;
-                        }
                     }
 
                     //Arrange UV and Normals
@@ -518,67 +476,25 @@ namespace PD2ModelParser
                         foreach (Vector3D vert in obj.verts)
                         {
                             //Z
-                            if (new_Model_data_bounds_min.Z == null)
-                            {
+                            // Note these were previously broken
+                            if (vert.Z < new_Model_data_bounds_min.Z)
                                 new_Model_data_bounds_min.Z = vert.Z;
-                            }
-                            else
-                            {
-                                if (vert.Z > new_Model_data_bounds_min.Z)
-                                    new_Model_data_bounds_min.Z = vert.Z;
-                            }
 
-                            if (new_Model_data_bounds_max.Z == null)
-                            {
+                            if (vert.Z > new_Model_data_bounds_max.Z)
                                 new_Model_data_bounds_max.Z = vert.Z;
-                            }
-                            else
-                            {
-                                if (vert.Z < new_Model_data_bounds_max.Z)
-                                    new_Model_data_bounds_max.Z = vert.Z;
-                            }
 
                             //X
-                            if (new_Model_data_bounds_min.X == null)
-                            {
+                            if (vert.X < new_Model_data_bounds_min.X)
                                 new_Model_data_bounds_min.X = vert.X;
-                            }
-                            else
-                            {
-                                if (vert.X < new_Model_data_bounds_min.X)
-                                    new_Model_data_bounds_min.X = vert.X;
-                            }
-
-                            if (new_Model_data_bounds_max.X == null)
-                            {
+                            if (vert.X > new_Model_data_bounds_max.X)
                                 new_Model_data_bounds_max.X = vert.X;
-                            }
-                            else
-                            {
-                                if (vert.X > new_Model_data_bounds_max.X)
-                                    new_Model_data_bounds_max.X = vert.X;
-                            }
 
                             //Y
-                            if (new_Model_data_bounds_min.Y == null)
-                            {
+                            if (vert.Y < new_Model_data_bounds_min.Y)
                                 new_Model_data_bounds_min.Y = vert.Y;
-                            }
-                            else
-                            {
-                                if (vert.Y < new_Model_data_bounds_min.Y)
-                                    new_Model_data_bounds_min[2] = vert.Y;
-                            }
 
-                            if (new_Model_data_bounds_max.Y == null)
-                            {
+                            if (vert.Y > new_Model_data_bounds_max.Y)
                                 new_Model_data_bounds_max.Y = vert.Y;
-                            }
-                            else
-                            {
-                                if (vert.Y > new_Model_data_bounds_max.Y)
-                                    new_Model_data_bounds_max.Y = vert.Y;
-                            }
                         }
 
                         //Arrange UV and Normals
