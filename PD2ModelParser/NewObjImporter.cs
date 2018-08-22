@@ -438,19 +438,19 @@ namespace PD2ModelParser
                     if (geometry_section.remaining_data != null)
                         geometry_calulated_size += (UInt32)geometry_section.remaining_data.Length;
 
-                    ((Geometry)parsed_sections[passthrough_section.geometry_section]).size = geometry_calulated_size;
-                    ((Topology)parsed_sections[passthrough_section.topology_section]).size = facelist_size + (uint)(new_faces.Count * 6);
-                    ((Geometry)parsed_sections[passthrough_section.geometry_section]).size = calc_size * (UInt32)obj.verts.Count;
+                    geometry_section.size = geometry_calulated_size;
+                    topology_section.size = facelist_size + (uint)(new_faces.Count * 6);
+                    geometry_section.size = calc_size * (UInt32)obj.verts.Count;
 
-                    ((Geometry)parsed_sections[passthrough_section.geometry_section]).vert_count = (uint)obj.verts.Count;
-                    ((Geometry)parsed_sections[passthrough_section.geometry_section]).verts = obj.verts;
-                    ((Geometry)parsed_sections[passthrough_section.geometry_section]).normals = new_arranged_Normals.ToList();
-                    ((Geometry)parsed_sections[passthrough_section.geometry_section]).uvs = new_arranged_UV.ToList();
-                    ((Geometry)parsed_sections[passthrough_section.geometry_section]).unknown20 = new_arranged_unknown20.ToList();
-                    ((Geometry)parsed_sections[passthrough_section.geometry_section]).unknown21 = new_arranged_unknown21.ToList();
+                    geometry_section.vert_count = (uint)obj.verts.Count;
+                    geometry_section.verts = obj.verts;
+                    geometry_section.normals = new_arranged_Normals.ToList();
+                    geometry_section.uvs = new_arranged_UV.ToList();
+                    geometry_section.unknown20 = new_arranged_unknown20.ToList();
+                    geometry_section.unknown21 = new_arranged_unknown21.ToList();
 
-                    ((Topology)parsed_sections[passthrough_section.topology_section]).count1 = (uint)(new_faces.Count * 3);
-                    ((Topology)parsed_sections[passthrough_section.topology_section]).facelist = new_faces;
+                    topology_section.count1 = (uint)(new_faces.Count * 3);
+                    topology_section.facelist = new_faces;
 
                 }
 
