@@ -39,7 +39,6 @@ namespace PD2ModelParser.Sections
     {
         private static uint topology_tag = 0x4C507A13; // Topology
         public UInt32 id;
-        public UInt32 size;
 
         public UInt32 unknown1;
         public UInt32 count1;
@@ -53,7 +52,6 @@ namespace PD2ModelParser.Sections
         public Topology(uint sec_id, obj_data obj)
         {
             this.id = sec_id;
-            this.size = 0;
 
             this.unknown1 = 0;
             this.count1 = (uint)(obj.faces.Count / 3);
@@ -67,7 +65,6 @@ namespace PD2ModelParser.Sections
         public Topology(BinaryReader instream, SectionHeader section)
         {
             this.id = section.id;
-            this.size = section.size;
 
             this.unknown1 = instream.ReadUInt32();
             this.count1 = instream.ReadUInt32();
@@ -93,7 +90,7 @@ namespace PD2ModelParser.Sections
             outstream.Write(topology_tag);
             outstream.Write(this.id);
             long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
+            outstream.Write((uint) 0);
 
             this.StreamWriteData(outstream);
 
@@ -126,7 +123,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return "[Topology] ID: " + this.id + " size: " + this.size + " unknown1: " + this.unknown1 + " count1: " + this.count1 + " facelist: " + this.facelist.Count + " count2: " + this.count2 + " items2: " + this.items2.Length + " hashname: " + StaticStorage.hashindex.GetString( this.hashname ) + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[Topology] ID: " + this.id + " unknown1: " + this.unknown1 + " count1: " + this.count1 + " facelist: " + this.facelist.Count + " count2: " + this.count2 + " items2: " + this.items2.Length + " hashname: " + StaticStorage.hashindex.GetString( this.hashname ) + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
     }
 }

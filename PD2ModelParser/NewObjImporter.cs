@@ -217,9 +217,6 @@ namespace PD2ModelParser
                     Geometry geometry_section = (Geometry)parsed_sections[passthrough_section.geometry_section];
                     Topology topology_section = (Topology)parsed_sections[passthrough_section.topology_section];
 
-                    uint geometry_size = geometry_section.size - (uint)((geometry_section.verts.Count * 12) + (geometry_section.uvs.Count * 8) + (geometry_section.normals.Count * 12));
-                    uint facelist_size = topology_section.size - (uint)(topology_section.facelist.Count * 6);
-
                     List<Face> called_faces = new List<Face>();
                     List<int> duplicate_verts = new List<int>();
                     Dictionary<int, Face> dup_faces = new Dictionary<int, Face>();
@@ -400,13 +397,6 @@ namespace PD2ModelParser
                     List<Vector3D> obj_verts = obj.verts;
                     ComputeTangentBasis(ref new_faces, ref obj_verts, ref new_arranged_UV, ref new_arranged_Normals, ref new_arranged_unknown20, ref new_arranged_unknown21);
 
-                    UInt32[] size_index = { 0, 4, 8, 12, 16, 4, 4, 8, 12 };
-                    UInt32 calc_size = 0;
-                    foreach (GeometryHeader head in geometry_section.headers)
-                    {
-                        calc_size += size_index[(int)head.item_size];
-                    }
-
                     List<ModelItem> new_Model_items2 = new List<ModelItem>();
 
                     foreach (ModelItem modelitem in model_data_section.items)
@@ -433,14 +423,6 @@ namespace PD2ModelParser
                         model_data_section.bounds_min = new_Model_data_bounds_min;
                         model_data_section.bounds_max = new_Model_data_bounds_max;
                     }
-
-                    UInt32 geometry_calulated_size = calc_size * (UInt32)obj.verts.Count + (8 + ((UInt32)geometry_section.headers.Count * 8)) + (UInt32)geometry_section.unknown_item_data.Count;
-                    if (geometry_section.remaining_data != null)
-                        geometry_calulated_size += (UInt32)geometry_section.remaining_data.Length;
-
-                    geometry_section.size = geometry_calulated_size;
-                    topology_section.size = facelist_size + (uint)(new_faces.Count * 6);
-                    geometry_section.size = calc_size * (UInt32)obj.verts.Count;
 
                     geometry_section.vert_count = (uint)obj.verts.Count;
                     geometry_section.verts = obj.verts;
@@ -655,13 +637,6 @@ namespace PD2ModelParser
 
                         List<Vector3D> obj_verts = obj.verts;
                         ComputeTangentBasis(ref new_faces, ref obj_verts, ref new_arranged_UV, ref new_arranged_Normals, ref new_arranged_unknown20, ref new_arranged_unknown21);
-
-                        UInt32[] size_index = { 0, 4, 8, 12, 16, 4, 4, 8, 12 };
-                        UInt32 calc_size = 0;
-                        foreach (GeometryHeader head in newGeom.headers)
-                        {
-                            calc_size += size_index[(int)head.item_size];
-                        }
 
                         List<ModelItem> new_Model_items2 = new List<ModelItem>();
 

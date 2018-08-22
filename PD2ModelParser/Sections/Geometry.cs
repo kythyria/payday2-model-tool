@@ -87,7 +87,6 @@ namespace PD2ModelParser.Sections
     {
         private static uint geometry_tag = 0x7AB072D3; // Geometry
         public UInt32 id;
-        public UInt32 size;
 
         public UInt32 vert_count; //Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
         public UInt32 header_count; //Count of all headers for items in this section
@@ -110,7 +109,6 @@ namespace PD2ModelParser.Sections
         public Geometry(uint sec_id, obj_data newobject)
         {
             this.id = sec_id;
-            this.size = 0;
 
             this.vert_count = (uint)newobject.verts.Count;
             this.header_count = 5;
@@ -133,7 +131,6 @@ namespace PD2ModelParser.Sections
         public Geometry(BinaryReader instream, SectionHeader section)
         {
             this.id = section.id;
-            this.size = section.size;
             
             UInt32[] size_index = { 0, 4, 8, 12, 16, 4, 4, 8, 12 };
             this.vert_count = instream.ReadUInt32(); //Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
@@ -269,7 +266,7 @@ namespace PD2ModelParser.Sections
             outstream.Write(geometry_tag);
             outstream.Write(this.id);
             long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
+            outstream.Write((uint) 0);
 
             this.StreamWriteData(outstream);
 
@@ -490,7 +487,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return "[Geometry] ID: " + this.id + " size: " + this.size + " Count: " + this.vert_count + " Count2: " + this.header_count + " Headers: " + this.headers.Count + " Size: " + this.geometry_size + " Verts: " + this.verts.Count + " UVs: " + this.uvs.Count + " Pattern UVs: " + this.pattern_uvs.Count + " Normals: " + this.normals.Count + " unknown_15: " + this.weight_groups.Count + " unknown_17: " + this.weights.Count + " unknown_20: " + this.unknown20.Count + " unknown_21: " + this.unknown21.Count + " Geometry_unknown_item_data: " + this.unknown_item_data.Count + " unknown_hash: " + StaticStorage.hashindex.GetString(this.hashname) + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[Geometry] ID: " + this.id + " Count: " + this.vert_count + " Count2: " + this.header_count + " Headers: " + this.headers.Count + " Size: " + this.geometry_size + " Verts: " + this.verts.Count + " UVs: " + this.uvs.Count + " Pattern UVs: " + this.pattern_uvs.Count + " Normals: " + this.normals.Count + " unknown_15: " + this.weight_groups.Count + " unknown_17: " + this.weights.Count + " unknown_20: " + this.unknown20.Count + " unknown_21: " + this.unknown21.Count + " Geometry_unknown_item_data: " + this.unknown_item_data.Count + " unknown_hash: " + StaticStorage.hashindex.GetString(this.hashname) + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
     }
 }
