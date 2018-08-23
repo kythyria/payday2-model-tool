@@ -12,8 +12,16 @@ cat << EOD > AssemblyInfo.cs
 EOD
 
 if [ "$1" == "Release" ]; then
-	VN="1.0.0.` git rev-list --count HEAD `"
 	VER=`git describe --dirty=-modified`
+	if [[ $VER =~ v([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+		VPRE=${BASH_REMATCH[1]}
+	else
+		echo "ERR: Describe ($VER) does not contain version in correct format!"
+		rm -f AssemblyInfo.cs
+		exit 1
+		#VPRE="1.0.0"
+	fi
+	VN="$VPRE.` git rev-list --count HEAD `"
 	sed "s/\"1.0.0.0\"/\"$VN\"/g;s/Debug Build/$VER/g" AssemblyInfo.i.cs >> AssemblyInfo.cs
 else
 	cat "AssemblyInfo.i.cs" >> "AssemblyInfo.cs"
