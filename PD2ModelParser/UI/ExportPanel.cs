@@ -17,6 +17,10 @@ namespace PD2ModelParser.UI
         public ExportPanel()
         {
             InitializeComponent();
+
+            // Select the default item, since for whatever reason we can't
+            // do that in the designer.
+            formatBox.SelectedIndex = 0;
         }
 
         private void browseBttn_Click(object sender, EventArgs e)
@@ -52,7 +56,26 @@ namespace PD2ModelParser.UI
 
         private void exportBttn_Click(object sender, EventArgs e)
         {
-            ColladaExporter.ExportFile(model, inputFileBox.Text);
+            string format = (string)formatBox.SelectedItem;
+
+            string result;
+            if (format.Contains(".obj"))
+            {
+                result = ObjWriter.ExportFile(model, inputFileBox.Text);
+            }
+            else if (format.Contains(".dae"))
+            {
+                result = ColladaExporter.ExportFile(model, inputFileBox.Text);
+            }
+            else
+            {
+                MessageBox.Show("Unknown format '" + format + "'");
+                return;
+            }
+
+            MessageBox.Show("Successfully exported model " + result.Split('\\').Last() + " (placed in the input model folder)");
+
+            //DieselExporter.ExportFile(model, inputFileBox.Text);
         }
     }
 }

@@ -34,6 +34,8 @@
             this.inputFileBox = new System.Windows.Forms.TextBox();
             this.exportBttn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.formatBox = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // label4
@@ -79,7 +81,7 @@
             // exportBttn
             // 
             this.exportBttn.Enabled = false;
-            this.exportBttn.Location = new System.Drawing.Point(6, 63);
+            this.exportBttn.Location = new System.Drawing.Point(6, 90);
             this.exportBttn.Name = "exportBttn";
             this.exportBttn.Size = new System.Drawing.Size(274, 23);
             this.exportBttn.TabIndex = 17;
@@ -96,17 +98,42 @@
             this.label1.TabIndex = 14;
             this.label1.Text = "Input File:";
             // 
-            // ImportPanel
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(5, 66);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(59, 13);
+            this.label2.TabIndex = 18;
+            this.label2.Text = "Root point:";
+            // 
+            // formatBox
+            // 
+            this.formatBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.formatBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.formatBox.FormattingEnabled = true;
+            this.formatBox.Items.AddRange(new object[] {
+            "Object (.obj)",
+            "Collada (.dae)"});
+            this.formatBox.Location = new System.Drawing.Point(70, 63);
+            this.formatBox.Name = "formatBox";
+            this.formatBox.Size = new System.Drawing.Size(353, 21);
+            this.formatBox.TabIndex = 19;
+            // 
+            // ExportPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.formatBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.exportBttn);
             this.Controls.Add(this.inputFileBox);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.rootPoint_combobox);
             this.Controls.Add(this.browseBttn);
-            this.Name = "ImportPanel";
+            this.Name = "ExportPanel";
             this.Size = new System.Drawing.Size(426, 189);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -121,5 +148,7 @@
         private System.Windows.Forms.TextBox inputFileBox;
         private System.Windows.Forms.Button exportBttn;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox formatBox;
     }
 }
