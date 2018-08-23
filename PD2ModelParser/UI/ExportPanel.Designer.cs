@@ -103,9 +103,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(5, 66);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(59, 13);
+            this.label2.Size = new System.Drawing.Size(42, 13);
             this.label2.TabIndex = 18;
-            this.label2.Text = "Root point:";
+            this.label2.Text = "Format:";
             // 
             // formatBox
             // 
