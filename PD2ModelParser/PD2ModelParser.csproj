@@ -68,6 +68,12 @@
     <Compile Include="UI\FileBrowserControl.Designer.cs">
       <DependentUpon>FileBrowserControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\ImportPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\ImportPanel.Designer.cs">
+      <DependentUpon>ImportPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Utils.cs" />
     <Compile Include="FullModelData.cs" />
     <Compile Include="NewObjImporter.cs" />
@@ -120,6 +126,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ExportPanel.resx">
       <DependentUpon>ExportPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\ImportPanel.resx">
+      <DependentUpon>ImportPanel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
