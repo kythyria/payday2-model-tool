@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 
 namespace PD2Bundle
 {
@@ -35,9 +36,18 @@ namespace PD2Bundle
 
         public bool Load()
         {
+            string filename = "hashes.txt";
+
+            if(!File.Exists(filename))
+            {
+                MessageBox.Show("Warning: the hashes file (" + filename + ") is missing - please aquire one and place"
+                    + "it here, otherwise unhashing will not function");
+                return false;
+            }
+
             try
             {
-                using (StreamReader sr = new StreamReader(new FileStream("hashes.txt", FileMode.Open)))
+                using (StreamReader sr = new StreamReader(new FileStream(filename, FileMode.Open)))
                 {
                     string line = sr.ReadLine();
                     while (line != null)
