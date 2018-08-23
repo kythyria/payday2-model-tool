@@ -27,5 +27,5 @@ else
 	cat "AssemblyInfo.i.cs" >> "AssemblyInfo.cs"
 fi
 
-dos2unix "AssemblyInfo.cs"
+dos2unix -q "AssemblyInfo.cs"
 
