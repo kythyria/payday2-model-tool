@@ -152,7 +152,7 @@
   </Target>
   <PropertyGroup>
     <PreBuildEvent Condition="'$(OS)' == 'Windows_NT' ">CD /D $(SolutionDir) &amp; C:\Windows\Sysnative\bash.exe "gen-version.sh" "$(ConfigurationName)"</PreBuildEvent>
-    <PreBuildEvent Condition="'$(OS)' != 'Windows_NT' ">"$(SolutionDir)/gen-version.sh" "$(ConfigurationName)"</PreBuildEvent>
+    <PreBuildEvent Condition="'$(OS)' != 'Windows_NT' ">"$(SolutionDir)gen-version.sh" "$(ConfigurationName)"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
