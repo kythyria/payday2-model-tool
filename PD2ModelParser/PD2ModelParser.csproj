@@ -62,6 +62,12 @@
     <Compile Include="Hash64.cs" />
     <Compile Include="Sections\ISection.cs" />
     <Compile Include="Tests\MultiplicationTest.cs" />
+    <Compile Include="UI\FileBrowserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\FileBrowserControl.Designer.cs">
+      <DependentUpon>FileBrowserControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Utils.cs" />
     <Compile Include="FullModelData.cs" />
     <Compile Include="NewObjImporter.cs" />
@@ -106,6 +112,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="UI\FileBrowserControl.resx">
+      <DependentUpon>FileBrowserControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
