@@ -15,8 +15,8 @@ namespace PD2ModelParser.Sections
         public UInt32 size;
 
         public UInt64 hashname; //Hashed object root point name (see hashlist.txt)
-        public UInt32 count;
-        public List<uint> child_ids = new List<uint>();
+        private UInt32 count;
+        private List<uint> child_ids = new List<uint>();
         public Matrix3D rotation = new Matrix3D(); //4x4 Rotation Matrix
         public UInt32 parentID; //ID of parent object
 
@@ -26,6 +26,7 @@ namespace PD2ModelParser.Sections
         private bool has_post_loaded;
         public Matrix3D world_transform;
         public Object3D parent;
+        public List<Object3D> children = new List<Object3D>();
 
         public Object3D(string object_name, uint parent)
         {
@@ -165,6 +166,11 @@ namespace PD2ModelParser.Sections
             {
                 parent = (Object3D) parsed_sections[parentID];
                 world_transform = rotation.MultDiesel(parent.CheckWorldTransform(parentID, parsed_sections));
+
+                if(!parent.children.Contains(this))
+                {
+                    parent.children.Add(this);
+                }
             }
 
             has_post_loaded = true;
