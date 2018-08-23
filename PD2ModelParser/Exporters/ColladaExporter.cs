@@ -47,16 +47,18 @@ namespace PD2ModelParser
             List<geometry> geometries = new List<geometry>();
             List<node> nodes = new List<node>();
 
-            int model_id = 0;
+            int model_i = 0;
             foreach (SectionHeader sectionheader in sections)
             {
                 if (sectionheader.type == model_data_tag)
                 {
-                    model_id++;
+                    model_i++;
 
                     Model model_data = (Model)parsed_sections[sectionheader.id];
                     if (model_data.version == 6)
                         continue;
+
+                    string model_id = model_i + "-" + StaticStorage.hashindex.GetString(model_data.object3D.hashname);
 
                     geometry geom = SerializeModel(parsed_sections, model_data, model_id);
 
@@ -109,11 +111,42 @@ namespace PD2ModelParser
 
                     Dictionary<UInt32, node> bones = new Dictionary<UInt32, node>();
 
-                    int i = 0;
+                    // In order to find locators, which aren't present in the SkinBones
+                    // object, we check the child of each object we process.
+                    //
+                    // To then process those, we use a queue (to_parse) which lists the
+                    // objects in our TODO list to search. We draw from this as we process them.
+                    //
+                    // We also keep the list of what we have processed in (parsed), so we don't
+                    // process anything twice.
+                    //
+                    // TODO rewrite this code to be based around children, removing the need for a seperate
+                    // loop after this that arranges the heirachy of nodes.
+                    List<uint> parsed = new List<uint>(sb.objects);
+                    Queue<uint> to_parse = new Queue<uint>();
+
                     foreach (UInt32 id in sb.objects)
                     {
+                        to_parse.Enqueue(id);
+                    }
+
+                    int i = 0;
+                    while(to_parse.Count != 0)
+                    {
+                        uint id = to_parse.Dequeue();
+
                         Object3D obj = (Object3D)parsed_sections[id];
                         string bonename = StaticStorage.hashindex.GetString(obj.hashname);
+
+                        // Find the locators and such, and add them to the TODO list
+                        foreach(Object3D child in obj.children)
+                        {
+                            if (!parsed.Contains(child.id)) // Don't process something twice
+                            {
+                                parsed.Add(child.id);
+                                to_parse.Enqueue(child.id);
+                            }
+                        }
 
                         Vector3D translate;
                         Quaternion rotate;
@@ -133,11 +166,15 @@ namespace PD2ModelParser
                             //final_rot = final_rot.MultDiesel(fixed_obj_transform);
                         }
 
+                        // If the object is not contained within the SkinBones
+                        // object, it must be a locator.
+                        bool locator = !sb.objects.Contains(id);
+
                         // Add the node
                         bones[id] = new node
                         {
                             id = "model-" + model_id + "-bone-" + bonename,
-                            name = bonename,
+                            name = (locator ? "locator-" : "") + bonename,
                             type = NodeType.JOINT,
                             Items = new object[]
                             {
@@ -204,7 +241,7 @@ namespace PD2ModelParser
             return path;
         }
 
-        private static geometry SerializeModel(Dictionary<UInt32, object> parsed_sections, Model model_data, int id)
+        private static geometry SerializeModel(Dictionary<UInt32, object> parsed_sections, Model model_data, string id)
         {
             string VERT_ID = "vertices-" + id;
             string NORM_ID = "norms-" + id;
