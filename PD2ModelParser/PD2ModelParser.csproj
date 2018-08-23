@@ -60,6 +60,11 @@
     <Compile Include="collada_schema_1_4.cs" />
     <Compile Include="Exporters\DieselExporter.cs" />
     <Compile Include="Hash64.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Sections\ISection.cs" />
     <Compile Include="Tests\MultiplicationTest.cs" />
     <Compile Include="UI\FileBrowserControl.cs">
@@ -118,6 +123,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\FileBrowserControl.resx">
       <DependentUpon>FileBrowserControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -130,6 +139,9 @@
     <EmbeddedResource Include="UI\ImportPanel.resx">
       <DependentUpon>ImportPanel.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="hashes.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -38,16 +38,23 @@ namespace PD2Bundle
         {
             string filename = "hashes.txt";
 
-            if(!File.Exists(filename))
+            Stream stream;
+
+            // Use the file if we have it
+            if(File.Exists(filename))
             {
-                MessageBox.Show("Warning: the hashes file (" + filename + ") is missing - please aquire one and place"
-                    + "it here, otherwise unhashing will not function");
-                return false;
+                stream = new FileStream(filename, FileMode.Open);
+            }
+            else
+            {
+                // Not very memory efficent, but in a world of almost all computers having 4+ GiB of RAM,
+                // what harm does 20MiB or so do?
+                stream = new MemoryStream(Encoding.UTF8.GetBytes(PD2ModelParser.Properties.Resources.hashes));
             }
 
             try
             {
-                using (StreamReader sr = new StreamReader(new FileStream(filename, FileMode.Open)))
+                using (StreamReader sr = new StreamReader(stream))
                 {
                     string line = sr.ReadLine();
                     while (line != null)
