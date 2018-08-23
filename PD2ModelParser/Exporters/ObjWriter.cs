@@ -15,13 +15,17 @@ namespace PD2ModelParser
     class ObjWriter
     {
 
-        public static void ExportFile(FullModelData data, string filepath)
+        public static string ExportFile(FullModelData data, string filepath)
         {
+            string output_file = filepath.Replace(".model", ".obj");
+
             GenerateOutputInfo(data, "outinfo.txt");
 
-            ExportObj(data, filepath.Replace(".model", ".obj")); // TODO configure output file
+            ExportObj(data, output_file); // TODO configure output file
 
             ExportPatternUVObj(data, filepath.Replace(".model", "_pattern_uv.obj")); // TODO configure output file
+
+            return output_file;
         }
 
         private static void GenerateOutputInfo(FullModelData data, string path)

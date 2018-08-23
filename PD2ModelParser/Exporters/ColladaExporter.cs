@@ -15,7 +15,7 @@ namespace PD2ModelParser
 {
     static class ColladaExporter
     {
-        public static void ExportFile(FullModelData data, string path)
+        public static string ExportFile(FullModelData data, string path)
         {
             path = path.Replace(".model", ".dae");
 
@@ -204,6 +204,8 @@ namespace PD2ModelParser
                 // Do we need this?
                 // fs.Close();
             }
+
+            return path;
         }
 
         private static geometry SerializeModel(Dictionary<UInt32, object> parsed_sections, Model model_data, int id)
