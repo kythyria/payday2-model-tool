@@ -114,30 +114,26 @@ namespace PD2ModelParser
                     {
                         Object3D obj = (Object3D)parsed_sections[id];
                         string bonename = StaticStorage.hashindex.GetString(obj.hashname);
-                        Console.WriteLine(bonename);
 
-                        Matrix3D transform = sb.rotations[i];
+                        Vector3D translate;
+                        Quaternion rotate;
+                        Vector3D scale;
+                        obj.rotation.Decompose(out scale, out rotate, out translate);
 
-                        Matrix3D adjustedTransform = transform;
-                        adjustedTransform.Translation = adjustedTransform.Transform(adjustedTransform.Translation);
+                        Matrix3D final_rot = Matrix3D.CreateFromQuaternion(rotate);
+                        final_rot.Translation = translate;
 
-
-                        //transform = new Matrix3D();
-                        //transform.Translation = obj.position;
-
-                        if (obj.parentID != 0)
+                        if (obj.parent == null || !sb.objects.Contains(obj.parentID))
                         {
-                            Object3D parent = (Object3D)parsed_sections[obj.parentID];
-                            //transform.Invert();
-                            //Console.WriteLine(parent.rotation.Translation);
-                            //transform = parent.rotation * transform;
+                            Matrix3D fixed_obj_transform = obj.world_transform;
+                            fixed_obj_transform.Decompose(out scale, out rotate, out translate);
 
-                            //transform.Translation -= parent.position;
+                            // Fixes the head, but breaks the arms
+                            // For now, leave it like this
+                            //final_rot = final_rot.MultDiesel(fixed_obj_transform);
                         }
 
-                        //Console.WriteLine(transform.Translation);
-                        //Console.WriteLine(obj.position);
-
+                        // Add the node
                         bones[id] = new node
                         {
                             id = "model-" + model_id + "-bone-" + bonename,
@@ -148,8 +144,8 @@ namespace PD2ModelParser
                                 new matrix
                                 {
                                     sid = "transform", // Apparently Blender really wants this
-                                    Values = MathUtil.Serialize(adjustedTransform)
-                                }
+                                    Values = MathUtil.Serialize(final_rot)
+                                },
                             },
                             ItemsElementName = new ItemsChoiceType2[]
                             {
