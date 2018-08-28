@@ -60,7 +60,10 @@ namespace PD2ModelParser
 
                     string model_id = model_i + "-" + StaticStorage.hashindex.GetString(model_data.object3D.hashname);
 
-                    geometry geom = SerializeModel(parsed_sections, model_data, model_id);
+                    PassthroughGP passthrough_section = (PassthroughGP) parsed_sections[model_data.passthroughGP_ID];
+                    Geometry geometry_section = (Geometry) parsed_sections[passthrough_section.geometry_section];
+                    Topology topology_section = (Topology) parsed_sections[passthrough_section.topology_section];
+                    geometry geom = SerializeModel(geometry_section, topology_section, model_data, model_id);
 
                     geometries.Add(geom);
 
@@ -241,16 +244,12 @@ namespace PD2ModelParser
             return path;
         }
 
-        private static geometry SerializeModel(Dictionary<UInt32, object> parsed_sections, Model model_data, string id)
+        private static geometry SerializeModel(Geometry geometry_section, Topology topology_section, Model model_data, string id)
         {
             string VERT_ID = "vertices-" + id;
             string NORM_ID = "norms-" + id;
             string UV_ID = "uv-" + id;
             string RAW_VERT_ID = "vert_raw-" + id;
-
-            PassthroughGP passthrough_section = (PassthroughGP)parsed_sections[model_data.passthroughGP_ID];
-            Geometry geometry_section = (Geometry)parsed_sections[passthrough_section.geometry_section];
-            Topology topology_section = (Topology)parsed_sections[passthrough_section.topology_section];
 
             int vertlen = geometry_section.verts.Count;
             int normlen = geometry_section.normals.Count;
