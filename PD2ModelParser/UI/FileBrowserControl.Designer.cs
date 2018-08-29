@@ -37,15 +37,15 @@ namespace PD2ModelParser.UI
             this.inputFileBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.inputFileBox.Enabled = false;
-            this.inputFileBox.Location = new System.Drawing.Point(3, 3);
+            this.inputFileBox.Location = new System.Drawing.Point(0, 3);
             this.inputFileBox.Name = "inputFileBox";
-            this.inputFileBox.Size = new System.Drawing.Size(191, 20);
+            this.inputFileBox.Size = new System.Drawing.Size(197, 20);
             this.inputFileBox.TabIndex = 14;
             // 
             // browseBttn
             // 
             this.browseBttn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseBttn.Location = new System.Drawing.Point(200, 1);
+            this.browseBttn.Location = new System.Drawing.Point(203, 1);
             this.browseBttn.Name = "browseBttn";
             this.browseBttn.Size = new System.Drawing.Size(75, 23);
             this.browseBttn.TabIndex = 15;
