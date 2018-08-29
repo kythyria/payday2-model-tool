@@ -69,7 +69,7 @@ namespace PD2ModelParser
                     {
                         object section = new object();
 
-                        fs.Position = sh.offset + 12;
+                        fs.Position = sh.Start;
 
                         if (sh.type == animation_data_tag)
                         {

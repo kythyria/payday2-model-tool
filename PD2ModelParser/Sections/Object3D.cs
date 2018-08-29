@@ -48,8 +48,8 @@ namespace PD2ModelParser.Sections
             this.id = section.id;
             this.size = section.size;
 
-            if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
-                remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
+            if (section.End > instream.BaseStream.Position)
+                remaining_data = instream.ReadBytes((int)(section.End - instream.BaseStream.Position));
         }
 
         public Object3D(BinaryReader instream)
