@@ -64,6 +64,11 @@ namespace PD2ModelParser.UI
 
                 return inputFileBox.Text;
             }
+            private set
+            {
+                inputFileBox.Text = value;
+                FileSelected?.Invoke(this, new EventArgs());
+            }
         }
 
         private void browseBttn_Click(object sender, EventArgs e)
@@ -83,9 +88,7 @@ namespace PD2ModelParser.UI
 
             if (fileDialog.ShowDialog() != DialogResult.OK) return;
 
-            inputFileBox.Text = fileDialog.FileName;
-
-            FileSelected?.Invoke(this, e);
+            Selected = fileDialog.FileName;
         }
 
         private void HandleDragEnter(object sender, DragEventArgs e)
@@ -158,7 +161,7 @@ namespace PD2ModelParser.UI
             // this won't be called if the user is dragging in a directory or anything.
             string file = ((string[]) e.Data.GetData(DataFormats.FileDrop))[0];
 
-            inputFileBox.Text = file;
+            Selected = file;
         }
     }
 }
