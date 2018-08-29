@@ -27,6 +27,32 @@ namespace PD2ModelParser
             return data;
         }
 
+        public delegate void SectionVisitor(BinaryReader file, SectionHeader section);
+
+        /// <summary>
+        /// Iterate over each part of the model file, and letting the caller handle them.
+        ///
+        /// This allows much faster reading of a file if you're only interested in one
+        /// specific part of it.
+        /// </summary>
+        /// <param name="filepath">The name of the file to open</param>
+        public static void VisitModel(string filepath, SectionVisitor visitor)
+        {
+            using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
+            {
+                using (BinaryReader br = new BinaryReader(fs))
+                {
+                    List<SectionHeader> headers = ReadHeaders(br);
+
+                    foreach (SectionHeader header in headers)
+                    {
+                        fs.Position = header.Start;
+                        visitor(br, header);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Reads all the section headers from a model file.
         ///
