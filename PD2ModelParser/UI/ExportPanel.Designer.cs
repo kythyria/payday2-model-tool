@@ -28,33 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.browseBttn = new System.Windows.Forms.Button();
-            this.inputFileBox = new System.Windows.Forms.TextBox();
             this.exportBttn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.formatBox = new System.Windows.Forms.ComboBox();
+            this.inputFileBox = new PD2ModelParser.UI.FileBrowserControl();
             this.SuspendLayout();
-            // 
-            // browseBttn
-            // 
-            this.browseBttn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseBttn.Location = new System.Drawing.Point(348, 7);
-            this.browseBttn.Name = "browseBttn";
-            this.browseBttn.Size = new System.Drawing.Size(75, 23);
-            this.browseBttn.TabIndex = 13;
-            this.browseBttn.Text = "Browse...";
-            this.browseBttn.UseVisualStyleBackColor = true;
-            this.browseBttn.Click += new System.EventHandler(this.browseBttn_Click);
-            // 
-            // inputFileBox
-            // 
-            this.inputFileBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.inputFileBox.Location = new System.Drawing.Point(70, 9);
-            this.inputFileBox.Name = "inputFileBox";
-            this.inputFileBox.Size = new System.Drawing.Size(272, 20);
-            this.inputFileBox.TabIndex = 12;
             // 
             // exportBttn
             // 
@@ -99,16 +78,28 @@
             this.formatBox.Size = new System.Drawing.Size(353, 21);
             this.formatBox.TabIndex = 19;
             // 
+            // inputFileBox
+            // 
+            this.inputFileBox.AllowDrop = true;
+            this.inputFileBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.inputFileBox.Filter = "Diesel Model(*.model)|*.model";
+            this.inputFileBox.Location = new System.Drawing.Point(70, 7);
+            this.inputFileBox.Name = "inputFileBox";
+            this.inputFileBox.SaveMode = false;
+            this.inputFileBox.Size = new System.Drawing.Size(353, 23);
+            this.inputFileBox.TabIndex = 20;
+            this.inputFileBox.FileSelected += new System.EventHandler(this.inputFileBox_FileSelected);
+            // 
             // ExportPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.inputFileBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.formatBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.exportBttn);
-            this.Controls.Add(this.inputFileBox);
-            this.Controls.Add(this.browseBttn);
             this.Name = "ExportPanel";
             this.Size = new System.Drawing.Size(426, 189);
             this.ResumeLayout(false);
@@ -117,11 +108,10 @@
         }
 
         #endregion
-        private System.Windows.Forms.Button browseBttn;
-        private System.Windows.Forms.TextBox inputFileBox;
         private System.Windows.Forms.Button exportBttn;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox formatBox;
+        private FileBrowserControl inputFileBox;
     }
 }

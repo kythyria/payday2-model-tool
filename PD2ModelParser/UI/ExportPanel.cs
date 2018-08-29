@@ -23,15 +23,9 @@ namespace PD2ModelParser.UI
             formatBox.SelectedIndex = 0;
         }
 
-        private void browseBttn_Click(object sender, EventArgs e)
+        private void inputFileBox_FileSelected(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Diesel Model(*.model)|*.model";
-            openFileDialog.CheckFileExists = true;
-            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
-
-            inputFileBox.Text = openFileDialog.FileName;
-            model = ModelReader.Open(openFileDialog.FileName);
+            model = ModelReader.Open(inputFileBox.Selected);
 
             exportBttn.Enabled = true;
         }
@@ -46,7 +40,7 @@ namespace PD2ModelParser.UI
             //}
             //MessageBox.Show("Failed setting model root_point!");
 
-            model = ModelReader.Open(inputFileBox.Text);
+            model = ModelReader.Open(inputFileBox.Selected);
         }
 
         private void exportBttn_Click(object sender, EventArgs e)
@@ -56,11 +50,11 @@ namespace PD2ModelParser.UI
             string result;
             if (format.Contains(".obj"))
             {
-                result = ObjWriter.ExportFile(model, inputFileBox.Text);
+                result = ObjWriter.ExportFile(model, inputFileBox.Selected);
             }
             else if (format.Contains(".dae"))
             {
-                result = ColladaExporter.ExportFile(model, inputFileBox.Text);
+                result = ColladaExporter.ExportFile(model, inputFileBox.Selected);
             }
             else
             {
