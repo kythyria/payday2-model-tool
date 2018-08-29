@@ -14,7 +14,7 @@ namespace PD2ModelParser
     static class ModelReader
     {
 
-        public static FullModelData Open(string filepath, string rp = null)
+        public static FullModelData Open(string filepath)
         {
             FullModelData data = new FullModelData();
 
@@ -23,11 +23,6 @@ namespace PD2ModelParser
             Console.WriteLine("Loading: " + filepath);
 
             Read(data, filepath);
-
-            if (rp != null)
-            {
-                UpdateRootPoint(data, rp);
-            }
 
             return data;
         }
@@ -222,24 +217,6 @@ namespace PD2ModelParser
                 }
                 fs.Close();
             }
-        }
-
-        private static bool UpdateRootPoint(FullModelData data, string rp)
-        {
-            ulong rp_hash = Hash64.HashString(rp);
-            foreach (object section in data.parsed_sections.Values)
-            {
-                if (section is Object3D)
-                {
-                    if ((section as Object3D).hashname == rp_hash)
-                    {
-                        StaticStorage.rp_id = (section as Object3D).id;
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
     }
 }

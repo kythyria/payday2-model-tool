@@ -25,18 +25,13 @@ namespace PD2ModelParser.UI
 
         private void browseBttn_Click(object sender, EventArgs e)
         {
-            StaticStorage.objects_list = new List<string>();
-            StaticStorage.rp_id = 0u;
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Diesel Model(*.model)|*.model";
             openFileDialog.CheckFileExists = true;
             if (openFileDialog.ShowDialog() != DialogResult.OK) return;
 
             inputFileBox.Text = openFileDialog.FileName;
-            model = ModelReader.Open(openFileDialog.FileName, rootPoint_combobox.Text);
-
-            this.rootPoint_combobox.Items.Clear();
-            this.rootPoint_combobox.Items.AddRange(StaticStorage.objects_list.ToArray());
+            model = ModelReader.Open(openFileDialog.FileName);
 
             exportBttn.Enabled = true;
         }
@@ -51,7 +46,7 @@ namespace PD2ModelParser.UI
             //}
             //MessageBox.Show("Failed setting model root_point!");
 
-            model = ModelReader.Open(inputFileBox.Text, rootPoint_combobox.Text);
+            model = ModelReader.Open(inputFileBox.Text);
         }
 
         private void exportBttn_Click(object sender, EventArgs e)

@@ -52,12 +52,12 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
-        public Model(obj_data obj, uint passGP_ID, uint topoIP_ID, uint matg_id)
+        public Model(obj_data obj, uint passGP_ID, uint topoIP_ID, uint matg_id, uint parent)
         {
             this.id = (uint)obj.object_name.GetHashCode();
             this.size = 0;
 
-            this.object3D = new Object3D(obj.object_name, StaticStorage.rp_id);
+            this.object3D = new Object3D(obj.object_name, parent);
 
             this.version = 3;
             this.passthroughGP_ID = passGP_ID;

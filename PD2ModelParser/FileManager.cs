@@ -24,8 +24,6 @@ namespace PD2ModelParser
         ///     The known index.
         /// </summary>
         public static KnownIndex hashindex = new KnownIndex();
-        public static uint rp_id = 0;
-        public static List<String> objects_list = new List<String>();
 
         #endregion
     }

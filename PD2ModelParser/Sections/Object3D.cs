@@ -47,7 +47,6 @@ namespace PD2ModelParser.Sections
         {
             this.id = section.id;
             this.size = section.size;
-            StaticStorage.objects_list.Add(StaticStorage.hashindex.GetString(this.hashname));
 
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
                 remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
