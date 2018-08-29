@@ -28,6 +28,14 @@ namespace PD2ModelParser.Sections
         public Object3D parent;
         public List<Object3D> children = new List<Object3D>();
 
+        public string Name
+        {
+            get
+            {
+                return StaticStorage.hashindex.GetString(hashname);
+            }
+        }
+
         public Object3D(string object_name, uint parent)
         {
             this.id = 0;
