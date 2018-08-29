@@ -37,7 +37,8 @@ namespace PD2ModelParser.UI
             this.inputFileBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.inputFileBox.Enabled = false;
-            this.inputFileBox.Location = new System.Drawing.Point(0, 3);
+            this.inputFileBox.Location = new System.Drawing.Point(0, 2);
+            this.inputFileBox.Margin = new System.Windows.Forms.Padding(0);
             this.inputFileBox.Name = "inputFileBox";
             this.inputFileBox.Size = new System.Drawing.Size(197, 20);
             this.inputFileBox.TabIndex = 14;
@@ -45,7 +46,8 @@ namespace PD2ModelParser.UI
             // browseBttn
             // 
             this.browseBttn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseBttn.Location = new System.Drawing.Point(203, 1);
+            this.browseBttn.Location = new System.Drawing.Point(203, 0);
+            this.browseBttn.Margin = new System.Windows.Forms.Padding(0);
             this.browseBttn.Name = "browseBttn";
             this.browseBttn.Size = new System.Drawing.Size(75, 23);
             this.browseBttn.TabIndex = 15;
@@ -60,7 +62,7 @@ namespace PD2ModelParser.UI
             this.Controls.Add(this.inputFileBox);
             this.Controls.Add(this.browseBttn);
             this.Name = "FileBrowserControl";
-            this.Size = new System.Drawing.Size(278, 27);
+            this.Size = new System.Drawing.Size(278, 23);
             this.ResumeLayout(false);
             this.PerformLayout();
 
