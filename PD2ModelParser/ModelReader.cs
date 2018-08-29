@@ -27,43 +27,54 @@ namespace PD2ModelParser
             return data;
         }
 
+        /// <summary>
+        /// Reads all the section headers from a model file.
+        ///
+        /// Note this leaves the file's position just after the end of the last section.
+        /// </summary>
+        /// <param name="br">The input source</param>
+        /// <returns>The list of section headers</returns>
+        public static List<SectionHeader> ReadHeaders(BinaryReader br)
+        {
+            int random = br.ReadInt32();
+            int filesize = br.ReadInt32();
+            int sectionCount;
+            if (random == -1)
+            {
+                sectionCount = br.ReadInt32();
+            }
+            else
+                sectionCount = random;
+
+            Console.WriteLine("Size: " + filesize + " bytes, Sections: " + sectionCount + "," + br.BaseStream.Position);
+
+            List<SectionHeader> sections = new List<SectionHeader>();
+
+            for (int x = 0; x < sectionCount; x++)
+            {
+                SectionHeader sectionHead = new SectionHeader(br);
+                sections.Add(sectionHead);
+                Console.WriteLine(sectionHead);
+
+                Console.WriteLine("Next offset: " + sectionHead.End);
+                br.BaseStream.Position = sectionHead.End;
+            }
+
+            return sections;
+        }
+
         private static void Read(FullModelData data, string filepath)
         {
             List<SectionHeader> sections = data.sections;
             Dictionary<UInt32, object> parsed_sections = data.parsed_sections;
             byte[] leftover_data = data.leftover_data;
 
-            uint offset = 0;
-
             using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
             {
                 using (BinaryReader br = new BinaryReader(fs))
                 {
-                    int random = br.ReadInt32();
-                    offset += 4;
-                    int filesize = br.ReadInt32();
-                    offset += 4;
-                    int sectionCount;
-                    if (random == -1)
-                    {
-                        sectionCount = br.ReadInt32();
-                        offset += 4;
-                    }
-                    else
-                        sectionCount = random;
-
-                    Console.WriteLine("Size: " + filesize + " bytes, Sections: " + sectionCount);
-
-                    for (int x = 0; x < sectionCount; x++)
-                    {
-                        SectionHeader sectionHead = new SectionHeader(br);
-                        sections.Add(sectionHead);
-                        Console.WriteLine(sectionHead);
-                        offset += sectionHead.size + 12;
-                        Console.WriteLine("Next offset: " + offset);
-                        fs.Position = (long)offset;
-                    }
-
+                    sections.Clear();
+                    sections.AddRange(ReadHeaders(br));
 
                     foreach (SectionHeader sh in sections)
                     {
