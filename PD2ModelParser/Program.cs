@@ -1,5 +1,6 @@
 ﻿//Original code by PoueT
 
+using PD2ModelParser.Misc;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,6 +19,8 @@ namespace PD2ModelParser
         [STAThread]
         static void Main(string[] args)
         {
+            Updates.Startup();
+
             Form1 form = new Form1();
             Application.Run(form);
 

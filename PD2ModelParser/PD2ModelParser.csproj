@@ -60,12 +60,19 @@
     <Compile Include="collada_schema_1_4.cs" />
     <Compile Include="Exporters\DieselExporter.cs" />
     <Compile Include="Hash64.cs" />
+    <Compile Include="Misc\Updates.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Sections\ISection.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Tests\MultiplicationTest.cs" />
     <Compile Include="UI\FileBrowserControl.cs">
       <SubType>UserControl</SubType>
@@ -78,6 +85,12 @@
     </Compile>
     <Compile Include="UI\ImportPanel.Designer.cs">
       <DependentUpon>ImportPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SettingsPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\SettingsPanel.Designer.cs">
+      <DependentUpon>SettingsPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Utils.cs" />
     <Compile Include="FullModelData.cs" />
@@ -121,6 +134,10 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -138,6 +155,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ImportPanel.resx">
       <DependentUpon>ImportPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\SettingsPanel.resx">
+      <DependentUpon>SettingsPanel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
