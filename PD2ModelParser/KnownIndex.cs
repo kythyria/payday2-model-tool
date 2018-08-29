@@ -33,9 +33,12 @@ namespace PD2Bundle
             this.hashes.Clear();
         }
 
+        bool loaded = false;
 
         public bool Load()
         {
+            if (loaded) return true;
+
             string filename = "hashes.txt";
 
             Stream stream;
@@ -71,6 +74,7 @@ namespace PD2Bundle
             {
                 return false;
             }
+            loaded = true;
             return true;
         }
     }
