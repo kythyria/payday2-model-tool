@@ -145,9 +145,6 @@ namespace PD2ModelParser
 
                             section = new Object3D(br, sh);
 
-                            if ((section as Object3D).hashname == 4921176767231919846)
-                                Console.WriteLine();
-
                             Console.WriteLine(section);
                         }
                         else if (sh.type == geometry_tag)
