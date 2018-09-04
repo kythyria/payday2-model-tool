@@ -91,9 +91,13 @@ namespace PD2ModelParser.UI
                 }
             }
 
-            bool outputSuccess = fm.GenerateNewModel(outputBox.Selected);
-            if (!outputSuccess)
+            try
             {
+                DieselExporter.ExportFile(fm.data, outputBox.Selected);
+            }
+            catch (Exception exc)
+            {
+                Log.Default.Warn("Exception exporting Diesel file: {}", exc);
                 MessageBox.Show("There was an error generating the output file - see console");
                 return;
             }

@@ -9,12 +9,10 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser
 {
-    class DieselExporter
+    static class DieselExporter
     {
         public static void ExportFile(FullModelData data, string path)
         {
-            path = path.Replace(".model", "shot.model");
-
             //you remove items from the parsed_sections
             //you edit items in the parsed_sections, they will get read and exported
 
@@ -153,7 +151,9 @@ namespace PD2ModelParser
                             }
                             else
                             {
-                                Log.Default.Warn("Tried to export an unknown section {0}",
+                                Log.Default.Warn("Tried to export an unknown section {0}, discarded.\n"
+                                    + "If there are subsequently a lot of problems with this model file,\n"
+                                    + "this was probably the problem. Please report this error immediately.",
                                     section.GetType().FullName);
                             }
                         }
