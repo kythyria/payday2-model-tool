@@ -93,7 +93,6 @@ namespace PD2ModelParser
         {
             List<SectionHeader> sections = data.sections;
             Dictionary<UInt32, object> parsed_sections = data.parsed_sections;
-            byte[] leftover_data = data.leftover_data;
 
             using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
             {
@@ -248,7 +247,7 @@ namespace PD2ModelParser
                     }
 
                     if (fs.Position < fs.Length)
-                        leftover_data = br.ReadBytes((int)(fs.Length - fs.Position));
+                        data.leftover_data = br.ReadBytes((int)(fs.Length - fs.Position));
 
                     br.Close();
                 }
