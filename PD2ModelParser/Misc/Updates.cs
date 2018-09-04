@@ -78,7 +78,7 @@ namespace PD2ModelParser.Misc
             }
             catch (Exception e)
             {
-                Console.WriteLine("Update check error: " + e.Message);
+                Log.Default.Warn("Update check error: {0}", e.Message);
             }
         }
 

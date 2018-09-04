@@ -37,7 +37,7 @@ namespace PD2ModelParser
 
         public bool GenerateModelFromObj(String filepath)
         {
-            Console.WriteLine("Importing new obj with file: " + filepath);
+            Log.Default.Info("Importing new obj with file: {0}", filepath);
 
             //Preload the .obj
             List<obj_data> objects = new List<obj_data>();
@@ -320,7 +320,8 @@ namespace PD2ModelParser
                             }
                             else
                             {
-                                Console.WriteLine("Tried to export an unknown section.");
+                                Log.Default.Warn("Tried to export an unknown section {0}, discarded.",
+                                    section.GetType().Name);
                             }
                         }
 

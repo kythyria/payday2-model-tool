@@ -20,7 +20,7 @@ namespace PD2ModelParser
 
             StaticStorage.hashindex.Load();
 
-            Console.WriteLine("Loading: " + filepath);
+            Log.Default.Info("Opening Model: {0}", filepath);
 
             Read(data, filepath);
 
@@ -72,7 +72,7 @@ namespace PD2ModelParser
             else
                 sectionCount = random;
 
-            Console.WriteLine("Size: " + filesize + " bytes, Sections: " + sectionCount + "," + br.BaseStream.Position);
+            Log.Default.Debug("Size: {0} bytes, Sections: {1},{2}", filesize, sectionCount, br.BaseStream.Position);
 
             List<SectionHeader> sections = new List<SectionHeader>();
 
@@ -80,9 +80,9 @@ namespace PD2ModelParser
             {
                 SectionHeader sectionHead = new SectionHeader(br);
                 sections.Add(sectionHead);
-                Console.WriteLine(sectionHead);
+                Log.Default.Debug("Section: {0}", sectionHead);
 
-                Console.WriteLine("Next offset: " + sectionHead.End);
+                Log.Default.Debug("Next offset: {0}", sectionHead.End);
                 br.BaseStream.Position = sectionHead.End;
             }
 
@@ -109,127 +109,72 @@ namespace PD2ModelParser
 
                         if (sh.type == animation_data_tag)
                         {
-                            Console.WriteLine("Animation Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new Animation(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == author_tag)
                         {
-                            Console.WriteLine("Author Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new Author(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == material_group_tag)
                         {
-                            Console.WriteLine("Material Group Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new Material_Group(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == material_tag)
                         {
-                            Console.WriteLine("Material Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new Material(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == object3D_tag)
                         {
-                            Console.WriteLine("Object 3D Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new Object3D(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == geometry_tag)
                         {
-                            Console.WriteLine("Geometry Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new Geometry(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == model_data_tag)
                         {
-                            Console.WriteLine("Model Data Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new Model(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == topology_tag)
                         {
-                            Console.WriteLine("Topology Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new Topology(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == passthroughGP_tag)
                         {
-                            Console.WriteLine("passthroughGP Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new PassthroughGP(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == topologyIP_tag)
                         {
-                            Console.WriteLine("TopologyIP Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new TopologyIP(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == bones_tag)
                         {
                             // I'm not sure this tag section ever appears in the model itself - instead, always at the start of a skinbones section
 
-                            Console.WriteLine("Bones Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new Bones(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == skinbones_tag)
                         {
-                            Console.WriteLine("SkinBones Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new SkinBones(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == quatLinearRotationController_tag)
                         {
-                            Console.WriteLine("QuatLinearRotationController Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new QuatLinearRotationController(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else if (sh.type == linearVector3Controller_tag)
                         {
-                            Console.WriteLine("QuatLinearRotationController Tag at " + sh.offset + " Size: " + sh.size);
-
                             section = new LinearVector3Controller(br, sh);
-
-                            Console.WriteLine(section);
                         }
                         else
                         {
-                            Console.WriteLine("UNKNOWN Tag at " + sh.offset + " Size: " + sh.size);
+                            Log.Default.Warn("UNKNOWN Tag at {0} Size: {1}", sh.offset, sh.size);
                             fs.Position = sh.offset;
 
                             section = new Unknown(br, sh);
-
-                            Console.WriteLine(section);
                         }
+
+                        Log.Default.Debug("Section {0} at {1} length {2}: {3}",
+                            section.GetType().Name, sh.offset, sh.size, section);
 
                         parsed_sections.Add(sh.id, section);
                     }

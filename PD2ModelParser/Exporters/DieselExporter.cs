@@ -153,7 +153,8 @@ namespace PD2ModelParser
                             }
                             else
                             {
-                                Console.WriteLine("Tried to export an unknown section.");
+                                Log.Default.Warn("Tried to export an unknown section {0}",
+                                    section.GetType().FullName);
                             }
                         }
 

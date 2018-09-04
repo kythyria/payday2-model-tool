@@ -21,10 +21,20 @@ namespace PD2ModelParser
         {
             Updates.Startup();
 
+            Log.Default = new ConsoleLogger();
+
             Form1 form = new Form1();
             Application.Run(form);
 
         }
 
+    }
+
+    internal class ConsoleLogger : BaseLogger
+    {
+        public override void Log(LoggerLevel level, string message, params object[] value)
+        {
+            Console.WriteLine(level + @": " + GetCallerName(3) + @": " + string.Format(message, value));
+        }
     }
 }

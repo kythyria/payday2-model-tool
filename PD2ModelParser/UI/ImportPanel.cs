@@ -139,7 +139,7 @@ namespace PD2ModelParser.UI
                         RootPointItem item = new RootPointItem(name, header.id);
                         root_point_items.Add(item);
 
-                        Console.WriteLine(name);
+                        Log.Default.Debug("Scanning for rootpoint: {0}", name);
 
                         if(old_selected_name == name)
                         {

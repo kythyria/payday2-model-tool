@@ -15,7 +15,7 @@ namespace PD2ModelParser
 
         public static bool ImportNewObj(FileManager fm, String filepath, bool addNew = false, uint root_point = 0)
         {
-            Console.WriteLine("Importing new obj with file: " + filepath);
+            Log.Default.Info("Importing new obj with file: {0}", filepath);
 
             //Preload the .obj
             List<obj_data> objects = new List<obj_data>();
@@ -62,7 +62,7 @@ namespace PD2ModelParser
                                 if (String.IsNullOrEmpty(obj.object_name))
                                 {
                                     obj.object_name = line.Substring(2);
-                                    Console.WriteLine("Object " + (objects.Count + 1) + " named: " + obj.object_name);
+                                    Log.Default.Debug("Object {0} named: {1}", objects.Count + 1, obj.object_name);
                                 }
                             }
                             else if (line.StartsWith("usemtl "))
@@ -519,7 +519,7 @@ namespace PD2ModelParser
 
         public static bool ImportNewObjPatternUV(FileManager fm, string filepath)
         {
-            Console.WriteLine("Importing new obj with file for UV patterns: " + filepath);
+            Log.Default.Info("Importing new obj with file for UV patterns: {0}", filepath);
 
             //Preload the .obj
             List<obj_data> objects = new List<obj_data>();

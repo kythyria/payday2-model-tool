@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using PD2ModelParser;
 
 namespace PD2Bundle
 {
@@ -24,7 +25,7 @@ namespace PD2Bundle
         {
             if ( item.ContainsKey(hash) && (item[hash] != value) )
             {
-                Console.WriteLine("Hash collision: {0:x} : {1} == {2}", hash, item[hash], value);
+                Log.Default.Warn("Hash collision: {0:x} : {1} == {2}", hash, item[hash], value);
             }
         }
 
