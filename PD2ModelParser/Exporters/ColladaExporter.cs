@@ -231,8 +231,6 @@ namespace PD2ModelParser
                 node = nodes.ToArray()
             } };
 
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
-
             using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write))
             {
                 collada.Save(fs);
