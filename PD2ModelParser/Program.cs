@@ -294,7 +294,7 @@ namespace PD2ModelParser
 
         private static void ShowHelp(OptionSet p)
         {
-            Console.WriteLine("Usage: {0} [OPTIONS]+ message", AppDomain.CurrentDomain.FriendlyName);
+            Console.WriteLine("Usage: {0} [OPTIONS]+", AppDomain.CurrentDomain.FriendlyName);
             Console.WriteLine("Import and export DieselX .model files");
             Console.WriteLine("If the program is called without any arguments,");
             Console.WriteLine(" GUI mode is enabled by default");
