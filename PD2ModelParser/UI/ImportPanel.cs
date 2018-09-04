@@ -46,16 +46,14 @@ namespace PD2ModelParser.UI
             if (!createNewModel.Checked)
             {
                 FullModelData model = ModelReader.Open(baseModelFileBrowser.Selected);
-                fm.parsed_sections = model.parsed_sections;
-                fm.sections = model.sections;
-                fm.leftover_data = model.leftover_data;
+                fm = new FileManager(model);
             }
 
             uint root_point;
             if(rootPoints.SelectedIndex > 0)
             {
                 RootPointItem item = root_point_items[rootPoints.SelectedIndex];
-                Object3D rp = fm.parsed_sections[item.Id] as Object3D;
+                Object3D rp = fm.data.parsed_sections[item.Id] as Object3D;
 
                 if(rp == null || rp.Name != item.Name)
                 {

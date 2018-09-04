@@ -30,10 +30,17 @@ namespace PD2ModelParser
 
     public class FileManager
     {
+        public readonly FullModelData data;
 
-        public List<SectionHeader> sections = new List<SectionHeader>();
-        public Dictionary<UInt32, object> parsed_sections = new Dictionary<UInt32, object>();
-        public byte[] leftover_data = null;
+        public FileManager()
+        {
+            data = new FullModelData();
+        }
+
+        public FileManager(FullModelData data)
+        {
+            this.data = data;
+        }
 
         public bool GenerateModelFromObj(String filepath)
         {
@@ -193,11 +200,11 @@ namespace PD2ModelParser
             List<Model> model_sections = new List<Model>();
 
 
-            foreach (SectionHeader sectionheader in sections)
+            foreach (SectionHeader sectionheader in data.sections)
             {
-                if (!parsed_sections.Keys.Contains(sectionheader.id))
+                if (!data.parsed_sections.Keys.Contains(sectionheader.id))
                     continue;
-                object section = parsed_sections[sectionheader.id];
+                object section = data.parsed_sections[sectionheader.id];
 
                 if (section is Animation)
                 {
@@ -232,7 +239,7 @@ namespace PD2ModelParser
 
                         bw.Write(-1); //the - (yyyy)
                         bw.Write((UInt32)100); //Filesize (GO BACK AT END AND CHANGE!!!)
-                        int sectionCount = sections.Count;
+                        int sectionCount = data.sections.Count;
                         bw.Write(sectionCount); //Sections count
 
                         foreach (Animation anim_sec in animation_sections)
@@ -250,8 +257,8 @@ namespace PD2ModelParser
                             mat_group_sec.StreamWrite(bw);
                             foreach (uint id in mat_group_sec.items)
                             {
-                                if (parsed_sections.Keys.Contains(id))
-                                    (parsed_sections[id] as Material).StreamWrite(bw);
+                                if (data.parsed_sections.Keys.Contains(id))
+                                    (data.parsed_sections[id] as Material).StreamWrite(bw);
                             }
                         }
 
@@ -266,11 +273,11 @@ namespace PD2ModelParser
                         }
 
 
-                        foreach (SectionHeader sectionheader in sections)
+                        foreach (SectionHeader sectionheader in data.sections)
                         {
-                            if (!parsed_sections.Keys.Contains(sectionheader.id))
+                            if (!data.parsed_sections.Keys.Contains(sectionheader.id))
                                 continue;
-                            object section = parsed_sections[sectionheader.id];
+                            object section = data.parsed_sections[sectionheader.id];
 
                             if (section is Unknown)
                             {
@@ -325,8 +332,8 @@ namespace PD2ModelParser
                             }
                         }
 
-                        if (leftover_data != null)
-                            bw.Write(leftover_data);
+                        if (data.leftover_data != null)
+                            bw.Write(data.leftover_data);
 
 
                         fs.Position = 4;

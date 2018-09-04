@@ -21,8 +21,8 @@ namespace PD2ModelParser
             List<obj_data> objects = new List<obj_data>();
             List<obj_data> toAddObjects = new List<obj_data>();
 
-            ref List<SectionHeader> sections = ref fm.sections;
-            ref Dictionary<UInt32, object> parsed_sections = ref fm.parsed_sections;
+            ref List<SectionHeader> sections = ref fm.data.sections;
+            ref Dictionary<UInt32, object> parsed_sections = ref fm.data.parsed_sections;
 
             try
             {
@@ -517,8 +517,9 @@ namespace PD2ModelParser
             }
         }
 
-        public static bool ImportNewObjPatternUV(FileManager fm, string filepath)
+        public static bool ImportNewObjPatternUV(FileManager file_manager, string filepath)
         {
+            FullModelData fm = file_manager.data;
             Log.Default.Info("Importing new obj with file for UV patterns: {0}", filepath);
 
             //Preload the .obj

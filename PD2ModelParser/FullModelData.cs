@@ -10,7 +10,7 @@ using static PD2ModelParser.Tags;
 
 namespace PD2ModelParser
 {
-    class FullModelData
+    public class FullModelData
     {
         public List<SectionHeader> sections = new List<SectionHeader>();
         public Dictionary<UInt32, object> parsed_sections = new Dictionary<UInt32, object>();
