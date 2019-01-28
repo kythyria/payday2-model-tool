@@ -10,7 +10,7 @@ namespace PD2ModelParser.Sections
     class Bone
     {
         public UInt32 vert_count;
-        public List<UInt32> verts = new List<UInt32>();
+        public readonly List<UInt32> verts = new List<UInt32>();
 
         public override string ToString()
         {
@@ -24,7 +24,7 @@ namespace PD2ModelParser.Sections
             return "vert_count: " + this.vert_count + " verts: [" + verts_string + "]";
         }
     }
-    
+
     class Bones
     {
         private static uint bones_tag = 0xEB43C77; // Bones
@@ -42,7 +42,8 @@ namespace PD2ModelParser.Sections
             this.size = section.size;
 
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
-                remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
+                remaining_data =
+                    instream.ReadBytes((int) ((section.offset + 12 + section.size) - instream.BaseStream.Position));
         }
 
         public Bones(BinaryReader instream)
@@ -73,7 +74,7 @@ namespace PD2ModelParser.Sections
             //update section size
             long newsizeend = outstream.BaseStream.Position;
             outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
+            outstream.Write((uint) (newsizeend - (newsizestart + 4)));
 
             outstream.BaseStream.Position = newsizeend;
         }
@@ -85,7 +86,8 @@ namespace PD2ModelParser.Sections
             foreach (Bone bone in this.bones)
             {
                 outstream.Write(bone.vert_count);
-                System.Diagnostics.Debug.Assert(bone.vert_count == bone.verts.Count, "[Bone] bone.vert_count != bone.verts.Count");
+                System.Diagnostics.Debug.Assert(bone.vert_count == bone.verts.Count,
+                    "[Bone] bone.vert_count != bone.verts.Count");
                 foreach (UInt32 vert in bone.verts)
                     outstream.Write(vert);
             }
@@ -96,7 +98,6 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-
             string bones_string = (this.bones.Count == 0 ? "none" : "");
 
             foreach (Bone bone in this.bones)
@@ -104,7 +105,10 @@ namespace PD2ModelParser.Sections
                 bones_string += bone + ", ";
             }
 
-            return "[Bones] ID: " + this.id + " size: " + this.size + " count: " + this.count + " bones:[ " + bones_string + " ]" + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[Bones] ID: " + this.id + " size: " + this.size + " count: " + this.count + " bones:[ " +
+                   bones_string + " ]" + (this.remaining_data != null
+                       ? " REMAINING DATA! " + this.remaining_data.Length + " bytes"
+                       : "");
         }
     }
 }
