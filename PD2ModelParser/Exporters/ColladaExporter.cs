@@ -38,7 +38,17 @@ namespace PD2ModelParser
             COLLADA collada = new COLLADA
             {
                 Items = new object[] { libgeoms, libscenes },
-                scene = scene
+                scene = scene,
+                asset = new asset
+                {
+                    created = DateTime.UtcNow,
+                    modified = DateTime.UtcNow,
+
+                    // Otherwise it defaults to Y-up (see asset's constructor), while we're
+                    //  using Z-up. Without the asset tag Blender defaults to Z-up, so if you
+                    //  remove this then the presence of the asset tag flips the model.
+                    up_axis =  UpAxisType.Z_UP,
+                },
             };
 
             // Build the mesh
