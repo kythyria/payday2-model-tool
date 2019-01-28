@@ -51,11 +51,11 @@ namespace PD2ModelParser
             {
                 if (sectionheader.type == model_data_tag)
                 {
-                    model_i++;
-
                     Model model_data = (Model) parsed_sections[sectionheader.id];
                     if (model_data.version == 6)
                         continue;
+
+                    model_i++;
 
                     string model_id = model_i + "-" + StaticStorage.hashindex.GetString(model_data.object3D.hashname);
 
