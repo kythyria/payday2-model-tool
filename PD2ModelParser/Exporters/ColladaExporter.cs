@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using static PD2ModelParser.Tags;
 
 namespace PD2ModelParser
@@ -54,7 +53,7 @@ namespace PD2ModelParser
                 {
                     model_i++;
 
-                    Model model_data = (Model)parsed_sections[sectionheader.id];
+                    Model model_data = (Model) parsed_sections[sectionheader.id];
                     if (model_data.version == 6)
                         continue;
 
@@ -88,7 +87,7 @@ namespace PD2ModelParser
                     if (model_data.skinbones_ID == 0)
                         continue;
 
-                    SkinBones sb = (SkinBones)parsed_sections[model_data.skinbones_ID];
+                    SkinBones sb = (SkinBones) parsed_sections[model_data.skinbones_ID];
                     //Console.WriteLine(sb.bones);
                     //Console.WriteLine(sb);
 
@@ -134,15 +133,15 @@ namespace PD2ModelParser
                     }
 
                     int i = 0;
-                    while(to_parse.Count != 0)
+                    while (to_parse.Count != 0)
                     {
                         uint id = to_parse.Dequeue();
 
-                        Object3D obj = (Object3D)parsed_sections[id];
+                        Object3D obj = (Object3D) parsed_sections[id];
                         string bonename = StaticStorage.hashindex.GetString(obj.hashname);
 
                         // Find the locators and such, and add them to the TODO list
-                        foreach(Object3D child in obj.children)
+                        foreach (Object3D child in obj.children)
                         {
                             if (!parsed.Contains(child.id)) // Don't process something twice
                             {
@@ -198,7 +197,7 @@ namespace PD2ModelParser
 
                     foreach (var nod in bones)
                     {
-                        Object3D obj = (Object3D)parsed_sections[nod.Key];
+                        Object3D obj = (Object3D) parsed_sections[nod.Key];
 
                         node parent = bone_root_node;
 
@@ -225,11 +224,15 @@ namespace PD2ModelParser
 
             libgeoms.geometry = geometries.ToArray();
 
-            libscenes.visual_scene = new visual_scene[] { new visual_scene {
-                id = "scene",
-                name = "Scene",
-                node = nodes.ToArray()
-            } };
+            libscenes.visual_scene = new visual_scene[]
+            {
+                new visual_scene
+                {
+                    id = "scene",
+                    name = "Scene",
+                    node = nodes.ToArray()
+                }
+            };
 
             using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write))
             {
@@ -242,7 +245,8 @@ namespace PD2ModelParser
             return path;
         }
 
-        private static geometry SerializeModel(Geometry geometry_section, Topology topology_section, Model model_data, string id)
+        private static geometry SerializeModel(Geometry geometry_section, Topology topology_section, Model model_data,
+            string id)
         {
             string VERT_ID = "vertices-" + id;
             string NORM_ID = "norms-" + id;
@@ -292,7 +296,8 @@ namespace PD2ModelParser
                 vertices = new vertices
                 {
                     id = VERT_ID,
-                    input = new InputLocal[] {
+                    input = new InputLocal[]
+                    {
                         new InputLocal
                         {
                             semantic = "POSITION",
@@ -300,7 +305,8 @@ namespace PD2ModelParser
                         }
                     }
                 },
-                Items = new object[] {
+                Items = new object[]
+                {
                     triangles
                 }
             };
@@ -356,30 +362,31 @@ namespace PD2ModelParser
 
         private static source GenerateSource(string name, List<Vector3D> vecs)
         {
-            return GenerateSource(name, new string[] { "X", "Y", "Z" }, vecs, VecToFloats);
+            return GenerateSource(name, new string[] {"X", "Y", "Z"}, vecs, VecToFloats);
         }
 
         private static source GenerateSource(string name, List<Vector2D> vecs)
         {
-            return GenerateSource(name, new string[] { "X", "Y" }, vecs, VecToFloats);
+            return GenerateSource(name, new string[] {"X", "Y"}, vecs, VecToFloats);
         }
 
         private static source GenerateSourceTex(string name, List<Vector2D> vecs)
         {
-            return GenerateSource(name, new string[] { "S", "T" }, vecs, VecToFloats);
+            return GenerateSource(name, new string[] {"S", "T"}, vecs, VecToFloats);
         }
 
         private static double[] VecToFloats(Vector3D vec)
         {
-            return new double[] { vec.X, vec.Y, vec.Z };
+            return new double[] {vec.X, vec.Y, vec.Z};
         }
 
         private static double[] VecToFloats(Vector2D vec)
         {
-            return new double[] { vec.X, vec.Y };
+            return new double[] {vec.X, vec.Y};
         }
 
-        private static source GenerateSource<T>(string id, string[] paramnames, List<T> list, Func<T, double[]> converter)
+        private static source GenerateSource<T>(string id, string[] paramnames, List<T> list,
+            Func<T, double[]> converter)
         {
             float_array verts = new float_array();
             source source = new source
@@ -410,7 +417,7 @@ namespace PD2ModelParser
             }
 
             verts.Values = values.ToArray();
-            verts.count = (ulong)verts.Values.LongLength;
+            verts.count = (ulong) verts.Values.LongLength;
             verts.id = id + "-data";
             verts.name = verts.id;
 
@@ -430,8 +437,8 @@ namespace PD2ModelParser
                 accessor = new accessor
                 {
                     source = "#" + verts.id,
-                    count = (ulong)list.Count,
-                    stride = (ulong)length,
+                    count = (ulong) list.Count,
+                    stride = (ulong) length,
                     param = indexes
                 }
             };
