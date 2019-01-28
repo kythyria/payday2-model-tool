@@ -17,10 +17,13 @@ namespace PD2ModelParser.Sections
 
         public Bones bones;
         public UInt32 object3D_section_id;
-        public UInt32 count;
+        public int count
+        {
+            get { return objects.Count; }
+        }
         public List<UInt32> objects = new List<UInt32>();
         public List<Matrix3D> rotations = new List<Matrix3D>();
-        public Matrix3D global_transform = new Matrix3D();
+        public Matrix3D global_skin_transform;
 
         public byte[] remaining_data = null;
 
@@ -31,14 +34,14 @@ namespace PD2ModelParser.Sections
 
             this.bones = new Bones(instream);
             this.object3D_section_id = instream.ReadUInt32();
-            this.count = instream.ReadUInt32();
-            for (int x = 0; x < this.count; x++)
+            uint count = instream.ReadUInt32();
+            for (int x = 0; x < count; x++)
                 this.objects.Add(instream.ReadUInt32());
-            for (int x = 0; x < this.count; x++)
+            for (int x = 0; x < count; x++)
             {
                 this.rotations.Add(MathUtil.ReadMatrix(instream));
             }
-            this.global_transform = MathUtil.ReadMatrix(instream);
+            this.global_skin_transform = MathUtil.ReadMatrix(instream);
 
             this.remaining_data = null;
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
@@ -73,7 +76,7 @@ namespace PD2ModelParser.Sections
             {
                 MathUtil.WriteMatrix(outstream, matrix);
             }
-            MathUtil.WriteMatrix(outstream, global_transform);
+            MathUtil.WriteMatrix(outstream, global_skin_transform);
 
             if (this.remaining_data != null)
                 outstream.Write(this.remaining_data);
@@ -82,20 +85,20 @@ namespace PD2ModelParser.Sections
         public override string ToString()
         {
             string objects_string = (this.objects.Count == 0 ? "none" : "");
-            
+
             foreach(UInt32 obj in this.objects)
             {
                 objects_string += obj + ", ";
             }
 
             string rotations_string = (this.rotations.Count == 0 ? "none" : "");
-            
+
             foreach(Matrix3D rotation in this.rotations)
             {
                 rotations_string += rotation + ", ";
             }
 
-            return "[SkinBones] ID: " + this.id + " size: " + this.size + " bones: [ " + this.bones + " ] object3D_section_id: " + this.object3D_section_id + " count: " + this.count + " objects count: " + this.objects.Count + " objects:[ " + objects_string + " ] rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ] unknown_matrix: " + this.global_transform + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[SkinBones] ID: " + this.id + " size: " + this.size + " bones: [ " + this.bones + " ] object3D_section_id: " + this.object3D_section_id + " count: " + this.count + " objects count: " + this.objects.Count + " objects:[ " + objects_string + " ] rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ] unknown_matrix: " + this.global_skin_transform + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
     }
 }
