@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    class SkinBones
+    // SkinBones should extend Bones (as it does in the game), but that'd
+    // be a bit of a pain to do.
+    class SkinBones : ISection
     {
         private static uint skinbones_tag = 0x65CC1825; // SkinBones
 
@@ -26,6 +28,9 @@ namespace PD2ModelParser.Sections
         public Matrix3D global_skin_transform;
 
         public byte[] remaining_data = null;
+
+        // Post-loaded
+        public List<Matrix3D> SkinPositions { get; private set; }
 
         public SkinBones(BinaryReader instream, SectionHeader section)
         {
@@ -99,6 +104,21 @@ namespace PD2ModelParser.Sections
             }
 
             return "[SkinBones] ID: " + this.id + " size: " + this.size + " bones: [ " + this.bones + " ] object3D_section_id: " + this.object3D_section_id + " count: " + this.count + " objects count: " + this.objects.Count + " objects:[ " + objects_string + " ] rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ] unknown_matrix: " + this.global_skin_transform + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+        }
+
+        public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)
+        {
+            SkinPositions = new List<Matrix3D>(count);
+
+            for (int i = 0; i < objects.Count; i++)
+            {
+                Object3D obj = (Object3D) parsed_sections[objects[i]];
+
+                Matrix3D inter = rotations[i].MultDiesel(obj.world_transform);
+                Matrix3D skin_node = inter.MultDiesel(global_skin_transform);
+
+                SkinPositions.Add(skin_node);
+            }
         }
     }
 }
