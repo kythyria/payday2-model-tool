@@ -40,7 +40,7 @@ namespace PD2ModelParser.Sections
         public List<ModelItem> items = new List<ModelItem>();
         //public UInt32 unknown9;
         public UInt32 material_group_section_id;
-        public UInt32 unknown10;
+        public UInt32 lightset_ID;
         public Vector3D bounds_min; // Z (max), X (low), Y (low)
         public Vector3D bounds_max; // Z (low), X (max), Y (max)
         public UInt32 properties_bitmap;
@@ -74,7 +74,7 @@ namespace PD2ModelParser.Sections
 
             //this.unknown9 = 0;
             this.material_group_section_id = matg_id;
-            this.unknown10 = 0;
+            this.lightset_ID = 0;
             this.bounds_min.Z = 0.0f;
             this.bounds_min.X = 0.0f;
             this.bounds_min.Y = 0.0f;
@@ -129,7 +129,7 @@ namespace PD2ModelParser.Sections
 
                 //this.unknown9 = instream.ReadUInt32();
                 this.material_group_section_id = instream.ReadUInt32();
-                this.unknown10 = instream.ReadUInt32(); // this is a section id afaik
+                this.lightset_ID = instream.ReadUInt32(); // this is a section id afaik
 
                 // Bitmap that stores properties about the model
                 // Bits:
@@ -203,7 +203,7 @@ namespace PD2ModelParser.Sections
 
                 //outstream.Write(this.unknown9);
                 outstream.Write(this.material_group_section_id);
-                outstream.Write(this.unknown10);
+                outstream.Write(this.lightset_ID);
 
                 outstream.Write(this.properties_bitmap);
 
@@ -238,7 +238,7 @@ namespace PD2ModelParser.Sections
                     first = false;
                 }
 
-                return "[Model] ID: " + this.id + " size: " + this.size + " Object3D: [ " + this.object3D + " ] version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " count: " + this.count + " items: [" + items_builder + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.unknown10 + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " unknown12: " + this.unknown12 + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+                return "[Model] ID: " + this.id + " size: " + this.size + " Object3D: [ " + this.object3D + " ] version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " count: " + this.count + " items: [" + items_builder + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " unknown12: " + this.unknown12 + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             }
         }
     }
