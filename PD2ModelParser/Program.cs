@@ -21,13 +21,13 @@ namespace PD2ModelParser
         [STAThread]
         static void Main(string[] args)
         {
-            Updates.Startup();
-
             Log.Default = new ConsoleLogger();
 
             bool gui = HandleCommandLine(args);
             if (!gui)
                 return;
+
+            Updates.Startup();
 
             Form1 form = new Form1();
             Application.Run(form);
