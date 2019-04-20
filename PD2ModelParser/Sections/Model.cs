@@ -45,7 +45,7 @@ namespace PD2ModelParser.Sections
         public UInt32 unknown10;
         public Vector3D bounds_min; // Z (max), X (low), Y (low)
         public Vector3D bounds_max; // Z (low), X (max), Y (max)
-        public UInt32 unknown11;
+        public UInt32 properties_bitmap;
         public UInt32 unknown12;
         public UInt32 unknown13;
         public UInt32 skinbones_ID;
@@ -83,7 +83,7 @@ namespace PD2ModelParser.Sections
             this.bounds_max.Z = 0.0f;
             this.bounds_max.X = 0.0f;
             this.bounds_max.Y = 0.0f;
-            this.unknown11 = 0;
+            this.properties_bitmap = 0;
             this.unknown12 = 1;
             this.unknown13 = 6;
             this.skinbones_ID = 0;
@@ -131,17 +131,22 @@ namespace PD2ModelParser.Sections
 
                 //this.unknown9 = instream.ReadUInt32();
                 this.material_group_section_id = instream.ReadUInt32();
-                this.unknown10 = instream.ReadUInt32();
+                this.unknown10 = instream.ReadUInt32(); // this is a section id afaik
+
+                // Bitmap that stores properties about the model
+                // Bits:
+                // 1: cast_shadows
+                // 3: has_opacity
+                this.properties_bitmap = instream.ReadUInt32();
 
                 // Order: maxX, minX, minY, minZ, maxX, maxY - Don't ask why.
-                this.bounds_max.Z = instream.ReadSingle();
                 this.bounds_min.X = instream.ReadSingle();
                 this.bounds_min.Y = instream.ReadSingle();
                 this.bounds_min.Z = instream.ReadSingle();
                 this.bounds_max.X = instream.ReadSingle();
                 this.bounds_max.Y = instream.ReadSingle();
+                this.bounds_max.Z = instream.ReadSingle();
 
-                this.unknown11 = instream.ReadUInt32();
                 this.unknown12 = instream.ReadUInt32();
                 this.unknown13 = instream.ReadUInt32();
                 this.skinbones_ID = instream.ReadUInt32();
@@ -202,15 +207,15 @@ namespace PD2ModelParser.Sections
                 outstream.Write(this.material_group_section_id);
                 outstream.Write(this.unknown10);
 
-                // Order: maxX, minX, minY, minZ, maxX, maxY - Don't ask why.
-                outstream.Write(this.bounds_max.Z); // Z (low)
-                outstream.Write(this.bounds_min.X); // X (low)
-                outstream.Write(this.bounds_min.Y); // Y (low)
-                outstream.Write(this.bounds_min.Z); // Z (max)
-                outstream.Write(this.bounds_max.X); // X (max)
-                outstream.Write(this.bounds_max.Y); // Y (max)
+                outstream.Write(this.properties_bitmap);
 
-                outstream.Write(this.unknown11);
+                outstream.Write(this.bounds_min.X);
+                outstream.Write(this.bounds_min.Y);
+                outstream.Write(this.bounds_min.Z);
+                outstream.Write(this.bounds_max.X);
+                outstream.Write(this.bounds_max.Y);
+                outstream.Write(this.bounds_max.Z);
+
                 outstream.Write(this.unknown12);
                 outstream.Write(this.unknown13);
                 outstream.Write(this.skinbones_ID);
@@ -235,7 +240,7 @@ namespace PD2ModelParser.Sections
                     first = false;
                 }
 
-                return "[Model] ID: " + this.id + " size: " + this.size + " Object3D: [ " + this.object3D + " ] version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " count: " + this.count + " items: [" + items_builder + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.unknown10 + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.unknown11 + " unknown12: " + this.unknown12 + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+                return "[Model] ID: " + this.id + " size: " + this.size + " Object3D: [ " + this.object3D + " ] version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " count: " + this.count + " items: [" + items_builder + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.unknown10 + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " unknown12: " + this.unknown12 + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             }
         }
     }
