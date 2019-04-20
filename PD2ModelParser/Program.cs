@@ -219,7 +219,7 @@ namespace PD2ModelParser
                         if (entry.arg.EndsWith(".obj"))
                         {
                             bool result = NewObjImporter.ImportNewObjPatternUV(
-                                new FileManager(data),
+                                data,
                                 entry.arg);
                             if (!result)
                             {

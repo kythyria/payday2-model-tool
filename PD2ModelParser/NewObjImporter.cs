@@ -517,9 +517,8 @@ namespace PD2ModelParser
             }
         }
 
-        public static bool ImportNewObjPatternUV(FileManager file_manager, string filepath)
+        public static bool ImportNewObjPatternUV(FullModelData fm, string filepath)
         {
-            FullModelData fm = file_manager.data;
             Log.Default.Info("Importing new obj with file for UV patterns: {0}", filepath);
 
             //Preload the .obj
