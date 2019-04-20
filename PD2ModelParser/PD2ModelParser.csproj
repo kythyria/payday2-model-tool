@@ -66,6 +66,7 @@
     <Compile Include="Hash64.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Misc\Updates.cs" />
+    <Compile Include="ModelScript.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

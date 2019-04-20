@@ -102,6 +102,10 @@ namespace PD2ModelParser
                     v => actions.Add(new CommandLineEntry(CommandLineActions.Export, v))
                 },
                 {
+                    "script=", "Executes a model script",
+                    v => actions.Add(new CommandLineEntry(CommandLineActions.Script, v))
+                },
+                {
                     "h|help", "show this message and exit",
                     v => show_help = v != null
                 },
@@ -256,6 +260,18 @@ namespace PD2ModelParser
                         }
 
                         break;
+                    case CommandLineActions.Script:
+                        try
+                        {
+                            ModelScript.Execute(data, entry.arg);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Default.Error("Error executing model script {0}: {1}",
+                                entry.arg, ex.Message);
+                        }
+
+                        break;
                     default:
                         Log.Default.Error("Unknown action {0}", entry.type);
                         break;
@@ -322,6 +338,7 @@ namespace PD2ModelParser
             Import,
             ImportPatternUv,
             Export,
+            Script,
         }
 
         private struct CommandLineEntry
