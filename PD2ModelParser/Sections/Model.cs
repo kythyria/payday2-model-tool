@@ -31,8 +31,6 @@ namespace PD2ModelParser.Sections
         public Object3D object3D;
         public UInt32 version;
         //Version 6
-        public Vector3D v6_unknown5 = new Vector3D();
-        public Vector3D v6_unknown6 = new Vector3D();
         public UInt32 v6_unknown7;
         public UInt32 v6_unknown8;
         //Other Versions
@@ -101,13 +99,13 @@ namespace PD2ModelParser.Sections
 
             if (this.version == 6)
             {
-                this.v6_unknown5.X = instream.ReadSingle();
-                this.v6_unknown5.Y = instream.ReadSingle();
-                this.v6_unknown5.Z = instream.ReadSingle();
+                this.bounds_min.X = instream.ReadSingle();
+                this.bounds_min.Y = instream.ReadSingle();
+                this.bounds_min.Z = instream.ReadSingle();
 
-                this.v6_unknown6.X = instream.ReadSingle();
-                this.v6_unknown6.Y = instream.ReadSingle();
-                this.v6_unknown6.Z = instream.ReadSingle();
+                this.bounds_max.X = instream.ReadSingle();
+                this.bounds_max.Y = instream.ReadSingle();
+                this.bounds_max.Z = instream.ReadSingle();
                 
                 this.v6_unknown7 = instream.ReadUInt32();
                 this.v6_unknown8 = instream.ReadUInt32();
@@ -180,12 +178,12 @@ namespace PD2ModelParser.Sections
             outstream.Write(this.version);
             if (this.version == 6)
             {
-                outstream.Write(this.v6_unknown5.X);
-                outstream.Write(this.v6_unknown5.Y);
-                outstream.Write(this.v6_unknown5.Z);
-                outstream.Write(this.v6_unknown6.X);
-                outstream.Write(this.v6_unknown6.Y);
-                outstream.Write(this.v6_unknown6.Z);
+                outstream.Write(this.bounds_min.X);
+                outstream.Write(this.bounds_min.Y);
+                outstream.Write(this.bounds_min.Z);
+                outstream.Write(this.bounds_max.X);
+                outstream.Write(this.bounds_max.Y);
+                outstream.Write(this.bounds_max.Z);
                 outstream.Write(this.v6_unknown7);
                 outstream.Write(this.v6_unknown8);
             }
@@ -229,7 +227,7 @@ namespace PD2ModelParser.Sections
         public override string ToString()
         {
             if (this.version == 6)
-                return "[Model_v6] ID: " + this.id + " size: " + this.size + " Object3D: [ " + this.object3D + " ] version: " + this.version + " unknown5: " + this.v6_unknown5 + " unknown6: " + this.v6_unknown6 + " unknown7: " + this.v6_unknown7 + " unknown8: " + this.v6_unknown8 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+                return "[Model_v6] ID: " + this.id + " size: " + this.size + " Object3D: [ " + this.object3D + " ] version: " + this.version + " unknown5: " + this.bounds_min + " unknown6: " + this.bounds_max + " unknown7: " + this.v6_unknown7 + " unknown8: " + this.v6_unknown8 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             else
             {
                 StringBuilder items_builder = new StringBuilder();
