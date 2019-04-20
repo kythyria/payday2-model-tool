@@ -127,11 +127,13 @@ namespace PD2ModelParser
             if (extra.Count != 0)
             {
                 ShowError($"Unknown argument \"{extra[0]}\"");
+                return false;
             }
 
             if (actions.Count != 0 && gui)
             {
                 ShowError("Cannot process files in GUI mode!");
+                return false;
             }
 
             if (verbosity > (int) LoggerLevel.Error || verbosity < 0)
