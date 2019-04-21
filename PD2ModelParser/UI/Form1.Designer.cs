@@ -58,7 +58,7 @@ namespace PD2ModelParser
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(413, 297);
+            this.label3.Location = new System.Drawing.Point(413, 333);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(222, 13);
             this.label3.TabIndex = 6;
@@ -75,7 +75,7 @@ namespace PD2ModelParser
             this.mainTabs.Location = new System.Drawing.Point(12, 12);
             this.mainTabs.Name = "mainTabs";
             this.mainTabs.SelectedIndex = 0;
-            this.mainTabs.Size = new System.Drawing.Size(627, 282);
+            this.mainTabs.Size = new System.Drawing.Size(627, 318);
             this.mainTabs.TabIndex = 14;
             // 
             // importTab
@@ -84,7 +84,7 @@ namespace PD2ModelParser
             this.importTab.Location = new System.Drawing.Point(4, 22);
             this.importTab.Name = "importTab";
             this.importTab.Padding = new System.Windows.Forms.Padding(3);
-            this.importTab.Size = new System.Drawing.Size(619, 256);
+            this.importTab.Size = new System.Drawing.Size(619, 292);
             this.importTab.TabIndex = 0;
             this.importTab.Text = "Import";
             this.importTab.UseVisualStyleBackColor = true;
@@ -96,7 +96,7 @@ namespace PD2ModelParser
             | System.Windows.Forms.AnchorStyles.Right)));
             this.importPanel.Location = new System.Drawing.Point(0, 0);
             this.importPanel.Name = "importPanel";
-            this.importPanel.Size = new System.Drawing.Size(619, 256);
+            this.importPanel.Size = new System.Drawing.Size(619, 292);
             this.importPanel.TabIndex = 0;
             // 
             // exportTab
@@ -105,7 +105,7 @@ namespace PD2ModelParser
             this.exportTab.Location = new System.Drawing.Point(4, 22);
             this.exportTab.Name = "exportTab";
             this.exportTab.Padding = new System.Windows.Forms.Padding(3);
-            this.exportTab.Size = new System.Drawing.Size(619, 256);
+            this.exportTab.Size = new System.Drawing.Size(619, 292);
             this.exportTab.TabIndex = 1;
             this.exportTab.Text = "Export";
             this.exportTab.UseVisualStyleBackColor = true;
@@ -117,7 +117,7 @@ namespace PD2ModelParser
             | System.Windows.Forms.AnchorStyles.Right)));
             this.exportPanel1.Location = new System.Drawing.Point(0, 0);
             this.exportPanel1.Name = "exportPanel1";
-            this.exportPanel1.Size = new System.Drawing.Size(619, 256);
+            this.exportPanel1.Size = new System.Drawing.Size(619, 292);
             this.exportPanel1.TabIndex = 14;
             // 
             // settingsTab
@@ -126,7 +126,7 @@ namespace PD2ModelParser
             this.settingsTab.Location = new System.Drawing.Point(4, 22);
             this.settingsTab.Name = "settingsTab";
             this.settingsTab.Padding = new System.Windows.Forms.Padding(3);
-            this.settingsTab.Size = new System.Drawing.Size(619, 256);
+            this.settingsTab.Size = new System.Drawing.Size(619, 292);
             this.settingsTab.TabIndex = 2;
             this.settingsTab.Text = "Settings";
             this.settingsTab.UseVisualStyleBackColor = true;
@@ -138,14 +138,14 @@ namespace PD2ModelParser
             | System.Windows.Forms.AnchorStyles.Right)));
             this.settingsPanel.Location = new System.Drawing.Point(0, 0);
             this.settingsPanel.Name = "settingsPanel";
-            this.settingsPanel.Size = new System.Drawing.Size(619, 256);
+            this.settingsPanel.Size = new System.Drawing.Size(619, 292);
             this.settingsPanel.TabIndex = 0;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(651, 319);
+            this.ClientSize = new System.Drawing.Size(651, 355);
             this.Controls.Add(this.mainTabs);
             this.Controls.Add(this.label3);
             this.Name = "Form1";
