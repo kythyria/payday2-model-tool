@@ -100,6 +100,36 @@ namespace PD2ModelParser
 
                         break;
                     }
+                    case "rotation":
+                    {
+                        Quaternion quat;
+
+                        quat.X = float.Parse(CheckAttr(operation, "x"));
+                        quat.Y = float.Parse(CheckAttr(operation, "y"));
+                        quat.Z = float.Parse(CheckAttr(operation, "z"));
+                        quat.W = float.Parse(CheckAttr(operation, "w"));
+                        quat.Normalize();
+
+                        // Unfortunately, there's no clean way to replace the matrix's rotation
+                        // So we break down the matrix into it's components, then rebuild it with the new rotation
+                        obj.rotation.Decompose(
+                            out Vector3D scale,
+                            out Quaternion _,
+                            out Vector3D translation
+                        );
+
+                        // Nexus's matrix multiplications work backwards, which is why this looks like it's
+                        // in the wrong order.
+                        // If this was the wrong way around, the scaling would be fixed, rather than relative
+                        // to the object.
+                        Matrix3D mat = Matrix3D.CreateScale(scale) * Matrix3D.CreateFromQuaternion(quat);
+                        mat.Translation = translation;
+
+                        // TODO update the object's world_transform property
+                        obj.rotation = mat;
+
+                        break;
+                    }
                     case "parent":
                     {
                         XAttribute root = operation.Attribute("root");
