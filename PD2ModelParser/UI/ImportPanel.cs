@@ -49,6 +49,20 @@ namespace PD2ModelParser.UI
                 fm = new FileManager(model);
             }
 
+            if (scriptFile.Selected != null)
+            {
+                try
+                {
+                    ModelScript.Execute(fm.data, scriptFile.Selected);
+                }
+                catch (Exception exc)
+                {
+                    Log.Default.Warn("Exception in script file: {0}", exc);
+                    MessageBox.Show("There was an error in the script file - see console");
+                    return;
+                }
+            }
+
             uint root_point;
             if(rootPoints.SelectedIndex > 0)
             {

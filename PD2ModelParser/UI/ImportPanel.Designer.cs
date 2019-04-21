@@ -28,6 +28,7 @@ namespace PD2ModelParser.UI
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.Label lblScript;
             this.labelSelBaseModel = new System.Windows.Forms.Label();
             this.createNewModel = new System.Windows.Forms.CheckBox();
             this.labelSaveTo = new System.Windows.Forms.Label();
@@ -42,6 +43,8 @@ namespace PD2ModelParser.UI
             this.outputBox = new PD2ModelParser.UI.FileBrowserControl();
             this.baseModelFileBrowser = new PD2ModelParser.UI.FileBrowserControl();
             this.label2 = new System.Windows.Forms.Label();
+            this.scriptFile = new PD2ModelParser.UI.FileBrowserControl();
+            lblScript = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // labelSelBaseModel
@@ -68,7 +71,7 @@ namespace PD2ModelParser.UI
             // 
             this.labelSaveTo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.labelSaveTo.AutoSize = true;
-            this.labelSaveTo.Location = new System.Drawing.Point(3, 216);
+            this.labelSaveTo.Location = new System.Drawing.Point(3, 251);
             this.labelSaveTo.Name = "labelSaveTo";
             this.labelSaveTo.Size = new System.Drawing.Size(51, 13);
             this.labelSaveTo.TabIndex = 3;
@@ -77,7 +80,7 @@ namespace PD2ModelParser.UI
             // labelObj
             // 
             this.labelObj.AutoSize = true;
-            this.labelObj.Location = new System.Drawing.Point(61, 67);
+            this.labelObj.Location = new System.Drawing.Point(61, 99);
             this.labelObj.Name = "labelObj";
             this.labelObj.Size = new System.Drawing.Size(41, 13);
             this.labelObj.TabIndex = 7;
@@ -86,7 +89,7 @@ namespace PD2ModelParser.UI
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(40, 101);
+            this.label1.Location = new System.Drawing.Point(40, 133);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(62, 13);
             this.label1.TabIndex = 8;
@@ -96,7 +99,7 @@ namespace PD2ModelParser.UI
             // 
             this.convert.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.convert.Location = new System.Drawing.Point(6, 242);
+            this.convert.Location = new System.Drawing.Point(6, 277);
             this.convert.Name = "convert";
             this.convert.Size = new System.Drawing.Size(479, 23);
             this.convert.TabIndex = 9;
@@ -107,7 +110,7 @@ namespace PD2ModelParser.UI
             // createNewObjectsBox
             // 
             this.createNewObjectsBox.AutoSize = true;
-            this.createNewObjectsBox.Location = new System.Drawing.Point(108, 127);
+            this.createNewObjectsBox.Location = new System.Drawing.Point(108, 159);
             this.createNewObjectsBox.Name = "createNewObjectsBox";
             this.createNewObjectsBox.Size = new System.Drawing.Size(163, 17);
             this.createNewObjectsBox.TabIndex = 10;
@@ -120,7 +123,7 @@ namespace PD2ModelParser.UI
             | System.Windows.Forms.AnchorStyles.Right)));
             this.rootPoints.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.rootPoints.FormattingEnabled = true;
-            this.rootPoints.Location = new System.Drawing.Point(108, 151);
+            this.rootPoints.Location = new System.Drawing.Point(108, 183);
             this.rootPoints.Name = "rootPoints";
             this.rootPoints.Size = new System.Drawing.Size(377, 21);
             this.rootPoints.TabIndex = 11;
@@ -128,7 +131,7 @@ namespace PD2ModelParser.UI
             // labelRootPoint
             // 
             this.labelRootPoint.AutoSize = true;
-            this.labelRootPoint.Location = new System.Drawing.Point(42, 154);
+            this.labelRootPoint.Location = new System.Drawing.Point(42, 186);
             this.labelRootPoint.Name = "labelRootPoint";
             this.labelRootPoint.Size = new System.Drawing.Size(60, 13);
             this.labelRootPoint.TabIndex = 12;
@@ -140,7 +143,7 @@ namespace PD2ModelParser.UI
             this.patternUVFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.patternUVFile.Filter = "Object File (*.obj)|*.obj";
-            this.patternUVFile.Location = new System.Drawing.Point(108, 94);
+            this.patternUVFile.Location = new System.Drawing.Point(108, 126);
             this.patternUVFile.Name = "patternUVFile";
             this.patternUVFile.SaveMode = false;
             this.patternUVFile.Size = new System.Drawing.Size(377, 27);
@@ -152,7 +155,7 @@ namespace PD2ModelParser.UI
             this.objectFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.objectFile.Filter = "Object File (*.obj)|*.obj";
-            this.objectFile.Location = new System.Drawing.Point(108, 60);
+            this.objectFile.Location = new System.Drawing.Point(108, 92);
             this.objectFile.Name = "objectFile";
             this.objectFile.SaveMode = false;
             this.objectFile.Size = new System.Drawing.Size(377, 27);
@@ -164,7 +167,7 @@ namespace PD2ModelParser.UI
             this.outputBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.outputBox.Filter = "Diesel Model (*.model)|*.model";
-            this.outputBox.Location = new System.Drawing.Point(108, 209);
+            this.outputBox.Location = new System.Drawing.Point(108, 244);
             this.outputBox.Name = "outputBox";
             this.outputBox.SaveMode = true;
             this.outputBox.Size = new System.Drawing.Size(377, 27);
@@ -186,16 +189,39 @@ namespace PD2ModelParser.UI
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(42, 175);
+            this.label2.Location = new System.Drawing.Point(42, 207);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(234, 13);
             this.label2.TabIndex = 13;
             this.label2.Text = "(which bone new objects should be attached to)";
             // 
+            // lblScript
+            // 
+            lblScript.AutoSize = true;
+            lblScript.Location = new System.Drawing.Point(65, 66);
+            lblScript.Name = "lblScript";
+            lblScript.Size = new System.Drawing.Size(37, 13);
+            lblScript.TabIndex = 15;
+            lblScript.Text = "Script:";
+            // 
+            // scriptFile
+            // 
+            this.scriptFile.AllowDrop = true;
+            this.scriptFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.scriptFile.Filter = "Model Script (*.mscript)|*.mscript";
+            this.scriptFile.Location = new System.Drawing.Point(108, 59);
+            this.scriptFile.Name = "scriptFile";
+            this.scriptFile.SaveMode = false;
+            this.scriptFile.Size = new System.Drawing.Size(377, 27);
+            this.scriptFile.TabIndex = 14;
+            // 
             // ImportPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(lblScript);
+            this.Controls.Add(this.scriptFile);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.labelRootPoint);
             this.Controls.Add(this.rootPoints);
@@ -211,7 +237,7 @@ namespace PD2ModelParser.UI
             this.Controls.Add(this.labelSelBaseModel);
             this.Controls.Add(this.baseModelFileBrowser);
             this.Name = "ImportPanel";
-            this.Size = new System.Drawing.Size(488, 268);
+            this.Size = new System.Drawing.Size(488, 303);
             this.Load += new System.EventHandler(this.ImportPanel_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -234,5 +260,6 @@ namespace PD2ModelParser.UI
         private System.Windows.Forms.ComboBox rootPoints;
         private System.Windows.Forms.Label labelRootPoint;
         private System.Windows.Forms.Label label2;
+        private FileBrowserControl scriptFile;
     }
 }
