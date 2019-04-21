@@ -46,11 +46,14 @@ namespace PD2ModelParser
             this.importPanel = new PD2ModelParser.UI.ImportPanel();
             this.exportTab = new System.Windows.Forms.TabPage();
             this.exportPanel1 = new PD2ModelParser.UI.ExportPanel();
+            this.objectsTab = new System.Windows.Forms.TabPage();
+            this.objectsPanel1 = new PD2ModelParser.UI.ObjectsPanel();
             this.settingsTab = new System.Windows.Forms.TabPage();
             this.settingsPanel = new PD2ModelParser.UI.SettingsPanel();
             this.mainTabs.SuspendLayout();
             this.importTab.SuspendLayout();
             this.exportTab.SuspendLayout();
+            this.objectsTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -71,6 +74,7 @@ namespace PD2ModelParser
             | System.Windows.Forms.AnchorStyles.Right)));
             this.mainTabs.Controls.Add(this.importTab);
             this.mainTabs.Controls.Add(this.exportTab);
+            this.mainTabs.Controls.Add(this.objectsTab);
             this.mainTabs.Controls.Add(this.settingsTab);
             this.mainTabs.Location = new System.Drawing.Point(12, 12);
             this.mainTabs.Name = "mainTabs";
@@ -120,6 +124,26 @@ namespace PD2ModelParser
             this.exportPanel1.Size = new System.Drawing.Size(619, 292);
             this.exportPanel1.TabIndex = 14;
             // 
+            // objectsTab
+            // 
+            this.objectsTab.Controls.Add(this.objectsPanel1);
+            this.objectsTab.Location = new System.Drawing.Point(4, 22);
+            this.objectsTab.Name = "objectsTab";
+            this.objectsTab.Size = new System.Drawing.Size(619, 292);
+            this.objectsTab.TabIndex = 3;
+            this.objectsTab.Text = "Objects";
+            this.objectsTab.UseVisualStyleBackColor = true;
+            // 
+            // objectsPanel1
+            // 
+            this.objectsPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.objectsPanel1.Location = new System.Drawing.Point(0, 0);
+            this.objectsPanel1.Name = "objectsPanel1";
+            this.objectsPanel1.Size = new System.Drawing.Size(619, 292);
+            this.objectsPanel1.TabIndex = 0;
+            // 
             // settingsTab
             // 
             this.settingsTab.Controls.Add(this.settingsPanel);
@@ -155,6 +179,7 @@ namespace PD2ModelParser
             this.mainTabs.ResumeLayout(false);
             this.importTab.ResumeLayout(false);
             this.exportTab.ResumeLayout(false);
+            this.objectsTab.ResumeLayout(false);
             this.settingsTab.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -169,5 +194,7 @@ namespace PD2ModelParser
         private UI.ImportPanel importPanel;
         private TabPage settingsTab;
         private UI.SettingsPanel settingsPanel;
+        private TabPage objectsTab;
+        private UI.ObjectsPanel objectsPanel1;
     }
 }

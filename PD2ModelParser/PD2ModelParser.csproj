@@ -92,6 +92,12 @@
     <Compile Include="UI\ImportPanel.Designer.cs">
       <DependentUpon>ImportPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\ObjectsPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\ObjectsPanel.Designer.cs">
+      <DependentUpon>ObjectsPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\SettingsPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -161,6 +167,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ImportPanel.resx">
       <DependentUpon>ImportPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\ObjectsPanel.resx">
+      <DependentUpon>ObjectsPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\SettingsPanel.resx">
       <DependentUpon>SettingsPanel.cs</DependentUpon>
