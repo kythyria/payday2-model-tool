@@ -82,6 +82,10 @@ namespace PD2ModelParser
                     throw new Exception($"Invalid Object3D mode \"{mode}\"");
             }
 
+            // Keep track of whether the object's parent was set
+            // This is mandatory for new elements
+            bool set_parent = false;
+
             // Look through the element's children and run them
             foreach (XElement operation in element.Elements())
             {
@@ -200,12 +204,17 @@ namespace PD2ModelParser
                         // And add it to the new parent's list of children
                         parent?.children.Add(obj);
 
+                        set_parent = true;
+
                         break;
                     }
                     default:
                         throw new Exception($"Invalid Object3D child element \"{operation.Name}\"");
                 }
             }
+
+            if (mode == "add" && !set_parent)
+                throw new Exception($"New object \"{name}\" did not set it's parent - all new elements must do so!");
         }
     }
 }
