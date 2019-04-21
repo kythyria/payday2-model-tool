@@ -295,4 +295,45 @@ namespace PD2ModelParser
             return result;*/
         }
     }
+
+    public class HashName
+    {
+        private ulong hash;
+        private string str;
+
+        public string String
+        {
+            get => str ?? (str = StaticStorage.hashindex.GetString(hash));
+            set
+            {
+                str = value ?? throw new ArgumentNullException(nameof(value));
+                hash = Hash64.HashString(value);
+            }
+        }
+
+        public ulong Hash
+        {
+            get => hash;
+            set
+            {
+                if (hash == value)
+                    return;
+
+                hash = value;
+                str = null;
+            }
+        }
+
+        public HashName(string str)
+        {
+            this.str = str ?? throw new ArgumentNullException(nameof(str));
+            hash = Hash64.HashString(str);
+        }
+
+        public HashName(ulong hash)
+        {
+            this.hash = hash;
+            str = null;
+        }
+    }
 }

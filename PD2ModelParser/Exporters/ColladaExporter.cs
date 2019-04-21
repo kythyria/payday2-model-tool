@@ -67,7 +67,7 @@ namespace PD2ModelParser
 
                     model_i++;
 
-                    string model_id = model_i + "-" + StaticStorage.hashindex.GetString(model_data.object3D.hashname);
+                    string model_id = model_i + "-" + model_data.object3D.hashname.String;
 
                     PassthroughGP passthrough_section = (PassthroughGP) parsed_sections[model_data.passthroughGP_ID];
                     Geometry geometry_section = (Geometry) parsed_sections[passthrough_section.geometry_section];
@@ -148,7 +148,7 @@ namespace PD2ModelParser
                         uint id = to_parse.Dequeue();
 
                         Object3D obj = (Object3D) parsed_sections[id];
-                        string bonename = StaticStorage.hashindex.GetString(obj.hashname);
+                        string bonename = obj.hashname.String;
 
                         // Find the locators and such, and add them to the TODO list
                         foreach (Object3D child in obj.children)

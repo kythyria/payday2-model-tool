@@ -14,7 +14,7 @@ namespace PD2ModelParser.Sections
         public UInt32 id;
         public UInt32 size;
 
-        public UInt64 hashname; //Hashed object root point name (see hashlist.txt)
+        public HashName hashname; //Hashed object root point name (see hashlist.txt)
         private UInt32 count;
         private List<uint> child_ids = new List<uint>();
         public Matrix3D rotation = new Matrix3D(); //4x4 Rotation Matrix
@@ -28,20 +28,14 @@ namespace PD2ModelParser.Sections
         public Object3D parent;
         public List<Object3D> children = new List<Object3D>();
 
-        public string Name
-        {
-            get
-            {
-                return StaticStorage.hashindex.GetString(hashname);
-            }
-        }
+        public string Name => hashname.String;
 
         public Object3D(string object_name, uint parent)
         {
             this.id = 0;
             this.size = 0;
 
-            this.hashname = Hash64.HashString(object_name);
+            this.hashname = new HashName(object_name);
             this.count = 0;
             this.child_ids = new List<uint>();
             this.rotation = new Matrix3D(1.0f, 0.0f, 0.0f, 0.0f,
@@ -63,7 +57,7 @@ namespace PD2ModelParser.Sections
         public Object3D(BinaryReader instream)
         {
             // In Object3D::load
-            this.hashname = instream.ReadUInt64();
+            this.hashname = new HashName(instream.ReadUInt64());
 
             // in dsl::ParamBlock::load
             this.count = instream.ReadUInt32();
@@ -121,7 +115,7 @@ namespace PD2ModelParser.Sections
 
         public void StreamWriteData(BinaryWriter outstream)
         {
-            outstream.Write(this.hashname);
+            outstream.Write(this.hashname.Hash);
             outstream.Write(this.count);
             foreach (uint item in this.child_ids)
             {
@@ -159,7 +153,7 @@ namespace PD2ModelParser.Sections
             Quaternion rot = new Quaternion();
             Vector3D translation = new Vector3D();
             this.rotation.Decompose(out scale, out rot, out translation);
-            return "[Object3D] ID: " + this.id + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " count: " + this.count + " children: " + this.child_ids.Count + " mat.scale: " + scale + " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "] Parent ID: " + this.parentID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[Object3D] ID: " + this.id + " size: " + this.size + " hashname: " + this.hashname.String + " count: " + this.count + " children: " + this.child_ids.Count + " mat.scale: " + scale + " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "] Parent ID: " + this.parentID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
         public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)

@@ -35,7 +35,7 @@ namespace PD2ModelParser
                 if (!(section is Object3D obj)) continue;
 
                 // Check if this one has the right name
-                if (obj.hashname != hashname) continue;
+                if (obj.hashname.Hash != hashname) continue;
 
                 return obj;
             }
