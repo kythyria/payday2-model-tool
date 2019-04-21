@@ -17,12 +17,14 @@ namespace PD2ModelParser
         public byte[] leftover_data = null;
 
         /// <summary>
-        /// Adds a section to the model data, and returns it's new ID
+        /// Adds a section to the model data.
         /// </summary>
+        /// <remarks>
+        /// This sets the Section ID of the passed object.
+        /// </remarks>
         /// <param name="obj">The section to add</param>
         /// <param name="typecode">The ID of the section header - see <see cref="Tags"/> for these</param>
-        /// <returns>The new ID of the section</returns>
-        public uint AddSection(object obj, uint typecode)
+        public void AddSection(ISection obj, uint typecode)
         {
             // Start custom objects at ID 10001, so they are easy to identify (there's no requirement
             // we start at this point, however).
@@ -32,14 +34,15 @@ namespace PD2ModelParser
             while (parsed_sections.ContainsKey(id))
                 id++;
 
+            // Set the object's ID
+            obj.SectionId = id;
+
             // Load the new section into the parsed_sections dictionary
             parsed_sections[id] = obj;
 
             // And create a header for it
             SectionHeader header = new SectionHeader(id) {type = typecode};
             sections.Add(header);
-
-            return id;
         }
     }
 }

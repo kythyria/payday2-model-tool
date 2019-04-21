@@ -30,6 +30,12 @@ namespace PD2ModelParser.Sections
 
         public string Name => hashname.String;
 
+        public uint SectionId
+        {
+            get => id;
+            set => id = value;
+        }
+
         public Object3D(string object_name, uint parent)
         {
             this.id = 0;

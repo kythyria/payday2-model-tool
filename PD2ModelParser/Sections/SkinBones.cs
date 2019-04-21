@@ -29,6 +29,12 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
+        public uint SectionId
+        {
+            get => id;
+            set => id = value;
+        }
+
         // Post-loaded
         public List<Matrix3D> SkinPositions { get; private set; }
 
