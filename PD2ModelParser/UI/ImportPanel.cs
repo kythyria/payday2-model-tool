@@ -97,7 +97,7 @@ namespace PD2ModelParser.UI
 
             if (patternUVFile.Selected != null)
             {
-                bool result = NewObjImporter.ImportNewObjPatternUV(fm.data, objectFile.Selected);
+                bool result = NewObjImporter.ImportNewObjPatternUV(fm.data, patternUVFile.Selected);
                 if (!result)
                 {
                     MessageBox.Show("There was an error importing Pattern UV OBJ - see console");
