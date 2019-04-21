@@ -68,7 +68,7 @@ namespace PD2ModelParser.UI
             // 
             this.labelSaveTo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.labelSaveTo.AutoSize = true;
-            this.labelSaveTo.Location = new System.Drawing.Point(3, 217);
+            this.labelSaveTo.Location = new System.Drawing.Point(3, 216);
             this.labelSaveTo.Name = "labelSaveTo";
             this.labelSaveTo.Size = new System.Drawing.Size(51, 13);
             this.labelSaveTo.TabIndex = 3;
@@ -77,7 +77,7 @@ namespace PD2ModelParser.UI
             // labelObj
             // 
             this.labelObj.AutoSize = true;
-            this.labelObj.Location = new System.Drawing.Point(61, 74);
+            this.labelObj.Location = new System.Drawing.Point(61, 67);
             this.labelObj.Name = "labelObj";
             this.labelObj.Size = new System.Drawing.Size(41, 13);
             this.labelObj.TabIndex = 7;
@@ -86,7 +86,7 @@ namespace PD2ModelParser.UI
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(40, 108);
+            this.label1.Location = new System.Drawing.Point(40, 101);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(62, 13);
             this.label1.TabIndex = 8;
