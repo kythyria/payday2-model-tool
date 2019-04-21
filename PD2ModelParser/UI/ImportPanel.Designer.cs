@@ -215,6 +215,7 @@ namespace PD2ModelParser.UI
             this.scriptFile.SaveMode = false;
             this.scriptFile.Size = new System.Drawing.Size(377, 27);
             this.scriptFile.TabIndex = 14;
+            this.scriptFile.FileSelected += new System.EventHandler(this.scriptFile_FileSelected);
             // 
             // ImportPanel
             // 

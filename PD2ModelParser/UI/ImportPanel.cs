@@ -1,6 +1,7 @@
 using PD2ModelParser.Sections;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace PD2ModelParser.UI
@@ -142,8 +143,43 @@ namespace PD2ModelParser.UI
             root_point_items.Clear();
             root_point_items.Add(new RootPointItem("None", 0));
 
-            if (baseModelFileBrowser.Enabled && baseModelFileBrowser.Selected != null)
+            if (scriptFile.Selected != null)
             {
+                // If we're using a script, we unfortunately have to fully load the file to evaluate the script
+
+                string model_file = baseModelFileBrowser.Enabled ? baseModelFileBrowser.Selected : null;
+                FullModelData data = model_file != null ? ModelReader.Open(model_file) : new FullModelData();
+                try
+                {
+                    ModelScript.Execute(data, scriptFile.Selected);
+                }
+                catch (Exception exc)
+                {
+                    // TODO display the errors in a less intrusive way
+                    Log.Default.Warn("Exception in script file: {0}", exc);
+                    MessageBox.Show("There was an error in the script file - see console");
+                    return;
+                }
+
+                // Make a list of all the Object3Ds to include in the tree
+                IEnumerable<Object3D> objects = data.parsed_sections.Values
+                    .Select(a => a as Object3D)
+                    .Where(a => a != null);
+
+                foreach (Object3D obj in objects)
+                {
+                    root_point_items.Add(new RootPointItem(obj.Name, obj.id));
+
+                    if (old_selected_name == obj.Name)
+                    {
+                        new_index = root_point_items.Count - 1;
+                    }
+                }
+            }
+            else if (baseModelFileBrowser.Enabled && baseModelFileBrowser.Selected != null)
+            {
+                // If there is no script file, just skim the model and collect the object IDs like that.
+                // This isn't a major improvement, but it does increase performance.
                 StaticStorage.hashindex.Load();
                 ModelReader.VisitModel(baseModelFileBrowser.Selected, (reader, header) => {
                     if (header.type == Tags.object3D_tag)
@@ -185,6 +221,11 @@ namespace PD2ModelParser.UI
             {
                 return Name;
             }
+        }
+
+        private void scriptFile_FileSelected(object sender, EventArgs e)
+        {
+            UpdateRootPointBox();
         }
     }
 }
