@@ -130,6 +130,37 @@ namespace PD2ModelParser
 
                         break;
                     }
+                    case "scale":
+                    {
+                        // WARNING:
+                        // DieselX probably doesn't expect you to scale stuff, so be careful with this!
+                        // If something blows up in your face when scaled, check that first.
+
+                        Vector3D scale;
+
+                        scale.X = float.Parse(CheckAttr(operation, "x"));
+                        scale.Y = float.Parse(CheckAttr(operation, "y"));
+                        scale.Z = float.Parse(CheckAttr(operation, "z"));
+
+                        // Same story as rotation - split and rebuild the matrix.
+                        obj.rotation.Decompose(
+                            out Vector3D _,
+                            out Quaternion quat,
+                            out Vector3D translation
+                        );
+
+                        // Nexus's matrix multiplications work backwards, which is why this looks like it's
+                        // in the wrong order.
+                        // If this was the wrong way around, the scaling would be fixed, rather than relative
+                        // to the object.
+                        Matrix3D mat = Matrix3D.CreateScale(scale) * Matrix3D.CreateFromQuaternion(quat);
+                        mat.Translation = translation;
+
+                        // TODO update the object's world_transform property
+                        obj.rotation = mat;
+
+                        break;
+                    }
                     case "parent":
                     {
                         XAttribute root = operation.Attribute("root");
