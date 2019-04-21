@@ -105,7 +105,7 @@ namespace PD2ModelParser
             this.exportTab.Location = new System.Drawing.Point(4, 22);
             this.exportTab.Name = "exportTab";
             this.exportTab.Padding = new System.Windows.Forms.Padding(3);
-            this.exportTab.Size = new System.Drawing.Size(619, 212);
+            this.exportTab.Size = new System.Drawing.Size(619, 256);
             this.exportTab.TabIndex = 1;
             this.exportTab.Text = "Export";
             this.exportTab.UseVisualStyleBackColor = true;
@@ -117,7 +117,7 @@ namespace PD2ModelParser
             | System.Windows.Forms.AnchorStyles.Right)));
             this.exportPanel1.Location = new System.Drawing.Point(0, 0);
             this.exportPanel1.Name = "exportPanel1";
-            this.exportPanel1.Size = new System.Drawing.Size(619, 212);
+            this.exportPanel1.Size = new System.Drawing.Size(619, 256);
             this.exportPanel1.TabIndex = 14;
             // 
             // settingsTab
@@ -126,7 +126,7 @@ namespace PD2ModelParser
             this.settingsTab.Location = new System.Drawing.Point(4, 22);
             this.settingsTab.Name = "settingsTab";
             this.settingsTab.Padding = new System.Windows.Forms.Padding(3);
-            this.settingsTab.Size = new System.Drawing.Size(619, 212);
+            this.settingsTab.Size = new System.Drawing.Size(619, 256);
             this.settingsTab.TabIndex = 2;
             this.settingsTab.Text = "Settings";
             this.settingsTab.UseVisualStyleBackColor = true;
@@ -138,7 +138,7 @@ namespace PD2ModelParser
             | System.Windows.Forms.AnchorStyles.Right)));
             this.settingsPanel.Location = new System.Drawing.Point(0, 0);
             this.settingsPanel.Name = "settingsPanel";
-            this.settingsPanel.Size = new System.Drawing.Size(619, 212);
+            this.settingsPanel.Size = new System.Drawing.Size(619, 256);
             this.settingsPanel.TabIndex = 0;
             // 
             // Form1
