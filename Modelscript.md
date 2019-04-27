@@ -31,7 +31,7 @@ tag:
 ```xml
 <?xml version="1.0" ?>
 <modelscript>
-	<!-- your stuff goes here -->
+    <!-- your stuff goes here -->
 </modelscript>
 ```
 
@@ -42,7 +42,7 @@ all. We can modify or add objects with an `<object3d>` tag, so let's try that:
 <?xml version="1.0" ?>
 <modelscript>
     <object3d name="rp_testmodel" mode="add">
-		<parent root="true" />
+        <parent root="true" />
     </object3d>
 </modelscript>
 ```
@@ -81,10 +81,10 @@ it `explosion_point`:
 <?xml version="1.0" ?>
 <modelscript>
     <object3d name="rp_testmodel" mode="add">
-		<parent root="true" />
+        <parent root="true" />
     </object3d>
     <object3d name="explosion_point" mode="add">
-		<parent name="rp_testmodel" />
+        <parent name="rp_testmodel" />
     </object3d>
 </modelscript>
 ```
@@ -108,11 +108,11 @@ explosion point around. We can do this with the `<position />` element:
 <?xml version="1.0" ?>
 <modelscript>
     <object3d name="rp_testmodel" mode="add">
-		<parent root="true" />
+        <parent root="true" />
     </object3d>
     <object3d name="explosion_point" mode="add">
-		<parent name="rp_testmodel" />
-		<position x="250" y="500" z="100" />
+        <parent name="rp_testmodel" />
+        <position x="250" y="500" z="100" />
     </object3d>
 </modelscript>
 ```
@@ -139,11 +139,11 @@ In a modelscript, you can also import OBJ files:
     <object3d name="rp_testmodel" mode="add">
         <parent root="true" />
     </object3d>
-	<import file="testmodel.obj" type="obj" create_objects="true">
-		<rootpoint name="rp_testmodel">
-			<default/>
-		</rootpoint>
-	</import>
+    <import file="testmodel.obj" type="obj" create_objects="true">
+        <rootpoint name="rp_testmodel">
+            <default/>
+        </rootpoint>
+    </import>
 </modelscript>
 ```
 
@@ -172,19 +172,19 @@ You can also attach different models to different objects:
     <object3d name="my_other_object" mode="add">
         <parent name="rp_testmodel" />
     </object3d>
-	<import file="testmodel.obj" type="obj" create_objects="true">
-		<rootpoint name="rp_testmodel">
-			<default/> <!-- unless otherwise specified, models will be attached to this -->
-			<object name="co_culling" /> <!-- also attach the culling box here, this could be
-				omitted since rp_testmodel is the default anyway, however it makes it clear
-				where this needs to be -->
-		</rootpoint>
-		<rootpoint name="rp_testmodel">
-			<object name="myobj_1" /> <!-- attach myobj_1, myobj_2, and myobj_3 to my_other_object -->
-			<object name="myobj_2" />
-			<object name="myobj_3" />
-		</rootpoint>
-	</import>
+    <import file="testmodel.obj" type="obj" create_objects="true">
+        <rootpoint name="rp_testmodel">
+            <default/> <!-- unless otherwise specified, models will be attached to this -->
+            <object name="co_culling" /> <!-- also attach the culling box here, this could be
+                omitted since rp_testmodel is the default anyway, however it makes it clear
+                where this needs to be -->
+        </rootpoint>
+        <rootpoint name="rp_testmodel">
+            <object name="myobj_1" /> <!-- attach myobj_1, myobj_2, and myobj_3 to my_other_object -->
+            <object name="myobj_2" />
+            <object name="myobj_3" />
+        </rootpoint>
+    </import>
 </modelscript>
 ```
 
