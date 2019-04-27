@@ -64,12 +64,18 @@ namespace PD2ModelParser.UI
                 }
             }
 
-            // Make a list of all the Object3Ds to include in the tree
-            // TODO also include Model-s, which in DieselX are a subclass of Object3D
-            List<Object3D> objs = data.parsed_sections.Values
+            // Make a list of all the Object3Ds and Models to include in the tree
+            List<ObjectOrModel> objs = new List<ObjectOrModel>();
+
+            objs.AddRange(data.parsed_sections.Values
                 .Select(a => a as Object3D)
                 .Where(a => a != null)
-                .ToList();
+                .Select(a => new ObjectOrModel(a)));
+
+            objs.AddRange(data.parsed_sections.Values
+                .Select(a => a as Model)
+                .Where(a => a != null)
+                .Select(a => new ObjectOrModel(a)));
 
             // Make a set with all the IDs of the nodes currently in the tree. As we
             // walk through the objects in the file, we remove them from this set. After
@@ -82,7 +88,7 @@ namespace PD2ModelParser.UI
             // Walk through and create a node (if it does not already exist) for each object.
             // Do this before attaching them to their parents, as otherwise the parent might
             // not exist when we build one if it's children.
-            foreach (Object3D obj in objs)
+            foreach (ObjectOrModel obj in objs)
             {
                 if (!nodes.ContainsKey(obj.id))
                     nodes[obj.id] = new TreeNode();
@@ -90,12 +96,15 @@ namespace PD2ModelParser.UI
             }
 
             // Set each object's label, and move it to the correct parent if needed.
-            foreach (Object3D obj in objs)
+            foreach (ObjectOrModel obj in objs)
             {
                 TreeNode node = nodes[obj.id];
                 TreeNode parent = obj.parent == null ? root : nodes[obj.parent.id];
 
-                node.Text = obj.Name;
+                if (obj.model == null)
+                    node.Text = obj.obj.Name;
+                else
+                    node.Text = obj.obj.Name + " (model)";
 
                 if (node.Parent == parent) continue;
 
@@ -130,6 +139,27 @@ namespace PD2ModelParser.UI
         private void fileBrowserControl1_FileSelected(object sender, EventArgs e)
         {
             Reload();
+        }
+
+        private class ObjectOrModel
+        {
+            public readonly Object3D obj;
+            public readonly Model model; // may be null
+
+            public uint id => obj.id;
+
+            public Object3D parent => obj.parent;
+
+            public ObjectOrModel(Object3D obj)
+            {
+                this.obj = obj;
+            }
+
+            public ObjectOrModel(Model model)
+            {
+                this.model = model;
+                this.obj = model.object3D;
+            }
         }
     }
 }
