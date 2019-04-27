@@ -256,8 +256,8 @@ namespace PD2ModelParser
                         sections.Add(new SectionHeader(newPassGP.id));
                         parsed_sections.Add(newTopoIP.id, newTopoIP);
                         sections.Add(new SectionHeader(newTopoIP.id));
-                        parsed_sections.Add(newModel.id, newModel);
-                        sections.Add(new SectionHeader(newModel.id));
+                        parsed_sections.Add(newModel.SectionId, newModel);
+                        sections.Add(new SectionHeader(newModel.SectionId));
                     }
                 }
             }

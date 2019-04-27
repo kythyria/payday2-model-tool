@@ -22,10 +22,9 @@ namespace PD2ModelParser.Sections
         }
     }
     
-    class Model
+    class Model : ISection
     {
         private static uint model_data_tag = 0x62212D88; // Model data
-        public UInt32 id;
         public UInt32 size;
 
         public Object3D object3D;
@@ -52,10 +51,10 @@ namespace PD2ModelParser.Sections
 
         public Model(obj_data obj, uint passGP_ID, uint topoIP_ID, uint matg_id, Object3D parent)
         {
-            this.id = (uint)obj.object_name.GetHashCode();
             this.size = 0;
 
             this.object3D = new Object3D(obj.object_name, parent);
+            SectionId = (uint)obj.object_name.GetHashCode();
 
             this.version = 3;
             this.passthroughGP_ID = passGP_ID;
@@ -90,10 +89,10 @@ namespace PD2ModelParser.Sections
 
         public Model(BinaryReader instream, SectionHeader section)
         {
-            this.id = section.id;
             this.size = section.size;
 
             this.object3D = new Object3D(instream);
+            SectionId = section.id;
 
             this.version = instream.ReadUInt32();
 
@@ -158,7 +157,7 @@ namespace PD2ModelParser.Sections
         public void StreamWrite(BinaryWriter outstream)
         {
             outstream.Write(model_data_tag);
-            outstream.Write(this.id);
+            outstream.Write(SectionId);
             long newsizestart = outstream.BaseStream.Position;
             outstream.Write(this.size);
 
@@ -227,7 +226,7 @@ namespace PD2ModelParser.Sections
         public override string ToString()
         {
             if (this.version == 6)
-                return "[Model_v6] ID: " + this.id + " size: " + this.size + " Object3D: [ " + this.object3D + " ] version: " + this.version + " unknown5: " + this.bounds_min + " unknown6: " + this.bounds_max + " unknown7: " + this.v6_unknown7 + " unknown8: " + this.v6_unknown8 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+                return "[Model_v6] ID: " + SectionId + " size: " + this.size + " Object3D: [ " + this.object3D + " ] version: " + this.version + " unknown5: " + this.bounds_min + " unknown6: " + this.bounds_max + " unknown7: " + this.v6_unknown7 + " unknown8: " + this.v6_unknown8 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             else
             {
                 StringBuilder items_builder = new StringBuilder();
@@ -238,8 +237,19 @@ namespace PD2ModelParser.Sections
                     first = false;
                 }
 
-                return "[Model] ID: " + this.id + " size: " + this.size + " Object3D: [ " + this.object3D + " ] version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " count: " + this.count + " items: [" + items_builder + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " unknown12: " + this.unknown12 + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+                return "[Model] ID: " + SectionId + " size: " + this.size + " Object3D: [ " + this.object3D + " ] version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " count: " + this.count + " items: [" + items_builder + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " unknown12: " + this.unknown12 + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             }
+        }
+
+        public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)
+        {
+            object3D.PostLoad(id, parsed_sections);
+        }
+
+        public uint SectionId
+        {
+            get => object3D.id;
+            set => object3D.id = value;
         }
     }
 }
