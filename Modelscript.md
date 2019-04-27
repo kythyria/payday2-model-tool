@@ -179,7 +179,7 @@ You can also attach different models to different objects:
                 omitted since rp_testmodel is the default anyway, however it makes it clear
                 where this needs to be -->
         </rootpoint>
-        <rootpoint name="rp_testmodel">
+        <rootpoint name="my_other_object">
             <object name="myobj_1" /> <!-- attach myobj_1, myobj_2, and myobj_3 to my_other_object -->
             <object name="myobj_2" />
             <object name="myobj_3" />
