@@ -16,6 +16,11 @@ namespace PD2ModelParser
         public static bool ImportNewObj(FileManager fm, String filepath, bool addNew = false, uint root_point = 0)
         {
             Object3D root_object = root_point == 0 ? null : (Object3D) fm.data.parsed_sections[root_point];
+            return ImportNewObj(fm, filepath, addNew, obj => root_object);
+        }
+
+        public static bool ImportNewObj(FileManager fm, String filepath, bool addNew, Func<obj_data, Object3D> root_point)
+        {
             Log.Default.Info("Importing new obj with file: {0}", filepath);
 
             //Preload the .obj
@@ -238,7 +243,8 @@ namespace PD2ModelParser
                         PassthroughGP newPassGP = new PassthroughGP((uint)(obj.object_name + ".passGP").GetHashCode(), newGeom.id, newTopo.id);
                         TopologyIP newTopoIP = new TopologyIP((uint)(obj.object_name + ".topoIP").GetHashCode(), newTopo.id);
 
-                        Model newModel = new Model(obj, newPassGP.id, newTopoIP.id, newMatG.id, root_object);
+                        Object3D parent = root_point.Invoke(obj);
+                        Model newModel = new Model(obj, newPassGP.id, newTopoIP.id, newMatG.id, parent);
 
                         AddObject(true, obj,
                             newModel, newPassGP, newGeom, newTopo);

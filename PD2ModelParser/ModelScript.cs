@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Xml.Linq;
 using Nexus;
 using PD2ModelParser.Sections;
@@ -20,6 +22,9 @@ namespace PD2ModelParser
                 {
                     case "object3d":
                         ExecObject3DElement(data, element);
+                        break;
+                    case "import":
+                        ExecImport(data, element, Directory.GetParent(filename).FullName);
                         break;
                     default:
                         throw new Exception($"Unknown node name \"{element.Name}\"");
@@ -214,6 +219,87 @@ namespace PD2ModelParser
 
             if (mode == "add" && !set_parent)
                 throw new Exception($"New object \"{name}\" did not set it's parent - all new elements must do so!");
+        }
+
+        private static void ExecImport(FullModelData data, XElement element, string directory)
+        {
+            string file = Path.Combine(directory, CheckAttr(element, "file"));
+            string type = CheckAttr(element, "type");
+
+            string create_objects_str = CheckAttr(element, "create_objects");
+            bool create_objects;
+
+            switch (create_objects_str)
+            {
+                case "true":
+                    create_objects = true;
+                    break;
+                case "false":
+                    create_objects = false;
+                    break;
+                default:
+                    throw new Exception($"Invalid value '{create_objects_str}' for create_objects: "
+                                        + "must either be true or false");
+            }
+
+            if (type != "obj")
+                throw new NotImplementedException($"Cannot import file with type '{type}', "
+                                                  + "only OBJ is currently supported");
+
+            Dictionary<string, Object3D> object_rootpoints = new Dictionary<string, Object3D>();
+            Object3D default_rootpoint = null;
+
+            foreach (XElement child in element.Elements())
+            {
+                switch (child.Name.ToString())
+                {
+                    case "rootpoint":
+                    {
+                        string id_str = CheckAttr(child, "name");
+                        Object3D obj = FindObjectByHashname(data, Hash64.HashString(id_str)) ??
+                                       throw new Exception($"Cannot find rootpoint element {id_str}");
+
+                        foreach (XElement elem in child.Elements())
+                        {
+                            switch (elem.Name.ToString())
+                            {
+                                case "object":
+                                    string obj_name = CheckAttr(elem, "name");
+                                    if (object_rootpoints.ContainsKey(obj_name))
+                                        throw new Exception($"Cannot redefine rootpoint for object {obj_name}");
+                                    object_rootpoints[obj_name] = obj;
+                                    break;
+                                case "default":
+                                    if (default_rootpoint == null)
+                                        default_rootpoint = obj;
+                                    else
+                                        throw new Exception($"Cannot redefine default rootpoint - '{id_str}'");
+                                    break;
+                                default:
+                                    throw new Exception($"Invalid rootpoint child element \"{elem.Name}\"");
+                            }
+                        }
+
+                        break;
+                    }
+                    default:
+                        throw new Exception($"Invalid Import child element \"{child.Name}\"");
+                }
+            }
+
+            Object3D ParentFinder(obj_data objData)
+            {
+                if (object_rootpoints.ContainsKey(objData.object_name)) return object_rootpoints[objData.object_name];
+
+                return default_rootpoint ??
+                       throw new Exception($"No default- nor object-rootpoint set for {objData.object_name}");
+            }
+
+            FileManager fm = new FileManager(data);
+            bool result = NewObjImporter.ImportNewObj(fm, file, create_objects, ParentFinder);
+
+            if (!result)
+                throw new Exception($"Could not import OBJ file {file} - see console");
         }
     }
 }
