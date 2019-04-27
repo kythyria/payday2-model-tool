@@ -18,14 +18,26 @@ namespace PD2ModelParser.Sections
         private UInt32 count;
         private List<uint> child_ids = new List<uint>();
         public Matrix3D rotation = new Matrix3D(); //4x4 Rotation Matrix
-        public UInt32 parentID; //ID of parent object
+        private UInt32 _parentID; //ID of parent object
+        public uint parentID => _parentID;
 
         public byte[] remaining_data = null;
 
         // Non-written fields
         private bool has_post_loaded;
         public Matrix3D world_transform;
-        public Object3D parent;
+        private Object3D _parent;
+
+        public Object3D parent
+        {
+            get => _parent;
+            set
+            {
+                _parent = value;
+                _parentID = parent?.id ?? 0;
+            }
+        }
+
         public List<Object3D> children = new List<Object3D>();
 
         public string Name => hashname.String;
@@ -36,7 +48,7 @@ namespace PD2ModelParser.Sections
             set => id = value;
         }
 
-        public Object3D(string object_name, uint parent)
+        public Object3D(string object_name, Object3D parent)
         {
             this.id = 0;
             this.size = 0;
@@ -48,7 +60,9 @@ namespace PD2ModelParser.Sections
                                         0.0f, 1.0f, 0.0f, 0.0f,
                                         0.0f, 0.0f, 1.0f, 0.0f, 
                                         0.0f, 0.0f, 0.0f, 0.0f);
-            this.parentID = parent;
+
+            // Sets parentID
+            this.parent = parent;
         }
 
         public Object3D(BinaryReader instream, SectionHeader section) : this(instream)
@@ -97,7 +111,7 @@ namespace PD2ModelParser.Sections
             this.rotation.M42 = instream.ReadSingle();
             this.rotation.M43 = instream.ReadSingle();
 
-            this.parentID = instream.ReadUInt32();
+            _parentID = instream.ReadUInt32();
 
             this.remaining_data = null;
         }

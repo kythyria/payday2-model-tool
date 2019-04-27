@@ -50,7 +50,7 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
-        public Model(obj_data obj, uint passGP_ID, uint topoIP_ID, uint matg_id, uint parent)
+        public Model(obj_data obj, uint passGP_ID, uint topoIP_ID, uint matg_id, Object3D parent)
         {
             this.id = (uint)obj.object_name.GetHashCode();
             this.size = 0;

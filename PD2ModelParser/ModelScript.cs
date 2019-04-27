@@ -67,7 +67,7 @@ namespace PD2ModelParser
                             $"Cannot create new Object3D named \"{name}\", as such "
                             + "an object already exists!");
 
-                    obj = new Object3D(name, 0) {rotation = Matrix3D.Identity};
+                    obj = new Object3D(name, null) {rotation = Matrix3D.Identity};
                     data.AddSection(obj, Tags.object3D_tag);
                     break;
                 }
@@ -199,7 +199,6 @@ namespace PD2ModelParser
 
                         // Set the object's parent attributes
                         obj.parent = parent;
-                        obj.parentID = parent?.id ?? 0;
 
                         // And add it to the new parent's list of children
                         parent?.children.Add(obj);
