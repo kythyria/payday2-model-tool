@@ -18,25 +18,18 @@ namespace PD2ModelParser.Sections
         private UInt32 count;
         private List<uint> child_ids = new List<uint>();
         public Matrix3D rotation = new Matrix3D(); //4x4 Rotation Matrix
-        private UInt32 _parentID; //ID of parent object
-        public uint parentID => _parentID;
+        public uint parentID => parent?.id ?? 0;
 
         public byte[] remaining_data = null;
 
         // Non-written fields
         private bool has_post_loaded;
         public Matrix3D world_transform;
-        private Object3D _parent;
 
-        public Object3D parent
-        {
-            get => _parent;
-            set
-            {
-                _parent = value;
-                _parentID = parent?.id ?? 0;
-            }
-        }
+        // Set when read from a section, before PostLoad is called
+        private uint loading_parent_id;
+
+        public Object3D parent { get; set; }
 
         public List<Object3D> children = new List<Object3D>();
 
@@ -61,7 +54,6 @@ namespace PD2ModelParser.Sections
                                         0.0f, 0.0f, 1.0f, 0.0f, 
                                         0.0f, 0.0f, 0.0f, 0.0f);
 
-            // Sets parentID
             this.parent = parent;
         }
 
@@ -111,7 +103,7 @@ namespace PD2ModelParser.Sections
             this.rotation.M42 = instream.ReadSingle();
             this.rotation.M43 = instream.ReadSingle();
 
-            _parentID = instream.ReadUInt32();
+            loading_parent_id = instream.ReadUInt32();
 
             this.remaining_data = null;
         }
@@ -178,15 +170,15 @@ namespace PD2ModelParser.Sections
 
         public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)
         {
-            if (parentID == 0)
+            if (loading_parent_id == 0)
             {
                 parent = null;
                 world_transform = rotation;
             }
             else
             {
-                parent = (Object3D) parsed_sections[parentID];
-                world_transform = rotation.MultDiesel(parent.CheckWorldTransform(parentID, parsed_sections));
+                parent = (Object3D) parsed_sections[loading_parent_id];
+                world_transform = rotation.MultDiesel(parent.CheckWorldTransform(loading_parent_id, parsed_sections));
 
                 if(!parent.children.Contains(this))
                 {
