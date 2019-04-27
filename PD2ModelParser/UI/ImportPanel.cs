@@ -52,16 +52,9 @@ namespace PD2ModelParser.UI
 
             if (scriptFile.Selected != null)
             {
-                try
-                {
-                    ModelScript.Execute(fm.data, scriptFile.Selected);
-                }
-                catch (Exception exc)
-                {
-                    Log.Default.Warn("Exception in script file: {0}", exc);
-                    MessageBox.Show("There was an error in the script file - see console");
+                bool success = ModelScript.ExecuteHandled(fm.data, scriptFile.Selected);
+                if (!success)
                     return;
-                }
             }
 
             uint root_point;
@@ -149,17 +142,10 @@ namespace PD2ModelParser.UI
 
                 string model_file = baseModelFileBrowser.Enabled ? baseModelFileBrowser.Selected : null;
                 FullModelData data = model_file != null ? ModelReader.Open(model_file) : new FullModelData();
-                try
-                {
-                    ModelScript.Execute(data, scriptFile.Selected);
-                }
-                catch (Exception exc)
-                {
-                    // TODO display the errors in a less intrusive way
-                    Log.Default.Warn("Exception in script file: {0}", exc);
-                    MessageBox.Show("There was an error in the script file - see console");
+                // TODO display the errors in a less intrusive way
+                bool success = ModelScript.ExecuteHandled(data, scriptFile.Selected);
+                if (!success)
                     return;
-                }
 
                 // Make a list of all the Object3Ds to include in the tree
                 IEnumerable<Object3D> objects = data.parsed_sections.Values

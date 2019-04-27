@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Forms;
 using System.Xml.Linq;
 using Nexus;
 using PD2ModelParser.Sections;
@@ -29,6 +30,21 @@ namespace PD2ModelParser
                     default:
                         throw new Exception($"Unknown node name \"{element.Name}\"");
                 }
+            }
+        }
+
+        public static bool ExecuteHandled(FullModelData data, string filename)
+        {
+            try
+            {
+                ModelScript.Execute(data, filename);
+                return true;
+            }
+            catch (Exception exc)
+            {
+                Log.Default.Warn("Exception in script file: {0}", exc);
+                MessageBox.Show("There was an error in the script file:\n" + exc.Message);
+                return false;
             }
         }
 

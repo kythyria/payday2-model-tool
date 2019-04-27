@@ -51,17 +51,10 @@ namespace PD2ModelParser.UI
             // Apply the script, if selected and enabled
             if (scriptFile.Selected != null && showScriptChanges.Checked)
             {
-                try
-                {
-                    ModelScript.Execute(data, scriptFile.Selected);
-                }
-                catch (Exception exc)
-                {
-                    // TODO display the errors in a less intrusive way
-                    Log.Default.Warn("Exception in script file: {0}", exc);
-                    MessageBox.Show("There was an error in the script file - see console");
+                // TODO display the errors in a less intrusive way
+                bool success = ModelScript.ExecuteHandled(data, scriptFile.Selected);
+                if (!success)
                     return;
-                }
             }
 
             // Make a list of all the Object3Ds and Models to include in the tree
