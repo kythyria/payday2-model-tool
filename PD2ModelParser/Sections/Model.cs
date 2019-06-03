@@ -22,7 +22,7 @@ namespace PD2ModelParser.Sections
         }
     }
     
-    class Model : ISection
+    class Model : ISection, IPostLoadable
     {
         private static uint model_data_tag = 0x62212D88; // Model data
         public UInt32 size;

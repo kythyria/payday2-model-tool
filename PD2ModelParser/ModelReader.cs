@@ -181,9 +181,9 @@ namespace PD2ModelParser
 
                     foreach(uint id in parsed_sections.Keys)
                     {
-                        if (parsed_sections[id] is ISection)
+                        if (parsed_sections[id] is IPostLoadable)
                         {
-                            ISection obj = (ISection) parsed_sections[id];
+                            IPostLoadable obj = (IPostLoadable) parsed_sections[id];
                             obj.PostLoad(id, parsed_sections);
                         }
                     }

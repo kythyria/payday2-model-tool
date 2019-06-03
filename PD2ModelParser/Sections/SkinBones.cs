@@ -10,7 +10,7 @@ namespace PD2ModelParser.Sections
 {
     // SkinBones should extend Bones (as it does in the game), but that'd
     // be a bit of a pain to do.
-    class SkinBones : ISection
+    class SkinBones : ISection, IPostLoadable
     {
         private static uint skinbones_tag = 0x65CC1825; // SkinBones
 

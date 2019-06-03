@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    class Object3D : ISection
+    class Object3D : ISection, IPostLoadable
     {
         private static uint object3D_tag = 0x0FFCD100; // Object3D
         public UInt32 id;
