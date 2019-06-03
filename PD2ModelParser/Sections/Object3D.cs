@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    class Object3D : ISection, IPostLoadable
+    class Object3D : AbstractSection, IPostLoadable, IHashContainer
     {
         private static uint object3D_tag = 0x0FFCD100; // Object3D
         public UInt32 id;
@@ -34,11 +34,13 @@ namespace PD2ModelParser.Sections
 
         public string Name => hashname.String;
 
-        public uint SectionId
+        public override uint SectionId
         {
             get => id;
             set => id = value;
         }
+
+        public override uint TypeCode => Tags.object3D_tag;
 
         public Object3D(string object_name, Object3D parent)
         {
@@ -106,24 +108,7 @@ namespace PD2ModelParser.Sections
             this.remaining_data = null;
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(object3D_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.hashname.Hash);
             outstream.Write(child_ids.Count);
@@ -164,6 +149,11 @@ namespace PD2ModelParser.Sections
             Vector3D translation = new Vector3D();
             this.rotation.Decompose(out scale, out rot, out translation);
             return "[Object3D] ID: " + this.id + " size: " + this.size + " hashname: " + this.hashname.String + " children: " + this.child_ids.Count + " mat.scale: " + scale + " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "] Parent ID: " + this.parentID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+        }
+
+        public void CollectHashes(CustomHashlist hashlist)
+        {
+            hashlist.Hint(hashname);
         }
 
         public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)

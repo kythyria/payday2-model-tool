@@ -24,7 +24,7 @@ namespace PD2ModelParser
         /// </remarks>
         /// <param name="obj">The section to add</param>
         /// <param name="typecode">The ID of the section header - see <see cref="Tags"/> for these</param>
-        public void AddSection(ISection obj, uint typecode)
+        public void AddSection(ISection obj)
         {
             // Start custom objects at ID 10001, so they are easy to identify (there's no requirement
             // we start at this point, however).
@@ -41,8 +41,21 @@ namespace PD2ModelParser
             parsed_sections[id] = obj;
 
             // And create a header for it
-            SectionHeader header = new SectionHeader(id) {type = typecode};
+            SectionHeader header = new SectionHeader(id) {type = obj.TypeCode};
             sections.Add(header);
+        }
+
+        public void RemoveById(uint id)
+        {
+            SectionHeader header = sections.Find(s => s.id == id);
+            if (header == null)
+                throw new ArgumentException("Cannot remove missing header", nameof(id));
+
+            if (!parsed_sections.ContainsKey(id))
+                throw new ArgumentException("Cannot remove unparsed header", nameof(id));
+
+            parsed_sections.Remove(id);
+            sections.Remove(header);
         }
     }
 }

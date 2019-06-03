@@ -23,6 +23,14 @@ namespace PD2ModelParser
             List<Object3D> object3D_sections = new List<Object3D>();
             List<Model> model_sections = new List<Model>();
 
+            // Discard the old hashlist
+            // Note that we use ToArray, which allows us to mutate the list without breaking anything
+            foreach (SectionHeader header in data.sections.ToArray())
+                if (header.type == Tags.custom_hashlist_tag)
+                    data.RemoveById(header.id);
+
+            CustomHashlist hashlist = new CustomHashlist();
+            data.AddSection(hashlist);
 
             foreach (SectionHeader sectionheader in data.sections)
             {
@@ -51,6 +59,10 @@ namespace PD2ModelParser
                     model_sections.Add(section as Model);
                 }
 
+                if (section is IHashContainer container)
+                {
+                    container.CollectHashes(hashlist);
+                }
             }
 
             //after each section, you go back and enter it's new size
@@ -146,6 +158,10 @@ namespace PD2ModelParser
                         else if (section is LinearVector3Controller)
                         {
                             (section as LinearVector3Controller).StreamWrite(bw);
+                        }
+                        else if (section is CustomHashlist chl)
+                        {
+                            chl.StreamWrite(bw);
                         }
                         else
                         {

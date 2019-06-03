@@ -21,6 +21,11 @@ namespace PD2Bundle
             return Convert.ToString(hash);
         }
 
+        public bool Contains(ulong hash)
+        {
+            return hashes.ContainsKey(hash);
+        }
+
         private void CheckCollision(Dictionary<ulong, string> item, ulong hash, string value)
         {
             if ( item.ContainsKey(hash) && (item[hash] != value) )
@@ -63,9 +68,7 @@ namespace PD2Bundle
                     string line = sr.ReadLine();
                     while (line != null)
                     {
-                        ulong hash = PD2ModelParser.Hash64.HashString(line);
-                        this.CheckCollision(this.hashes, hash, line);
-                        this.hashes[hash] = line;
+                        Hint(line);
                         line = sr.ReadLine();
                     }
                     sr.Close();
@@ -77,6 +80,13 @@ namespace PD2Bundle
             }
             loaded = true;
             return true;
+        }
+
+        public void Hint(string line)
+        {
+            ulong hash = Hash64.HashString(line);
+            CheckCollision(hashes, hash, line);
+            hashes[hash] = line;
         }
     }
 }

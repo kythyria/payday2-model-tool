@@ -35,6 +35,8 @@ namespace PD2ModelParser.Sections
             set => id = value;
         }
 
+        public uint TypeCode => Tags.skinbones_tag;
+
         // Post-loaded
         public List<Matrix3D> SkinPositions { get; private set; }
 

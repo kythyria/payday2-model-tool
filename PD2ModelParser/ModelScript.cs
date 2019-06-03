@@ -89,7 +89,7 @@ namespace PD2ModelParser
                             + "an object already exists!");
 
                     obj = new Object3D(name, null) {rotation = Matrix3D.Identity};
-                    data.AddSection(obj, Tags.object3D_tag);
+                    data.AddSection(obj);
                     break;
                 }
                 case "edit":

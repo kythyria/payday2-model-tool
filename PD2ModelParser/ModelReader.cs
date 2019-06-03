@@ -165,6 +165,10 @@ namespace PD2ModelParser
                         {
                             section = new LinearVector3Controller(br, sh);
                         }
+                        else if (sh.type == custom_hashlist_tag)
+                        {
+                            section = new CustomHashlist(br, sh);
+                        }
                         else
                         {
                             Log.Default.Warn("UNKNOWN Tag at {0} Size: {1}", sh.offset, sh.size);

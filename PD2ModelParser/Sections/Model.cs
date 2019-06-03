@@ -22,7 +22,7 @@ namespace PD2ModelParser.Sections
         }
     }
     
-    class Model : ISection, IPostLoadable
+    class Model : ISection, IPostLoadable, IHashContainer
     {
         private static uint model_data_tag = 0x62212D88; // Model data
         public UInt32 size;
@@ -241,6 +241,11 @@ namespace PD2ModelParser.Sections
             }
         }
 
+        public void CollectHashes(CustomHashlist hashlist)
+        {
+            object3D.CollectHashes(hashlist);
+        }
+
         public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)
         {
             object3D.PostLoad(id, parsed_sections);
@@ -251,5 +256,7 @@ namespace PD2ModelParser.Sections
             get => object3D.id;
             set => object3D.id = value;
         }
+
+        public uint TypeCode => Tags.model_data_tag;
     }
 }

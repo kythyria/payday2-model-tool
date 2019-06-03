@@ -30,6 +30,10 @@ namespace PD2ModelParser
         public static uint linearFloatController_tag = 0x76BF5B66; //LinearFloatController
         public static uint lookAtConstrRotationController = 0x679D695B; //LookAtConstrRotationController
         public static uint camera_tag = 0x46BF31A7; //Camera
+
+        // Custom tags - not used in vanilla PD2, but used here for whatever reason
+        // To generate these on Linux, use xxd -l 4 /dev/random
+        public const uint custom_hashlist_tag = 0x7c7844fd;
     }
 
     static class MathUtil
@@ -300,10 +304,11 @@ namespace PD2ModelParser
     {
         private ulong hash;
         private string str;
+        private bool known;
 
         public string String
         {
-            get => str ?? (str = StaticStorage.hashindex.GetString(hash));
+            get => str ?? StaticStorage.hashindex.GetString(hash);
             set
             {
                 str = value ?? throw new ArgumentNullException(nameof(value));
@@ -324,16 +329,20 @@ namespace PD2ModelParser
             }
         }
 
+        public bool Known => known || StaticStorage.hashindex.Contains(Hash);
+
         public HashName(string str)
         {
             this.str = str ?? throw new ArgumentNullException(nameof(str));
             hash = Hash64.HashString(str);
+            known = true;
         }
 
         public HashName(ulong hash)
         {
             this.hash = hash;
             str = null;
+            known = false;
         }
     }
 }
