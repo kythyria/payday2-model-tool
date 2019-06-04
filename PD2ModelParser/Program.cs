@@ -15,7 +15,6 @@ using PD2ModelParser.Sections;
 
 namespace PD2ModelParser
 {
-
     class Program
     {
         [STAThread]
@@ -31,7 +30,6 @@ namespace PD2ModelParser
 
             Form1 form = new Form1();
             Application.Run(form);
-
         }
 
         private static bool HandleCommandLine(string[] args)

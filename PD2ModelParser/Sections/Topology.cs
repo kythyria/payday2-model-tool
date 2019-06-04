@@ -34,7 +34,7 @@ namespace PD2ModelParser.Sections
             return a >= 0 && b >= 0 && c >= 0 && a < vertlen && b < vertlen && c < vertlen;
         }
     }
-    
+
     class Topology
     {
         private static uint topology_tag = 0x4C507A13; // Topology

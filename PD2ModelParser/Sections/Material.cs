@@ -17,7 +17,7 @@ namespace PD2ModelParser.Sections
             return "unknown1: " + this.unknown1 + " unknown2: " + this.unknown2;
         }
     }
-    
+
     class Material
     {
         private static uint material_tag = 0x3C54609C; // Material
@@ -96,7 +96,6 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-
             string items_string = (this.items.Count == 0 ? "none" : "");
 
             foreach (MaterialItem item in this.items)

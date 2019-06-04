@@ -37,7 +37,7 @@ namespace PD2ModelParser.Sections
             return "{ Bones1=" + this.Bones1 + ", Bones2=" + this.Bones2 + ", Bones3=" + this.Bones3 + ", Bones4=" + this.Bones4 + " }";
         }
     }
-    
+
     public class GeometryColor
     {
         public Byte red = 0;
@@ -66,7 +66,7 @@ namespace PD2ModelParser.Sections
             return "{Red=" + this.red + ", Green=" + this.green + ", Blue=" + this.blue + ", Alpha=" + this.alpha + "}";
         }
     }
-    
+
     public class GeometryHeader
     {
         public UInt32 item_size;
@@ -82,7 +82,7 @@ namespace PD2ModelParser.Sections
             item_type = type;
         }
     }
-    
+
     class Geometry
     {
         private static uint geometry_tag = 0x7AB072D3; // Geometry
@@ -131,7 +131,7 @@ namespace PD2ModelParser.Sections
         public Geometry(BinaryReader instream, SectionHeader section)
         {
             this.id = section.id;
-            
+
             UInt32[] size_index = { 0, 4, 8, 12, 16, 4, 4, 8, 12 };
             this.vert_count = instream.ReadUInt32(); //Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
             this.header_count = instream.ReadUInt32(); //Count of all headers for items in this section
