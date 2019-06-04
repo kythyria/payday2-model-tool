@@ -18,7 +18,7 @@ namespace PD2ModelParser.Sections
         }
     }
 
-    class Material
+    class Material : ISection
     {
         private static uint material_tag = 0x3C54609C; // Material
         public UInt32 id;
@@ -105,5 +105,13 @@ namespace PD2ModelParser.Sections
 
             return "[Material] ID: " + this.id + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " count: " + this.count + " items: [ " + items_string + " ] " + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
+
+        public uint SectionId
+        {
+            get => id;
+            set => id = value;
+        }
+
+        public uint TypeCode => Tags.material_tag;
     }
 }

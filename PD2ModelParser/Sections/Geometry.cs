@@ -83,7 +83,7 @@ namespace PD2ModelParser.Sections
         }
     }
 
-    class Geometry
+    class Geometry : ISection
     {
         private static uint geometry_tag = 0x7AB072D3; // Geometry
         public UInt32 id;
@@ -489,5 +489,12 @@ namespace PD2ModelParser.Sections
         {
             return "[Geometry] ID: " + this.id + " Count: " + this.vert_count + " Count2: " + this.header_count + " Headers: " + this.headers.Count + " Size: " + this.geometry_size + " Verts: " + this.verts.Count + " UVs: " + this.uvs.Count + " Pattern UVs: " + this.pattern_uvs.Count + " Normals: " + this.normals.Count + " unknown_15: " + this.weight_groups.Count + " unknown_17: " + this.weights.Count + " unknown_20: " + this.unknown20.Count + " unknown_21: " + this.unknown21.Count + " Geometry_unknown_item_data: " + this.unknown_item_data.Count + " unknown_hash: " + StaticStorage.hashindex.GetString(this.hashname) + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
+
+        public uint SectionId
+        {
+            get => id;
+            set => id = value;
+        }
+        public uint TypeCode => Tags.geometry_tag;
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    class Material_Group
+    class Material_Group : ISection
     {
         private static uint material_group_tag = 0x29276B1D; // Material Group
         public UInt32 id;
@@ -82,5 +82,13 @@ namespace PD2ModelParser.Sections
 
             return "[Material Group] ID: " + this.id + " size: " + this.size + " Count: " + this.count + " Items: [ " + items_string + " ] " + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
+
+        public uint SectionId
+        {
+            get => id;
+            set => id = value;
+        }
+
+        public uint TypeCode => Tags.material_group_tag;
     }
 }

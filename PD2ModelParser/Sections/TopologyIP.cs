@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    class TopologyIP
+    class TopologyIP : ISection
     {
         private static uint topologyIP_tag = 0x03B634BD;  // TopologyIP
         public UInt32 id;
@@ -63,5 +63,13 @@ namespace PD2ModelParser.Sections
         {
             return "[TopologyIP] ID: " + this.id + " size: " + this.size + " TopologyIP sectionID: " + this.sectionID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
+
+        public uint SectionId
+        {
+            get => id;
+            set => id = value;
+        }
+
+        public uint TypeCode => Tags.topologyIP_tag;
     }
 }

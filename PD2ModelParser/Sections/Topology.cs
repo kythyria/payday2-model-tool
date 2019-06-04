@@ -35,7 +35,7 @@ namespace PD2ModelParser.Sections
         }
     }
 
-    class Topology
+    class Topology : ISection
     {
         private static uint topology_tag = 0x4C507A13; // Topology
         public UInt32 id;
@@ -122,5 +122,13 @@ namespace PD2ModelParser.Sections
         {
             return "[Topology] ID: " + this.id + " unknown1: " + this.unknown1 + " facelist: " + this.facelist.Count + " count2: " + this.count2 + " items2: " + this.items2.Length + " hashname: " + StaticStorage.hashindex.GetString( this.hashname ) + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
+
+        public uint SectionId
+        {
+            get => id;
+            set => id = value;
+        }
+
+        public uint TypeCode => Tags.topology_tag;
     }
 }
