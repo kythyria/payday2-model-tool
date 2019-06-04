@@ -453,7 +453,6 @@ namespace PD2ModelParser
             geometry_section.unknown20 = new_arranged_unknown20.ToList();
             geometry_section.unknown21 = new_arranged_unknown21.ToList();
 
-            topology_section.count1 = (uint)(new_faces.Count * 3);
             topology_section.facelist = new_faces;
         }
 

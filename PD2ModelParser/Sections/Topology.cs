@@ -41,7 +41,6 @@ namespace PD2ModelParser.Sections
         public UInt32 id;
 
         public UInt32 unknown1;
-        public UInt32 count1;
         public List<Face> facelist = new List<Face>();
         public UInt32 count2;
         public byte[] items2;
@@ -54,7 +53,6 @@ namespace PD2ModelParser.Sections
             this.id = sec_id;
 
             this.unknown1 = 0;
-            this.count1 = (uint)(obj.faces.Count / 3);
             this.facelist = obj.faces;
 
             this.count2 = 0;
@@ -67,8 +65,8 @@ namespace PD2ModelParser.Sections
             this.id = section.id;
 
             this.unknown1 = instream.ReadUInt32();
-            this.count1 = instream.ReadUInt32();
-            for (int x = 0; x < this.count1 / 3; x++)
+            uint count1 = instream.ReadUInt32();
+            for (int x = 0; x < count1 / 3; x++)
             {
                 Face face = new Face();
                 face.a = instream.ReadUInt16();
@@ -105,8 +103,7 @@ namespace PD2ModelParser.Sections
         public void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.unknown1);
-            outstream.Write(this.count1);
-            List<Face> facelist = this.facelist;
+            outstream.Write(facelist.Count * 3);
             foreach (Face face in facelist)
             {
                 outstream.Write(face.a);
@@ -123,7 +120,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return "[Topology] ID: " + this.id + " unknown1: " + this.unknown1 + " count1: " + this.count1 + " facelist: " + this.facelist.Count + " count2: " + this.count2 + " items2: " + this.items2.Length + " hashname: " + StaticStorage.hashindex.GetString( this.hashname ) + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[Topology] ID: " + this.id + " unknown1: " + this.unknown1 + " facelist: " + this.facelist.Count + " count2: " + this.count2 + " items2: " + this.items2.Length + " hashname: " + StaticStorage.hashindex.GetString( this.hashname ) + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
     }
 }
