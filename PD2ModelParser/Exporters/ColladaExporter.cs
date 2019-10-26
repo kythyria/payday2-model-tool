@@ -147,7 +147,13 @@ namespace PD2ModelParser
                     {
                         uint id = to_parse.Dequeue();
 
-                        Object3D obj = (Object3D) parsed_sections[id];
+                        // This used to hard cast the section out - unfortunately I didn't
+                        // make a comment when I wrote this and it's been like six months, so
+                        // I can only guess that a model node found it's way in here?
+                        Object3D obj = parsed_sections[id] as Object3D;
+                        if (obj == null)
+                            continue;
+
                         string bonename = obj.hashname.String;
 
                         // Find the locators and such, and add them to the TODO list
