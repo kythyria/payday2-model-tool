@@ -17,7 +17,7 @@ namespace PD2ModelParser.Sections
         public UInt32 id;
 
         public Bones bones;
-        public UInt32 object3D_section_id;
+        public UInt32 probably_root_bone;
         public int count
         {
             get { return objects.Count; }
@@ -44,7 +44,7 @@ namespace PD2ModelParser.Sections
             this.id = section.id;
 
             this.bones = new Bones(instream);
-            this.object3D_section_id = instream.ReadUInt32();
+            this.probably_root_bone = instream.ReadUInt32();
             uint count = instream.ReadUInt32();
             for (int x = 0; x < count; x++)
                 this.objects.Add(instream.ReadUInt32());
@@ -79,7 +79,7 @@ namespace PD2ModelParser.Sections
         public void StreamWriteData(BinaryWriter outstream)
         {
             this.bones.StreamWriteData(outstream);
-            outstream.Write(this.object3D_section_id);
+            outstream.Write(this.probably_root_bone);
             outstream.Write(this.count);
             foreach (UInt32 item in this.objects)
                 outstream.Write(item);
@@ -109,7 +109,7 @@ namespace PD2ModelParser.Sections
                 rotations_string += rotation + ", ";
             }
 
-            return "[SkinBones] ID: " + this.id + " bones: [ " + this.bones + " ] object3D_section_id: " + this.object3D_section_id + " count: " + this.count + " objects count: " + this.objects.Count + " objects:[ " + objects_string + " ] rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ] unknown_matrix: " + this.global_skin_transform + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[SkinBones] ID: " + this.id + " bones: [ " + this.bones + " ] object3D_section_id: " + this.probably_root_bone + " count: " + this.count + " objects count: " + this.objects.Count + " objects:[ " + objects_string + " ] rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ] unknown_matrix: " + this.global_skin_transform + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
         public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)
