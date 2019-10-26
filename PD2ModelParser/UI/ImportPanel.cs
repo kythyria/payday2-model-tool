@@ -105,7 +105,7 @@ namespace PD2ModelParser.UI
             }
             catch (Exception exc)
             {
-                Log.Default.Warn("Exception exporting Diesel file: {}", exc);
+                Log.Default.Warn("Exception exporting Diesel file: {0}", exc);
                 MessageBox.Show("There was an error generating the output file - see console");
                 return;
             }
