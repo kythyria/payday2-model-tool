@@ -15,7 +15,6 @@ namespace PD2ModelParser.Sections
         private static uint skinbones_tag = 0x65CC1825; // SkinBones
 
         public UInt32 id;
-        public UInt32 size;
 
         public Bones bones;
         public UInt32 object3D_section_id;
@@ -43,7 +42,6 @@ namespace PD2ModelParser.Sections
         public SkinBones(BinaryReader instream, SectionHeader section)
         {
             this.id = section.id;
-            this.size = section.size;
 
             this.bones = new Bones(instream);
             this.object3D_section_id = instream.ReadUInt32();
@@ -66,7 +64,7 @@ namespace PD2ModelParser.Sections
             outstream.Write(skinbones_tag);
             outstream.Write(this.id);
             long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
+            outstream.Write(0); // Will be overwritten
 
             this.StreamWriteData(outstream);
 
@@ -111,7 +109,7 @@ namespace PD2ModelParser.Sections
                 rotations_string += rotation + ", ";
             }
 
-            return "[SkinBones] ID: " + this.id + " size: " + this.size + " bones: [ " + this.bones + " ] object3D_section_id: " + this.object3D_section_id + " count: " + this.count + " objects count: " + this.objects.Count + " objects:[ " + objects_string + " ] rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ] unknown_matrix: " + this.global_skin_transform + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[SkinBones] ID: " + this.id + " bones: [ " + this.bones + " ] object3D_section_id: " + this.object3D_section_id + " count: " + this.count + " objects count: " + this.objects.Count + " objects:[ " + objects_string + " ] rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ] unknown_matrix: " + this.global_skin_transform + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
         public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)
