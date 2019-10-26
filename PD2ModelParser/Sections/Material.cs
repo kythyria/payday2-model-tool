@@ -59,7 +59,8 @@ namespace PD2ModelParser.Sections
 
             this.remaining_data = null;
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
-                this.remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
+                this.remaining_data =
+                    instream.ReadBytes((int) ((section.offset + 12 + section.size) - instream.BaseStream.Position));
         }
 
         public void StreamWrite(BinaryWriter outstream)
@@ -74,7 +75,7 @@ namespace PD2ModelParser.Sections
             //update section size
             long newsizeend = outstream.BaseStream.Position;
             outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
+            outstream.Write((uint) (newsizeend - (newsizestart + 4)));
 
             outstream.BaseStream.Position = newsizeend;
         }
@@ -103,7 +104,12 @@ namespace PD2ModelParser.Sections
                 items_string += item + ", ";
             }
 
-            return "[Material] ID: " + this.id + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " count: " + this.count + " items: [ " + items_string + " ] " + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[Material] ID: " + this.id +
+                   " size: " + this.size +
+                   " hashname: " + StaticStorage.hashindex.GetString(this.hashname) +
+                   " count: " + this.count +
+                   " items: [ " + items_string + " ] " +
+                   (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
         public uint SectionId

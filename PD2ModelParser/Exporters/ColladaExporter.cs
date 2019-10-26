@@ -37,7 +37,7 @@ namespace PD2ModelParser
 
             COLLADA collada = new COLLADA
             {
-                Items = new object[] { libgeoms, libscenes },
+                Items = new object[] {libgeoms, libscenes},
                 scene = scene,
                 asset = new asset
                 {
@@ -47,7 +47,7 @@ namespace PD2ModelParser
                     // Otherwise it defaults to Y-up (see asset's constructor), while we're
                     //  using Z-up. Without the asset tag Blender defaults to Z-up, so if you
                     //  remove this then the presence of the asset tag flips the model.
-                    up_axis =  UpAxisType.Z_UP,
+                    up_axis = UpAxisType.Z_UP,
                 },
             };
 
@@ -119,7 +119,7 @@ namespace PD2ModelParser
                                 ItemsChoiceType2.matrix
                             }*/
                     };
-                    root_node.node1 = new node[] { bone_root_node };
+                    root_node.node1 = new node[] {bone_root_node};
 
                     Dictionary<UInt32, node> bones = new Dictionary<UInt32, node>();
 
