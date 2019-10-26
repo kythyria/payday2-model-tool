@@ -90,6 +90,7 @@ namespace PD2ModelParser.UI
             this.treeView.Name = "treeView";
             this.treeView.Size = new System.Drawing.Size(613, 163);
             this.treeView.TabIndex = 6;
+            this.treeView.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseClick);
             // 
             // scriptFile
             // 

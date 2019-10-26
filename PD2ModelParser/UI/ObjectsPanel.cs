@@ -14,7 +14,10 @@ namespace PD2ModelParser.UI
     public partial class ObjectsPanel : UserControl
     {
         private readonly Dictionary<uint, TreeNode> nodes = new Dictionary<uint, TreeNode>();
+        private readonly Dictionary<TreeNode, ObjectOrModel> reverseNodes = new Dictionary<TreeNode, ObjectOrModel>();
         private readonly TreeNode root = new TreeNode("<root>");
+        private readonly ContextMenu nodeRightclickMenu;
+        private TreeNode menuTarget;
 
         public ObjectsPanel()
         {
@@ -22,6 +25,12 @@ namespace PD2ModelParser.UI
 
             treeView.Nodes.Clear();
             treeView.Nodes.Add(root);
+
+            nodeRightclickMenu = new ContextMenu();
+
+            MenuItem properties = new MenuItem("Properties");
+            properties.Click += optProperties_Click;
+            nodeRightclickMenu.MenuItems.Add(properties);
         }
 
         /// <summary>
@@ -78,6 +87,10 @@ namespace PD2ModelParser.UI
             // be deleted.
             HashSet<uint> unused = new HashSet<uint>(nodes.Keys);
 
+            // Fill out the reverse nodes
+            // It maintains a node-to-object mapping, for stuff like the properties window
+            reverseNodes.Clear();
+
             // Walk through and create a node (if it does not already exist) for each object.
             // Do this before attaching them to their parents, as otherwise the parent might
             // not exist when we build one if it's children.
@@ -93,6 +106,8 @@ namespace PD2ModelParser.UI
             {
                 TreeNode node = nodes[obj.id];
                 TreeNode parent = obj.parent == null ? root : nodes[obj.parent.id];
+
+                reverseNodes[node] = obj;
 
                 if (obj.model == null)
                     node.Text = obj.obj.Name;
@@ -153,6 +168,28 @@ namespace PD2ModelParser.UI
                 this.model = model;
                 this.obj = model.object3D;
             }
+        }
+
+        private void treeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            // Only process right clicks
+            if (e.Button != MouseButtons.Right)
+                return;
+
+            // No properties for the root node
+            if (e.Node == root)
+                return;
+
+            menuTarget = e.Node;
+            nodeRightclickMenu.Show(treeView, e.Location);
+        }
+
+        private void optProperties_Click(object sender, EventArgs e)
+        {
+            ObjectOrModel obj = reverseNodes[menuTarget];
+
+            // TODO actually show some useful information
+            MessageBox.Show(obj.obj.Name);
         }
     }
 }
