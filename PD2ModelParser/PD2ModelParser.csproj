@@ -38,6 +38,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FbxNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\FbxNet\FbxNet\bin\Debug\FbxNet.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Options, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Mono.Options.5.3.0.1\lib\net4-client\Mono.Options.dll</HintPath>
       <Private>True</Private>
@@ -63,6 +66,7 @@
     <Compile Include="Exporters\ColladaExporter.cs" />
     <Compile Include="collada_schema_1_4.cs" />
     <Compile Include="Exporters\DieselExporter.cs" />
+    <Compile Include="Exporters\FbxExporter.cs" />
     <Compile Include="Hash64.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Misc\Updates.cs" />

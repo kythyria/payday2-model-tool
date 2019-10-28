@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Mono.Options;
+using PD2ModelParser.Exporters;
 using PD2ModelParser.Sections;
 
 namespace PD2ModelParser
@@ -244,6 +245,10 @@ namespace PD2ModelParser
                         if (entry.arg.EndsWith(".dae"))
                         {
                             ColladaExporter.ExportFile(data, entry.arg);
+                        }
+                        else if (entry.arg.EndsWith(".fbx"))
+                        {
+                            FbxExporter.ExportFile(data, entry.arg);
                         }
                         else if (entry.arg.EndsWith(".obj"))
                         {
