@@ -113,6 +113,9 @@ namespace PD2ModelParser.Exporters
             {
                 temp.Set(geom.verts[i]);
                 mesh.SetControlPointAt(temp, i);
+
+                temp.Set(geom.normals[i]);
+                mesh.SetControlPointNormalAt(temp, i);
             }
 
             foreach (Face face in topo.facelist)
