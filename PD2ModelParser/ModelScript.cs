@@ -52,8 +52,19 @@ namespace PD2ModelParser
         {
             foreach (object section in data.parsed_sections.Values)
             {
-                // Only look for Object3Ds
-                if (!(section is Object3D obj)) continue;
+                // Only look for Object3Ds (and models, which contain Object3Ds)
+                Object3D obj;
+                switch (section)
+                {
+                    case Object3D tmp:
+                        obj = tmp;
+                        break;
+                    case Model tmp:
+                        obj = tmp.object3D;
+                        break;
+                    default:
+                        continue;
+                }
 
                 // Check if this one has the right name
                 if (obj.hashname.Hash != hashname) continue;
