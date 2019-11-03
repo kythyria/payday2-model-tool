@@ -133,6 +133,23 @@ namespace PD2ModelParser.Exporters
             AddUVs(mesh, "PrimaryUV", geom.uvs);
             AddUVs(mesh, "PatternUV", geom.pattern_uvs);
 
+            if (geom.vertex_colors.Count > 0)
+            {
+                FbxLayerElementVertexColor colours = mesh.CreateElementVertexColor();
+                colours.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
+                colours.SetReferenceMode(FbxLayerElement.EReferenceMode.eDirect);
+                for (int i = 0; i < geom.vert_count; i++)
+                {
+                    GeometryColor c = geom.vertex_colors[i];
+                    colours.mDirectArray.Add(new FbxColor(
+                        c.red / 255.0,
+                        c.green / 255.0,
+                        c.blue / 255.0,
+                        c.alpha / 255.0
+                    ));
+                }
+            }
+
             return new ModelInfo
             {
                 Model = model,
