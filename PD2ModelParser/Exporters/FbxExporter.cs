@@ -114,6 +114,7 @@ namespace PD2ModelParser.Exporters
                 temp.Set(geom.verts[i]);
                 mesh.SetControlPointAt(temp, i);
 
+                if (geom.normals.Count <= 0) continue;
                 temp.Set(geom.normals[i]);
                 mesh.SetControlPointNormalAt(temp, i);
             }
