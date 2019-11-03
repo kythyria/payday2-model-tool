@@ -128,12 +128,30 @@ namespace PD2ModelParser.Exporters
                 mesh.EndPolygon();
             }
 
+            // Export the UVs
+            AddUVs(mesh, "PrimaryUV", geom.uvs);
+            AddUVs(mesh, "PatternUV", geom.pattern_uvs);
+
             return new ModelInfo
             {
                 Model = model,
                 Mesh = mesh,
                 Node = mesh_node,
             };
+        }
+
+        private static void AddUVs(FbxMesh mesh, string name, List<Vector2D> uvs)
+        {
+            if (uvs.Count == 0)
+                return;
+
+            FbxLayerElementUV uv = mesh.CreateElementUV("PrimaryUV");
+            uv.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
+            uv.SetReferenceMode(FbxLayerElement.EReferenceMode.eDirect);
+            for (int i = 0; i < uvs.Count; i++)
+            {
+                uv.GetDirectArray().Add(uvs[i].ToFbxV2());
+            }
         }
 
         private static Dictionary<Object3D, BoneInfo> AddSkeleton(FbxScene scene, FullModelData data, SkinBones bones)
@@ -302,6 +320,8 @@ namespace PD2ModelParser.Exporters
         }
 
         private static FbxDouble3 ToFbxD3(this Vector3D v) => new FbxDouble3(v.X, v.Y, v.Z);
+
+        private static FbxVector2 ToFbxV2(this Vector2D v) => new FbxVector2(v.X, v.Y);
 
         private struct ModelInfo
         {
