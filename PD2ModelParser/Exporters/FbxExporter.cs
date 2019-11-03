@@ -66,12 +66,13 @@ namespace PD2ModelParser.Exporters
 
                 ModelInfo mesh = AddModel(data, model);
 
-                SkinBones sb = (SkinBones) data.parsed_sections[model.skinbones_ID];
-                if (sb == null)
+                if (model.skinbones_ID == 0)
                 {
                     scene.GetRootNode().AddChild(mesh.Node);
                     continue;
                 }
+
+                SkinBones sb = (SkinBones) data.parsed_sections[model.skinbones_ID];
 
                 Dictionary<Object3D, BoneInfo> bones = AddSkeleton(scene, data, sb);
 
