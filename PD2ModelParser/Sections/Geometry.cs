@@ -34,7 +34,8 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return "{ Bones1=" + this.Bones1 + ", Bones2=" + this.Bones2 + ", Bones3=" + this.Bones3 + ", Bones4=" + this.Bones4 + " }";
+            return "{ Bones1=" + this.Bones1 + ", Bones2=" + this.Bones2 + ", Bones3=" + this.Bones3 + ", Bones4=" +
+                   this.Bones4 + " }";
         }
     }
 
@@ -88,7 +89,9 @@ namespace PD2ModelParser.Sections
         private static uint geometry_tag = 0x7AB072D3; // Geometry
         public UInt32 id;
 
-        public UInt32 vert_count; //Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
+        // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
+        public UInt32 vert_count;
+
         public UInt32 header_count; //Count of all headers for items in this section
         public UInt32 geometry_size;
         public List<GeometryHeader> headers = new List<GeometryHeader>();
@@ -101,7 +104,10 @@ namespace PD2ModelParser.Sections
         public List<Vector3D> weights = new List<Vector3D>(); //3 - Weights
         public List<Vector3D> unknown20 = new List<Vector3D>(); //3 - Tangent/Binormal
         public List<Vector3D> unknown21 = new List<Vector3D>(); //3 - Tangent/Binormal
-        public List<byte[]> unknown_item_data = new List<byte[]>(); //Unknown items from this section. Includes colors and a few other items.
+
+        // Unknown items from this section. Includes colors and a few other items.
+        public List<byte[]> unknown_item_data = new List<byte[]>();
+
         public UInt64 hashname;
 
         public byte[] remaining_data = null;
@@ -110,7 +116,7 @@ namespace PD2ModelParser.Sections
         {
             this.id = sec_id;
 
-            this.vert_count = (uint)newobject.verts.Count;
+            this.vert_count = (uint) newobject.verts.Count;
             this.header_count = 5;
 
             this.headers.Add(new GeometryHeader(3, 1)); // vert
@@ -125,23 +131,25 @@ namespace PD2ModelParser.Sections
             //this.unknown20;
             //this.unknown21;
 
-            this.hashname = Hash64.HashString(newobject.object_name+".Geometry");
+            this.hashname = Hash64.HashString(newobject.object_name + ".Geometry");
         }
 
         public Geometry(BinaryReader instream, SectionHeader section)
         {
             this.id = section.id;
 
-            UInt32[] size_index = { 0, 4, 8, 12, 16, 4, 4, 8, 12 };
-            this.vert_count = instream.ReadUInt32(); //Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
-            this.header_count = instream.ReadUInt32(); //Count of all headers for items in this section
+            UInt32[] size_index = {0, 4, 8, 12, 16, 4, 4, 8, 12};
+            // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
+            this.vert_count = instream.ReadUInt32();
+            //Count of all headers for items in this section
+            this.header_count = instream.ReadUInt32();
             UInt32 calc_size = 0;
             for (int x = 0; x < this.header_count; x++)
             {
                 GeometryHeader header = new GeometryHeader();
                 header.item_size = instream.ReadUInt32();
                 header.item_type = instream.ReadUInt32();
-                calc_size += size_index[(int)header.item_size];
+                calc_size += size_index[(int) header.item_size];
                 this.headers.Add(header);
             }
 
@@ -249,16 +257,20 @@ namespace PD2ModelParser.Sections
                 }
                 else
                 {
-                    this.unknown_item_data.Add(instream.ReadBytes((int)(size_index[head.item_size] * this.vert_count)));
+                    this.unknown_item_data.Add(
+                        instream.ReadBytes((int) (size_index[head.item_size] * this.vert_count)));
                 }
-
             }
 
             this.hashname = instream.ReadUInt64();
 
             this.remaining_data = null;
-            if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
-                remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position)); //If exists, this contains hashed name for this geometry (see hashlist.txt)
+            long sect_end = section.offset + 12 + section.size;
+            if (sect_end > instream.BaseStream.Position)
+            {
+                // If exists, this contains hashed name for this geometry (see hashlist.txt)
+                remaining_data = instream.ReadBytes((int) (sect_end - instream.BaseStream.Position));
+            }
         }
 
         public void StreamWrite(BinaryWriter outstream)
@@ -273,7 +285,7 @@ namespace PD2ModelParser.Sections
             //update section size
             long newsizeend = outstream.BaseStream.Position;
             outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
+            outstream.Write((uint) (newsizeend - (newsizestart + 4)));
 
             outstream.BaseStream.Position = newsizeend;
         }
@@ -287,6 +299,7 @@ namespace PD2ModelParser.Sections
                 outstream.Write(head.item_size);
                 outstream.Write(head.item_type);
             }
+
             List<Vector3D> verts = this.verts;
             int vert_pos = 0;
             List<Vector2D> uvs = this.uvs;
@@ -373,7 +386,6 @@ namespace PD2ModelParser.Sections
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
-
                         if (this.unknown20.Count != this.vert_count)
                         {
                             outstream.Write(0.0f);
@@ -394,7 +406,6 @@ namespace PD2ModelParser.Sections
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
-
                         if (this.unknown21.Count != this.vert_count)
                         {
                             outstream.Write(0.0f);
@@ -415,7 +426,6 @@ namespace PD2ModelParser.Sections
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
-
                         if (this.weight_groups.Count != this.vert_count)
                         {
                             outstream.Write(0.0f);
@@ -433,7 +443,6 @@ namespace PD2ModelParser.Sections
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
-
                         if (this.weights.Count != this.vert_count)
                         {
                             outstream.Write(1.0f);
@@ -468,26 +477,66 @@ namespace PD2ModelParser.Sections
             //for debug purposes
             //following prints the suspected "weights" table
 
-            if (this.weight_groups.Count > 0 && this.unknown20.Count > 0 && this.unknown21.Count > 0 && this.weights.Count > 0)
+            if (this.weight_groups.Count > 0 && this.unknown20.Count > 0 && this.unknown21.Count > 0 &&
+                this.weights.Count > 0)
             {
                 outstream.WriteLine("Printing weights table for " + StaticStorage.hashindex.GetString(this.hashname));
                 outstream.WriteLine("====================================================");
-                outstream.WriteLine("unkn15_1\tunkn15_2\tunkn15_3\tunkn15_4\tunkn17_X\tunkn17_Y\tunk17_Z\ttotalsum\tunk_20_X\tunk_20_Y\tunk_20_Z\tunk21_X\tunk21_Y\tunk21_Z");
+                outstream.WriteLine(
+                    "unkn15_1\tunkn15_2\tunkn15_3\tunkn15_4\tunkn17_X\tunkn17_Y\tunk17_Z\ttotalsum\tunk_20_X\tunk_20_Y\tunk_20_Z\tunk21_X\tunk21_Y\tunk21_Z");
 
 
                 for (int x = 0; x < this.weight_groups.Count; x++)
                 {
-                    outstream.WriteLine(this.weight_groups[x].Bones1.ToString() + "\t" + this.weight_groups[x].Bones2.ToString() + "\t" + this.weight_groups[x].Bones3.ToString() + "\t" + this.weight_groups[x].Bones4.ToString() + "\t" + this.weights[x].X.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.weights[x].Y.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.weights[x].Z.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + (this.weights[x].X + this.weights[x].Y + this.weights[x].Z).ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown20[x].X.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown20[x].Y.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown20[x].Z.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown21[x].X.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown21[x].Y.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown21[x].Z.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture));
+                    outstream.WriteLine(this.weight_groups[x].Bones1.ToString() + "\t" +
+                                        this.weight_groups[x].Bones2.ToString() + "\t" +
+                                        this.weight_groups[x].Bones3.ToString() + "\t" +
+                                        this.weight_groups[x].Bones4.ToString() + "\t" +
+                                        this.weights[x].X.ToString("0.000000",
+                                            System.Globalization.CultureInfo.InvariantCulture) + "\t" +
+                                        this.weights[x].Y.ToString("0.000000",
+                                            System.Globalization.CultureInfo.InvariantCulture) + "\t" +
+                                        this.weights[x].Z.ToString("0.000000",
+                                            System.Globalization.CultureInfo.InvariantCulture) + "\t" +
+                                        (this.weights[x].X + this.weights[x].Y + this.weights[x].Z).ToString("0.000000",
+                                            System.Globalization.CultureInfo.InvariantCulture) + "\t" +
+                                        this.unknown20[x].X.ToString("0.000000",
+                                            System.Globalization.CultureInfo.InvariantCulture) + "\t" +
+                                        this.unknown20[x].Y.ToString("0.000000",
+                                            System.Globalization.CultureInfo.InvariantCulture) + "\t" +
+                                        this.unknown20[x].Z.ToString("0.000000",
+                                            System.Globalization.CultureInfo.InvariantCulture) + "\t" +
+                                        this.unknown21[x].X.ToString("0.000000",
+                                            System.Globalization.CultureInfo.InvariantCulture) + "\t" +
+                                        this.unknown21[x].Y.ToString("0.000000",
+                                            System.Globalization.CultureInfo.InvariantCulture) + "\t" +
+                                        this.unknown21[x].Z.ToString("0.000000",
+                                            System.Globalization.CultureInfo.InvariantCulture));
                     //outstream.WriteLine(this.unknown15[x].X.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown15[x].Y.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.weights[x].X.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.weights[x].Y.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.weights[x].Z.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + (this.unknown15[x].X + this.unknown15[x].Y + this.weights[x].X + this.weights[x].Y + this.weights[x].Z).ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown20[x].X.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown20[x].Y.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown20[x].Z.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown21[x].X.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown21[x].Y.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown21[x].Z.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture));
                 }
-                outstream.WriteLine("====================================================");
 
+                outstream.WriteLine("====================================================");
             }
         }
 
         public override string ToString()
         {
-            return "[Geometry] ID: " + this.id + " Count: " + this.vert_count + " Count2: " + this.header_count + " Headers: " + this.headers.Count + " Size: " + this.geometry_size + " Verts: " + this.verts.Count + " UVs: " + this.uvs.Count + " Pattern UVs: " + this.pattern_uvs.Count + " Normals: " + this.normals.Count + " unknown_15: " + this.weight_groups.Count + " unknown_17: " + this.weights.Count + " unknown_20: " + this.unknown20.Count + " unknown_21: " + this.unknown21.Count + " Geometry_unknown_item_data: " + this.unknown_item_data.Count + " unknown_hash: " + StaticStorage.hashindex.GetString(this.hashname) + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[Geometry] ID: " + this.id +
+                   " Count: " + this.vert_count +
+                   " Count2: " + this.header_count +
+                   " Headers: " + this.headers.Count +
+                   " Size: " + this.geometry_size +
+                   " Verts: " + this.verts.Count +
+                   " UVs: " + this.uvs.Count +
+                   " Pattern UVs: " + this.pattern_uvs.Count +
+                   " Normals: " + this.normals.Count +
+                   " unknown_15: " + this.weight_groups.Count +
+                   " unknown_17: " + this.weights.Count +
+                   " unknown_20: " + this.unknown20.Count +
+                   " unknown_21: " + this.unknown21.Count +
+                   " Geometry_unknown_item_data: " + this.unknown_item_data.Count +
+                   " unknown_hash: " + StaticStorage.hashindex.GetString(this.hashname) +
+                   (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
         public uint SectionId
@@ -495,6 +544,7 @@ namespace PD2ModelParser.Sections
             get => id;
             set => id = value;
         }
+
         public uint TypeCode => Tags.geometry_tag;
     }
 }
