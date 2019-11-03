@@ -86,6 +86,9 @@ namespace PD2ModelParser.Exporters
                 FbxSkeleton skeleton = FbxSkeleton.Create(fm, "");
                 skeleton.SetSkeletonType(FbxSkeleton.EType.eRoot);
                 root.SetNodeAttribute(skeleton);
+
+                // Add the skin weights, which bind the model onto the bones
+                AddWeights(data, model, sb, mesh.Mesh, bones);
             }
         }
 
@@ -166,6 +169,60 @@ namespace PD2ModelParser.Exporters
             bones[obj] = info;
 
             return info;
+        }
+
+        private static void AddWeights(FullModelData data, Model model, SkinBones sb,
+            FbxMesh mesh, IReadOnlyDictionary<Object3D, BoneInfo> bones)
+        {
+            Dictionary<uint, object> parsed = data.parsed_sections;
+            PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
+            Geometry geom = (Geometry) parsed[pgp.geometry_section];
+
+            FbxSkin skin = FbxSkin.Create(fm, model.object3D.Name + "Skin");
+            mesh.AddDeformer(skin);
+
+            for (int bone_idx = 0; bone_idx < sb.count; bone_idx++)
+            {
+                Object3D obj = (Object3D) parsed[sb.objects[bone_idx]];
+
+                FbxCluster cluster = FbxCluster.Create(fm, "");
+                cluster.SetLink(bones[obj].Node);
+                cluster.SetLinkMode(FbxCluster.ELinkMode.eNormalize);
+
+                FbxAMatrix ident = new FbxAMatrix();
+                ident.SetIdentity();
+                cluster.SetTransformLinkMatrix(ident);
+
+                // TODO
+                cluster.SetTransformMatrix(ident);
+
+                for (int i = 0; i < geom.verts.Count; i++)
+                {
+                    GeometryWeightGroups groups = geom.weight_groups[i];
+                    Vector3D weights = geom.weights[i];
+                    float weight;
+
+                    if (bone_idx == 0)
+                        continue;
+                    int bi = bone_idx;
+
+                    if (groups.Bones1 == bi)
+                        weight = weights.X;
+                    else if (groups.Bones2 == bi)
+                        weight = weights.Y;
+                    else if (groups.Bones3 == bi)
+                        weight = weights.Z;
+                    else if (groups.Bones4 == bi)
+                        throw new Exception("Unsupported Bone4 weight - not in weights");
+                    else
+                        continue;
+
+                    cluster.AddControlPointIndex(i, weight);
+                }
+
+                if (!skin.AddCluster(cluster))
+                    throw new Exception();
+            }
         }
 
         private static void CopyTransform(Matrix3D transform, FbxNode node)
