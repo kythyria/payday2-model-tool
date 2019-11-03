@@ -111,8 +111,7 @@ namespace PD2ModelParser.Exporters
             FbxVector4 temp = new FbxVector4();
             for (int i = 0; i < geom.verts.Count; i++)
             {
-                Vector3D vert = geom.verts[i];
-                temp.Set(vert.X, vert.Y, vert.Z);
+                temp.Set(geom.verts[i]);
                 mesh.SetControlPointAt(temp, i);
             }
 
@@ -270,6 +269,8 @@ namespace PD2ModelParser.Exporters
             double z = FbxNet.FbxNet.doubleArray_getitem(data, 2);
             return new Vector3D((float) x, (float) y, (float) z);
         }
+
+        private static void Set(this FbxVector4 v, Vector3D other) => v.Set(other.X, other.Y, other.Z, 0);
 
         // ReSharper disable once InconsistentNaming
         private static Vector3D ToEulerZYX(this Quaternion q)
