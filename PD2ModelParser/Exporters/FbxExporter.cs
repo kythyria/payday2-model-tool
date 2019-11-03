@@ -189,12 +189,23 @@ namespace PD2ModelParser.Exporters
                 cluster.SetLink(bones[obj].Node);
                 cluster.SetLinkMode(FbxCluster.ELinkMode.eNormalize);
 
+                // This is all AFAIK, but here's what I'm pretty sure this is doing
+                // SetTransformMatrix registers the transform of the mesh
+                // While SetTransformLinkMatrix binds it to the transform of the bone
                 FbxAMatrix ident = new FbxAMatrix();
                 ident.SetIdentity();
-                cluster.SetTransformLinkMatrix(ident);
-
-                // TODO
                 cluster.SetTransformMatrix(ident);
+
+                // Break down the bone's transform and convert it to an FBX affine matrix
+                // Skip the scale for now though, we don't need it
+                obj.world_transform.Decompose(out Vector3D _, out Quaternion rotate, out Vector3D translate);
+                FbxAMatrix mat = new FbxAMatrix();
+                mat.SetIdentity();
+                mat.SetT(new FbxVector4(translate.X, translate.Y, translate.Z));
+                mat.SetQ(new FbxQuaternion(rotate.X, rotate.Y, rotate.Z, rotate.W));
+
+                // And lode that in as the bone (what it's linked to) transform matrix
+                cluster.SetTransformLinkMatrix(mat);
 
                 for (int i = 0; i < geom.verts.Count; i++)
                 {
