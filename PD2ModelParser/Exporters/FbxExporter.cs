@@ -71,7 +71,7 @@ namespace PD2ModelParser.Exporters
                 if (sb == null)
                     continue;
 
-                AddSkeleton(scene, data, sb);
+                Dictionary<Object3D, FbxNode> bones = AddSkeleton(scene, data, sb);
             }
         }
 
@@ -116,23 +116,26 @@ namespace PD2ModelParser.Exporters
             };
         }
 
-        private static void AddSkeleton(FbxScene scene, FullModelData data, SkinBones bones)
+        private static Dictionary<Object3D, FbxNode> AddSkeleton(FbxScene scene, FullModelData data, SkinBones bones)
         {
             Dictionary<uint, object> parsed = data.parsed_sections;
+            Dictionary<Object3D, FbxNode> bone_maps = new Dictionary<Object3D, FbxNode>();
             Object3D root = (Object3D) parsed[bones.probably_root_bone];
-            FbxNode fbx_root = AddBone(root);
+            FbxNode fbx_root = AddBone(root, bone_maps);
             scene.GetRootNode().AddChild(fbx_root);
+            return bone_maps;
         }
 
-        private static FbxNode AddBone(Object3D obj)
+        private static FbxNode AddBone(Object3D obj, Dictionary<Object3D, FbxNode> bones)
         {
             FbxNode node = FbxNode.Create(fm, obj.Name + "Bone");
+            bones[obj] = node;
 
             CopyTransform(obj.rotation, node);
 
             foreach (Object3D child in obj.children)
             {
-                FbxNode n = AddBone(child);
+                FbxNode n = AddBone(child, bones);
                 node.AddChild(n);
             }
 
