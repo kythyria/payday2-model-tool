@@ -64,7 +64,8 @@ namespace PD2ModelParser.Exporters
                 if (model.version == 6)
                     continue;
 
-                AddModel(scene, data, model);
+                ModelInfo mesh = AddModel(data, model);
+                scene.GetRootNode().AddChild(mesh.Node);
 
                 SkinBones sb = (SkinBones) data.parsed_sections[model.skinbones_ID];
                 if (sb == null)
@@ -74,7 +75,7 @@ namespace PD2ModelParser.Exporters
             }
         }
 
-        private static void AddModel(FbxScene scene, FullModelData data, Model model)
+        private static ModelInfo AddModel(FullModelData data, Model model)
         {
             Dictionary<uint, object> parsed = data.parsed_sections;
             PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
@@ -86,7 +87,6 @@ namespace PD2ModelParser.Exporters
             FbxNode mesh_node = FbxNode.Create(fm, name + "Object");
             FbxMesh mesh = FbxMesh.Create(fm, name + "Mesh");
             mesh_node.SetNodeAttributeGeom(mesh);
-            scene.GetRootNode().AddChild(mesh_node);
 
             CopyTransform(model.object3D.world_transform, mesh_node);
 
@@ -107,6 +107,13 @@ namespace PD2ModelParser.Exporters
                 mesh.AddPolygon(face.c);
                 mesh.EndPolygon();
             }
+
+            return new ModelInfo
+            {
+                Model = model,
+                Mesh = mesh,
+                Node = mesh_node,
+            };
         }
 
         private static void AddSkeleton(FbxScene scene, FullModelData data, SkinBones bones)
@@ -193,5 +200,12 @@ namespace PD2ModelParser.Exporters
         }
 
         private static FbxDouble3 ToFbxD3(this Vector3D v) => new FbxDouble3(v.X, v.Y, v.Z);
+
+        private struct ModelInfo
+        {
+            public Model Model;
+            public FbxMesh Mesh;
+            public FbxNode Node;
+        }
     }
 }
