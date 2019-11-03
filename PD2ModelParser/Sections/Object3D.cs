@@ -10,7 +10,6 @@ namespace PD2ModelParser.Sections
 {
     class Object3D : AbstractSection, IPostLoadable, IHashContainer
     {
-        private static uint object3D_tag = 0x0FFCD100; // Object3D
         public UInt32 id;
         public UInt32 size;
 

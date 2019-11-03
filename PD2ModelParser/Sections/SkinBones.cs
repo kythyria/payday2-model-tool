@@ -18,10 +18,7 @@ namespace PD2ModelParser.Sections
 
         public Bones bones;
         public UInt32 probably_root_bone;
-        public int count
-        {
-            get { return objects.Count; }
-        }
+        public int count => objects.Count;
         public List<UInt32> objects = new List<UInt32>();
         public List<Matrix3D> rotations = new List<Matrix3D>();
         public Matrix3D global_skin_transform;
@@ -52,11 +49,17 @@ namespace PD2ModelParser.Sections
             {
                 this.rotations.Add(MathUtil.ReadMatrix(instream));
             }
+
             this.global_skin_transform = MathUtil.ReadMatrix(instream);
 
             this.remaining_data = null;
-            if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
-                remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position)); //If exists, this contains hashed name for this geometry (see hashlist.txt)
+
+            long end_pos = section.offset + 12 + section.size;
+            if (end_pos > instream.BaseStream.Position)
+            {
+                // If exists, this contains hashed name for this geometry (see hashlist.txt)
+                remaining_data = instream.ReadBytes((int) (end_pos - instream.BaseStream.Position));
+            }
         }
 
         public void StreamWrite(BinaryWriter outstream)
@@ -71,7 +74,7 @@ namespace PD2ModelParser.Sections
             //update section size
             long newsizeend = outstream.BaseStream.Position;
             outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
+            outstream.Write((uint) (newsizeend - (newsizestart + 4)));
 
             outstream.BaseStream.Position = newsizeend;
         }
@@ -87,6 +90,7 @@ namespace PD2ModelParser.Sections
             {
                 MathUtil.WriteMatrix(outstream, matrix);
             }
+
             MathUtil.WriteMatrix(outstream, global_skin_transform);
 
             if (this.remaining_data != null)
@@ -97,19 +101,26 @@ namespace PD2ModelParser.Sections
         {
             string objects_string = (this.objects.Count == 0 ? "none" : "");
 
-            foreach(UInt32 obj in this.objects)
+            foreach (UInt32 obj in this.objects)
             {
                 objects_string += obj + ", ";
             }
 
             string rotations_string = (this.rotations.Count == 0 ? "none" : "");
 
-            foreach(Matrix3D rotation in this.rotations)
+            foreach (Matrix3D rotation in this.rotations)
             {
                 rotations_string += rotation + ", ";
             }
 
-            return "[SkinBones] ID: " + this.id + " bones: [ " + this.bones + " ] object3D_section_id: " + this.probably_root_bone + " count: " + this.count + " objects count: " + this.objects.Count + " objects:[ " + objects_string + " ] rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ] unknown_matrix: " + this.global_skin_transform + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[SkinBones] ID: " + this.id +
+                   " bones: [ " + this.bones + " ]" +
+                   " object3D_section_id: " + this.probably_root_bone +
+                   " count: " + this.count + " objects" +
+                   " count: " + this.objects.Count + " objects:[ " + objects_string + " ]" +
+                   " rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ]" +
+                   " global_skin_transform: " + this.global_skin_transform +
+                   (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
         public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)
