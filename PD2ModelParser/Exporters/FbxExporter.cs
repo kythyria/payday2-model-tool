@@ -65,13 +65,21 @@ namespace PD2ModelParser.Exporters
                     continue;
 
                 ModelInfo mesh = AddModel(data, model);
-                scene.GetRootNode().AddChild(mesh.Node);
 
                 SkinBones sb = (SkinBones) data.parsed_sections[model.skinbones_ID];
                 if (sb == null)
+                {
+                    scene.GetRootNode().AddChild(mesh.Node);
                     continue;
+                }
 
                 Dictionary<Object3D, BoneInfo> bones = AddSkeleton(scene, data, sb);
+
+                // Make one root node to contain both the skeleton and the model
+                FbxNode root = FbxNode.Create(fm, model.object3D.Name + "Root");
+                root.AddChild(mesh.Node);
+                root.AddChild(bones[(Object3D) data.parsed_sections[sb.probably_root_bone]].Node);
+                scene.GetRootNode().AddChild(root);
             }
         }
 
@@ -122,7 +130,6 @@ namespace PD2ModelParser.Exporters
             Dictionary<Object3D, BoneInfo> bone_maps = new Dictionary<Object3D, BoneInfo>();
             Object3D root = (Object3D) parsed[bones.probably_root_bone];
             BoneInfo fbx_root = AddBone(root, bone_maps);
-            scene.GetRootNode().AddChild(fbx_root.Node);
             return bone_maps;
         }
 
