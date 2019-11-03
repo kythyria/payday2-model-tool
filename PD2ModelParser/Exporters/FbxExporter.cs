@@ -80,6 +80,12 @@ namespace PD2ModelParser.Exporters
                 root.AddChild(mesh.Node);
                 root.AddChild(bones[(Object3D) data.parsed_sections[sb.probably_root_bone]].Node);
                 scene.GetRootNode().AddChild(root);
+
+                // Add a root skeleton node. THis must be in the model's parent, otherwise Blender won't
+                // set up the armatures correctly (or at all, actually).
+                FbxSkeleton skeleton = FbxSkeleton.Create(fm, "");
+                skeleton.SetSkeletonType(FbxSkeleton.EType.eRoot);
+                root.SetNodeAttribute(skeleton);
             }
         }
 
@@ -139,6 +145,11 @@ namespace PD2ModelParser.Exporters
 
             CopyTransform(obj.rotation, node);
 
+            FbxSkeleton skel = FbxSkeleton.Create(fm, obj.Name + "Skel");
+            skel.Size.Set(1);
+            skel.SetSkeletonType(FbxSkeleton.EType.eLimbNode);
+            node.SetNodeAttribute(skel);
+
             foreach (Object3D child in obj.children)
             {
                 BoneInfo n = AddBone(child, bones);
@@ -149,6 +160,7 @@ namespace PD2ModelParser.Exporters
             {
                 Game = obj,
                 Node = node,
+                Skeleton = skel,
             };
 
             bones[obj] = info;
@@ -229,6 +241,7 @@ namespace PD2ModelParser.Exporters
         {
             public Object3D Game;
             public FbxNode Node;
+            public FbxSkeleton Skeleton;
         }
     }
 }
