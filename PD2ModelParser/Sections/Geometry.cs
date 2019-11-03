@@ -84,6 +84,39 @@ namespace PD2ModelParser.Sections
         }
     }
 
+    // Extracted from dsl::wd3d::D3DShaderProgram::compile
+    public enum GeometryChannelTypes
+    {
+        POSITION = 1,
+        POSITION0 = 1,
+        NORMAL = 2,
+        NORMAL0 = 2,
+        POSITION1 = 3,
+        NORMAL1 = 4,
+        COLOR = 5,
+        COLOR0 = 5,
+        COLOR1 = 6,
+        TEXCOORD0 = 7,
+        TEXCOORD1 = 8,
+        TEXCOORD2 = 9,
+        TEXCOORD3 = 10,
+        TEXCOORD4 = 11,
+        TEXCOORD5 = 12,
+        TEXCOORD6 = 13,
+        TEXCOORD7 = 14,
+        BLENDINDICES = 15,
+        BLENDINDICES0 = 15,
+        BLENDINDICES1 = 16,
+        BLENDWEIGHT = 17,
+        BLENDWEIGHT0 = 17,
+        BLENDWEIGHT1 = 18,
+        POINTSIZE = 19,
+        BINORMAL = 20,
+        BINORMAL0 = 20,
+        TANGENT = 21,
+        TANGENT0 = 21,
+    }
+
     class Geometry : ISection
     {
         private static uint geometry_tag = 0x7AB072D3; // Geometry
