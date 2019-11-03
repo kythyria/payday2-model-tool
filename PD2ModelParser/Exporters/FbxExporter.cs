@@ -71,7 +71,7 @@ namespace PD2ModelParser.Exporters
                 if (sb == null)
                     continue;
 
-                Dictionary<Object3D, FbxNode> bones = AddSkeleton(scene, data, sb);
+                Dictionary<Object3D, BoneInfo> bones = AddSkeleton(scene, data, sb);
             }
         }
 
@@ -116,30 +116,37 @@ namespace PD2ModelParser.Exporters
             };
         }
 
-        private static Dictionary<Object3D, FbxNode> AddSkeleton(FbxScene scene, FullModelData data, SkinBones bones)
+        private static Dictionary<Object3D, BoneInfo> AddSkeleton(FbxScene scene, FullModelData data, SkinBones bones)
         {
             Dictionary<uint, object> parsed = data.parsed_sections;
-            Dictionary<Object3D, FbxNode> bone_maps = new Dictionary<Object3D, FbxNode>();
+            Dictionary<Object3D, BoneInfo> bone_maps = new Dictionary<Object3D, BoneInfo>();
             Object3D root = (Object3D) parsed[bones.probably_root_bone];
-            FbxNode fbx_root = AddBone(root, bone_maps);
-            scene.GetRootNode().AddChild(fbx_root);
+            BoneInfo fbx_root = AddBone(root, bone_maps);
+            scene.GetRootNode().AddChild(fbx_root.Node);
             return bone_maps;
         }
 
-        private static FbxNode AddBone(Object3D obj, Dictionary<Object3D, FbxNode> bones)
+        private static BoneInfo AddBone(Object3D obj, Dictionary<Object3D, BoneInfo> bones)
         {
             FbxNode node = FbxNode.Create(fm, obj.Name + "Bone");
-            bones[obj] = node;
 
             CopyTransform(obj.rotation, node);
 
             foreach (Object3D child in obj.children)
             {
-                FbxNode n = AddBone(child, bones);
-                node.AddChild(n);
+                BoneInfo n = AddBone(child, bones);
+                node.AddChild(n.Node);
             }
 
-            return node;
+            BoneInfo info = new BoneInfo
+            {
+                Game = obj,
+                Node = node,
+            };
+
+            bones[obj] = info;
+
+            return info;
         }
 
         private static void CopyTransform(Matrix3D transform, FbxNode node)
@@ -208,6 +215,12 @@ namespace PD2ModelParser.Exporters
         {
             public Model Model;
             public FbxMesh Mesh;
+            public FbxNode Node;
+        }
+
+        private struct BoneInfo
+        {
+            public Object3D Game;
             public FbxNode Node;
         }
     }
