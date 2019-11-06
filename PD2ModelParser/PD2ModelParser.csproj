@@ -49,7 +49,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FbxNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="!$(DefineConstants.Contains('NO_FBX'))">
-      <HintPath>C:\Users\ZNix\source\repos\fbxnet\FbxNet\bin\Debug\FbxNet.dll</HintPath>
+      <HintPath>../Libs/FbxNet.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Options, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Mono.Options.5.3.0.1\lib\net4-client\Mono.Options.dll</HintPath>
@@ -204,6 +204,17 @@
     <PreBuildEvent Condition="'$(OS)' == 'Windows_NT' ">CD /D $(SolutionDir) &amp; C:\Windows\Sysnative\bash.exe "gen-version.sh" "$(ConfigurationName)"</PreBuildEvent>
     <PreBuildEvent Condition="'$(OS)' != 'Windows_NT' ">"$(SolutionDir)gen-version.sh" "$(ConfigurationName)"</PreBuildEvent>
   </PropertyGroup>
+
+  <Target Name="AfterBuild" Condition="!$(DefineConstants.Contains('NO_FBX'))">
+    <!-- Copy in the FbxNet natives -->
+    <Copy SourceFiles="../Libs/FbxNetNative.dll" DestinationFolder="$(OutputPath)" />
+    <Copy SourceFiles="../Libs/libFbxNet.so" DestinationFolder="$(OutputPath)" />
+
+    <!-- Copy in the FBX SDK itself-->
+    <Copy SourceFiles="../Libs/libfbxsdk.dll" DestinationFolder="$(OutputPath)" />
+    <Copy SourceFiles="../Libs/libfbxsdk.so" DestinationFolder="$(OutputPath)" />
+  </Target>
+
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
