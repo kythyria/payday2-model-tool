@@ -56,6 +56,15 @@ namespace PD2ModelParser.UI
             {
                 result = ColladaExporter.ExportFile(model, inputFileBox.Selected);
             }
+            else if (format.Contains(".fbx"))
+            {
+#if NO_FBX
+                MessageBox.Show("This copy of the model tool was compiled without the FBX SDK", "FBX Export Unavailable");
+                return;
+#else
+                result = Exporters.FbxExporter.ExportFile(model, inputFileBox.Selected);
+#endif
+            }
             else
             {
                 MessageBox.Show("Unknown format '" + format + "'");

@@ -10,12 +10,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PD2ModelParser</RootNamespace>
     <AssemblyName>PD2ModelParser</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,21 +23,34 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugNoFBX|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\DebugNoFBX\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NO_FBX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FbxNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="!$(DefineConstants.Contains('NO_FBX'))">
+      <HintPath>../Libs/FbxNet.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Options, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Mono.Options.5.3.0.1\lib\net4-client\Mono.Options.dll</HintPath>
       <Private>True</Private>
@@ -63,6 +76,7 @@
     <Compile Include="Exporters\ColladaExporter.cs" />
     <Compile Include="collada_schema_1_4.cs" />
     <Compile Include="Exporters\DieselExporter.cs" />
+    <Compile Include="Exporters\FbxExporter.cs" />
     <Compile Include="Hash64.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Misc\Updates.cs" />
@@ -190,6 +204,17 @@
     <PreBuildEvent Condition="'$(OS)' == 'Windows_NT' ">CD /D $(SolutionDir) &amp; C:\Windows\Sysnative\bash.exe "gen-version.sh" "$(ConfigurationName)"</PreBuildEvent>
     <PreBuildEvent Condition="'$(OS)' != 'Windows_NT' ">"$(SolutionDir)gen-version.sh" "$(ConfigurationName)"</PreBuildEvent>
   </PropertyGroup>
+
+  <Target Name="AfterBuild" Condition="!$(DefineConstants.Contains('NO_FBX'))">
+    <!-- Copy in the FbxNet natives -->
+    <Copy SourceFiles="../Libs/FbxNetNative.dll" DestinationFolder="$(OutputPath)" />
+    <Copy SourceFiles="../Libs/libFbxNet.so" DestinationFolder="$(OutputPath)" />
+
+    <!-- Copy in the FBX SDK itself-->
+    <Copy SourceFiles="../Libs/libfbxsdk.dll" DestinationFolder="$(OutputPath)" />
+    <Copy SourceFiles="../Libs/libfbxsdk.so" DestinationFolder="$(OutputPath)" />
+  </Target>
+
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

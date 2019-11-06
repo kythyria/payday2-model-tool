@@ -449,7 +449,7 @@ namespace PD2ModelParser
             geometry_section.vert_count = (uint)obj.verts.Count;
             geometry_section.verts = obj.verts;
             geometry_section.normals = new_arranged_Normals.ToList();
-            geometry_section.uvs = new_arranged_UV.ToList();
+            geometry_section.UVs[0] = new_arranged_UV.ToList();
             geometry_section.unknown20 = new_arranged_unknown20.ToList();
             geometry_section.unknown21 = new_arranged_unknown21.ToList();
 
@@ -729,9 +729,9 @@ namespace PD2ModelParser
 
 
 
-                    geometry_section.pattern_uvs = new_arranged_UV.ToList();
+                    geometry_section.UVs[1] = new_arranged_UV.ToList();
 
-                    ((Geometry)fm.parsed_sections[passthrough_section.geometry_section]).pattern_uvs = new_arranged_UV.ToList();
+                    ((Geometry)fm.parsed_sections[passthrough_section.geometry_section]).UVs[1] = new_arranged_UV.ToList();
                 }
             }
             catch (Exception exc)
