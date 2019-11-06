@@ -19,6 +19,11 @@ namespace PD2ModelParser.UI
             AllowDrop = true;
             DragEnter += HandleDragEnter;
             DragDrop += HandleDragDrop;
+
+            ContextMenu cm = new ContextMenu();
+            ContextMenu = cm;
+            MenuItem clearItem = cm.MenuItems.Add("Clear");
+            clearItem.Click += ClearFileSelected;
         }
 
         public event EventHandler FileSelected;
@@ -66,7 +71,7 @@ namespace PD2ModelParser.UI
             }
             private set
             {
-                inputFileBox.Text = value;
+                inputFileBox.Text = value ?? "";
                 FileSelected?.Invoke(this, new EventArgs());
             }
         }
@@ -162,6 +167,11 @@ namespace PD2ModelParser.UI
             string file = ((string[]) e.Data.GetData(DataFormats.FileDrop))[0];
 
             Selected = file;
+        }
+
+        private void ClearFileSelected(object sender, EventArgs e)
+        {
+            Selected = null;
         }
     }
 }

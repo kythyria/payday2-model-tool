@@ -25,6 +25,12 @@ namespace PD2ModelParser.UI
 
         private void inputFileBox_FileSelected(object sender, EventArgs e)
         {
+            if (inputFileBox.Selected == null)
+            {
+                exportBttn.Enabled = false;
+                return;
+            }
+
             model = ModelReader.Open(inputFileBox.Selected);
 
             exportBttn.Enabled = true;
