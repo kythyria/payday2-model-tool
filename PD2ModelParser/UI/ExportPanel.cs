@@ -58,7 +58,12 @@ namespace PD2ModelParser.UI
             }
             else if (format.Contains(".fbx"))
             {
+#if NO_FBX
+                MessageBox.Show("This copy of the model tool was compiled without the FBX SDK", "FBX Export Unavailable");
+                return;
+#else
                 result = Exporters.FbxExporter.ExportFile(model, inputFileBox.Selected);
+#endif
             }
             else
             {

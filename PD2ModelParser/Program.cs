@@ -11,7 +11,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Mono.Options;
+// Currently the FBX exporter is the only class in the namespace, the others are in the PD2ModelParser namespace
+#if !NO_FBX
 using PD2ModelParser.Exporters;
+#endif
 using PD2ModelParser.Sections;
 
 namespace PD2ModelParser
@@ -248,7 +251,12 @@ namespace PD2ModelParser
                         }
                         else if (entry.arg.EndsWith(".fbx"))
                         {
+#if NO_FBX
+                            Console.WriteLine("FBX support disabled");
+                            return false;
+#else
                             FbxExporter.ExportFile(data, entry.arg);
+#endif
                         }
                         else if (entry.arg.EndsWith(".obj"))
                         {
