@@ -126,12 +126,14 @@ namespace PD2ModelParser.Sections
         // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
         public UInt32 vert_count;
 
+        public List<Vector2D>[] UVs = new List<Vector2D>[8];
+
         public UInt32 header_count; //Count of all headers for items in this section
         public UInt32 geometry_size;
         public List<GeometryHeader> headers = new List<GeometryHeader>();
         public List<Vector3D> verts = new List<Vector3D>();
-        public List<Vector2D> uvs = new List<Vector2D>();
-        public List<Vector2D> pattern_uvs = new List<Vector2D>();
+        public List<Vector2D> uvs => UVs[0];
+        public List<Vector2D> pattern_uvs => UVs[1];
         public List<Vector3D> normals = new List<Vector3D>();
         public List<GeometryColor> vertex_colors = new List<GeometryColor>();
         public List<GeometryWeightGroups> weight_groups = new List<GeometryWeightGroups>(); //4 - Weight Groups
@@ -146,10 +148,18 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
-        public Geometry(uint sec_id, obj_data newobject)
+        private Geometry(uint id)
         {
-            this.id = sec_id;
+            this.id = id;
 
+            for (int i = 0; i < UVs.Length; i++)
+            {
+                UVs[i] = new List<Vector2D>();
+            }
+        }
+
+        public Geometry(uint secId, obj_data newobject) : this(secId)
+        {
             this.vert_count = (uint) newobject.verts.Count;
             this.header_count = 5;
 
@@ -160,7 +170,7 @@ namespace PD2ModelParser.Sections
             this.headers.Add(new GeometryHeader(3, GeometryChannelTypes.TANGENT0)); // unk21
 
             this.verts = newobject.verts;
-            this.uvs = newobject.uv;
+            this.UVs[0] = newobject.uv;
             this.normals = newobject.normals;
             //this.unknown20;
             //this.unknown21;
@@ -168,10 +178,8 @@ namespace PD2ModelParser.Sections
             this.hashname = Hash64.HashString(newobject.object_name + ".Geometry");
         }
 
-        public Geometry(BinaryReader instream, SectionHeader section)
+        public Geometry(BinaryReader instream, SectionHeader section) : this(section.id)
         {
-            this.id = section.id;
-
             UInt32[] size_index = {0, 4, 8, 12, 16, 4, 4, 8, 12};
             // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
             this.vert_count = instream.ReadUInt32();
@@ -204,16 +212,6 @@ namespace PD2ModelParser.Sections
                         this.verts.Add(vert);
                     }
                 }
-                else if (head.item_type == GeometryChannelTypes.TEXCOORD0)
-                {
-                    for (int x = 0; x < this.vert_count; x++)
-                    {
-                        Vector2D uv = new Vector2D();
-                        uv.X = instream.ReadSingle();
-                        uv.Y = -instream.ReadSingle();
-                        this.uvs.Add(uv);
-                    }
-                }
                 else if (head.item_type == GeometryChannelTypes.NORMAL)
                 {
                     for (int x = 0; x < this.vert_count; x++)
@@ -223,16 +221,6 @@ namespace PD2ModelParser.Sections
                         norm.Y = instream.ReadSingle();
                         norm.Z = instream.ReadSingle();
                         this.normals.Add(norm);
-                    }
-                }
-                else if (head.item_type == GeometryChannelTypes.TEXCOORD1)
-                {
-                    for (int x = 0; x < this.vert_count; x++)
-                    {
-                        Vector2D pattern_uv_entry = new Vector2D();
-                        pattern_uv_entry.X = instream.ReadSingle();
-                        pattern_uv_entry.Y = instream.ReadSingle();
-                        this.pattern_uvs.Add(pattern_uv_entry);
                     }
                 }
                 else if (head.item_type == GeometryChannelTypes.COLOR0)
@@ -289,6 +277,16 @@ namespace PD2ModelParser.Sections
                         this.weights.Add(unknown_17_entry);
                     }
                 }
+                else if (head.item_type >= GeometryChannelTypes.TEXCOORD0 &&
+                         head.item_type <= GeometryChannelTypes.TEXCOORD7)
+                {
+                    int idx = head.item_type - GeometryChannelTypes.TEXCOORD0;
+                    for (int x = 0; x < vert_count; x++)
+                    {
+                        Vector2D uv = new Vector2D {X = instream.ReadSingle(), Y = instream.ReadSingle()};
+                        UVs[idx].Add(uv);
+                    }
+                }
                 else
                 {
                     this.unknown_item_data.Add(
@@ -336,12 +334,8 @@ namespace PD2ModelParser.Sections
 
             List<Vector3D> verts = this.verts;
             int vert_pos = 0;
-            List<Vector2D> uvs = this.uvs;
-            int uv_pos = 0;
             List<Vector3D> normals = this.normals;
             int norm_pos = 0;
-            List<Vector2D> pattern_uvs = this.pattern_uvs;
-            int pattern_uvs_pos = 0;
 
             List<GeometryWeightGroups> unknown_15s = this.weight_groups;
             int unknown_15s_pos = 0;
@@ -368,16 +362,6 @@ namespace PD2ModelParser.Sections
                         vert_pos++;
                     }
                 }
-                else if (head.item_type == GeometryChannelTypes.TEXCOORD0)
-                {
-                    for (int x = 0; x < this.vert_count; x++)
-                    {
-                        Vector2D uv = uvs[uv_pos];
-                        outstream.Write(uv.X);
-                        outstream.Write(-uv.Y);
-                        uv_pos++;
-                    }
-                }
                 else if (head.item_type == GeometryChannelTypes.NORMAL)
                 {
                     for (int x = 0; x < this.vert_count; x++)
@@ -395,25 +379,6 @@ namespace PD2ModelParser.Sections
                     for (int x = 0; x < this.vert_count; x++)
                     {
                         this.vertex_colors[x].StreamWrite(outstream);
-                    }
-                }
-
-                else if (head.item_type == GeometryChannelTypes.TEXCOORD1)
-                {
-                    for (int x = 0; x < this.vert_count; x++)
-                    {
-                        if (this.pattern_uvs.Count != this.vert_count)
-                        {
-                            outstream.Write(0.0f);
-                            outstream.Write(0.0f);
-                        }
-                        else
-                        {
-                            Vector2D pattern_uv_entry = pattern_uvs[pattern_uvs_pos];
-                            outstream.Write(pattern_uv_entry.X);
-                            outstream.Write(-pattern_uv_entry.Y);
-                            pattern_uvs_pos++;
-                        }
                     }
                 }
                 else if (head.item_type == GeometryChannelTypes.BINORMAL)
@@ -491,6 +456,18 @@ namespace PD2ModelParser.Sections
                             outstream.Write(unknown_17_entry.Z);
                             unknown_17s_pos++;
                         }
+                    }
+                }
+                else if (head.item_type >= GeometryChannelTypes.TEXCOORD0 &&
+                         head.item_type <= GeometryChannelTypes.TEXCOORD7)
+                {
+                    int idx = head.item_type - GeometryChannelTypes.TEXCOORD0;
+                    for (int x = 0; x < this.vert_count; x++)
+                    {
+                        Vector2D uv = UVs[idx][x];
+                        outstream.Write(uv.X);
+                        outstream.Write(-uv.Y);
+                        x++;
                     }
                 }
                 else
