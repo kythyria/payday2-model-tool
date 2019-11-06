@@ -56,6 +56,10 @@ namespace PD2ModelParser.UI
             {
                 result = ColladaExporter.ExportFile(model, inputFileBox.Selected);
             }
+            else if (format.Contains(".fbx"))
+            {
+                result = Exporters.FbxExporter.ExportFile(model, inputFileBox.Selected);
+            }
             else
             {
                 MessageBox.Show("Unknown format '" + format + "'");

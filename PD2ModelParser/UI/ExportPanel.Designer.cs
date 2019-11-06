@@ -72,7 +72,8 @@
             this.formatBox.FormattingEnabled = true;
             this.formatBox.Items.AddRange(new object[] {
             "Object (.obj)",
-            "Collada (.dae)"});
+            "Collada (.dae)",
+            "Filmbox (.fbx)"});
             this.formatBox.Location = new System.Drawing.Point(70, 36);
             this.formatBox.Name = "formatBox";
             this.formatBox.Size = new System.Drawing.Size(353, 21);
