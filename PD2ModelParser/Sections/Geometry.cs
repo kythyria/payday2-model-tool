@@ -283,7 +283,9 @@ namespace PD2ModelParser.Sections
                     int idx = head.item_type - GeometryChannelTypes.TEXCOORD0;
                     for (int x = 0; x < vert_count; x++)
                     {
-                        Vector2D uv = new Vector2D {X = instream.ReadSingle(), Y = instream.ReadSingle()};
+                        // Previously, the Y was only inverted on the TEXCOORD0 channel, and
+                        // not on the TEXCOORD1 channel. I assume that was incorrect, TODO check?
+                        Vector2D uv = new Vector2D {X = instream.ReadSingle(), Y = -instream.ReadSingle()};
                         UVs[idx].Add(uv);
                     }
                 }
