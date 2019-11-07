@@ -160,6 +160,7 @@
   <ItemGroup Condition="!$(DefineConstants.Contains('NO_FBX'))">
     <!-- FBX-specific files that are excluded entirely when FBX support is disabled -->
     <Compile Include="Exporters\FbxExporter.cs" />
+    <Compile Include="Misc\FbxUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
