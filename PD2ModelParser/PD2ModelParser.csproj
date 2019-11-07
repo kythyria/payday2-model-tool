@@ -208,7 +208,7 @@
   <Target Name="AfterBuild" Condition="!$(DefineConstants.Contains('NO_FBX'))">
     <!-- Copy in the FbxNet natives -->
     <Copy SourceFiles="../Libs/FbxNetNative.dll" DestinationFolder="$(OutputPath)" />
-    <Copy SourceFiles="../Libs/libFbxNet.so" DestinationFolder="$(OutputPath)" />
+    <Copy SourceFiles="../Libs/libFbxNetNative.so" DestinationFolder="$(OutputPath)" />
 
     <!-- Copy in the FBX SDK itself-->
     <Copy SourceFiles="../Libs/libfbxsdk.dll" DestinationFolder="$(OutputPath)" />
