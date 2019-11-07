@@ -76,7 +76,6 @@
     <Compile Include="Exporters\ColladaExporter.cs" />
     <Compile Include="collada_schema_1_4.cs" />
     <Compile Include="Exporters\DieselExporter.cs" />
-    <Compile Include="Exporters\FbxExporter.cs" />
     <Compile Include="Hash64.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Misc\Updates.cs" />
@@ -157,6 +156,10 @@
     <Compile Include="UI\ExportPanel.Designer.cs">
       <DependentUpon>ExportPanel.cs</DependentUpon>
     </Compile>
+  </ItemGroup>
+  <ItemGroup Condition="!$(DefineConstants.Contains('NO_FBX'))">
+    <!-- FBX-specific files that are excluded entirely when FBX support is disabled -->
+    <Compile Include="Exporters\FbxExporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

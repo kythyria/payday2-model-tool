@@ -1,4 +1,3 @@
-#if !NO_FBX
 using System;
 using System.Collections.Generic;
 using FbxNet;
@@ -357,4 +356,3 @@ namespace PD2ModelParser.Exporters
         }
     }
 }
-#endif
