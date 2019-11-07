@@ -469,7 +469,6 @@ namespace PD2ModelParser.Sections
                         Vector2D uv = UVs[idx][x];
                         outstream.Write(uv.X);
                         outstream.Write(-uv.Y);
-                        x++;
                     }
                 }
                 else
