@@ -206,7 +206,7 @@ namespace PD2ModelParser
                                 return false;
                             }
                         }
-                        else if (entry.arg.EndsWith(".obj"))
+                        else if (entry.arg.EndsWith(".dae"))
                         {
                             Console.WriteLine(
                                 "Currently Collada imports are not yet supported (for {0})",
