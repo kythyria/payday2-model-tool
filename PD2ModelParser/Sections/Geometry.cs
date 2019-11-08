@@ -128,7 +128,6 @@ namespace PD2ModelParser.Sections
 
         public List<Vector2D>[] UVs = new List<Vector2D>[8];
 
-        public UInt32 header_count; //Count of all headers for items in this section
         public UInt32 geometry_size;
         public List<GeometryHeader> headers = new List<GeometryHeader>();
         public List<Vector3D> verts = new List<Vector3D>();
@@ -161,7 +160,6 @@ namespace PD2ModelParser.Sections
         public Geometry(uint secId, obj_data newobject) : this(secId)
         {
             this.vert_count = (uint) newobject.verts.Count;
-            this.header_count = 5;
 
             this.headers.Add(new GeometryHeader(3, GeometryChannelTypes.POSITION)); // vert
             this.headers.Add(new GeometryHeader(2, GeometryChannelTypes.TEXCOORD0)); // uv
@@ -184,9 +182,9 @@ namespace PD2ModelParser.Sections
             // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
             this.vert_count = instream.ReadUInt32();
             //Count of all headers for items in this section
-            this.header_count = instream.ReadUInt32();
+            uint header_count = instream.ReadUInt32();
             UInt32 calc_size = 0;
-            for (int x = 0; x < this.header_count; x++)
+            for (int x = 0; x < header_count; x++)
             {
                 GeometryHeader header = new GeometryHeader();
                 header.item_size = instream.ReadUInt32();
@@ -327,7 +325,7 @@ namespace PD2ModelParser.Sections
         public void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.vert_count);
-            outstream.Write(this.header_count);
+            outstream.Write(headers.Count);
             foreach (GeometryHeader head in this.headers)
             {
                 outstream.Write(head.item_size);
@@ -535,7 +533,6 @@ namespace PD2ModelParser.Sections
         {
             return "[Geometry] ID: " + this.id +
                    " Count: " + this.vert_count +
-                   " Count2: " + this.header_count +
                    " Headers: " + this.headers.Count +
                    " Size: " + this.geometry_size +
                    " Verts: " + this.verts.Count +
