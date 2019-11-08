@@ -113,7 +113,39 @@ namespace PD2ModelParser.Importers
                 v.Dispose();
             }
 
+            AddVertexColours(mesh, geom);
+
             return geom;
+        }
+
+        private static void AddVertexColours(FbxMesh mesh, Geometry geom)
+        {
+            int vertex_colour_count = mesh.GetElementVertexColorCount();
+            if (vertex_colour_count > 1)
+                throw new Exception("The model tool does not support more than one vertex colour layer");
+
+            if (vertex_colour_count == 0) return;
+
+            // TODO confirm the size is indeed 3
+            geom.headers.Add(new GeometryHeader(3, GeometryChannelTypes.COLOR));
+            FbxLayerElementVertexColor layer = mesh.GetElementVertexColor();
+
+            if (layer.GetMappingMode() != FbxLayerElement.EMappingMode.eByControlPoint)
+                throw new Exception("Vertex colour: only per-vertex colouring is supported");
+
+            if (layer.GetReferenceMode() != FbxLayerElement.EReferenceMode.eDirect)
+                throw new Exception("Vertex colour: only per-vertex colouring is supported");
+
+            FbxLayerElementArrayTemplateColour array = layer.GetDirectArray();
+
+            if (array.GetCount() != geom.vert_count)
+                throw new Exception("Vertex colour: mismatched vertex count");
+
+            for (int i = 0; i < array.GetCount(); i++)
+            {
+                FbxColor colour = array.GetAt(i);
+                geom.vertex_colors.Add(colour.ToGeomColour());
+            }
         }
 
         private static Topology BuildTopology(FbxMesh mesh, string name)

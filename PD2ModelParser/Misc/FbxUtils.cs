@@ -1,6 +1,7 @@
 using System;
 using FbxNet;
 using Nexus;
+using PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Misc
 {
@@ -63,5 +64,16 @@ namespace PD2ModelParser.Misc
         public static FbxDouble3 ToFbxD3(this Vector3D v) => new FbxDouble3(v.X, v.Y, v.Z);
 
         public static FbxVector2 ToFbxV2(this Vector2D v) => new FbxVector2(v.X, v.Y);
+
+        public static GeometryColor ToGeomColour(this FbxColor c)
+        {
+            return new GeometryColor
+            {
+                red = (byte) (c.mRed * 255),
+                green = (byte) (c.mGreen * 255),
+                blue = (byte) (c.mBlue * 255),
+                alpha = (byte) (c.mAlpha * 255),
+            };
+        }
     }
 }
