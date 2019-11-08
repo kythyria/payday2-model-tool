@@ -23,9 +23,9 @@ namespace PD2ModelParser.Sections
         {
             return new Face
             {
-                a = (ushort)(a + offset),
-                b = (ushort)(b + offset),
-                c = (ushort)(c + offset)
+                a = (ushort) (a + offset),
+                b = (ushort) (b + offset),
+                c = (ushort) (c + offset)
             };
         }
 
@@ -44,14 +44,17 @@ namespace PD2ModelParser.Sections
         public List<Face> facelist = new List<Face>();
         public UInt32 count2;
         public byte[] items2;
-        public UInt64 hashname;  //Hashed name of this topology (see hashlist.txt)
+        public UInt64 hashname; //Hashed name of this topology (see hashlist.txt)
 
         public byte[] remaining_data = null;
 
-        public Topology(uint sec_id, obj_data obj)
+        public Topology(uint secId)
         {
-            this.id = sec_id;
+            id = secId;
+        }
 
+        public Topology(uint secId, obj_data obj) : this(secId)
+        {
             this.unknown1 = 0;
             this.facelist = obj.faces;
 
@@ -60,10 +63,8 @@ namespace PD2ModelParser.Sections
             this.hashname = Hash64.HashString(obj.object_name + ".Topology");
         }
 
-        public Topology(BinaryReader instream, SectionHeader section)
+        public Topology(BinaryReader instream, SectionHeader section) : this(section.id)
         {
-            this.id = section.id;
-
             this.unknown1 = instream.ReadUInt32();
             uint count1 = instream.ReadUInt32();
             for (int x = 0; x < count1 / 3; x++)
@@ -74,8 +75,9 @@ namespace PD2ModelParser.Sections
                 face.c = instream.ReadUInt16();
                 this.facelist.Add(face);
             }
+
             this.count2 = instream.ReadUInt32();
-            this.items2 = instream.ReadBytes((int)this.count2);
+            this.items2 = instream.ReadBytes((int) this.count2);
             this.hashname = instream.ReadUInt64();
 
             this.remaining_data = null;
@@ -95,7 +97,7 @@ namespace PD2ModelParser.Sections
             //update section size
             long newsizeend = outstream.BaseStream.Position;
             outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
+            outstream.Write((uint) (newsizeend - (newsizestart + 4)));
 
             outstream.BaseStream.Position = newsizeend;
         }
@@ -110,6 +112,7 @@ namespace PD2ModelParser.Sections
                 outstream.Write(face.b);
                 outstream.Write(face.c);
             }
+
             outstream.Write(this.count2);
             outstream.Write(this.items2);
             outstream.Write(this.hashname);
@@ -120,7 +123,13 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return "[Topology] ID: " + this.id + " unknown1: " + this.unknown1 + " facelist: " + this.facelist.Count + " count2: " + this.count2 + " items2: " + this.items2.Length + " hashname: " + StaticStorage.hashindex.GetString( this.hashname ) + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[Topology] ID: " + this.id +
+                   " unknown1: " + this.unknown1 +
+                   " facelist: " + this.facelist.Count +
+                   " count2: " + this.count2 +
+                   " items2: " + this.items2.Length +
+                   " hashname: " + StaticStorage.hashindex.GetString(this.hashname) +
+                   (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
         public uint SectionId
