@@ -17,11 +17,11 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
-        public TopologyIP(uint sec_id, uint top_id)
+        public TopologyIP(uint sec_id, Topology top)
         {
             this.id = sec_id;
             this.size = 0;
-            this.sectionID = top_id;
+            this.sectionID = top.id;
         }
 
         public TopologyIP(BinaryReader br, SectionHeader sh)

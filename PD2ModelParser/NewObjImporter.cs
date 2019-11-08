@@ -240,11 +240,11 @@ namespace PD2ModelParser
                         Geometry newGeom = new Geometry((uint)(obj.object_name + ".geom").GetHashCode(), obj);
                         Topology newTopo = new Topology((uint)(obj.object_name + ".topo").GetHashCode(), obj);
 
-                        PassthroughGP newPassGP = new PassthroughGP((uint)(obj.object_name + ".passGP").GetHashCode(), newGeom.id, newTopo.id);
-                        TopologyIP newTopoIP = new TopologyIP((uint)(obj.object_name + ".topoIP").GetHashCode(), newTopo.id);
+                        PassthroughGP newPassGP = new PassthroughGP((uint)(obj.object_name + ".passGP").GetHashCode(), newGeom, newTopo);
+                        TopologyIP newTopoIP = new TopologyIP((uint)(obj.object_name + ".topoIP").GetHashCode(), newTopo);
 
                         Object3D parent = root_point.Invoke(obj);
-                        Model newModel = new Model(obj, newPassGP.id, newTopoIP.id, newMatG.id, parent);
+                        Model newModel = new Model(obj, newPassGP, newTopoIP, newMatG, parent);
 
                         AddObject(true, obj,
                             newModel, newPassGP, newGeom, newTopo);

@@ -18,12 +18,12 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
-        public PassthroughGP(uint sec_id, uint geom_id, uint face_id)
+        public PassthroughGP(uint sec_id, Geometry geom, Topology topo)
         {
             this.id = sec_id;
             this.size = 8;
-            this.geometry_section = geom_id;
-            this.topology_section = face_id;
+            this.geometry_section = geom.id;
+            this.topology_section = topo.id;
         }
 
         public PassthroughGP(BinaryReader instream, SectionHeader section)

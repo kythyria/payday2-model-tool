@@ -49,7 +49,7 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
-        public Model(obj_data obj, uint passGP_ID, uint topoIP_ID, uint matg_id, Object3D parent)
+        public Model(obj_data obj, PassthroughGP passGP, TopologyIP topoIP, Material_Group matg, Object3D parent)
         {
             this.size = 0;
 
@@ -57,8 +57,8 @@ namespace PD2ModelParser.Sections
             SectionId = (uint)obj.object_name.GetHashCode();
 
             this.version = 3;
-            this.passthroughGP_ID = passGP_ID;
-            this.topologyIP_ID = topoIP_ID;
+            this.passthroughGP_ID = passGP.id;
+            this.topologyIP_ID = topoIP.id;
             this.count = 1;
             this.items = new List<ModelItem>();
             ModelItem nmi = new ModelItem();
@@ -72,7 +72,7 @@ namespace PD2ModelParser.Sections
             this.items.Add(nmi);
 
             //this.unknown9 = 0;
-            this.material_group_section_id = matg_id;
+            this.material_group_section_id = matg.id;
             this.lightset_ID = 0;
             this.bounds_min.Z = 0.0f;
             this.bounds_min.X = 0.0f;
