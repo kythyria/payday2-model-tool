@@ -14,6 +14,7 @@ using Mono.Options;
 // Currently the FBX exporter is the only class in the namespace, the others are in the PD2ModelParser namespace
 #if !NO_FBX
 using PD2ModelParser.Exporters;
+using PD2ModelParser.Importers;
 #endif
 using PD2ModelParser.Sections;
 
@@ -205,6 +206,15 @@ namespace PD2ModelParser
                             {
                                 return false;
                             }
+                        }
+                        else if (entry.arg.EndsWith(".fbx"))
+                        {
+#if NO_FBX
+                            Console.WriteLine("FBX support disabled");
+                            return false;
+#else
+                            FilmboxImporter.Import(data, entry.arg, new_obj, obj => null);
+#endif
                         }
                         else if (entry.arg.EndsWith(".dae"))
                         {

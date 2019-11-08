@@ -147,7 +147,7 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
-        private Geometry(uint id)
+        public Geometry(uint id)
         {
             this.id = id;
 

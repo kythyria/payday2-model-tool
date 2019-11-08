@@ -24,6 +24,15 @@ namespace PD2ModelParser.Misc
             return new Vector3D((float) x, (float) y, (float) z);
         }
 
+        public static Vector3D V3(this FbxVector4 vec)
+        {
+            SWIGTYPE_p_double data = vec.mData;
+            double x = FbxNet.FbxNet.doubleArray_getitem(data, 0);
+            double y = FbxNet.FbxNet.doubleArray_getitem(data, 1);
+            double z = FbxNet.FbxNet.doubleArray_getitem(data, 2);
+            return new Vector3D((float) x, (float) y, (float) z);
+        }
+
         public static void Set(this FbxVector4 v, Vector3D other) => v.Set(other.X, other.Y, other.Z, 0);
 
         // ReSharper disable once InconsistentNaming
