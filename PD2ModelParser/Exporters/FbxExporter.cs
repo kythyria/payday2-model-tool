@@ -220,7 +220,7 @@ namespace PD2ModelParser.Exporters
 
             // Mainly for testing stuff with bone exports, keep things working if
             // the model has a skeleton but no weights.
-            if(geom.weights.Count == 0)
+            if (geom.weights.Count == 0)
                 return;
 
             FbxSkin skin = FbxSkin.Create(fm, model.object3D.Name + "Skin");
