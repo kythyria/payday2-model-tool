@@ -84,9 +84,15 @@ namespace PD2ModelParser.Importers
             data.AddSection(model);
 
             // Add the bones - note this *only* adds the skeleton, and not any weights
-            Dictionary<ulong, Object3D> skel = AddSkeleton(root, data, model, parent, out Object3D _);
+            Dictionary<ulong, Object3D> skel = AddSkeleton(root, data, model, parent, out Object3D root_bone);
             if (skel == null)
                 return model;
+
+            // Parent the model to the root bone, as per the cop model where the meshes are parented to
+            // the hip bone.
+            // Note that the model only had one skeleton, shared between all models - this will probably break
+            // it quite a bit if we try and export them all back in.
+            model.object3D.parent = root_bone;
 
             AddWeights(data, mesh, skel, model, geom);
 
