@@ -60,20 +60,13 @@ namespace PD2ModelParser.Importers
             }
         }
 
-        private Model AddMesh(Object3D parent, FbxNode node, FbxMesh mesh)
+        private Model CreateEmptyMesh(Object3D parent, string name, out Geometry geom, out Topology topo)
         {
-            FbxNode root = node;
-            if (node.GetParent()?.GetSkeleton() != null)
-            {
-                root = node.GetParent();
-            }
-
             // The basic geometry information - vertices, normals, UVs, but notably no faces
-            Geometry geom = BuildGeometry(mesh);
-            data.AddSection(geom);
+            geom = CreateGeometry();
 
             // Faces
-            Topology topo = BuildTopology(mesh, root.GetName());
+            topo = new Topology(0, name);
             data.AddSection(topo);
 
             // Weird wrappers
@@ -92,7 +85,7 @@ namespace PD2ModelParser.Importers
             // Used for some internal model stuff
             obj_data fake_obj = new obj_data
             {
-                object_name = root.GetName(),
+                object_name = name,
                 verts = geom.verts,
                 faces = topo.facelist,
             };
@@ -100,6 +93,22 @@ namespace PD2ModelParser.Importers
             // Build the model itself
             Model model = new Model(fake_obj, pgp, tip, mat_g, parent);
             data.AddSection(model);
+
+            return model;
+        }
+
+        private Model AddMesh(Object3D parent, FbxNode node, FbxMesh mesh)
+        {
+            FbxNode root = node;
+            if (node.GetParent()?.GetSkeleton() != null)
+            {
+                root = node.GetParent();
+            }
+
+            Model model = CreateEmptyMesh(parent, root.GetName(), out Geometry geom, out Topology topo);
+
+            BuildGeometry(mesh, geom);
+            BuildTopology(topo, mesh);
 
             // Add the bones - note this *only* adds the skeleton, and not any weights
             Dictionary<ulong, Object3D> skel = AddSkeleton(root, model, parent, out Object3D root_bone);
@@ -304,12 +313,10 @@ namespace PD2ModelParser.Importers
             geom.weight_groups.Add(groups);
         }
 
-        private Geometry BuildGeometry(FbxMesh mesh)
+        private Geometry CreateGeometry()
         {
-            Geometry geom = new Geometry(0)
-            {
-                vert_count = (uint) mesh.GetControlPointsCount(),
-            };
+            Geometry geom = new Geometry(0);
+            data.AddSection(geom);
 
             // TODO cleanup
             geom.headers.Add(new GeometryHeader(3, GeometryChannelTypes.POSITION)); // vert
@@ -317,6 +324,18 @@ namespace PD2ModelParser.Importers
             geom.headers.Add(new GeometryHeader(3, GeometryChannelTypes.NORMAL0)); // norm
             geom.headers.Add(new GeometryHeader(3, GeometryChannelTypes.BINORMAL0)); // unk20
             geom.headers.Add(new GeometryHeader(3, GeometryChannelTypes.TANGENT0)); // unk21
+
+            return geom;
+        }
+
+        private void BuildGeometry(FbxMesh mesh, Geometry geom)
+        {
+            geom.vert_count = (uint) mesh.GetControlPointsCount();
+
+            geom.verts.Clear();
+            geom.normals.Clear();
+            geom.vertex_colors.Clear();
+            foreach (List<Vector2D> uvs in geom.UVs) uvs.Clear();
 
             for (int i = 0; i < mesh.GetControlPointsCount(); i++)
             {
@@ -335,8 +354,6 @@ namespace PD2ModelParser.Importers
             }
 
             AddVertexColours(mesh, geom);
-
-            return geom;
         }
 
         private void AddVertexColours(FbxMesh mesh, Geometry geom)
@@ -369,10 +386,8 @@ namespace PD2ModelParser.Importers
             }
         }
 
-        private Topology BuildTopology(FbxMesh mesh, string name)
+        private void BuildTopology(Topology topo, FbxMesh mesh)
         {
-            Topology topo = new Topology(0, name);
-
             for (int i = 0; i < mesh.GetPolygonCount(); i++)
             {
                 int size = mesh.GetPolygonSize(i);
@@ -386,8 +401,6 @@ namespace PD2ModelParser.Importers
                 Face f = new Face {a = (ushort) a, b = (ushort) b, c = (ushort) c};
                 topo.facelist.Add(f);
             }
-
-            return topo;
         }
 
         private void RecurseMeshes(FbxNode root, List<FbxNode> meshes)
