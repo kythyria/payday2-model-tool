@@ -169,19 +169,27 @@ namespace PD2ModelParser.Importers
             return topo;
         }
 
-        private static void RecurseMeshes(FbxNode node, List<FbxNode> meshes)
+        private static void RecurseMeshes(FbxNode root, List<FbxNode> meshes)
         {
+            Recurse<object>(root, null, (node, ud) =>
+            {
+                FbxMesh mesh = node.GetMesh();
+                if (mesh == null)
+                    return null;
+
+                meshes.Add(node);
+                return null;
+            });
+        }
+
+        private static void Recurse<T>(FbxNode node, T ud, Func<FbxNode, T, T> callback)
+        {
+            T sub = callback(node, ud);
             for (int i = 0; i < node.GetChildCount(); i++)
             {
                 FbxNode child = node.GetChild(i);
-                RecurseMeshes(child, meshes);
+                Recurse(child, sub, callback);
             }
-
-            FbxMesh mesh = node.GetMesh();
-            if (mesh == null)
-                return;
-
-            meshes.Add(node);
         }
     }
 }
