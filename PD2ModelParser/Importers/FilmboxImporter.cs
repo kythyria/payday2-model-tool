@@ -34,7 +34,6 @@ namespace PD2ModelParser.Importers
 
             foreach (FbxNode node in meshes)
             {
-                Console.WriteLine(node.GetName());
                 FbxMesh mesh = node.GetMesh();
 
                 Object3D parent = rootPointResolver.Invoke(node);
