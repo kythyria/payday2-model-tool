@@ -88,6 +88,10 @@ namespace PD2ModelParser.Sections
             this.bones.StreamWriteData(outstream);
             outstream.Write(this.probably_root_bone);
             outstream.Write(this.count);
+
+            SectionUtils.CheckLength(count, objects);
+            SectionUtils.CheckLength(count, rotations);
+
             foreach (UInt32 item in this.objects)
                 outstream.Write(item);
             foreach (Matrix3D matrix in this.rotations)

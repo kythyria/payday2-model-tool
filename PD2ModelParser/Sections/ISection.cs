@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
@@ -45,5 +47,14 @@ namespace PD2ModelParser.Sections
         }
 
         public abstract void StreamWriteData(BinaryWriter output);
+    }
+
+    public static class SectionUtils
+    {
+        public static void CheckLength(long length, IList obj)
+        {
+            if (length != obj.Count)
+                throw new Exception("Could not save model - bad list length, see stacktrace");
+        }
     }
 }
