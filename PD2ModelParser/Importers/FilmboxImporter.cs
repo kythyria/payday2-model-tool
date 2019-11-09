@@ -37,8 +37,6 @@ namespace PD2ModelParser.Importers
                 Console.WriteLine(node.GetName());
                 FbxMesh mesh = node.GetMesh();
 
-                // FbxDeformer deformer = mesh.GetDeformer(0); // TODO multiple deformers?
-
                 Object3D parent = rootPointResolver.Invoke(node);
 
                 AddMesh(data, parent, node, mesh);
@@ -84,6 +82,8 @@ namespace PD2ModelParser.Importers
             Dictionary<ulong, Object3D> skel = AddSkeleton(node, data, model);
             if (skel == null)
                 return model;
+
+            AddWeights(data, mesh, skel, model, geom);
 
             return model;
         }
@@ -134,6 +134,119 @@ namespace PD2ModelParser.Importers
 
             // TODO setup the other SkinBones fields - probably very important for Diesel
             return objs;
+        }
+
+        private static void AddWeights(FullModelData data, FbxMesh mesh,
+            Dictionary<ulong, Object3D> skel, Model model, Geometry geom)
+        {
+            int deformer_count = mesh.GetDeformerCount(FbxDeformer.EDeformerType.eSkin);
+            if (deformer_count == 0) return;
+            if (deformer_count != 1)
+                throw new Exception("Only one skin per mesh is supported");
+
+            FbxSkin skin = mesh.GetDeformer(0, FbxDeformer.EDeformerType.eSkin).CastToSkin();
+            if (skin == null)
+                throw new Exception("Could not get skin deformer ID=0");
+
+            SkinBones sb = (SkinBones) data.parsed_sections[model.skinbones_ID];
+
+            // Either 2 for low-LOD models or 3 for high-LOD models - afaik this
+            // has something to do with which render template is used.
+            // TODO confirm if this is true, and if so allow selection of the render template somehow
+            geom.headers.Add(new GeometryHeader(3, GeometryChannelTypes.BLENDWEIGHT));
+
+            // Odd size, but consistent when taken from default models
+            geom.headers.Add(new GeometryHeader(7, GeometryChannelTypes.BLENDINDICES));
+
+            // Build a lookup table to find the index of a given bone
+            Dictionary<Object3D, int> bone_indices = new Dictionary<Object3D, int>();
+            for (int i = 0; i < sb.count; i++)
+            {
+                Object3D obj = (Object3D) data.parsed_sections[sb.objects[i]];
+                bone_indices[obj] = i;
+            }
+
+            // FBX (roughly, via clusters) stores the vertices/weights for each bone, while Diesel
+            // stores the bones/weights for each vertex. This list corresponds to each
+            // vertex in the model so we can flip this around.
+            List<WeightPart>[] parts = new List<WeightPart>[geom.vert_count];
+            for (int i = 0; i < geom.vert_count; i++)
+                parts[i] = new List<WeightPart>();
+
+            for (int i = 0; i < skin.GetClusterCount(); i++)
+            {
+                FbxCluster cluster = skin.GetCluster(i);
+
+                FbxNode bone_node = cluster.GetLink();
+                Object3D bone = skel[bone_node.PtrHashCode()];
+                int idx = bone_indices[bone];
+
+                SWIGTYPE_p_int indices = cluster.GetControlPointIndices();
+                SWIGTYPE_p_double weights = cluster.GetControlPointWeights();
+                for (int j = 0; j < cluster.GetControlPointIndicesCount(); j++)
+                {
+                    int vert_idx = FbxNet.FbxNet.intArray_getitem(indices, j);
+                    double weight = FbxNet.FbxNet.doubleArray_getitem(weights, j);
+
+                    List<WeightPart> vert = parts[vert_idx];
+
+                    if (vert.Any(p => p.boneID == idx))
+                        throw new Exception("Two clusters for the same bone and vertex " +
+                                            "are currently unsupported");
+
+                    vert.Add(new WeightPart
+                    {
+                        boneID = idx,
+                        weight = (float) weight,
+                    });
+                }
+            }
+
+            for (int i = 0; i < geom.vert_count; i++)
+            {
+                AddWeightsForVertex(parts[i], geom);
+            }
+        }
+
+        private static void AddWeightsForVertex(List<WeightPart> parts, Geometry geom)
+        {
+            // AFAIK this is affected by the header thing - see above
+            // TODO should we quietly just chop off the least important few weights?
+            if (parts.Count > 3)
+                throw new Exception("Vertices cannot be affected by more than three bones");
+
+            Vector3D weights = Vector3D.Zero;
+            GeometryWeightGroups groups = new GeometryWeightGroups();
+
+            int wi = 0;
+            foreach (WeightPart part in parts.OrderByDescending(v => v.weight))
+            {
+                if (part.boneID > ushort.MaxValue)
+                    throw new Exception("Too many bones!");
+
+                weights[wi] = part.weight;
+
+                ushort bid = (ushort) part.boneID;
+                switch (wi)
+                {
+                    case 0:
+                        groups.Bones1 = bid;
+                        break;
+                    case 1:
+                        groups.Bones2 = bid;
+                        break;
+                    case 2:
+                        groups.Bones3 = bid;
+                        break;
+                    default:
+                        throw new Exception(); // Should already be stopped above
+                }
+
+                wi++;
+            }
+
+            geom.weights.Add(weights);
+            geom.weight_groups.Add(groups);
         }
 
         private static Geometry BuildGeometry(FbxMesh mesh)
@@ -243,6 +356,12 @@ namespace PD2ModelParser.Importers
                 FbxNode child = node.GetChild(i);
                 Recurse(child, sub, callback);
             }
+        }
+
+        private class WeightPart
+        {
+            public int boneID;
+            public float weight;
         }
     }
 }
