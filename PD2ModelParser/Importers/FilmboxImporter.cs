@@ -121,7 +121,12 @@ namespace PD2ModelParser.Importers
                 obj.rotation = node.GetNexusTransform();
 
                 sb.objects.Add(obj.id);
-                // TODO sb.rotations
+
+                // TODO implement
+                // For now just put *something* in so we have the correct number of matricies
+                // As otherwise it'll be impossible to load the model
+                sb.rotations.Add(Matrix3D.Identity);
+
                 // TODO sb.bones.bones
 
                 return obj;
