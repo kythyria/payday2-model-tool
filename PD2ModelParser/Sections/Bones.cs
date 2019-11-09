@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 namespace PD2ModelParser.Sections
 {
     /// <summary>
-    /// Represents an entry in dsl::BoneMapping - does not represent a single bone, despite
-    /// the name.
+    /// Represents an entry in dsl::BoneMapping, storing indexed mappings to SkinBones.SkinPositions
     /// </summary>
     /// <remarks>
     /// Inside PD2, there is the dsl::BoneMapping class. This is used for some unknown purpose,
@@ -20,21 +19,20 @@ namespace PD2ModelParser.Sections
     /// transform onto each SkinBones matrix. This is done in C#, loaded into the SkinPositions
     /// list in SkinBones.
     /// </remarks>
-    class Bone
+    class BoneMappingItem
     {
-        public UInt32 vert_count;
-        public readonly List<UInt32> verts = new List<UInt32>();
+        public readonly List<UInt32> bones = new List<UInt32>();
 
         public override string ToString()
         {
-            string verts_string = (this.verts.Count == 0 ? "none" : "");
+            string verts_string = (bones.Count == 0 ? "none" : "");
 
-            foreach (UInt32 vert in this.verts)
+            foreach (UInt32 vert in bones)
             {
                 verts_string += vert + ", ";
             }
 
-            return "vert_count: " + this.vert_count + " verts: [" + verts_string + "]";
+            return "count: " + bones.Count + " verts: [" + verts_string + "]";
         }
     }
 
@@ -57,7 +55,7 @@ namespace PD2ModelParser.Sections
         public UInt32 size;
 
         public UInt32 count;
-        public List<Bone> bones = new List<Bone>();
+        public List<BoneMappingItem> bone_mappings = new List<BoneMappingItem>();
 
         public byte[] remaining_data = null;
 
@@ -81,11 +79,11 @@ namespace PD2ModelParser.Sections
 
             for (int x = 0; x < this.count; x++)
             {
-                Bone bone = new Bone();
-                bone.vert_count = instream.ReadUInt32();
-                for (int y = 0; y < bone.vert_count; y++)
-                    bone.verts.Add(instream.ReadUInt32());
-                bones.Add(bone);
+                BoneMappingItem bone_mapping_item = new BoneMappingItem();
+                uint bone_count = instream.ReadUInt32();
+                for (int y = 0; y < bone_count; y++)
+                    bone_mapping_item.bones.Add(instream.ReadUInt32());
+                bone_mappings.Add(bone_mapping_item);
             }
 
             this.remaining_data = null;
@@ -111,13 +109,11 @@ namespace PD2ModelParser.Sections
         public void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.count);
-            System.Diagnostics.Debug.Assert(this.count == this.bones.Count, "[Bones] this.count != this.bones.Count");
-            foreach (Bone bone in this.bones)
+            System.Diagnostics.Debug.Assert(this.count == this.bone_mappings.Count, "[Bones] this.count != this.bones.Count");
+            foreach (BoneMappingItem bone in this.bone_mappings)
             {
-                outstream.Write(bone.vert_count);
-                System.Diagnostics.Debug.Assert(bone.vert_count == bone.verts.Count,
-                    "[Bone] bone.vert_count != bone.verts.Count");
-                foreach (UInt32 vert in bone.verts)
+                outstream.Write(bone.bones.Count);
+                foreach (UInt32 vert in bone.bones)
                     outstream.Write(vert);
             }
 
@@ -127,9 +123,9 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            string bones_string = (this.bones.Count == 0 ? "none" : "");
+            string bones_string = (bone_mappings.Count == 0 ? "none" : "");
 
-            foreach (Bone bone in this.bones)
+            foreach (BoneMappingItem bone in bone_mappings)
             {
                 bones_string += bone + ", ";
             }
