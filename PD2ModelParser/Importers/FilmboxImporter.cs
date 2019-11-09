@@ -113,7 +113,8 @@ namespace PD2ModelParser.Importers
 
             Recurse(rootNode, root, (node, parent) =>
             {
-                if (node.GetSkeleton() == null)
+                FbxSkeleton skel = node.GetSkeleton();
+                if (skel == null || skel.GetSkeletonType() == FbxSkeleton.EType.eRoot)
                     return parent;
 
                 Object3D obj = new Object3D(node.GetName(), parent);
