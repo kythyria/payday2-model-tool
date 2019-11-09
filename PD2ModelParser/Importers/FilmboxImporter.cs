@@ -84,7 +84,7 @@ namespace PD2ModelParser.Importers
             data.AddSection(model);
 
             // Add the bones - note this *only* adds the skeleton, and not any weights
-            Dictionary<ulong, Object3D> skel = AddSkeleton(root, data, model);
+            Dictionary<ulong, Object3D> skel = AddSkeleton(root, data, model, parent, out Object3D _);
             if (skel == null)
                 return model;
 
@@ -93,33 +93,42 @@ namespace PD2ModelParser.Importers
             return model;
         }
 
-        private static Dictionary<ulong, Object3D> AddSkeleton(FbxNode rootNode, FullModelData data, Model model)
+        private static Dictionary<ulong, Object3D> AddSkeleton(FbxNode rootNode, FullModelData data, Model model,
+            Object3D rootPoint, out Object3D rootBone)
         {
             FbxSkeleton root_skeleton = rootNode.GetSkeleton();
             if (root_skeleton == null)
+            {
+                rootBone = null;
                 return null;
+            }
 
             Dictionary<ulong, Object3D> objs = new Dictionary<ulong, Object3D>();
 
-            Object3D root = new Object3D(rootNode.GetName() + "Skel", null);
-            data.AddSection(root);
+            Object3D root_bone = null;
 
-            SkinBones sb = new SkinBones(0)
-            {
-                probably_root_bone = root.id,
-            };
+            SkinBones sb = new SkinBones(0);
             data.AddSection(sb);
             model.skinbones_ID = sb.id;
 
-            Recurse(rootNode, root, (node, parent) =>
+            Recurse(rootNode, rootPoint, (node, parent) =>
             {
                 FbxSkeleton skel = node.GetSkeleton();
                 if (skel == null || skel.GetSkeletonType() == FbxSkeleton.EType.eRoot)
                     return parent;
 
                 Object3D obj = new Object3D(node.GetName(), parent);
-                parent.children.Add(obj);
+                parent?.children?.Add(obj);
                 data.AddSection(obj);
+
+                if (root_bone == null)
+                {
+                    root_bone = obj;
+                }
+                else if (parent == rootPoint)
+                {
+                    throw new Exception("Each rigged model must have only one root bone");
+                }
 
                 objs[node.PtrHashCode()] = obj;
 
@@ -137,6 +146,16 @@ namespace PD2ModelParser.Importers
 
                 return obj;
             });
+
+            // No bones :(
+            // We could continue here, but it's almost certainly not what the
+            // user would expect and a loud error is almost always better than
+            // a silent failure.
+            if (root_bone == null)
+                throw new Exception("Rigged model " + rootNode.GetName() + " has no bones");
+
+            sb.probably_root_bone = root_bone.id;
+            rootBone = root_bone;
 
             // TODO setup the other SkinBones fields - probably very important for Diesel
             return objs;
