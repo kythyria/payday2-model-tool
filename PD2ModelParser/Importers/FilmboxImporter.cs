@@ -45,12 +45,18 @@ namespace PD2ModelParser.Importers
 
         private static Model AddMesh(FullModelData data, Object3D parent, FbxNode node, FbxMesh mesh)
         {
+            FbxNode root = node;
+            if (node.GetParent()?.GetSkeleton() != null)
+            {
+                root = node.GetParent();
+            }
+
             // The basic geometry information - vertices, normals, UVs, but notably no faces
             Geometry geom = BuildGeometry(mesh);
             data.AddSection(geom);
 
             // Faces
-            Topology topo = BuildTopology(mesh, node.GetName());
+            Topology topo = BuildTopology(mesh, root.GetName());
             data.AddSection(topo);
 
             // Weird wrappers
@@ -69,7 +75,7 @@ namespace PD2ModelParser.Importers
             // Used for some internal model stuff
             obj_data fake_obj = new obj_data
             {
-                object_name = node.GetName(),
+                object_name = root.GetName(),
                 verts = geom.verts,
                 faces = topo.facelist,
             };
@@ -79,7 +85,7 @@ namespace PD2ModelParser.Importers
             data.AddSection(model);
 
             // Add the bones - note this *only* adds the skeleton, and not any weights
-            Dictionary<ulong, Object3D> skel = AddSkeleton(node, data, model);
+            Dictionary<ulong, Object3D> skel = AddSkeleton(root, data, model);
             if (skel == null)
                 return model;
 
@@ -88,15 +94,15 @@ namespace PD2ModelParser.Importers
             return model;
         }
 
-        private static Dictionary<ulong, Object3D> AddSkeleton(FbxNode meshNode, FullModelData data, Model model)
+        private static Dictionary<ulong, Object3D> AddSkeleton(FbxNode rootNode, FullModelData data, Model model)
         {
-            FbxSkeleton root_skeleton = meshNode.GetParent()?.GetSkeleton();
+            FbxSkeleton root_skeleton = rootNode.GetSkeleton();
             if (root_skeleton == null)
                 return null;
 
             Dictionary<ulong, Object3D> objs = new Dictionary<ulong, Object3D>();
 
-            Object3D root = new Object3D(meshNode.GetName() + "Skel", null);
+            Object3D root = new Object3D(rootNode.GetName() + "Skel", null);
             data.AddSection(root);
 
             SkinBones sb = new SkinBones(0)
@@ -106,7 +112,7 @@ namespace PD2ModelParser.Importers
             data.AddSection(sb);
             model.skinbones_ID = sb.id;
 
-            Recurse(meshNode.GetParent(), root, (node, parent) =>
+            Recurse(rootNode, root, (node, parent) =>
             {
                 if (node.GetSkeleton() == null)
                     return parent;
