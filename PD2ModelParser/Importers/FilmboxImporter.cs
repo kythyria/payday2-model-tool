@@ -8,7 +8,7 @@ using PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Importers
 {
-    public static class FilmboxImporter
+    public class FilmboxImporter
     {
         private static FbxManager _fm;
 
@@ -29,8 +29,10 @@ namespace PD2ModelParser.Importers
             if (!result)
                 throw new Exception("Cannot import FBX file");
 
+            FilmboxImporter imp = new FilmboxImporter(data);
+
             List<FbxNode> meshes = new List<FbxNode>();
-            RecurseMeshes(scene.GetRootNode(), meshes);
+            imp.RecurseMeshes(scene.GetRootNode(), meshes);
 
             foreach (FbxNode node in meshes)
             {
@@ -38,11 +40,18 @@ namespace PD2ModelParser.Importers
 
                 Object3D parent = rootPointResolver.Invoke(node);
 
-                AddMesh(data, parent, node, mesh);
+                imp.AddMesh(parent, node, mesh);
             }
         }
 
-        private static Model AddMesh(FullModelData data, Object3D parent, FbxNode node, FbxMesh mesh)
+        private readonly FullModelData data;
+
+        private FilmboxImporter(FullModelData data)
+        {
+            this.data = data;
+        }
+
+        private Model AddMesh(Object3D parent, FbxNode node, FbxMesh mesh)
         {
             FbxNode root = node;
             if (node.GetParent()?.GetSkeleton() != null)
@@ -84,7 +93,7 @@ namespace PD2ModelParser.Importers
             data.AddSection(model);
 
             // Add the bones - note this *only* adds the skeleton, and not any weights
-            Dictionary<ulong, Object3D> skel = AddSkeleton(root, data, model, parent, out Object3D root_bone);
+            Dictionary<ulong, Object3D> skel = AddSkeleton(root, model, parent, out Object3D root_bone);
             if (skel == null)
                 return model;
 
@@ -94,12 +103,12 @@ namespace PD2ModelParser.Importers
             // it quite a bit if we try and export them all back in.
             model.object3D.parent = root_bone;
 
-            AddWeights(data, mesh, skel, model, geom);
+            AddWeights(mesh, skel, model, geom);
 
             return model;
         }
 
-        private static Dictionary<ulong, Object3D> AddSkeleton(FbxNode rootNode, FullModelData data, Model model,
+        private Dictionary<ulong, Object3D> AddSkeleton(FbxNode rootNode, Model model,
             Object3D rootPoint, out Object3D rootBone)
         {
             FbxSkeleton root_skeleton = rootNode.GetSkeleton();
@@ -167,7 +176,7 @@ namespace PD2ModelParser.Importers
             return objs;
         }
 
-        private static void AddWeights(FullModelData data, FbxMesh mesh,
+        private void AddWeights(FbxMesh mesh,
             Dictionary<ulong, Object3D> skel, Model model, Geometry geom)
         {
             int deformer_count = mesh.GetDeformerCount(FbxDeformer.EDeformerType.eSkin);
@@ -239,7 +248,7 @@ namespace PD2ModelParser.Importers
             }
         }
 
-        private static void AddWeightsForVertex(List<WeightPart> parts, Geometry geom)
+        private void AddWeightsForVertex(List<WeightPart> parts, Geometry geom)
         {
             // AFAIK this is affected by the header thing - see above
             // TODO should we quietly just chop off the least important few weights?
@@ -280,7 +289,7 @@ namespace PD2ModelParser.Importers
             geom.weight_groups.Add(groups);
         }
 
-        private static Geometry BuildGeometry(FbxMesh mesh)
+        private Geometry BuildGeometry(FbxMesh mesh)
         {
             Geometry geom = new Geometry(0)
             {
@@ -315,7 +324,7 @@ namespace PD2ModelParser.Importers
             return geom;
         }
 
-        private static void AddVertexColours(FbxMesh mesh, Geometry geom)
+        private void AddVertexColours(FbxMesh mesh, Geometry geom)
         {
             int vertex_colour_count = mesh.GetElementVertexColorCount();
             if (vertex_colour_count > 1)
@@ -345,7 +354,7 @@ namespace PD2ModelParser.Importers
             }
         }
 
-        private static Topology BuildTopology(FbxMesh mesh, string name)
+        private Topology BuildTopology(FbxMesh mesh, string name)
         {
             Topology topo = new Topology(0, name);
 
@@ -366,7 +375,7 @@ namespace PD2ModelParser.Importers
             return topo;
         }
 
-        private static void RecurseMeshes(FbxNode root, List<FbxNode> meshes)
+        private void RecurseMeshes(FbxNode root, List<FbxNode> meshes)
         {
             Recurse<object>(root, null, (node, ud) =>
             {
@@ -379,7 +388,7 @@ namespace PD2ModelParser.Importers
             });
         }
 
-        private static void Recurse<T>(FbxNode node, T ud, Func<FbxNode, T, T> callback)
+        private void Recurse<T>(FbxNode node, T ud, Func<FbxNode, T, T> callback)
         {
             T sub = callback(node, ud);
             for (int i = 0; i < node.GetChildCount(); i++)
