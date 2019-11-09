@@ -218,6 +218,11 @@ namespace PD2ModelParser.Exporters
             PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
             Geometry geom = (Geometry) parsed[pgp.geometry_section];
 
+            // Mainly for testing stuff with bone exports, keep things working if
+            // the model has a skeleton but no weights.
+            if(geom.weights.Count == 0)
+                return;
+
             FbxSkin skin = FbxSkin.Create(fm, model.object3D.Name + "Skin");
             mesh.AddDeformer(skin);
 
