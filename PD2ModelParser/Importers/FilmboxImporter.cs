@@ -45,6 +45,7 @@ namespace PD2ModelParser.Importers
         }
 
         private readonly FullModelData data;
+        private readonly Dictionary<Object3D, Model> _modelObjects = new Dictionary<Object3D, Model>();
         private readonly Dictionary<ulong, Object3D> _objects = new Dictionary<ulong, Object3D>();
 
         private FilmboxImporter(FullModelData data)
@@ -53,6 +54,15 @@ namespace PD2ModelParser.Importers
 
             foreach (object item in data.parsed_sections.Values)
             {
+                if (item is Model m)
+                {
+                    _modelObjects[m.object3D] = m;
+
+                    // While it's not a 'real' Object3D in that it's embedded into Model, make it
+                    // available for access later.
+                    _objects[m.object3D.hashname.Hash] = m.object3D;
+                }
+
                 if (!(item is Object3D obj))
                     continue;
 
@@ -60,13 +70,13 @@ namespace PD2ModelParser.Importers
             }
         }
 
-        private Model CreateEmptyMesh(Object3D parent, string name, out Geometry geom, out Topology topo)
+        private Model CreateEmptyMesh(Object3D parent, string name)
         {
             // The basic geometry information - vertices, normals, UVs, but notably no faces
-            geom = CreateGeometry();
+            Geometry geom = CreateGeometry();
 
             // Faces
-            topo = new Topology(0, name);
+            Topology topo = new Topology(0, name);
             data.AddSection(topo);
 
             // Weird wrappers
@@ -105,7 +115,20 @@ namespace PD2ModelParser.Importers
                 root = node.GetParent();
             }
 
-            Model model = CreateEmptyMesh(parent, root.GetName(), out Geometry geom, out Topology topo);
+            Model model;
+            if (_objects.TryGetValue(Hash64.HashString(root.GetName()), out Object3D existing_object))
+            {
+                model = _modelObjects[existing_object];
+            }
+            else
+            {
+                model = CreateEmptyMesh(parent, root.GetName());
+            }
+
+            Dictionary<uint, object> parsed = data.parsed_sections;
+            PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
+            Geometry geom = (Geometry) parsed[pgp.geometry_section];
+            Topology topo = (Topology) parsed[pgp.topology_section];
 
             BuildGeometry(mesh, geom);
             BuildTopology(topo, mesh);
