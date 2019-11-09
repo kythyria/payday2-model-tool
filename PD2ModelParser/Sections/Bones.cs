@@ -18,6 +18,12 @@ namespace PD2ModelParser.Sections
     /// This runtime table is built by multiplying together the world transform and global skin
     /// transform onto each SkinBones matrix. This is done in C#, loaded into the SkinPositions
     /// list in SkinBones.
+    ///
+    /// Note to self: Setting this directly after the invocation of BoneMapping::setup_matrix_sets
+    /// will null out the first matrix in the first set.
+    /// set *(void**)(  **(void***)((char*)($rbx + 0x20) + 24)     ) = 0
+    /// And that didn't cause any crashes for me unfortunately, which would give a stacktrace to
+    /// where it's used.
     /// </remarks>
     class BoneMappingItem
     {
