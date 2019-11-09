@@ -36,6 +36,10 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
+        internal Bones()
+        {
+        }
+
         public Bones(BinaryReader instream, SectionHeader section) : this(instream)
         {
             this.id = section.id;

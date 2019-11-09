@@ -36,10 +36,14 @@ namespace PD2ModelParser.Sections
         // Post-loaded
         public List<Matrix3D> SkinPositions { get; private set; }
 
-        public SkinBones(BinaryReader instream, SectionHeader section)
+        public SkinBones(uint secId)
         {
-            this.id = section.id;
+            bones = new Bones();
+            id = secId;
+        }
 
+        public SkinBones(BinaryReader instream, SectionHeader section) : this(section.id)
+        {
             this.bones = new Bones(instream);
             this.probably_root_bone = instream.ReadUInt32();
             uint count = instream.ReadUInt32();
