@@ -7,6 +7,19 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
+    /// <summary>
+    /// Represents an entry in dsl::BoneMapping - does not represent a single bone, despite
+    /// the name.
+    /// </summary>
+    /// <remarks>
+    /// Inside PD2, there is the dsl::BoneMapping class. This is used for some unknown purpose,
+    /// however what is known is that it builds a list of matrices. These are referred to by
+    /// indexes into a runtime table built by SkinBones (Bones::matrices).
+    ///
+    /// This runtime table is built by multiplying together the world transform and global skin
+    /// transform onto each SkinBones matrix. This is done in C#, loaded into the SkinPositions
+    /// list in SkinBones.
+    /// </remarks>
     class Bone
     {
         public UInt32 vert_count;
@@ -25,6 +38,18 @@ namespace PD2ModelParser.Sections
         }
     }
 
+    /// <summary>
+    /// Represents dsl::Bones, an abstract base class inside PD2.
+    /// </summary>
+    ///
+    /// <remarks>
+    /// See the dumped vtables:
+    /// https://raw.githubusercontent.com/blt4linux/blt4l/master/doc/payday2_vtables
+    /// Note it has pure virtual methods.
+    ///
+    /// As an abstract class, it can never be found by itself, only embedded within
+    /// SkinBones (it's only known - and likely only - subclass).
+    /// </remarks>
     class Bones
     {
         private static uint bones_tag = 0xEB43C77; // Bones
