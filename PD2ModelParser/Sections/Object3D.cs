@@ -1,10 +1,7 @@
-﻿using Nexus;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Nexus;
 
 namespace PD2ModelParser.Sections
 {
@@ -49,9 +46,9 @@ namespace PD2ModelParser.Sections
             this.hashname = new HashName(object_name);
             this.child_ids = new List<uint>();
             this.rotation = new Matrix3D(1.0f, 0.0f, 0.0f, 0.0f,
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 1.0f, 0.0f, 
-                                        0.0f, 0.0f, 0.0f, 0.0f);
+                0.0f, 1.0f, 0.0f, 0.0f,
+                0.0f, 0.0f, 1.0f, 0.0f,
+                0.0f, 0.0f, 0.0f, 0.0f);
 
             this.parent = parent;
         }
@@ -62,7 +59,7 @@ namespace PD2ModelParser.Sections
             this.size = section.size;
 
             if (section.End > instream.BaseStream.Position)
-                remaining_data = instream.ReadBytes((int)(section.End - instream.BaseStream.Position));
+                remaining_data = instream.ReadBytes((int) (section.End - instream.BaseStream.Position));
         }
 
         public Object3D(BinaryReader instream)
@@ -116,6 +113,7 @@ namespace PD2ModelParser.Sections
                 outstream.Write(item);
                 outstream.Write((ulong) 0); // Bit to skip - the PD2 binary does the exact same thing
             }
+
             outstream.Write(this.rotation.M11);
             outstream.Write(this.rotation.M12);
             outstream.Write(this.rotation.M13);
@@ -147,7 +145,14 @@ namespace PD2ModelParser.Sections
             Quaternion rot = new Quaternion();
             Vector3D translation = new Vector3D();
             this.rotation.Decompose(out scale, out rot, out translation);
-            return "[Object3D] ID: " + this.id + " size: " + this.size + " hashname: " + this.hashname.String + " children: " + this.child_ids.Count + " mat.scale: " + scale + " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "] Parent ID: " + this.parentID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[Object3D] ID: " + this.id +
+                   " size: " + this.size +
+                   " hashname: " + this.hashname.String +
+                   " children: " + this.child_ids.Count +
+                   " mat.scale: " + scale +
+                   " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "]" +
+                   " Parent ID: " + this.parentID +
+                   (remaining_data != null ? " REMAINING DATA! " + remaining_data.Length + " bytes" : "");
         }
 
         public void CollectHashes(CustomHashlist hashlist)
@@ -183,6 +188,5 @@ namespace PD2ModelParser.Sections
 
             return world_transform;
         }
-
     }
 }
