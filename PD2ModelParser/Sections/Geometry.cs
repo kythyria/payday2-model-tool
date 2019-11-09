@@ -15,6 +15,9 @@ namespace PD2ModelParser.Sections
         public UInt16 Bones3;
         public UInt16 Bones4;
 
+        public GeometryWeightGroups()
+        {
+        }
 
         public GeometryWeightGroups(BinaryReader instream)
         {
