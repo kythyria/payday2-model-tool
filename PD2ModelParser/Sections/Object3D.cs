@@ -12,7 +12,18 @@ namespace PD2ModelParser.Sections
 
         public HashName hashname; //Hashed object root point name (see hashlist.txt)
         private List<uint> child_ids = new List<uint>();
-        public Matrix3D rotation = new Matrix3D(); //4x4 Rotation Matrix
+        private Matrix3D _rotation = new Matrix3D(); // 4x4 transform matrix - for translation/scale too
+
+        public Matrix3D rotation
+        {
+            get => _rotation;
+            set
+            {
+                _rotation = value;
+                UpdateTransforms();
+            }
+        }
+
         public uint parentID => parent?.id ?? 0;
 
         public byte[] remaining_data = null;
@@ -45,10 +56,7 @@ namespace PD2ModelParser.Sections
 
             this.hashname = new HashName(object_name);
             this.child_ids = new List<uint>();
-            this.rotation = new Matrix3D(1.0f, 0.0f, 0.0f, 0.0f,
-                0.0f, 1.0f, 0.0f, 0.0f,
-                0.0f, 0.0f, 1.0f, 0.0f,
-                0.0f, 0.0f, 0.0f, 0.0f);
+            this.rotation = Matrix3D.Identity;
 
             this.parent = parent;
 
@@ -80,26 +88,29 @@ namespace PD2ModelParser.Sections
             }
 
             // In Object3D::load
-            this.rotation.M11 = instream.ReadSingle();
-            this.rotation.M12 = instream.ReadSingle();
-            this.rotation.M13 = instream.ReadSingle();
-            this.rotation.M14 = instream.ReadSingle();
-            this.rotation.M21 = instream.ReadSingle();
-            this.rotation.M22 = instream.ReadSingle();
-            this.rotation.M23 = instream.ReadSingle();
-            this.rotation.M24 = instream.ReadSingle();
-            this.rotation.M31 = instream.ReadSingle();
-            this.rotation.M32 = instream.ReadSingle();
-            this.rotation.M33 = instream.ReadSingle();
-            this.rotation.M34 = instream.ReadSingle();
-            this.rotation.M41 = instream.ReadSingle();
-            this.rotation.M42 = instream.ReadSingle();
-            this.rotation.M43 = instream.ReadSingle();
-            this.rotation.M44 = instream.ReadSingle();
+            Matrix3D transform = new Matrix3D();
+            transform.M11 = instream.ReadSingle();
+            transform.M12 = instream.ReadSingle();
+            transform.M13 = instream.ReadSingle();
+            transform.M14 = instream.ReadSingle();
+            transform.M21 = instream.ReadSingle();
+            transform.M22 = instream.ReadSingle();
+            transform.M23 = instream.ReadSingle();
+            transform.M24 = instream.ReadSingle();
+            transform.M31 = instream.ReadSingle();
+            transform.M32 = instream.ReadSingle();
+            transform.M33 = instream.ReadSingle();
+            transform.M34 = instream.ReadSingle();
+            transform.M41 = instream.ReadSingle();
+            transform.M42 = instream.ReadSingle();
+            transform.M43 = instream.ReadSingle();
+            transform.M44 = instream.ReadSingle();
 
-            this.rotation.M41 = instream.ReadSingle();
-            this.rotation.M42 = instream.ReadSingle();
-            this.rotation.M43 = instream.ReadSingle();
+            transform.M41 = instream.ReadSingle();
+            transform.M42 = instream.ReadSingle();
+            transform.M43 = instream.ReadSingle();
+
+            rotation = transform;
 
             loading_parent_id = instream.ReadUInt32();
 

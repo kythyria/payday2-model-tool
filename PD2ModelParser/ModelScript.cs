@@ -132,7 +132,9 @@ namespace PD2ModelParser
                         vec.Z = float.Parse(CheckAttr(operation, "z"));
 
                         // TODO update the object's world_transform property
-                        obj.rotation.Translation = vec;
+                        Matrix3D transform = obj.rotation;
+                        transform.Translation = vec;
+                        obj.rotation = transform;
 
                         break;
                     }
@@ -161,7 +163,6 @@ namespace PD2ModelParser
                         Matrix3D mat = Matrix3D.CreateScale(scale) * Matrix3D.CreateFromQuaternion(quat);
                         mat.Translation = translation;
 
-                        // TODO update the object's world_transform property
                         obj.rotation = mat;
 
                         break;
@@ -192,7 +193,6 @@ namespace PD2ModelParser
                         Matrix3D mat = Matrix3D.CreateScale(scale) * Matrix3D.CreateFromQuaternion(quat);
                         mat.Translation = translation;
 
-                        // TODO update the object's world_transform property
                         obj.rotation = mat;
 
                         break;
