@@ -45,10 +45,19 @@ namespace PD2ModelParser.Importers
         }
 
         private readonly FullModelData data;
+        private readonly Dictionary<ulong, Object3D> _objects = new Dictionary<ulong, Object3D>();
 
         private FilmboxImporter(FullModelData data)
         {
             this.data = data;
+
+            foreach (object item in data.parsed_sections.Values)
+            {
+                if (!(item is Object3D obj))
+                    continue;
+
+                _objects[obj.hashname.Hash] = obj;
+            }
         }
 
         private Model AddMesh(Object3D parent, FbxNode node, FbxMesh mesh)
@@ -132,9 +141,15 @@ namespace PD2ModelParser.Importers
                 if (skel == null || skel.GetSkeletonType() == FbxSkeleton.EType.eRoot)
                     return parent;
 
-                Object3D obj = new Object3D(node.GetName(), parent);
-                parent?.children?.Add(obj);
-                data.AddSection(obj);
+                // Look up if there's an existing object matching this object
+                _objects.TryGetValue(Hash64.HashString(node.GetName()), out Object3D obj);
+
+                if (obj == null)
+                {
+                    obj = new Object3D(node.GetName(), parent);
+                    parent?.children?.Add(obj);
+                    data.AddSection(obj);
+                }
 
                 if (root_bone == null)
                 {
