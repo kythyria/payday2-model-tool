@@ -51,6 +51,8 @@ namespace PD2ModelParser.Sections
                 0.0f, 0.0f, 0.0f, 0.0f);
 
             this.parent = parent;
+
+            UpdateTransforms();
         }
 
         public Object3D(BinaryReader instream, SectionHeader section) : this(instream)
@@ -165,28 +167,34 @@ namespace PD2ModelParser.Sections
             if (loading_parent_id == 0)
             {
                 parent = null;
-                world_transform = rotation;
             }
             else
             {
                 parent = (Object3D) parsed_sections[loading_parent_id];
-                world_transform = rotation.MultDiesel(parent.CheckWorldTransform(loading_parent_id, parsed_sections));
 
-                if(!parent.children.Contains(this))
+                if (!parent.has_post_loaded)
+                    parent.PostLoad(loading_parent_id, parsed_sections);
+
+                if (!parent.children.Contains(this))
                 {
                     parent.children.Add(this);
                 }
             }
 
+            UpdateTransforms();
+
             has_post_loaded = true;
         }
 
-        private Matrix3D CheckWorldTransform(uint id, Dictionary<uint, object> parsed_sections)
+        public void UpdateTransforms()
         {
-            if (!has_post_loaded)
-                PostLoad(id, parsed_sections);
+            if (parent == null)
+            {
+                world_transform = rotation;
+                return;
+            }
 
-            return world_transform;
+            world_transform = rotation.MultDiesel(parent.world_transform);
         }
     }
 }
