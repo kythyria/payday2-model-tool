@@ -69,6 +69,9 @@ namespace PD2ModelParser.Exporters
 
                 if (model.skinbones_ID == 0)
                 {
+                    // If there's no corresponding skeleton, remove the 'Object' suffix
+                    mesh.Node.SetName(model.object3D.Name);
+
                     scene.GetRootNode().AddChild(mesh.Node);
                     continue;
                 }
@@ -78,7 +81,7 @@ namespace PD2ModelParser.Exporters
                 Dictionary<Object3D, BoneInfo> bones = AddSkeleton(scene, data, sb);
 
                 // Make one root node to contain both the skeleton and the model
-                FbxNode root = FbxNode.Create(fm, model.object3D.Name + "Root");
+                FbxNode root = FbxNode.Create(fm, model.object3D.Name);
                 root.AddChild(mesh.Node);
                 root.AddChild(bones[(Object3D) data.parsed_sections[sb.probably_root_bone]].Node);
                 scene.GetRootNode().AddChild(root);
@@ -184,7 +187,7 @@ namespace PD2ModelParser.Exporters
 
         private static BoneInfo AddBone(Object3D obj, Dictionary<Object3D, BoneInfo> bones)
         {
-            FbxNode node = FbxNode.Create(fm, obj.Name + "Bone");
+            FbxNode node = FbxNode.Create(fm, obj.Name);
 
             CopyTransform(obj.rotation, node);
 
