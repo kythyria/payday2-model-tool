@@ -81,20 +81,20 @@ namespace PD2ModelParser.Importers
             data.AddSection(model);
 
             // Add the bones - note this *only* adds the skeleton, and not any weights
-            SkinBones sb = AddSkeleton(node, data);
-            if (sb == null)
+            Dictionary<ulong, Object3D> skel = AddSkeleton(node, data, model);
+            if (skel == null)
                 return model;
-
-            model.skinbones_ID = sb.id;
 
             return model;
         }
 
-        private static SkinBones AddSkeleton(FbxNode meshNode, FullModelData data)
+        private static Dictionary<ulong, Object3D> AddSkeleton(FbxNode meshNode, FullModelData data, Model model)
         {
             FbxSkeleton root_skeleton = meshNode.GetParent()?.GetSkeleton();
             if (root_skeleton == null)
                 return null;
+
+            Dictionary<ulong, Object3D> objs = new Dictionary<ulong, Object3D>();
 
             Object3D root = new Object3D(meshNode.GetName() + "Skel", null);
             data.AddSection(root);
@@ -104,6 +104,7 @@ namespace PD2ModelParser.Importers
                 probably_root_bone = root.id,
             };
             data.AddSection(sb);
+            model.skinbones_ID = sb.id;
 
             Recurse(meshNode.GetParent(), root, (node, parent) =>
             {
@@ -113,6 +114,8 @@ namespace PD2ModelParser.Importers
                 Object3D obj = new Object3D(node.GetName(), parent);
                 parent.children.Add(obj);
                 data.AddSection(obj);
+
+                objs[node.PtrHashCode()] = obj;
 
                 // Note the field is named badly - it's a transform, not just a rotation
                 obj.rotation = node.GetNexusTransform();
@@ -125,7 +128,7 @@ namespace PD2ModelParser.Importers
             });
 
             // TODO setup the other SkinBones fields - probably very important for Diesel
-            return sb;
+            return objs;
         }
 
         private static Geometry BuildGeometry(FbxMesh mesh)
