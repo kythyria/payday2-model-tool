@@ -56,6 +56,16 @@ namespace PD2ModelParser.Exporters
 
         private static void AddModelContents(FbxScene scene, FullModelData data)
         {
+            // Find all the Object3Ds that are actually part of an object
+            HashSet<Object3D> model_objects = new HashSet<Object3D>();
+            foreach (object obj in data.parsed_sections.Values)
+            {
+                if (!(obj is Model m))
+                    continue;
+
+                model_objects.Add(m.object3D);
+            }
+
             foreach (SectionHeader section_header in data.sections)
             {
                 if (section_header.type != Tags.model_data_tag)
@@ -78,7 +88,7 @@ namespace PD2ModelParser.Exporters
 
                 SkinBones sb = (SkinBones) data.parsed_sections[model.skinbones_ID];
 
-                Dictionary<Object3D, BoneInfo> bones = AddSkeleton(scene, data, sb);
+                Dictionary<Object3D, BoneInfo> bones = AddSkeleton(data, sb, model_objects);
 
                 // Make one root node to contain both the skeleton and the model
                 FbxNode root = FbxNode.Create(fm, model.object3D.Name);
@@ -176,16 +186,17 @@ namespace PD2ModelParser.Exporters
             }
         }
 
-        private static Dictionary<Object3D, BoneInfo> AddSkeleton(FbxScene scene, FullModelData data, SkinBones bones)
+        private static Dictionary<Object3D, BoneInfo> AddSkeleton(FullModelData data, SkinBones bones,
+            HashSet<Object3D> exclude)
         {
             Dictionary<uint, object> parsed = data.parsed_sections;
             Dictionary<Object3D, BoneInfo> bone_maps = new Dictionary<Object3D, BoneInfo>();
             Object3D root = (Object3D) parsed[bones.probably_root_bone];
-            BoneInfo fbx_root = AddBone(root, bone_maps);
+            AddBone(root, bone_maps, exclude);
             return bone_maps;
         }
 
-        private static BoneInfo AddBone(Object3D obj, Dictionary<Object3D, BoneInfo> bones)
+        private static BoneInfo AddBone(Object3D obj, Dictionary<Object3D, BoneInfo> bones, HashSet<Object3D> exclude)
         {
             FbxNode node = FbxNode.Create(fm, obj.Name);
 
@@ -198,7 +209,10 @@ namespace PD2ModelParser.Exporters
 
             foreach (Object3D child in obj.children)
             {
-                BoneInfo n = AddBone(child, bones);
+                if (exclude.Contains(child))
+                    continue;
+
+                BoneInfo n = AddBone(child, bones, exclude);
                 node.AddChild(n.Node);
             }
 
