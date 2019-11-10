@@ -362,17 +362,28 @@ namespace PD2ModelParser.Importers
             geom.vertex_colors.Clear();
             foreach (List<Vector2D> uvs in geom.UVs) uvs.Clear();
 
+            FbxLayerElementNormal normals = mesh.GetElementNormal();
+            if (normals.GetMappingMode() != FbxLayerElement.EMappingMode.eByControlPoint)
+                throw new Exception("Normals must be mapped by control point");
+
+            if (normals.GetReferenceMode() != FbxLayerElement.EReferenceMode.eDirect)
+                throw new Exception("Normals must be referenced direct");
+
             for (int i = 0; i < mesh.GetControlPointsCount(); i++)
             {
                 FbxVector4 v = mesh.GetControlPointAt(i);
                 geom.verts.Add(v.V3());
 
-                // TODO Normals
-                geom.normals.Add(Vector3D.Zero);
+                FbxVector4 n = normals.GetDirectArray().GetAt(i);
+                geom.normals.Add(n.V3());
+
+                if (n.V3().Length() < 0.1)
+                    throw new Exception("Short normal!");
 
                 // Normally I don't care about leaving stuff around as it'll be cleaned
                 // up when the C# GC eats it, but in this case it might be a bit too much.
                 v.Dispose();
+                n.Dispose();
             }
 
             AddVertexColours(mesh, geom);
