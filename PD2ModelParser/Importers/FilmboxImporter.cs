@@ -411,6 +411,8 @@ namespace PD2ModelParser.Importers
 
         private void BuildTopology(Topology topo, FbxMesh mesh)
         {
+            topo.facelist.Clear();
+
             for (int i = 0; i < mesh.GetPolygonCount(); i++)
             {
                 int size = mesh.GetPolygonSize(i);
