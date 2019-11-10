@@ -62,7 +62,6 @@ namespace PD2ModelParser.Sections
         public UInt32 id;
         public UInt32 size;
 
-        public UInt32 count;
         public List<BoneMappingItem> bone_mappings = new List<BoneMappingItem>();
 
         public byte[] remaining_data = null;
@@ -83,9 +82,9 @@ namespace PD2ModelParser.Sections
 
         public Bones(BinaryReader instream)
         {
-            this.count = instream.ReadUInt32();
+            uint count = instream.ReadUInt32();
 
-            for (int x = 0; x < this.count; x++)
+            for (int x = 0; x < count; x++)
             {
                 BoneMappingItem bone_mapping_item = new BoneMappingItem();
                 uint bone_count = instream.ReadUInt32();
@@ -116,8 +115,7 @@ namespace PD2ModelParser.Sections
 
         public void StreamWriteData(BinaryWriter outstream)
         {
-            outstream.Write(this.count);
-            System.Diagnostics.Debug.Assert(this.count == this.bone_mappings.Count, "[Bones] this.count != this.bones.Count");
+            outstream.Write(bone_mappings.Count);
             foreach (BoneMappingItem bone in this.bone_mappings)
             {
                 outstream.Write(bone.bones.Count);
@@ -138,7 +136,7 @@ namespace PD2ModelParser.Sections
                 bones_string += bone + ", ";
             }
 
-            return "[Bones] ID: " + this.id + " size: " + this.size + " count: " + this.count + " bones:[ " +
+            return "[Bones] ID: " + this.id + " size: " + this.size + " bones:[ " +
                    bones_string + " ]" + (this.remaining_data != null
                        ? " REMAINING DATA! " + this.remaining_data.Length + " bytes"
                        : "");
