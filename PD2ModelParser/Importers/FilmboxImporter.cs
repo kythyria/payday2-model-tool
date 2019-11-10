@@ -370,9 +370,6 @@ namespace PD2ModelParser.Importers
                 // TODO Normals
                 geom.normals.Add(Vector3D.Zero);
 
-                // TODO UVs
-                geom.uvs.Add(Vector2D.Zero);
-
                 // Normally I don't care about leaving stuff around as it'll be cleaned
                 // up when the C# GC eats it, but in this case it might be a bit too much.
                 v.Dispose();
