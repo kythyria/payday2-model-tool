@@ -169,6 +169,8 @@ namespace PD2ModelParser.Importers
             data.AddSection(sb);
             model.skinbones_ID = sb.id;
 
+            Matrix3D offset_transform = Matrix3D.Identity;
+
             Recurse(rootNode, rootPoint, (node, parent) =>
             {
                 FbxSkeleton skel = node.GetSkeleton();
@@ -188,6 +190,10 @@ namespace PD2ModelParser.Importers
                 if (root_bone == null)
                 {
                     root_bone = obj;
+                    sb.global_skin_transform = obj.rotation;
+
+                    offset_transform = sb.global_skin_transform;
+                    offset_transform.Invert();
                 }
                 else if (parent == rootPoint)
                 {
@@ -202,9 +208,17 @@ namespace PD2ModelParser.Importers
                 sb.objects.Add(obj.id);
 
                 // TODO implement
-                // For now just put *something* in so we have the correct number of matricies
-                // As otherwise it'll be impossible to load the model
-                sb.rotations.Add(Matrix3D.Identity);
+                // ZNix's 10/11/19 notes on how the rotation and global_skin_transform seem
+                // to work (on ene_security_3):
+                // global_skin transform holds the root bone's transform, and seems to be applied
+                // to everything else in sb.rotations. Objects then have entries in sb.rotations
+                // that move them back to their position relative to the root node, undoing
+                // global_skin_transform (to get their in-model position) and undoing it again
+                // to get their position relative to the root bone.
+                // This seems to correctly position the hips (and stepping through with the debugger
+                // confirms that the sb.rotations matrix produced matches that in the original source
+                // model, however all other bones are broken.
+                sb.rotations.Add(offset_transform * offset_transform * obj.rotation);
 
                 // TODO sb.bones.bones
 
