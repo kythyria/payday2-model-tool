@@ -122,6 +122,10 @@ namespace PD2ModelParser.Exporters
 
             CopyTransform(model.object3D.world_transform, mesh_node);
 
+            FbxLayerElementNormal normals = mesh.CreateElementNormal();
+            normals.SetReferenceMode(FbxLayerElement.EReferenceMode.eDirect);
+            normals.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
+
             mesh.InitControlPoints(geom.verts.Count);
             FbxVector4 temp = new FbxVector4();
             for (int i = 0; i < geom.verts.Count; i++)
