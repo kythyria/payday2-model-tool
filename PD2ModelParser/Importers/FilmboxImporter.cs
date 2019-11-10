@@ -221,6 +221,15 @@ namespace PD2ModelParser.Importers
             sb.probably_root_bone = root_bone.id;
             rootBone = root_bone;
 
+            // TODO more research into how this works
+            // This seems to be an index mapping through to bones from RenderAtoms
+            BoneMappingItem bmi = new BoneMappingItem();
+            for (uint i = 0; i < sb.count; i++)
+                bmi.bones.Add(i);
+
+            for (int i = 0; i < model.renderAtoms.Count; i++)
+                sb.bones.bone_mappings.Add(bmi);
+
             // TODO setup the other SkinBones fields - probably very important for Diesel
             return objs;
         }
