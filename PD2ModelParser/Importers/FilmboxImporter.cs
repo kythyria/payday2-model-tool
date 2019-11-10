@@ -133,6 +133,8 @@ namespace PD2ModelParser.Importers
             BuildGeometry(mesh, geom);
             BuildTopology(topo, mesh);
 
+            BuildUVs(mesh, geom);
+
             // Add the bones - note this *only* adds the skeleton, and not any weights
             Dictionary<ulong, Object3D> skel = AddSkeleton(root, model, parent, out Object3D root_bone);
             if (skel == null)
@@ -425,6 +427,38 @@ namespace PD2ModelParser.Importers
                 // TODO verify the indices are within bounds
                 Face f = new Face {a = (ushort) a, b = (ushort) b, c = (ushort) c};
                 topo.facelist.Add(f);
+            }
+        }
+
+        private void BuildUVs(FbxMesh mesh, Geometry geom)
+        {
+            for (int i = 0; i < mesh.GetElementUVCount(); i++)
+            {
+                FbxLayerElementUV layer = mesh.GetElementUV(i);
+
+                int gi;
+                switch (layer.GetName())
+                {
+                    case "PrimaryUV":
+                        gi = 0;
+                        break;
+                    default:
+                        throw new Exception("Unknown UV " + layer.GetName());
+                }
+
+                if (layer.GetMappingMode() != FbxLayerElement.EMappingMode.eByControlPoint)
+                    throw new Exception("UV: only per-vertex UVs are supported");
+
+                if (layer.GetReferenceMode() != FbxLayerElement.EReferenceMode.eDirect)
+                    throw new Exception("UV: only direct indexing is supported");
+
+                FbxLayerElementArrayTemplateVector2 direct = layer.GetDirectArray();
+                List<Vector2D> uv = geom.UVs[gi];
+
+                for (int j = 0; j < direct.GetCount(); j++)
+                {
+                    uv.Add(direct.GetAt(j).V2());
+                }
             }
         }
 
