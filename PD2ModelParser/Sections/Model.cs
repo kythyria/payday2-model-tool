@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    public class ModelItem
+    public class RenderAtom
     {
         public UInt32 unknown1;
         public UInt32 vertCount; //Verts/Uvs/Normals/etc Count
@@ -36,7 +36,7 @@ namespace PD2ModelParser.Sections
         public UInt32 passthroughGP_ID; //ID of associated PassthroughGP
         public UInt32 topologyIP_ID; //ID of associated TopologyIP
         public UInt32 count;
-        public List<ModelItem> items = new List<ModelItem>();
+        public List<RenderAtom> renderAtoms = new List<RenderAtom>();
         //public UInt32 unknown9;
         public UInt32 material_group_section_id;
         public UInt32 lightset_ID;
@@ -60,8 +60,8 @@ namespace PD2ModelParser.Sections
             this.passthroughGP_ID = passGP.id;
             this.topologyIP_ID = topoIP.id;
             this.count = 1;
-            this.items = new List<ModelItem>();
-            ModelItem nmi = new ModelItem();
+            this.renderAtoms = new List<RenderAtom>();
+            RenderAtom nmi = new RenderAtom();
             nmi.unknown1 = 0;
             nmi.vertCount = (uint)obj.verts.Count; //vert count
             nmi.unknown2 = 0;
@@ -69,7 +69,7 @@ namespace PD2ModelParser.Sections
             nmi.material_id = 0;
             
 
-            this.items.Add(nmi);
+            this.renderAtoms.Add(nmi);
 
             //this.unknown9 = 0;
             this.material_group_section_id = matg.id;
@@ -117,13 +117,13 @@ namespace PD2ModelParser.Sections
 
                 for (int x = 0; x < this.count; x++)
                 {
-                    ModelItem item = new ModelItem();
+                    RenderAtom item = new RenderAtom();
                     item.unknown1 = instream.ReadUInt32();
                     item.vertCount = instream.ReadUInt32(); //Verts/Uvs/Normals/etc Count
                     item.unknown2 = instream.ReadUInt32();
                     item.faceCount = instream.ReadUInt32(); //Face count
                     item.material_id = instream.ReadUInt32();
-                    this.items.Add(item);
+                    this.renderAtoms.Add(item);
                 }
 
                 //this.unknown9 = instream.ReadUInt32();
@@ -191,7 +191,7 @@ namespace PD2ModelParser.Sections
                 outstream.Write(this.passthroughGP_ID);
                 outstream.Write(this.topologyIP_ID);
                 outstream.Write(this.count);
-                foreach (ModelItem modelitem in this.items)
+                foreach (RenderAtom modelitem in this.renderAtoms)
                 {
                     outstream.Write(modelitem.unknown1);
                     outstream.Write(modelitem.vertCount);
@@ -231,7 +231,7 @@ namespace PD2ModelParser.Sections
             {
                 StringBuilder items_builder = new StringBuilder();
                 bool first = true;
-                foreach (ModelItem item in this.items)
+                foreach (RenderAtom item in this.renderAtoms)
                 {
                     items_builder.Append( (first ? "" : ", ") + item.ToString());
                     first = false;

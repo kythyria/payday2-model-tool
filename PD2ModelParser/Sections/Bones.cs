@@ -19,6 +19,8 @@ namespace PD2ModelParser.Sections
     /// transform onto each SkinBones matrix. This is done in C#, loaded into the SkinPositions
     /// list in SkinBones.
     ///
+    /// Each bone mapping corresponds to a RenderAtom.
+    ///
     /// Note to self: Setting this directly after the invocation of BoneMapping::setup_matrix_sets
     /// will null out the first matrix in the first set.
     /// set *(void**)(  **(void***)((char*)($rbx + 0x20) + 24)     ) = 0
