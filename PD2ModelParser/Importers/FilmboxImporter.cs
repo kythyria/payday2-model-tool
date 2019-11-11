@@ -169,8 +169,6 @@ namespace PD2ModelParser.Importers
             data.AddSection(sb);
             model.skinbones_ID = sb.id;
 
-            Matrix3D offset_transform = Matrix3D.Identity;
-
             Recurse(rootNode, rootPoint, (node, parent) =>
             {
                 FbxSkeleton skel = node.GetSkeleton();
@@ -191,9 +189,6 @@ namespace PD2ModelParser.Importers
                 {
                     root_bone = obj;
                     sb.global_skin_transform = obj.rotation;
-
-                    offset_transform = sb.global_skin_transform;
-                    offset_transform.Invert();
                 }
                 else if (parent == rootPoint)
                 {
