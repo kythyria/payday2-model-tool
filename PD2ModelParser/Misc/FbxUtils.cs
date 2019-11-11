@@ -7,6 +7,8 @@ namespace PD2ModelParser.Misc
 {
     public static class FbxUtils
     {
+        public const string LocatorSuffix = "_locator";
+
         public static FbxDouble3 D3(this FbxDouble4 vec)
         {
             SWIGTYPE_p_double data = vec.mData;

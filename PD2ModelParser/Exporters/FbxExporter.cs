@@ -196,13 +196,23 @@ namespace PD2ModelParser.Exporters
             Dictionary<uint, object> parsed = data.parsed_sections;
             Dictionary<Object3D, BoneInfo> bone_maps = new Dictionary<Object3D, BoneInfo>();
             Object3D root = (Object3D) parsed[bones.probably_root_bone];
-            AddBone(root, bone_maps, exclude);
+            AddBone(root, bone_maps, exclude, bones);
             return bone_maps;
         }
 
-        private static BoneInfo AddBone(Object3D obj, Dictionary<Object3D, BoneInfo> bones, HashSet<Object3D> exclude)
+        private static BoneInfo AddBone(Object3D obj, Dictionary<Object3D, BoneInfo> bones, HashSet<Object3D> exclude,
+            SkinBones sb)
         {
-            FbxNode node = FbxNode.Create(fm, obj.Name);
+            string name = obj.Name;
+
+            // If it's not part of the SkinBones object list, then it's a locator that vertices can't bind to
+            // This will be read later when importing
+            if (!sb.objects.Contains(obj.id))
+            {
+                name += FbxUtils.LocatorSuffix;
+            }
+
+            FbxNode node = FbxNode.Create(fm, name);
 
             CopyTransform(obj.rotation, node);
 
@@ -216,7 +226,7 @@ namespace PD2ModelParser.Exporters
                 if (exclude.Contains(child))
                     continue;
 
-                BoneInfo n = AddBone(child, bones, exclude);
+                BoneInfo n = AddBone(child, bones, exclude, sb);
                 node.AddChild(n.Node);
             }
 
