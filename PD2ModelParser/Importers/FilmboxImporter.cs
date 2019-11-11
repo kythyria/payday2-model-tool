@@ -209,16 +209,10 @@ namespace PD2ModelParser.Importers
 
                 // TODO implement
                 // ZNix's 10/11/19 notes on how the rotation and global_skin_transform seem
-                // to work (on ene_security_3):
-                // global_skin transform holds the root bone's transform, and seems to be applied
-                // to everything else in sb.rotations. Objects then have entries in sb.rotations
-                // that move them back to their position relative to the root node, undoing
-                // global_skin_transform (to get their in-model position) and undoing it again
-                // to get their position relative to the root bone.
-                // This seems to correctly position the hips (and stepping through with the debugger
-                // confirms that the sb.rotations matrix produced matches that in the original source
-                // model, however all other bones are broken.
-                sb.rotations.Add(offset_transform * offset_transform * obj.rotation);
+                // to work (on ene_security_3): Archived in Git history, check out an older version
+                // to see the old and incorrect nodes.
+                // As it turns out, this just has to be the inverse of the object's world transform matrix
+                sb.rotations.Add(obj.world_transform.Inv());
 
                 // TODO sb.bones.bones
 
