@@ -175,6 +175,14 @@ namespace PD2ModelParser.Importers
                 if (skel == null || skel.GetSkeletonType() == FbxSkeleton.EType.eRoot)
                     return parent;
 
+                string name = node.GetName();
+                bool isBone = true;
+                if (name.EndsWith(FbxUtils.LocatorSuffix))
+                {
+                    name = name.Substring(0, name.Length - FbxUtils.LocatorSuffix.Length);
+                    isBone = false;
+                }
+
                 // Look up if there's an existing object matching this object
                 _objects.TryGetValue(Hash64.HashString(node.GetName()), out Object3D obj);
 
@@ -196,6 +204,9 @@ namespace PD2ModelParser.Importers
                 }
 
                 objs[node.PtrHashCode()] = obj;
+
+                if (!isBone)
+                    return obj;
 
                 // Note the field is named badly - it's a transform, not just a rotation
                 obj.rotation = node.GetNexusTransform();
