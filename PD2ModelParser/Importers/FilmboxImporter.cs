@@ -222,8 +222,6 @@ namespace PD2ModelParser.Importers
                 rotation.Invert();
                 sb.rotations.Add(rotation);
 
-                // TODO sb.bones.bones
-
                 return obj;
             });
 
