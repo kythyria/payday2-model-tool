@@ -207,7 +207,9 @@ namespace PD2ModelParser.Importers
                 // to work (on ene_security_3): Archived in Git history, check out an older version
                 // to see the old and incorrect nodes.
                 // As it turns out, this just has to be the inverse of the object's world transform matrix
-                sb.rotations.Add(obj.world_transform.Inv());
+                Matrix3D rotation = obj.world_transform;
+                rotation.Invert();
+                sb.rotations.Add(rotation);
 
                 // TODO sb.bones.bones
 
