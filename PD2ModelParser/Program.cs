@@ -61,7 +61,7 @@ namespace PD2ModelParser
                     "v|verbose", "increase debug message verbosity",
                     v =>
                     {
-                        if (v != null) ++verbosity;
+                        if (v != null) --verbosity;
                     }
                 },
                 {
