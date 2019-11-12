@@ -312,6 +312,11 @@ namespace PD2ModelParser.Sections
             }
         }
 
+        public bool HasHeader(GeometryChannelTypes type)
+        {
+            return headers.Any(h => h.item_type == type);
+        }
+
         public void StreamWrite(BinaryWriter outstream)
         {
             outstream.Write(geometry_tag);

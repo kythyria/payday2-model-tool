@@ -286,10 +286,20 @@ namespace PD2ModelParser.Importers
             // Either 2 for low-LOD models or 3 for high-LOD models - afaik this
             // has something to do with which render template is used.
             // TODO confirm if this is true, and if so allow selection of the render template somehow
-            geom.headers.Add(new GeometryHeader(3, GeometryChannelTypes.BLENDWEIGHT));
+            if (!geom.HasHeader(GeometryChannelTypes.BLENDWEIGHT))
+            {
+                geom.headers.Add(new GeometryHeader(3, GeometryChannelTypes.BLENDWEIGHT));
+            }
 
             // Odd size, but consistent when taken from default models
-            geom.headers.Add(new GeometryHeader(7, GeometryChannelTypes.BLENDINDICES));
+            if (!geom.HasHeader(GeometryChannelTypes.BLENDINDICES))
+            {
+                geom.headers.Add(new GeometryHeader(7, GeometryChannelTypes.BLENDINDICES));
+            }
+
+            // Clear the channels out, required if we're overwriting a model
+            geom.weights.Clear();
+            geom.weight_groups.Clear();
 
             // Build a lookup table to find the index of a given bone
             Dictionary<Object3D, int> bone_indices = new Dictionary<Object3D, int>();
