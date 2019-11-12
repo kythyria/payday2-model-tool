@@ -423,27 +423,34 @@ namespace PD2ModelParser.Importers
             foreach (List<Vector2D> uvs in geom.UVs) uvs.Clear();
 
             FbxLayerElementNormal normals = mesh.GetElementNormal();
-            if (normals.GetMappingMode() != FbxLayerElement.EMappingMode.eByControlPoint)
-                throw new Exception("Normals must be mapped by control point");
-
-            if (normals.GetReferenceMode() != FbxLayerElement.EReferenceMode.eDirect)
-                throw new Exception("Normals must be referenced direct");
+            List<int>[] cp_to_entries = FindPerVertEntries(mesh, normals, normals.GetIndexArray());
 
             for (int i = 0; i < mesh.GetControlPointsCount(); i++)
             {
                 FbxVector4 v = mesh.GetControlPointAt(i);
                 geom.verts.Add(v.V3());
 
-                FbxVector4 n = normals.GetDirectArray().GetAt(i);
-                geom.normals.Add(n.V3());
+                // Average out all the normals, since if we're in per-poly-vert mode there
+                // will be more than one normal per control point.
+                // TODO will this break them, and is there a better way to do it?
+                Vector3D norm = Vector3D.Zero;
+                foreach (int cp in cp_to_entries[i])
+                {
+                    FbxVector4 n = normals.GetDirectArray().GetAt(cp);
+                    if (n.V3().Length() < 0.1)
+                        throw new Exception("Short normal!");
 
-                if (n.V3().Length() < 0.1)
-                    throw new Exception("Short normal!");
+                    norm += n.V3();
+                    n.Dispose();
+                }
+
+                norm.Normalize();
+
+                geom.normals.Add(norm);
 
                 // Normally I don't care about leaving stuff around as it'll be cleaned
                 // up when the C# GC eats it, but in this case it might be a bit too much.
                 v.Dispose();
-                n.Dispose();
             }
 
             AddVertexColours(mesh, geom);
