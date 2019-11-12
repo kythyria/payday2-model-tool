@@ -205,11 +205,11 @@ namespace PD2ModelParser.Importers
                 }
 
                 // Look up if there's an existing object matching this object
-                _objects.TryGetValue(Hash64.HashString(node.GetName()), out Object3D obj);
+                _objects.TryGetValue(Hash64.HashString(name), out Object3D obj);
 
                 if (obj == null)
                 {
-                    obj = new Object3D(node.GetName(), parent);
+                    obj = new Object3D(name, parent);
                     parent?.children?.Add(obj);
                     data.AddSection(obj);
                 }
