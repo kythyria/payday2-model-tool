@@ -514,18 +514,28 @@ namespace PD2ModelParser.Importers
                         throw new Exception("Unknown UV " + layer.GetName());
                 }
 
-                if (layer.GetMappingMode() != FbxLayerElement.EMappingMode.eByControlPoint)
-                    throw new Exception("UV: only per-vertex UVs are supported");
-
-                if (layer.GetReferenceMode() != FbxLayerElement.EReferenceMode.eDirect)
-                    throw new Exception("UV: only direct indexing is supported");
+                List<int>[] cp_to_entries = FindPerVertEntries(mesh, layer, layer.GetIndexArray());
 
                 FbxLayerElementArrayTemplateVector2 direct = layer.GetDirectArray();
                 List<Vector2D> uv = geom.UVs[gi];
 
-                for (int j = 0; j < direct.GetCount(); j++)
+                for (int j = 0; j < geom.vert_count; j++)
                 {
-                    uv.Add(direct.GetAt(j).V2());
+                    List<int> entries = cp_to_entries[j];
+
+                    Vector2D v = Vector2D.Zero;
+
+                    foreach (int idx in entries)
+                    {
+                        Vector2D vv = direct.GetAt(idx).V2();
+                        v.X += vv.X;
+                        v.Y += vv.Y;
+                    }
+
+                    v.X /= entries.Count;
+                    v.Y /= entries.Count;
+
+                    uv.Add(v);
                 }
             }
         }
@@ -551,6 +561,74 @@ namespace PD2ModelParser.Importers
                 FbxNode child = node.GetChild(i);
                 Recurse(child, sub, callback);
             }
+        }
+
+        /// <summary>
+        /// For a given layer element, produce a mapping of control points
+        /// to all the values in the direct array they correspond to.
+        /// </summary>
+        private static List<int>[] FindPerVertEntries(FbxMesh mesh, FbxLayerElement elem,
+            FbxLayerElementArrayTemplateInt indexArray)
+        {
+            List<int>[] points = new List<int>[mesh.GetControlPointsCount()];
+            for (int i = 0; i < points.Length; i++)
+            {
+                points[i] = new List<int>();
+            }
+
+            switch (elem.GetMappingMode())
+            {
+                case FbxLayerElement.EMappingMode.eByControlPoint:
+                    // 1:1 mapping of control points to the positions in the index array
+                    for (int i = 0; i < points.Length; i++)
+                    {
+                        points[i].Add(i);
+                    }
+
+                    break;
+                case FbxLayerElement.EMappingMode.eByPolygonVertex:
+                    // Map each control point to each of the polygon verts that reference it
+                    SWIGTYPE_p_int vertices = mesh.GetPolygonVertices();
+                    int poly_count = mesh.GetPolygonCount();
+
+                    int vert_id = 0;
+                    for (int poly = 0; poly < poly_count; poly++)
+                    {
+                        int vert_count = mesh.GetPolygonSize(poly);
+                        for (int vert = 0; vert < vert_count; vert++)
+                        {
+                            int control_point = FbxNet.FbxNet.intArray_getitem(vertices, vert_id);
+                            points[control_point].Add(vert_id);
+                            vert_id++;
+                        }
+                    }
+
+                    break;
+                default:
+                    throw new Exception("Unsupported mapping mode " + elem.GetMappingMode());
+            }
+
+            switch (elem.GetReferenceMode())
+            {
+                case FbxLayerElement.EReferenceMode.eDirect:
+                    // Already correct, CP maps straight to the direct array
+                    break;
+                case FbxLayerElement.EReferenceMode.eIndexToDirect:
+                    // Look up each point in the index array
+                    foreach (List<int> elems in points)
+                    {
+                        for (int i = 0; i < elems.Count; i++)
+                        {
+                            elems[i] = indexArray.GetAt(elems[i]);
+                        }
+                    }
+
+                    break;
+                default:
+                    throw new Exception("Unknown reference mode " + elem.GetReferenceMode());
+            }
+
+            return points;
         }
 
         private class WeightPart
