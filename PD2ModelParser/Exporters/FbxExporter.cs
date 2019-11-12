@@ -66,6 +66,8 @@ namespace PD2ModelParser.Exporters
                 model_objects.Add(m.object3D);
             }
 
+            Dictionary<uint, SkeletonInfo> skeletons = new Dictionary<uint, SkeletonInfo>();
+
             foreach (SectionHeader section_header in data.sections)
             {
                 if (section_header.type != Tags.model_data_tag)
@@ -88,22 +90,33 @@ namespace PD2ModelParser.Exporters
 
                 SkinBones sb = (SkinBones) data.parsed_sections[model.skinbones_ID];
 
-                Dictionary<Object3D, BoneInfo> bones = AddSkeleton(data, sb, model_objects);
+                SkeletonInfo bones;
+                if (skeletons.ContainsKey(sb.probably_root_bone))
+                {
+                    bones = skeletons[sb.probably_root_bone];
+                }
+                else
+                {
+                    bones = AddSkeleton(data, sb, model_objects);
+                    skeletons[sb.probably_root_bone] = bones;
 
-                // Make one root node to contain both the skeleton and the model
-                FbxNode root = FbxNode.Create(fm, model.object3D.Name);
-                root.AddChild(mesh.Node);
-                root.AddChild(bones[(Object3D) data.parsed_sections[sb.probably_root_bone]].Node);
-                scene.GetRootNode().AddChild(root);
+                    // Make one root node to contain the skeleton, and all the models
+                    FbxNode root = FbxNode.Create(fm, bones.Root.Game.Name + "_RigRoot");
+                    root.AddChild(bones.Root.Node);
+                    scene.GetRootNode().AddChild(root);
+                    bones.RigRoot = root;
 
-                // Add a root skeleton node. THis must be in the model's parent, otherwise Blender won't
-                // set up the armatures correctly (or at all, actually).
-                FbxSkeleton skeleton = FbxSkeleton.Create(fm, "");
-                skeleton.SetSkeletonType(FbxSkeleton.EType.eRoot);
-                root.SetNodeAttribute(skeleton);
+                    // Add a root skeleton node. THis must be in the model's parent, otherwise Blender won't
+                    // set up the armatures correctly (or at all, actually).
+                    FbxSkeleton skeleton = FbxSkeleton.Create(fm, "");
+                    skeleton.SetSkeletonType(FbxSkeleton.EType.eRoot);
+                    root.SetNodeAttribute(skeleton);
+                }
+
+                bones.RigRoot.AddChild(mesh.Node);
 
                 // Add the skin weights, which bind the model onto the bones
-                AddWeights(data, model, sb, mesh.Mesh, bones);
+                AddWeights(data, model, sb, mesh.Mesh, bones.Nodes);
             }
         }
 
@@ -190,14 +203,18 @@ namespace PD2ModelParser.Exporters
             }
         }
 
-        private static Dictionary<Object3D, BoneInfo> AddSkeleton(FullModelData data, SkinBones bones,
-            HashSet<Object3D> exclude)
+        private static SkeletonInfo AddSkeleton(FullModelData data, SkinBones bones, HashSet<Object3D> exclude)
         {
             Dictionary<uint, object> parsed = data.parsed_sections;
             Dictionary<Object3D, BoneInfo> bone_maps = new Dictionary<Object3D, BoneInfo>();
             Object3D root = (Object3D) parsed[bones.probably_root_bone];
-            AddBone(root, bone_maps, exclude, bones);
-            return bone_maps;
+            BoneInfo root_bone = AddBone(root, bone_maps, exclude, bones);
+            return new SkeletonInfo
+            {
+                Nodes = bone_maps,
+                Root = root_bone,
+                SkinBones = bones,
+            };
         }
 
         private static BoneInfo AddBone(Object3D obj, Dictionary<Object3D, BoneInfo> bones, HashSet<Object3D> exclude,
@@ -341,6 +358,14 @@ namespace PD2ModelParser.Exporters
             public Object3D Game;
             public FbxNode Node;
             public FbxSkeleton Skeleton;
+        }
+
+        private class SkeletonInfo
+        {
+            public SkinBones SkinBones;
+            public Dictionary<Object3D, BoneInfo> Nodes;
+            public BoneInfo Root;
+            public FbxNode RigRoot;
         }
     }
 }
