@@ -15,6 +15,9 @@ namespace PD2ModelParser.Sections
         public UInt16 Bones3;
         public UInt16 Bones4;
 
+        public GeometryWeightGroups()
+        {
+        }
 
         public GeometryWeightGroups(BinaryReader instream)
         {
@@ -45,6 +48,10 @@ namespace PD2ModelParser.Sections
         public Byte green = 0;
         public Byte blue = 0;
         public Byte alpha = 0;
+
+        public GeometryColor()
+        {
+        }
 
         public GeometryColor(BinaryReader instream)
         {
@@ -147,7 +154,7 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
-        private Geometry(uint id)
+        public Geometry(uint id)
         {
             this.id = id;
 
@@ -303,6 +310,11 @@ namespace PD2ModelParser.Sections
                 // If exists, this contains hashed name for this geometry (see hashlist.txt)
                 remaining_data = instream.ReadBytes((int) (sect_end - instream.BaseStream.Position));
             }
+        }
+
+        public bool HasHeader(GeometryChannelTypes type)
+        {
+            return headers.Any(h => h.item_type == type);
         }
 
         public void StreamWrite(BinaryWriter outstream)

@@ -56,6 +56,18 @@ namespace PD2ModelParser.Exporters
 
         private static void AddModelContents(FbxScene scene, FullModelData data)
         {
+            // Find all the Object3Ds that are actually part of an object
+            HashSet<Object3D> model_objects = new HashSet<Object3D>();
+            foreach (object obj in data.parsed_sections.Values)
+            {
+                if (!(obj is Model m))
+                    continue;
+
+                model_objects.Add(m.object3D);
+            }
+
+            Dictionary<uint, SkeletonInfo> skeletons = new Dictionary<uint, SkeletonInfo>();
+
             foreach (SectionHeader section_header in data.sections)
             {
                 if (section_header.type != Tags.model_data_tag)
@@ -69,28 +81,42 @@ namespace PD2ModelParser.Exporters
 
                 if (model.skinbones_ID == 0)
                 {
+                    // If there's no corresponding skeleton, remove the 'Object' suffix
+                    mesh.Node.SetName(model.object3D.Name);
+
                     scene.GetRootNode().AddChild(mesh.Node);
                     continue;
                 }
 
                 SkinBones sb = (SkinBones) data.parsed_sections[model.skinbones_ID];
 
-                Dictionary<Object3D, BoneInfo> bones = AddSkeleton(scene, data, sb);
+                SkeletonInfo bones;
+                if (skeletons.ContainsKey(sb.probably_root_bone))
+                {
+                    bones = skeletons[sb.probably_root_bone];
+                }
+                else
+                {
+                    bones = AddSkeleton(data, sb, model_objects);
+                    skeletons[sb.probably_root_bone] = bones;
 
-                // Make one root node to contain both the skeleton and the model
-                FbxNode root = FbxNode.Create(fm, model.object3D.Name + "Root");
-                root.AddChild(mesh.Node);
-                root.AddChild(bones[(Object3D) data.parsed_sections[sb.probably_root_bone]].Node);
-                scene.GetRootNode().AddChild(root);
+                    // Make one root node to contain the skeleton, and all the models
+                    FbxNode root = FbxNode.Create(fm, bones.Root.Game.Name + "_RigRoot");
+                    root.AddChild(bones.Root.Node);
+                    scene.GetRootNode().AddChild(root);
+                    bones.RigRoot = root;
 
-                // Add a root skeleton node. THis must be in the model's parent, otherwise Blender won't
-                // set up the armatures correctly (or at all, actually).
-                FbxSkeleton skeleton = FbxSkeleton.Create(fm, "");
-                skeleton.SetSkeletonType(FbxSkeleton.EType.eRoot);
-                root.SetNodeAttribute(skeleton);
+                    // Add a root skeleton node. THis must be in the model's parent, otherwise Blender won't
+                    // set up the armatures correctly (or at all, actually).
+                    FbxSkeleton skeleton = FbxSkeleton.Create(fm, "");
+                    skeleton.SetSkeletonType(FbxSkeleton.EType.eRoot);
+                    root.SetNodeAttribute(skeleton);
+                }
+
+                bones.RigRoot.AddChild(mesh.Node);
 
                 // Add the skin weights, which bind the model onto the bones
-                AddWeights(data, model, sb, mesh.Mesh, bones);
+                AddWeights(data, model, sb, mesh.Mesh, bones.Nodes);
             }
         }
 
@@ -108,6 +134,10 @@ namespace PD2ModelParser.Exporters
             mesh_node.SetNodeAttributeGeom(mesh);
 
             CopyTransform(model.object3D.world_transform, mesh_node);
+
+            FbxLayerElementNormal normals = mesh.CreateElementNormal();
+            normals.SetReferenceMode(FbxLayerElement.EReferenceMode.eIndexToDirect);
+            normals.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
 
             mesh.InitControlPoints(geom.verts.Count);
             FbxVector4 temp = new FbxVector4();
@@ -173,18 +203,33 @@ namespace PD2ModelParser.Exporters
             }
         }
 
-        private static Dictionary<Object3D, BoneInfo> AddSkeleton(FbxScene scene, FullModelData data, SkinBones bones)
+        private static SkeletonInfo AddSkeleton(FullModelData data, SkinBones bones, HashSet<Object3D> exclude)
         {
             Dictionary<uint, object> parsed = data.parsed_sections;
             Dictionary<Object3D, BoneInfo> bone_maps = new Dictionary<Object3D, BoneInfo>();
             Object3D root = (Object3D) parsed[bones.probably_root_bone];
-            BoneInfo fbx_root = AddBone(root, bone_maps);
-            return bone_maps;
+            BoneInfo root_bone = AddBone(root, bone_maps, exclude, bones);
+            return new SkeletonInfo
+            {
+                Nodes = bone_maps,
+                Root = root_bone,
+                SkinBones = bones,
+            };
         }
 
-        private static BoneInfo AddBone(Object3D obj, Dictionary<Object3D, BoneInfo> bones)
+        private static BoneInfo AddBone(Object3D obj, Dictionary<Object3D, BoneInfo> bones, HashSet<Object3D> exclude,
+            SkinBones sb)
         {
-            FbxNode node = FbxNode.Create(fm, obj.Name + "Bone");
+            string name = obj.Name;
+
+            // If it's not part of the SkinBones object list, then it's a locator that vertices can't bind to
+            // This will be read later when importing
+            if (!sb.objects.Contains(obj.id))
+            {
+                name += FbxUtils.LocatorSuffix;
+            }
+
+            FbxNode node = FbxNode.Create(fm, name);
 
             CopyTransform(obj.rotation, node);
 
@@ -195,7 +240,10 @@ namespace PD2ModelParser.Exporters
 
             foreach (Object3D child in obj.children)
             {
-                BoneInfo n = AddBone(child, bones);
+                if (exclude.Contains(child))
+                    continue;
+
+                BoneInfo n = AddBone(child, bones, exclude, sb);
                 node.AddChild(n.Node);
             }
 
@@ -217,6 +265,11 @@ namespace PD2ModelParser.Exporters
             Dictionary<uint, object> parsed = data.parsed_sections;
             PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
             Geometry geom = (Geometry) parsed[pgp.geometry_section];
+
+            // Mainly for testing stuff with bone exports, keep things working if
+            // the model has a skeleton but no weights.
+            if (geom.weights.Count == 0)
+                return;
 
             FbxSkin skin = FbxSkin.Create(fm, model.object3D.Name + "Skin");
             mesh.AddDeformer(skin);
@@ -305,6 +358,14 @@ namespace PD2ModelParser.Exporters
             public Object3D Game;
             public FbxNode Node;
             public FbxSkeleton Skeleton;
+        }
+
+        private class SkeletonInfo
+        {
+            public SkinBones SkinBones;
+            public Dictionary<Object3D, BoneInfo> Nodes;
+            public BoneInfo Root;
+            public FbxNode RigRoot;
         }
     }
 }

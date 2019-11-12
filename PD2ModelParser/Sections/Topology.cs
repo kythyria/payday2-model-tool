@@ -53,14 +53,18 @@ namespace PD2ModelParser.Sections
             id = secId;
         }
 
-        public Topology(uint secId, obj_data obj) : this(secId)
+        public Topology(uint secId, string objectName) : this(secId)
         {
             this.unknown1 = 0;
-            this.facelist = obj.faces;
 
             this.count2 = 0;
             this.items2 = new byte[0];
-            this.hashname = Hash64.HashString(obj.object_name + ".Topology");
+            this.hashname = Hash64.HashString(objectName + ".Topology");
+        }
+
+        public Topology(uint secId, obj_data obj) : this(secId, obj.object_name)
+        {
+            this.facelist = obj.faces;
         }
 
         public Topology(BinaryReader instream, SectionHeader section) : this(section.id)

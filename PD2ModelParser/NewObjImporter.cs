@@ -424,11 +424,11 @@ namespace PD2ModelParser
             List<Vector3D> obj_verts = obj.verts;
             ComputeTangentBasis(ref new_faces, ref obj_verts, ref new_arranged_UV, ref new_arranged_Normals, ref new_arranged_unknown20, ref new_arranged_unknown21);
 
-            List<ModelItem> new_Model_items2 = new List<ModelItem>();
+            List<RenderAtom> new_Model_items2 = new List<RenderAtom>();
 
-            foreach (ModelItem modelitem in model_data_section.items)
+            foreach (RenderAtom modelitem in model_data_section.renderAtoms)
             {
-                ModelItem new_model_item = new ModelItem();
+                RenderAtom new_model_item = new RenderAtom();
                 new_model_item.unknown1 = modelitem.unknown1;
                 new_model_item.vertCount = (uint)new_faces.Count;
                 new_model_item.unknown2 = modelitem.unknown2;
@@ -438,7 +438,7 @@ namespace PD2ModelParser
                 new_Model_items2.Add(new_model_item);
             }
 
-            model_data_section.items = new_Model_items2;
+            model_data_section.renderAtoms = new_Model_items2;
 
             if (model_data_section.version != 6)
             {

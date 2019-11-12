@@ -1,11 +1,14 @@
 using System;
 using FbxNet;
 using Nexus;
+using PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Misc
 {
     public static class FbxUtils
     {
+        public const string LocatorSuffix = "_locator";
+
         public static FbxDouble3 D3(this FbxDouble4 vec)
         {
             SWIGTYPE_p_double data = vec.mData;
@@ -22,6 +25,23 @@ namespace PD2ModelParser.Misc
             double y = FbxNet.FbxNet.doubleArray_getitem(data, 1);
             double z = FbxNet.FbxNet.doubleArray_getitem(data, 2);
             return new Vector3D((float) x, (float) y, (float) z);
+        }
+
+        public static Vector3D V3(this FbxDouble3 vec)
+        {
+            SWIGTYPE_p_double data = vec.mData;
+            double x = FbxNet.FbxNet.doubleArray_getitem(data, 0);
+            double y = FbxNet.FbxNet.doubleArray_getitem(data, 1);
+            double z = FbxNet.FbxNet.doubleArray_getitem(data, 2);
+            return new Vector3D((float) x, (float) y, (float) z);
+        }
+
+        public static Vector2D V2(this FbxDouble2 vec)
+        {
+            SWIGTYPE_p_double data = vec.mData;
+            double x = FbxNet.FbxNet.doubleArray_getitem(data, 0);
+            double y = FbxNet.FbxNet.doubleArray_getitem(data, 1);
+            return new Vector2D((float) x, (float) y);
         }
 
         public static void Set(this FbxVector4 v, Vector3D other) => v.Set(other.X, other.Y, other.Z, 0);
@@ -51,8 +71,44 @@ namespace PD2ModelParser.Misc
             return angles;
         }
 
+        // ReSharper disable once InconsistentNaming
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static Quaternion EulerToQuaternionXYZ(this Vector3D v)
+        {
+            Quaternion roll = Quaternion.CreateFromAxisAngle(Vector3D.UnitX, v.X);
+            Quaternion pitch = Quaternion.CreateFromAxisAngle(Vector3D.UnitY, v.Y);
+            Quaternion yaw = Quaternion.CreateFromAxisAngle(Vector3D.UnitZ, v.Z);
+
+            return yaw * pitch * roll;
+        }
+
         public static FbxDouble3 ToFbxD3(this Vector3D v) => new FbxDouble3(v.X, v.Y, v.Z);
 
         public static FbxVector2 ToFbxV2(this Vector2D v) => new FbxVector2(v.X, v.Y);
+
+        public static GeometryColor ToGeomColour(this FbxColor c)
+        {
+            return new GeometryColor
+            {
+                red = (byte) (c.mRed * 255),
+                green = (byte) (c.mGreen * 255),
+                blue = (byte) (c.mBlue * 255),
+                alpha = (byte) (c.mAlpha * 255),
+            };
+        }
+
+        public static Matrix3D GetNexusTransform(this FbxNode node)
+        {
+            // TODO do we need to support other rotation orders? They all seem to come out as XYZ
+            if (node.RotationOrder.Get() != FbxEuler.EOrder.eOrderXYZ)
+                throw new Exception("Currently only the XYZ rotation order is supported");
+
+            Vector3D radians_euler = node.LclRotation.Get().V3() / 180 * (float) Math.PI;
+            Quaternion rotation = radians_euler.EulerToQuaternionXYZ();
+
+            Matrix3D transform = Matrix3D.CreateFromQuaternion(rotation);
+            transform.Translation = node.LclTranslation.Get().V3();
+            return transform;
+        }
     }
 }
