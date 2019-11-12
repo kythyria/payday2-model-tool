@@ -109,20 +109,41 @@ namespace PD2ModelParser.Importers
 
         private Model AddMesh(Object3D parent, FbxNode node, FbxMesh mesh)
         {
-            FbxNode root = node;
-            if (node.GetParent()?.GetSkeleton() != null)
+            string name = node.GetName();
+            FbxNode skeleton_root = null;
+            if (mesh.GetDeformerCount(FbxDeformer.EDeformerType.eSkin) != 0)
             {
-                root = node.GetParent();
+                // We can't rely on consistent parents and take the name from that, see below
+                name = node.GetName();
+
+                if (!name.EndsWith("Object"))
+                    throw new Exception("Mesh parent objects must currently end with the 'Object' suffix");
+
+                name = node.GetName().Substring(0, name.Length - "Object".Length);
+
+                FbxSkin skin = mesh.GetDeformer(0, FbxDeformer.EDeformerType.eSkin).CastToSkin();
+
+                // Blender seems to put the root node at index 0, but go through and
+                // find the root one just to be sure, and to allow imports from other
+                // software.
+                // Blender also omits the root skeleton node and makes the mesh no longer
+                // a child of that, which of course means we can't just look up it's
+                // parent's skeleton like we used to.
+                skeleton_root = skin.GetCluster(0).GetLink();
+                while (skeleton_root.GetParent()?.GetSkeleton() != null)
+                {
+                    skeleton_root = skeleton_root.GetParent();
+                }
             }
 
             Model model;
-            if (_objects.TryGetValue(Hash64.HashString(root.GetName()), out Object3D existing_object))
+            if (_objects.TryGetValue(Hash64.HashString(name), out Object3D existing_object))
             {
                 model = _modelObjects[existing_object];
             }
             else
             {
-                model = CreateEmptyMesh(parent, root.GetName());
+                model = CreateEmptyMesh(parent, name);
             }
 
             Dictionary<uint, object> parsed = data.parsed_sections;
@@ -136,7 +157,7 @@ namespace PD2ModelParser.Importers
             BuildUVs(mesh, geom);
 
             // Add the bones - note this *only* adds the skeleton, and not any weights
-            Dictionary<ulong, Object3D> skel = AddSkeleton(root, model, parent, out Object3D root_bone);
+            Dictionary<ulong, Object3D> skel = AddSkeleton(skeleton_root, model, parent, out Object3D root_bone);
             if (skel == null)
                 return model;
 
@@ -291,6 +312,12 @@ namespace PD2ModelParser.Importers
 
                 FbxNode bone_node = cluster.GetLink();
                 Object3D bone = skel[bone_node.PtrHashCode()];
+
+                // Blender seems to add clusters for all it's bones, even ones which
+                // don't attach to anything.
+                if (!bone_indices.ContainsKey(bone) && cluster.GetControlPointIndicesCount() == 0)
+                    continue;
+
                 int idx = bone_indices[bone];
 
                 SWIGTYPE_p_int indices = cluster.GetControlPointIndices();
