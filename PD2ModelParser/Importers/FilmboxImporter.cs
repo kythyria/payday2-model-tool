@@ -186,6 +186,13 @@ namespace PD2ModelParser.Importers
 
             Object3D root_bone = null;
 
+            // Temporary hack:
+            // With the unified skeleton exports, we're getting bones like 'neck' in the
+            // body skeleton which breaks everything. For this reason, ignore any bones
+            // not in the previous SkinBones.
+            // Ideally we'd fix this properly via mscript, but this will do for now.
+            SkinBones previous = (SkinBones) data.parsed_sections[model.skinbones_ID];
+
             SkinBones sb = new SkinBones(0);
             data.AddSection(sb);
             model.skinbones_ID = sb.id;
@@ -227,6 +234,10 @@ namespace PD2ModelParser.Importers
                 objs[node.PtrHashCode()] = obj;
 
                 if (!isBone)
+                    return obj;
+
+                // See above, wrt the hack to get around extra bones
+                if (!previous.objects.Contains(obj.id))
                     return obj;
 
                 // Note the field is named badly - it's a transform, not just a rotation
