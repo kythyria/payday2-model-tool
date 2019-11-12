@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Nexus;
+using PD2ModelParser.Importers;
 using PD2ModelParser.Sections;
 
 namespace PD2ModelParser
@@ -269,10 +270,6 @@ namespace PD2ModelParser
                                         + "must either be true or false");
             }
 
-            if (type != "obj")
-                throw new NotImplementedException($"Cannot import file with type '{type}', "
-                                                  + "only OBJ is currently supported");
-
             Dictionary<string, Object3D> object_rootpoints = new Dictionary<string, Object3D>();
             Object3D default_rootpoint = null;
 
@@ -314,19 +311,33 @@ namespace PD2ModelParser
                 }
             }
 
-            Object3D ParentFinder(obj_data objData)
+            Object3D ParentFinder(string name)
             {
-                if (object_rootpoints.ContainsKey(objData.object_name)) return object_rootpoints[objData.object_name];
+                if (object_rootpoints.ContainsKey(name)) return object_rootpoints[name];
 
                 return default_rootpoint ??
-                       throw new Exception($"No default- nor object-rootpoint set for {objData.object_name}");
+                       throw new Exception($"No default- nor object-rootpoint set for {name}");
             }
 
-            FileManager fm = new FileManager(data);
-            bool result = NewObjImporter.ImportNewObj(fm, file, create_objects, ParentFinder);
+            switch (type)
+            {
+                case "obj":
+                    FileManager fm = new FileManager(data);
+                    bool result = NewObjImporter.ImportNewObj(fm, file, create_objects,
+                        objData => ParentFinder(objData.object_name));
 
-            if (!result)
-                throw new Exception($"Could not import OBJ file {file} - see console");
+                    if (!result)
+                        throw new Exception($"Could not import OBJ file {file} - see console");
+                    break;
+                case "fbx":
+                    if (create_objects)
+                        throw new Exception("Creating objects is not yet supported for FBX");
+                    FilmboxImporter.Import(data, file, create_objects, fn => null);
+                    break;
+                default:
+                    throw new NotImplementedException($"Cannot import file with type '{type}', "
+                                                      + "only OBJ and FBX are currently supported");
+            }
         }
     }
 }
