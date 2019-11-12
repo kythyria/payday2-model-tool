@@ -136,7 +136,7 @@ namespace PD2ModelParser.Exporters
             CopyTransform(model.object3D.world_transform, mesh_node);
 
             FbxLayerElementNormal normals = mesh.CreateElementNormal();
-            normals.SetReferenceMode(FbxLayerElement.EReferenceMode.eDirect);
+            normals.SetReferenceMode(FbxLayerElement.EReferenceMode.eIndexToDirect);
             normals.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
 
             mesh.InitControlPoints(geom.verts.Count);
