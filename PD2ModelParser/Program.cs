@@ -291,6 +291,7 @@ namespace PD2ModelParser
                         }
                         catch (Exception ex)
                         {
+                            Log.Default.Warn("Stacktrace: {0}", ex.StackTrace);
                             Log.Default.Error("Error executing model script {0}: {1}",
                                 entry.arg, ex.Message);
                         }
