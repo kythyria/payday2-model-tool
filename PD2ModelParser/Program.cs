@@ -42,6 +42,9 @@ namespace PD2ModelParser
             // If there are no args, assume we're in GUI mode
             if (args.Length == 0)
             {
+                // Set a sane default logging level to avoid console spam
+                ConsoleLogger.minimumLevel = LoggerLevel.Info;
+
                 return true;
             }
 
