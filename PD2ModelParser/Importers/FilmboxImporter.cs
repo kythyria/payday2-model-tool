@@ -482,7 +482,8 @@ namespace PD2ModelParser.Importers
             if (vertex_colour_count == 0) return;
 
             // TODO confirm the size is indeed 3
-            geom.headers.Add(new GeometryHeader(3, GeometryChannelTypes.COLOR));
+            if (!geom.HasHeader(GeometryChannelTypes.COLOR))
+                geom.headers.Add(new GeometryHeader(3, GeometryChannelTypes.COLOR));
             FbxLayerElementVertexColor layer = mesh.GetElementVertexColor();
 
             if (layer.GetMappingMode() != FbxLayerElement.EMappingMode.eByControlPoint)
