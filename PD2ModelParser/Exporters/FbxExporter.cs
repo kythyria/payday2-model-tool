@@ -306,8 +306,6 @@ namespace PD2ModelParser.Exporters
                     Vector3D weights = geom.weights[i];
                     float weight;
 
-                    if (bone_idx == 0)
-                        continue;
                     int bi = bone_idx;
 
                     if (groups.Bones1 == bi)
@@ -316,9 +314,12 @@ namespace PD2ModelParser.Exporters
                         weight = weights.Y;
                     else if (groups.Bones3 == bi)
                         weight = weights.Z;
-                    else if (groups.Bones4 == bi)
+                    else if (groups.Bones4 == bi && bi != 0)
                         throw new Exception("Unsupported Bone4 weight - not in weights");
                     else
+                        continue;
+
+                    if (weight < 0.00001f)
                         continue;
 
                     cluster.AddControlPointIndex(i, weight);
