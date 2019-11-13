@@ -21,13 +21,13 @@ namespace PD2ModelParser.Importers
             FbxImporter importer = FbxImporter.Create(_fm, "");
             bool result = importer.Initialize(filepath);
             if (!result)
-                throw new Exception("Cannot load FBX file");
+                throw new Exception("EFBX001 Cannot load FBX file");
 
             FbxScene scene = FbxScene.Create(_fm, "");
             result = importer.Import(scene);
             // TODO add FbxIOBase to FbxNet so we can access the error code
             if (!result)
-                throw new Exception("Cannot import FBX file");
+                throw new Exception("EFBX002 Cannot import FBX file");
 
             FilmboxImporter imp = new FilmboxImporter(data);
 
@@ -117,7 +117,7 @@ namespace PD2ModelParser.Importers
                 name = node.GetName();
 
                 if (!name.EndsWith("Object"))
-                    throw new Exception("Mesh parent objects must currently end with the 'Object' suffix");
+                    throw new Exception("EFBX003 Mesh objects must currently end with the 'Object' suffix");
 
                 name = node.GetName().Substring(0, name.Length - "Object".Length);
 
@@ -228,7 +228,7 @@ namespace PD2ModelParser.Importers
                 }
                 else if (parent == rootPoint)
                 {
-                    throw new Exception("Each rigged model must have only one root bone");
+                    throw new Exception("EFBX004 Each rigged model must have only one root bone");
                 }
 
                 objs[node.PtrHashCode()] = obj;
@@ -262,7 +262,7 @@ namespace PD2ModelParser.Importers
             // user would expect and a loud error is almost always better than
             // a silent failure.
             if (root_bone == null)
-                throw new Exception("Rigged model " + rootNode.GetName() + " has no bones");
+                throw new Exception("EFBX005 Rigged model " + rootNode.GetName() + " has no bones");
 
             sb.probably_root_bone = root_bone.id;
             rootBone = root_bone;
@@ -286,11 +286,11 @@ namespace PD2ModelParser.Importers
             int deformer_count = mesh.GetDeformerCount(FbxDeformer.EDeformerType.eSkin);
             if (deformer_count == 0) return;
             if (deformer_count != 1)
-                throw new Exception("Only one skin per mesh is supported");
+                throw new Exception("EFBX006 Only one skin per mesh is supported");
 
             FbxSkin skin = mesh.GetDeformer(0, FbxDeformer.EDeformerType.eSkin).CastToSkin();
             if (skin == null)
-                throw new Exception("Could not get skin deformer ID=0");
+                throw new Exception("EFBX007 Could not get skin deformer ID=0");
 
             SkinBones sb = (SkinBones) data.parsed_sections[model.skinbones_ID];
 
@@ -341,7 +341,7 @@ namespace PD2ModelParser.Importers
 
                 if (!bone_indices.ContainsKey(bone))
                 {
-                    throw new Exception($"Model {model.object3D.Name} uses bone {bone.Name} which is "
+                    throw new Exception($"EFBX008 Model {model.object3D.Name} uses bone {bone.Name} which is "
                                         + "unavailable in this model");
                 }
 
@@ -357,7 +357,7 @@ namespace PD2ModelParser.Importers
                     List<WeightPart> vert = parts[vert_idx];
 
                     if (vert.Any(p => p.boneID == idx))
-                        throw new Exception("Two clusters for the same bone and vertex " +
+                        throw new Exception("EFBX009 Two clusters for the same bone and vertex " +
                                             "are currently unsupported");
 
                     vert.Add(new WeightPart
@@ -379,7 +379,7 @@ namespace PD2ModelParser.Importers
             // AFAIK this is affected by the header thing - see above
             // TODO should we quietly just chop off the least important few weights?
             if (parts.Count > 3)
-                throw new Exception("Vertices cannot be affected by more than three bones");
+                throw new Exception("EFBX010 Vertices cannot be affected by more than three bones");
 
             Vector3D weights = Vector3D.Zero;
             GeometryWeightGroups groups = new GeometryWeightGroups();
@@ -388,7 +388,7 @@ namespace PD2ModelParser.Importers
             foreach (WeightPart part in parts.OrderByDescending(v => v.weight))
             {
                 if (part.boneID > ushort.MaxValue)
-                    throw new Exception("Too many bones!");
+                    throw new Exception("EFBX011 Too many bones!");
 
                 weights[wi] = part.weight;
 
@@ -455,7 +455,7 @@ namespace PD2ModelParser.Importers
                 {
                     FbxVector4 n = normals.GetDirectArray().GetAt(cp);
                     if (n.V3().Length() < 0.1)
-                        throw new Exception("Short normal!");
+                        throw new Exception("EFBX012 Short normal!");
 
                     norm += n.V3();
                     n.Dispose();
@@ -477,7 +477,7 @@ namespace PD2ModelParser.Importers
         {
             int vertex_colour_count = mesh.GetElementVertexColorCount();
             if (vertex_colour_count > 1)
-                throw new Exception("The model tool does not support more than one vertex colour layer");
+                throw new Exception("EFBX013 The model tool does not support more than one vertex colour layer");
 
             if (vertex_colour_count == 0) return;
 
@@ -511,7 +511,7 @@ namespace PD2ModelParser.Importers
             {
                 int size = mesh.GetPolygonSize(i);
                 if (size != 3)
-                    throw new Exception("Triangles are the only supported type of polygon");
+                    throw new Exception("EFBX014 Triangles are the only supported type of polygon");
 
                 int a = mesh.GetPolygonVertex(i, 0);
                 int b = mesh.GetPolygonVertex(i, 1);
@@ -545,7 +545,7 @@ namespace PD2ModelParser.Importers
                         gi = layer.GetName()[2] - '0';
                         break;
                     default:
-                        throw new Exception("Unknown UV " + layer.GetName());
+                        throw new Exception("EFBX015 Unknown UV " + layer.GetName());
                 }
 
                 List<int>[] cp_to_entries = FindPerVertEntries(mesh, layer, layer.GetIndexArray());
@@ -639,7 +639,7 @@ namespace PD2ModelParser.Importers
 
                     break;
                 default:
-                    throw new Exception("Unsupported mapping mode " + elem.GetMappingMode());
+                    throw new Exception("EFBX016 Unsupported mapping mode " + elem.GetMappingMode());
             }
 
             switch (elem.GetReferenceMode())
