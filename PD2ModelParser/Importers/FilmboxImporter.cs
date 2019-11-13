@@ -339,6 +339,12 @@ namespace PD2ModelParser.Importers
                 if (!bone_indices.ContainsKey(bone) && cluster.GetControlPointIndicesCount() == 0)
                     continue;
 
+                if (!bone_indices.ContainsKey(bone))
+                {
+                    throw new Exception($"Model {model.object3D.Name} uses bone {bone.Name} which is "
+                                        + "unavailable in this model");
+                }
+
                 int idx = bone_indices[bone];
 
                 SWIGTYPE_p_int indices = cluster.GetControlPointIndices();
