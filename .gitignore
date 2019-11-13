@@ -10,5 +10,6 @@
 /Libs/FbxNet.dll
 /Libs/FbxNetNative.dll
 /Libs/libFbxNet.so
+/Libs/libFbxNetNative.so
 /Libs/libfbxsdk.dll
 /Libs/libfbxsdk.so
