@@ -528,6 +528,16 @@ namespace PD2ModelParser.Importers
                     case "PrimaryUV":
                         gi = 0;
                         break;
+                    case "UV0":
+                    case "UV1":
+                    case "UV2":
+                    case "UV3":
+                    case "UV4":
+                    case "UV5":
+                    case "UV6":
+                    case "UV7":
+                        gi = layer.GetName()[2] - '0';
+                        break;
                     default:
                         throw new Exception("Unknown UV " + layer.GetName());
                 }

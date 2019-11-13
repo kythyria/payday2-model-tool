@@ -161,8 +161,10 @@ namespace PD2ModelParser.Exporters
             }
 
             // Export the UVs
-            AddUVs(mesh, "PrimaryUV", geom.uvs);
-            AddUVs(mesh, "PatternUV", geom.pattern_uvs);
+            for (int i = 0; i < geom.UVs.Length; i++)
+            {
+                AddUVs(mesh, "UV" + i, geom.UVs[i]);
+            }
 
             if (geom.vertex_colors.Count > 0)
             {
@@ -194,7 +196,7 @@ namespace PD2ModelParser.Exporters
             if (uvs.Count == 0)
                 return;
 
-            FbxLayerElementUV uv = mesh.CreateElementUV("PrimaryUV");
+            FbxLayerElementUV uv = mesh.CreateElementUV(name);
             uv.SetMappingMode(FbxLayerElement.EMappingMode.eByControlPoint);
             uv.SetReferenceMode(FbxLayerElement.EReferenceMode.eDirect);
             for (int i = 0; i < uvs.Count; i++)
