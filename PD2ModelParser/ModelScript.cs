@@ -44,7 +44,8 @@ namespace PD2ModelParser
             catch (Exception exc)
             {
                 Log.Default.Warn("Exception in script file: {0}", exc);
-                MessageBox.Show("There was an error in the script file:\n" + exc.Message);
+                MessageBox.Show("There was an error in the script file:\n" +
+                                "(check the readme on GitLab for more information)\n" + exc.Message);
                 return false;
             }
         }

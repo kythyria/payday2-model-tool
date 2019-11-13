@@ -23,3 +23,8 @@ you must provide the entire rest of the program under the GPLv3 with this except
 
 If you wish, you may also delete this exception from modified versions of the software and use the plain
 GPLv3.
+
+# Error Codes
+
+Error codes, descriptions and solutions in the format of 'EFBX123' can be found on
+the [FBX Importer page](Docs/FBXImporter.md) page.
