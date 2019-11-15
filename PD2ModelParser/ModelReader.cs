@@ -177,8 +177,8 @@ namespace PD2ModelParser
                             section = new Unknown(br, sh);
                         }
 
-                        Log.Default.Debug("Section {0} at {1} length {2}: {3}",
-                            section.GetType().Name, sh.offset, sh.size, section);
+                        Log.Default.Debug("Section {0} at {1} length {2}",
+                            section.GetType().Name, sh.offset, sh.size);
 
                         parsed_sections.Add(sh.id, section);
                     }
