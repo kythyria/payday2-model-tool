@@ -362,6 +362,7 @@ namespace PD2ModelParser.Importers
 
                     vert.Add(new WeightPart
                     {
+                        Bone = bone,
                         boneID = idx,
                         weight = (float) weight,
                     });
@@ -370,16 +371,21 @@ namespace PD2ModelParser.Importers
 
             for (int i = 0; i < geom.vert_count; i++)
             {
-                AddWeightsForVertex(parts[i], geom);
+                AddWeightsForVertex(parts[i], geom, model, i);
             }
         }
 
-        private void AddWeightsForVertex(List<WeightPart> parts, Geometry geom)
+        private void AddWeightsForVertex(List<WeightPart> parts, Geometry geom, Model model, int vertIdx)
         {
             // AFAIK this is affected by the header thing - see above
             // TODO should we quietly just chop off the least important few weights?
             if (parts.Count > 3)
-                throw new Exception("EFBX010 Vertices cannot be affected by more than three bones");
+            {
+                Vector3D vert = geom.verts[vertIdx];
+                string dbg = $"{model.object3D.Name}: vert at {vert.X},{vert.Y},{vert.Z}";
+                dbg = parts.Aggregate(dbg, (current, part) => current + $"\n{part.Bone.Name} weight {part.weight}");
+                throw new Exception("EFBX010 Vertices cannot be affected by more than three bones:\n" + dbg);
+            }
 
             Vector3D weights = Vector3D.Zero;
             GeometryWeightGroups groups = new GeometryWeightGroups();
@@ -668,6 +674,7 @@ namespace PD2ModelParser.Importers
 
         private class WeightPart
         {
+            public Object3D Bone;
             public int boneID;
             public float weight;
         }
