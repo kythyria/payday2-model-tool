@@ -278,7 +278,10 @@ namespace PD2ModelParser.Sections
                         Vector3D unknown_17_entry = new Vector3D();
                         unknown_17_entry.X = instream.ReadSingle();
                         unknown_17_entry.Y = instream.ReadSingle();
-                        unknown_17_entry.Z = instream.ReadSingle();
+                        if (head.item_size == 3)
+                            unknown_17_entry.Z = instream.ReadSingle();
+                        else if (head.item_size != 2)
+                            throw new Exception("Bad BLENDWEIGHT0 item size " + head.item_size);
                         this.weights.Add(unknown_17_entry);
                     }
                 }
@@ -351,8 +354,6 @@ namespace PD2ModelParser.Sections
 
             List<GeometryWeightGroups> unknown_15s = this.weight_groups;
             int unknown_15s_pos = 0;
-            List<Vector3D> unknown_17s = this.weights;
-            int unknown_17s_pos = 0;
             List<Vector3D> unknown_20s = this.unknown20;
             int unknown_20s_pos = 0;
             List<Vector3D> unknown_21s = this.unknown21;
@@ -454,20 +455,14 @@ namespace PD2ModelParser.Sections
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        if (this.weights.Count != this.vert_count)
-                        {
-                            outstream.Write(1.0f);
-                            outstream.Write(0.0f);
-                            outstream.Write(0.0f);
-                        }
-                        else
-                        {
-                            Vector3D unknown_17_entry = unknown_17s[x];
-                            outstream.Write(unknown_17_entry.X);
-                            outstream.Write(unknown_17_entry.Y);
-                            outstream.Write(unknown_17_entry.Z);
-                            unknown_17s_pos++;
-                        }
+                        Vector3D weight = this.weights.Count != this.vert_count ? Vector3D.UnitX : weights[x];
+                        outstream.Write(weight.X);
+                        outstream.Write(weight.Y);
+
+                        if (head.item_size == 3)
+                            outstream.Write(weight.Z);
+                        else if (head.item_size != 2)
+                            throw new Exception("Cannot write bad header BLENDWEIGHT s=" + head.item_size);
                     }
                 }
                 else if (head.item_type >= GeometryChannelTypes.TEXCOORD0 &&
