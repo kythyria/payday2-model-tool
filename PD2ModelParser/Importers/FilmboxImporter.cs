@@ -233,8 +233,17 @@ namespace PD2ModelParser.Importers
 
                 objs[node.PtrHashCode()] = obj;
 
-                if (!isBone)
-                    return obj;
+                // Another little hack
+                // Currently whether skeletons have the _locator suffix or not depends on
+                // which model was first exported and created the skeleton. As such later
+                // models might use these 'locators' as actual bones. However just fixing
+                // the exporter won't be enough - all those bones will then get imported
+                // back in and we'll exceed the bone limit.
+                // As a temporary hack until we can get this done in XML, use the bones we're
+                // replacing to determine if this is actually a bone or not, and completely
+                // ignore the locator suffix.
+                // if (!isBone)
+                //     return obj;
 
                 // See above, wrt the hack to get around extra bones
                 if (!previous.objects.Contains(obj.id))
