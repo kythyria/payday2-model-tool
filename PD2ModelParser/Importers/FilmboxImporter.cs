@@ -388,13 +388,14 @@ namespace PD2ModelParser.Importers
 
         private void AddWeightsForVertex(List<WeightPart> parts, Geometry geom, Model model, int vertIdx)
         {
+            List<WeightPart> processed = ProcessWeights(parts);
+
             // AFAIK this is affected by the header thing - see above
-            // TODO should we quietly just chop off the least important few weights?
-            if (parts.Count > 3)
+            if (processed.Count > 3)
             {
                 Vector3D vert = geom.verts[vertIdx];
                 string dbg = $"{model.object3D.Name}: vert at {vert.X},{vert.Y},{vert.Z}";
-                dbg = parts.Aggregate(dbg, (current, part) => current + $"\n{part.Bone.Name} weight {part.weight}");
+                dbg = processed.Aggregate(dbg, (current, part) => current + $"\n{part.Bone.Name} weight {part.weight}");
                 throw new Exception("EFBX010 Vertices cannot be affected by more than three bones:\n" + dbg);
             }
 
@@ -402,7 +403,7 @@ namespace PD2ModelParser.Importers
             GeometryWeightGroups groups = new GeometryWeightGroups();
 
             int wi = 0;
-            foreach (WeightPart part in parts.OrderByDescending(v => v.weight))
+            foreach (WeightPart part in processed)
             {
                 if (part.boneID > ushort.MaxValue)
                     throw new Exception("EFBX011 Too many bones!");
@@ -430,6 +431,34 @@ namespace PD2ModelParser.Importers
 
             geom.weights.Add(weights);
             geom.weight_groups.Add(groups);
+        }
+
+        private List<WeightPart> ProcessWeights(List<WeightPart> orig)
+        {
+            List<WeightPart> sorted = orig.OrderByDescending(v => v.weight).ToList();
+
+            // TODO use the header length to find out the max value, so we don't try
+            // and stuff three weights into a two-weight LOD model
+            const int max_weights = 3;
+
+            if (sorted.Count <= max_weights || _options.WeightRoundingThreshold == null)
+                return sorted;
+
+            // Check that we're about to round weights within the allowable tolerance
+            float to_round = 0;
+            for (int i = max_weights; i < sorted.Count; i++)
+            {
+                to_round += sorted[i].weight;
+            }
+
+            // If we would be rounding off more than the user has allowed, abort
+            if (to_round > _options.WeightRoundingThreshold)
+                return sorted;
+
+            // Remove the weights in question
+            sorted.RemoveRange(max_weights, sorted.Count - max_weights);
+
+            return sorted;
         }
 
         private Geometry CreateGeometry()
@@ -692,10 +721,15 @@ namespace PD2ModelParser.Importers
 
         public class FbxImportOptions : IOptionReceiver
         {
+            public float? WeightRoundingThreshold = null;
+
             public void AddOption(string name, string value)
             {
                 switch (name)
                 {
+                    case "weight-rounding-threshold":
+                        WeightRoundingThreshold = float.Parse(value);
+                        break;
                     default:
                         throw new Exception($"Unsupported option type '{name}' for FBX import");
                 }
