@@ -216,7 +216,8 @@ namespace PD2ModelParser
                             Console.WriteLine("FBX support disabled");
                             return false;
 #else
-                            FilmboxImporter.Import(data, entry.arg, new_obj, obj => null);
+                            FilmboxImporter.FbxImportOptions options = new FilmboxImporter.FbxImportOptions();
+                            FilmboxImporter.Import(data, entry.arg, new_obj, obj => null, options);
 #endif
                         }
                         else if (entry.arg.EndsWith(".dae"))

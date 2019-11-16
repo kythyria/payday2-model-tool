@@ -13,7 +13,7 @@ namespace PD2ModelParser.Importers
         private static FbxManager _fm;
 
         public static void Import(FullModelData data, string filepath, bool addNew,
-            Func<FbxNode, Object3D> rootPointResolver)
+            Func<FbxNode, Object3D> rootPointResolver, FbxImportOptions options)
         {
             if (_fm == null)
                 _fm = FbxManager.Create();
@@ -29,7 +29,7 @@ namespace PD2ModelParser.Importers
             if (!result)
                 throw new Exception("EFBX002 Cannot import FBX file");
 
-            FilmboxImporter imp = new FilmboxImporter(data);
+            FilmboxImporter imp = new FilmboxImporter(data, options);
 
             List<FbxNode> meshes = new List<FbxNode>();
             imp.RecurseMeshes(scene.GetRootNode(), meshes);
@@ -45,12 +45,14 @@ namespace PD2ModelParser.Importers
         }
 
         private readonly FullModelData data;
+        private readonly FbxImportOptions _options;
         private readonly Dictionary<Object3D, Model> _modelObjects = new Dictionary<Object3D, Model>();
         private readonly Dictionary<ulong, Object3D> _objects = new Dictionary<ulong, Object3D>();
 
-        private FilmboxImporter(FullModelData data)
+        private FilmboxImporter(FullModelData data, FbxImportOptions options)
         {
             this.data = data;
+            _options = options;
 
             foreach (object item in data.parsed_sections.Values)
             {
@@ -686,6 +688,18 @@ namespace PD2ModelParser.Importers
             public Object3D Bone;
             public int boneID;
             public float weight;
+        }
+
+        public class FbxImportOptions : IOptionReceiver
+        {
+            public void AddOption(string name, string value)
+            {
+                switch (name)
+                {
+                    default:
+                        throw new Exception($"Unsupported option type '{name}' for FBX import");
+                }
+            }
         }
     }
 }
