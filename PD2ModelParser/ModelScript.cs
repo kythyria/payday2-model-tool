@@ -271,6 +271,14 @@ namespace PD2ModelParser
                                         + "must either be true or false");
             }
 
+            IOptionReceiver options;
+            switch (type)
+            {
+                default:
+                    options = null;
+                    break;
+            }
+
             Dictionary<string, Object3D> object_rootpoints = new Dictionary<string, Object3D>();
             Object3D default_rootpoint = null;
 
@@ -303,6 +311,25 @@ namespace PD2ModelParser
                                 default:
                                     throw new Exception($"Invalid rootpoint child element \"{elem.Name}\"");
                             }
+                        }
+
+                        break;
+                    }
+                    case "option":
+                    {
+                        if (options == null)
+                            throw new Exception($"Options are not supported on {type} imports");
+
+                        string name = CheckAttr(child, "name");
+                        string value = child.Value.Trim();
+
+                        try
+                        {
+                            options.AddOption(name, value);
+                        }
+                        catch (FormatException ex)
+                        {
+                            throw new Exception($"Error parsing value for option {name} value '{value}'", ex);
                         }
 
                         break;
