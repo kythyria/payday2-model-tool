@@ -113,13 +113,24 @@ software. If you can create this issue, I'd be very interested to hear about it.
 **Vertices cannot be affected by more than three bones**
 
 As an engine limition, no vertex can ever be affected by more than three
-bones. This means some vertex in your model is affected by more than three,
-though currently the error doesn't give you anywhere to look (a major TODO since
-this would be a very obnoxious error to fix).
+bones. This means some vertex in your model is affected by more than three
+bones, and the error should list the bones in question and the weights to them.
 
-You could maybe try (after making a backup of course) chopping up your
-model until you find the problem vertex, or tell me to hurry up and add some
-way to find the vertex.
+With v2.5.4 and above, you can also set the `weight-rounding-threshold` option
+to discard excess weights, so long as they are under that limit (be careful setting
+it too high - if a vertex has four bones it has strong weights to and one
+gets trimmed off, it may look weird in game.
+
+Example of using this option:
+
+```xml
+<?xml version="1.0" ?>
+<modelscript>
+    <import file="my_model.fbx" type="fbx" create_objects="false">
+        <option name="weight-rounding-threshold"> 0.25 </option>
+    </import>
+</modelscript>
+```
 
 ## EFBX011
 
