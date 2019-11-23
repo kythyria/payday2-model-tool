@@ -251,8 +251,14 @@ namespace PD2ModelParser.Importers
                 if (!previous.objects.Contains(obj.id))
                     return obj;
 
-                // Note the field is named badly - it's a transform, not just a rotation
-                obj.rotation = node.GetNexusTransform();
+                // Bone transforms seem to get messed up really easily. Since changing bone
+                // transforms will likely break animations anyway, make the user opt-in if
+                // they want to move bones.
+                if (_options.ImportBoneTransforms)
+                {
+                    // Note the field is named badly - it's a transform, not just a rotation
+                    obj.rotation = node.GetNexusTransform();
+                }
 
                 sb.objects.Add(obj.id);
 
@@ -738,6 +744,7 @@ namespace PD2ModelParser.Importers
         {
             public float? WeightRoundingThreshold = null;
             public bool NormaliseWeights = true;
+            public bool ImportBoneTransforms = false;
 
             public void AddOption(string name, string value)
             {
@@ -748,6 +755,9 @@ namespace PD2ModelParser.Importers
                         break;
                     case "normalise-weights":
                         NormaliseWeights = bool.Parse(value);
+                        break;
+                    case "import-bone-transforms":
+                        ImportBoneTransforms = bool.Parse(value);
                         break;
                     default:
                         throw new Exception($"Unsupported option type '{name}' for FBX import");
