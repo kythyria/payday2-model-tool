@@ -390,6 +390,21 @@ namespace PD2ModelParser.Importers
         {
             List<WeightPart> processed = ProcessWeights(parts);
 
+            if (_options.NormaliseWeights)
+            {
+                float total_weights = processed.Sum(v => v.weight);
+                if (total_weights < 0.1 && total_weights > 10)
+                {
+                    throw new Exception($"Weights sum {total_weights} out of range!");
+                }
+
+                float factor = 1 / total_weights;
+                foreach (WeightPart w in processed)
+                {
+                    w.weight *= factor;
+                }
+            }
+
             // AFAIK this is affected by the header thing - see above
             if (processed.Count > 3)
             {
@@ -722,6 +737,7 @@ namespace PD2ModelParser.Importers
         public class FbxImportOptions : IOptionReceiver
         {
             public float? WeightRoundingThreshold = null;
+            public bool NormaliseWeights = true;
 
             public void AddOption(string name, string value)
             {
@@ -729,6 +745,9 @@ namespace PD2ModelParser.Importers
                 {
                     case "weight-rounding-threshold":
                         WeightRoundingThreshold = value.ParseFloat();
+                        break;
+                    case "normalise-weights":
+                        NormaliseWeights = bool.Parse(value);
                         break;
                     default:
                         throw new Exception($"Unsupported option type '{name}' for FBX import");
