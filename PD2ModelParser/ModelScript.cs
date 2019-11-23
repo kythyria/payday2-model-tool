@@ -83,6 +83,16 @@ namespace PD2ModelParser
                    throw new Exception($"Missing \"{attr}\" attribute for {elem.Name} element");
         }
 
+        private static Vector3D CheckAttrVec(XElement elem)
+        {
+            return new Vector3D
+            {
+                X = CheckAttr(elem, "x").ParseFloat(),
+                Y = CheckAttr(elem, "y").ParseFloat(),
+                Z = CheckAttr(elem, "z").ParseFloat(),
+            };
+        }
+
         private static void ExecObject3DElement(FullModelData data, XElement element)
         {
             string mode = CheckAttr(element, "mode");
@@ -127,11 +137,7 @@ namespace PD2ModelParser
                 {
                     case "position":
                     {
-                        Vector3D vec;
-
-                        vec.X = float.Parse(CheckAttr(operation, "x"));
-                        vec.Y = float.Parse(CheckAttr(operation, "y"));
-                        vec.Z = float.Parse(CheckAttr(operation, "z"));
+                        Vector3D vec = CheckAttrVec(operation);
 
                         // TODO update the object's world_transform property
                         Matrix3D transform = obj.rotation;
@@ -144,10 +150,10 @@ namespace PD2ModelParser
                     {
                         Quaternion quat;
 
-                        quat.X = float.Parse(CheckAttr(operation, "x"));
-                        quat.Y = float.Parse(CheckAttr(operation, "y"));
-                        quat.Z = float.Parse(CheckAttr(operation, "z"));
-                        quat.W = float.Parse(CheckAttr(operation, "w"));
+                        quat.X = CheckAttr(operation, "x").ParseFloat();
+                        quat.Y = CheckAttr(operation, "y").ParseFloat();
+                        quat.Z = CheckAttr(operation, "z").ParseFloat();
+                        quat.W = CheckAttr(operation, "w").ParseFloat();
                         quat.Normalize();
 
                         // Unfortunately, there's no clean way to replace the matrix's rotation
@@ -175,11 +181,7 @@ namespace PD2ModelParser
                         // DieselX probably doesn't expect you to scale stuff, so be careful with this!
                         // If something blows up in your face when scaled, check that first.
 
-                        Vector3D scale;
-
-                        scale.X = float.Parse(CheckAttr(operation, "x"));
-                        scale.Y = float.Parse(CheckAttr(operation, "y"));
-                        scale.Z = float.Parse(CheckAttr(operation, "z"));
+                        Vector3D scale = CheckAttrVec(operation);
 
                         // Same story as rotation - split and rebuild the matrix.
                         obj.rotation.Decompose(

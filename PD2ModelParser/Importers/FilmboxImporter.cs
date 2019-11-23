@@ -728,7 +728,7 @@ namespace PD2ModelParser.Importers
                 switch (name)
                 {
                     case "weight-rounding-threshold":
-                        WeightRoundingThreshold = float.Parse(value);
+                        WeightRoundingThreshold = value.ParseFloat();
                         break;
                     default:
                         throw new Exception($"Unsupported option type '{name}' for FBX import");
