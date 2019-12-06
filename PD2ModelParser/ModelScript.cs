@@ -274,9 +274,11 @@ namespace PD2ModelParser
             IOptionReceiver options;
             switch (type)
             {
+#if !NO_FBX
                 case "fbx":
                     options = new FilmboxImporter.FbxImportOptions();
                     break;
+#endif
                 default:
                     options = null;
                     break;
@@ -360,12 +362,14 @@ namespace PD2ModelParser
                     if (!result)
                         throw new Exception($"Could not import OBJ file {file} - see console");
                     break;
+#if !NO_FBX
                 case "fbx":
                     if (create_objects)
                         throw new Exception("Creating objects is not yet supported for FBX");
                     FilmboxImporter.Import(data, file, create_objects, fn => null,
                         (FilmboxImporter.FbxImportOptions) options);
                     break;
+#endif
                 default:
                     throw new NotImplementedException($"Cannot import file with type '{type}', "
                                                       + "only OBJ and FBX are currently supported");
