@@ -298,6 +298,16 @@ namespace PD2ModelParser
 
             return result;*/
         }
+
+        public static System.Numerics.Matrix4x4 ToMatrix4x4(this Matrix3D input)
+        {
+            return new System.Numerics.Matrix4x4(
+                input.M11, input.M12, input.M13, input.M14,
+                input.M21, input.M22, input.M23, input.M24,
+                input.M31, input.M32, input.M33, input.M34,
+                input.M41, input.M42, input.M43, input.M44
+            );
+        }
     }
 
     public class HashName
