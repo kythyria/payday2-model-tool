@@ -86,7 +86,7 @@ namespace PD2ModelParser.Exporters
 
             var attribs = GetGeometryAttributes(geometry);
 
-            foreach (var indexAccessor in CreatePrimitiveIndices2(topology, model.renderAtoms))
+            foreach (var indexAccessor in CreatePrimitiveIndices(topology, model.renderAtoms))
             {
                 var prim = mesh.CreatePrimitive();
                 prim.DrawPrimitiveType = GLTF.PrimitiveType.TRIANGLES;
@@ -101,7 +101,7 @@ namespace PD2ModelParser.Exporters
             return mesh;
         }
 
-        IEnumerable<GLTF.Accessor> CreatePrimitiveIndices2(Topology topo, IEnumerable<RenderAtom> atoms)
+        IEnumerable<GLTF.Accessor> CreatePrimitiveIndices(Topology topo, IEnumerable<RenderAtom> atoms)
         {
             var buf = new ArraySegment<byte>(new byte[topo.facelist.Count * 3 * 2]);
             var mai = new MemoryAccessInfo($"indices_{topo.hashname}", 0, topo.facelist.Count * 3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
@@ -125,38 +125,6 @@ namespace PD2ModelParser.Exporters
                 accessor.SetIndexData(atom_ma);
                 yield return accessor;
                 nextvtx += (int)ra.faceCount;
-            }
-        }
-
-        IEnumerable<GLTF.Accessor> CreatePrimitiveIndices(Topology topo, IEnumerable<RenderAtom> atoms)
-        {
-            var buf = new ArraySegment<byte>(new byte[topo.facelist.Count * 3 * 2]);
-            var mai = new MemoryAccessInfo($"indices_{topo.hashname}", 0, topo.facelist.Count * 3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
-            var ma = new MemoryAccessor(buf, mai);
-            var array = ma.AsIntegerArray();
-            for (int i = 0; i < topo.facelist.Count; i++)
-            {
-                array[i * 3 + 0] = topo.facelist[i].a;
-                array[i * 3 + 1] = topo.facelist[i].b;
-                array[i * 3 + 2] = topo.facelist[i].c;
-            }
-
-            var nextvtx = 0;
-            var atomcount = 0;
-
-            var accessor = root.CreateAccessor();
-            accessor.SetIndexData(ma);
-            yield return accessor;
-            yield break;
-
-            foreach (var ra in atoms)
-            {
-                var atom_mai = new MemoryAccessInfo($"indices_{topo.hashname}_{atomcount++}", nextvtx * 2, (int)ra.vertCount, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
-                var atom_ma = new MemoryAccessor(buf, atom_mai);
-                //var accessor = root.CreateAccessor();
-                accessor.SetIndexData(atom_ma);
-                yield return accessor;
-                nextvtx += (int)ra.vertCount;
             }
         }
 
