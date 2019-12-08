@@ -161,7 +161,7 @@ namespace PD2ModelParser.Exporters
             return result;
         }
 
-        System.Numerics.Vector2 FixupUV(Nexus.Vector2D input) => new System.Numerics.Vector2(input.X, -input.Y);
+        System.Numerics.Vector2 FixupUV(Nexus.Vector2D input) => new System.Numerics.Vector2(input.X, 1-input.Y);
 
         GLTF.Accessor MakeIndexAccessor(Topology topo)
         {
