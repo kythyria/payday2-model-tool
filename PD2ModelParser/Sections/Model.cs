@@ -11,14 +11,14 @@ namespace PD2ModelParser.Sections
     public class RenderAtom
     {
         public UInt32 unknown1;
-        public UInt32 vertCount; //Verts/Uvs/Normals/etc Count
-        public UInt32 unknown2;
-        public UInt32 faceCount; //Face count
+        public UInt32 vertCount;  //Number of vertices in this RenderAtom
+        public UInt32 baseVertex; //Probably the offset from the start of the Topology where this RA starts, in vertices.
+        public UInt32 faceCount;  //Face count
         public UInt32 material_id;
 
         public override string ToString()
         {
-            return "{unknown1=" + this.unknown1 + " vertCount=" + this.vertCount + " unknown2=" + this.unknown2 + " faceCount=" + this.faceCount + " material_id=" + this.material_id + "}";
+            return "{unknown1=" + this.unknown1 + " vertCount=" + this.vertCount + " unknown2=" + this.baseVertex + " faceCount=" + this.faceCount + " material_id=" + this.material_id + "}";
         }
     }
     
@@ -64,7 +64,7 @@ namespace PD2ModelParser.Sections
             RenderAtom nmi = new RenderAtom();
             nmi.unknown1 = 0;
             nmi.vertCount = (uint)obj.verts.Count; //vert count
-            nmi.unknown2 = 0;
+            nmi.baseVertex = 0;
             nmi.faceCount = (uint)obj.faces.Count; //face count
             nmi.material_id = 0;
             
@@ -120,7 +120,7 @@ namespace PD2ModelParser.Sections
                     RenderAtom item = new RenderAtom();
                     item.unknown1 = instream.ReadUInt32();
                     item.vertCount = instream.ReadUInt32(); //Verts/Uvs/Normals/etc Count
-                    item.unknown2 = instream.ReadUInt32();
+                    item.baseVertex = instream.ReadUInt32();
                     item.faceCount = instream.ReadUInt32(); //Face count
                     item.material_id = instream.ReadUInt32();
                     this.renderAtoms.Add(item);
@@ -195,7 +195,7 @@ namespace PD2ModelParser.Sections
                 {
                     outstream.Write(modelitem.unknown1);
                     outstream.Write(modelitem.vertCount);
-                    outstream.Write(modelitem.unknown2);
+                    outstream.Write(modelitem.baseVertex);
                     outstream.Write(modelitem.faceCount);
                     outstream.Write(modelitem.material_id);
                 }

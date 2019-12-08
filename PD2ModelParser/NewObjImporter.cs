@@ -431,7 +431,7 @@ namespace PD2ModelParser
                 RenderAtom new_model_item = new RenderAtom();
                 new_model_item.unknown1 = modelitem.unknown1;
                 new_model_item.vertCount = (uint)new_faces.Count;
-                new_model_item.unknown2 = modelitem.unknown2;
+                new_model_item.baseVertex = modelitem.baseVertex;
                 new_model_item.faceCount = (uint)obj.verts.Count;
                 new_model_item.material_id = modelitem.material_id;
 

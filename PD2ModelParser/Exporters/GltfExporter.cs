@@ -119,7 +119,7 @@ namespace PD2ModelParser.Exporters
 
             foreach (var ra in atoms)
             {
-                var atom_mai = new MemoryAccessInfo($"indices_{topo.hashname}_{atomcount++}", (int)ra.unknown2*2, (int)ra.vertCount*3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
+                var atom_mai = new MemoryAccessInfo($"indices_{topo.hashname}_{atomcount++}", (int)ra.baseVertex*2, (int)ra.vertCount*3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
                 var atom_ma = new MemoryAccessor(buf, atom_mai);
                 var accessor = root.CreateAccessor();
                 accessor.SetIndexData(atom_ma);
