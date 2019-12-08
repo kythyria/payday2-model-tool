@@ -251,8 +251,14 @@ namespace PD2ModelParser.Importers
                 if (!previous.objects.Contains(obj.id))
                     return obj;
 
-                // Note the field is named badly - it's a transform, not just a rotation
-                obj.rotation = node.GetNexusTransform();
+                // Bone transforms seem to get messed up really easily. Since changing bone
+                // transforms will likely break animations anyway, make the user opt-in if
+                // they want to move bones.
+                if (_options.ImportBoneTransforms)
+                {
+                    // Note the field is named badly - it's a transform, not just a rotation
+                    obj.rotation = node.GetNexusTransform();
+                }
 
                 sb.objects.Add(obj.id);
 
@@ -389,6 +395,21 @@ namespace PD2ModelParser.Importers
         private void AddWeightsForVertex(List<WeightPart> parts, Geometry geom, Model model, int vertIdx)
         {
             List<WeightPart> processed = ProcessWeights(parts);
+
+            if (_options.NormaliseWeights)
+            {
+                float total_weights = processed.Sum(v => v.weight);
+                if (total_weights < 0.1 && total_weights > 10)
+                {
+                    throw new Exception($"Weights sum {total_weights} out of range!");
+                }
+
+                float factor = 1 / total_weights;
+                foreach (WeightPart w in processed)
+                {
+                    w.weight *= factor;
+                }
+            }
 
             // AFAIK this is affected by the header thing - see above
             if (processed.Count > 3)
@@ -722,13 +743,21 @@ namespace PD2ModelParser.Importers
         public class FbxImportOptions : IOptionReceiver
         {
             public float? WeightRoundingThreshold = null;
+            public bool NormaliseWeights = true;
+            public bool ImportBoneTransforms = false;
 
             public void AddOption(string name, string value)
             {
                 switch (name)
                 {
                     case "weight-rounding-threshold":
-                        WeightRoundingThreshold = float.Parse(value);
+                        WeightRoundingThreshold = value.ParseFloat();
+                        break;
+                    case "normalise-weights":
+                        NormaliseWeights = bool.Parse(value);
+                        break;
+                    case "import-bone-transforms":
+                        ImportBoneTransforms = bool.Parse(value);
                         break;
                     default:
                         throw new Exception($"Unsupported option type '{name}' for FBX import");

@@ -98,6 +98,7 @@
     <Compile Include="Exporters\GltfExporter.cs" />
     <Compile Include="Hash64.cs" />
     <Compile Include="Importers\IOptionReceiver.cs" />
+    <Compile Include="InternationalisationUtils.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Misc\Updates.cs" />
     <Compile Include="ModelScript.cs" />
