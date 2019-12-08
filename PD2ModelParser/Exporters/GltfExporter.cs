@@ -23,20 +23,21 @@ namespace PD2ModelParser.Exporters
         GLTF.Scene scene;
         Dictionary<uint, Nodeoid> nodeoidsByObjectId;
         Dictionary<uint, List<(string, GLTF.Accessor)>> vertexAttributesByGeometryId;
-        Dictionary<uint, List<GLTF.Material>> materialsByMaterialGroupSlot;
         Dictionary<uint, GLTF.Material> materialsBySectionId;
 
         GLTF.ModelRoot Convert(FullModelData data)
         {
             nodeoidsByObjectId = new Dictionary<uint, Nodeoid>();
             vertexAttributesByGeometryId = new Dictionary<uint, List<(string, GLTF.Accessor)>>();
-            materialsByMaterialGroupSlot = new Dictionary<uint, List<GLTF.Material>>();
             materialsBySectionId = new Dictionary<uint, GLTF.Material>();
             this.data = data;
             root = GLTF.ModelRoot.CreateModel();
             scene = root.UseScene(0);
 
-            ProcessMaterialSections();
+            foreach (var ms in data.parsed_sections.Where(i => i.Value is Material).Select(i => i.Value as Material))
+            {
+                materialsBySectionId[ms.id] = root.CreateMaterial(ms.hashname.String);
+            }
 
             var rootNodeoids = GenerateNodeoids();
             AddModelNodes();
@@ -49,14 +50,6 @@ namespace PD2ModelParser.Exporters
             root.MergeBuffers();
 
             return root;
-        }
-
-        void ProcessMaterialSections()
-        {
-            foreach(var ms in data.parsed_sections.Where(i => i.Value is Material).Select(i => i.Value as Material))
-            {
-                materialsBySectionId[ms.id] = root.CreateMaterial("");
-            }
         }
 
         void CreateNodeFromNodeoid(Nodeoid thing, GLTF.IVisualNodeContainer parent)
@@ -83,10 +76,11 @@ namespace PD2ModelParser.Exporters
             var secPassthrough = (PassthroughGP)data.parsed_sections[model.passthroughGP_ID];
             var geometry = (Geometry)data.parsed_sections[secPassthrough.geometry_section];
             var topology = (Topology)data.parsed_sections[secPassthrough.topology_section];
+            var materialGroup = (Material_Group)data.parsed_sections[model.material_group_section_id];
 
             var attribs = GetGeometryAttributes(geometry);
 
-            foreach (var indexAccessor in CreatePrimitiveIndices(topology, model.renderAtoms))
+            foreach (var (indexAccessor,material) in CreatePrimitiveIndices(topology, model.renderAtoms, materialGroup))
             {
                 var prim = mesh.CreatePrimitive();
                 prim.DrawPrimitiveType = GLTF.PrimitiveType.TRIANGLES;
@@ -96,12 +90,13 @@ namespace PD2ModelParser.Exporters
                 }
 
                 prim.SetIndexAccessor(indexAccessor);
+                prim.Material = material;
             }
 
             return mesh;
         }
 
-        IEnumerable<GLTF.Accessor> CreatePrimitiveIndices(Topology topo, IEnumerable<RenderAtom> atoms)
+        IEnumerable<(GLTF.Accessor, GLTF.Material)> CreatePrimitiveIndices(Topology topo, IEnumerable<RenderAtom> atoms, Material_Group materialGroup)
         {
             var buf = new ArraySegment<byte>(new byte[topo.facelist.Count * 3 * 2]);
             var mai = new MemoryAccessInfo($"indices_{topo.hashname}", 0, topo.facelist.Count * 3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
@@ -123,7 +118,8 @@ namespace PD2ModelParser.Exporters
                 var atom_ma = new MemoryAccessor(buf, atom_mai);
                 var accessor = root.CreateAccessor();
                 accessor.SetIndexData(atom_ma);
-                yield return accessor;
+                var material = materialsBySectionId[materialGroup.items[(int)ra.material_id]];
+                yield return (accessor, material);
                 nextvtx += (int)ra.faceCount;
             }
         }
