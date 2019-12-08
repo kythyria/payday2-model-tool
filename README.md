@@ -7,6 +7,7 @@ This is a copy of IAmNotASpy and PoueT's model tool, with a bunch of new feature
 new models without deriving them from an existing model, and set rootpoints for different objects
 * Experimental Collada (DAE) and Filmbox (FBX) export support, for bones and (in the latter case) full
 rigging, vertex colours, and eight UV channel support.
+* Experimental glTF export support, with vertex colours, all eight UV channels, and material slots.
 * An importer for Filmbox (Coming Soon™)
 * And a bunch of miscellaneous features and bugfixes
 
