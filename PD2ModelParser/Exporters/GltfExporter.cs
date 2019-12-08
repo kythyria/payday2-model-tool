@@ -1,9 +1,8 @@
 ﻿using PD2ModelParser.Sections;
+using SharpGLTF.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GLTF = SharpGLTF.Schema2;
 
 namespace PD2ModelParser.Exporters
@@ -19,24 +18,29 @@ namespace PD2ModelParser.Exporters
             return path;
         }
 
+        FullModelData data;
         GLTF.ModelRoot root;
         GLTF.Scene scene;
         Dictionary<uint, Nodeoid> nodeoidsByObjectId;
+        Dictionary<uint, List<(string, GLTF.Accessor)>> vertexAttributesByGeometryId;
 
         GLTF.ModelRoot Convert(FullModelData data)
         {
             nodeoidsByObjectId = new Dictionary<uint, Nodeoid>();
-
-            root = SharpGLTF.Schema2.ModelRoot.CreateModel();
+            vertexAttributesByGeometryId = new Dictionary<uint, List<(string, GLTF.Accessor)>>();
+            this.data = data;
+            root = GLTF.ModelRoot.CreateModel();
             scene = root.UseScene(0);
 
-            var rootNodeoids = GenerateNodeoids(data);
-            AddModelNodes(data);
+            var rootNodeoids = GenerateNodeoids();
+            AddModelNodes();
             foreach(var i in rootNodeoids)
             {
                 i.HoistMeshChild();
                 CreateNodeFromNodeoid(i, scene);
             }
+
+            root.MergeBuffers();
 
             return root;
         }
@@ -50,7 +54,7 @@ namespace PD2ModelParser.Exporters
             }
             if(thing.Model != null)
             {
-                
+                node.Mesh = GetMeshForModel(thing.Model);
             }
             foreach (var i in thing.Children)
             {
@@ -58,7 +62,97 @@ namespace PD2ModelParser.Exporters
             }
         }
 
-        List<Nodeoid> GenerateNodeoids(FullModelData data)
+        GLTF.Mesh GetMeshForModel(Model model)
+        {
+            var mesh = root.CreateMesh(model.object3D.Name);
+
+            var secPassthrough = (PassthroughGP)data.parsed_sections[model.passthroughGP_ID];
+            var geometry = (Geometry)data.parsed_sections[secPassthrough.geometry_section];
+            var topology = (Topology)data.parsed_sections[secPassthrough.topology_section];
+
+            var attribs = GetGeometryAttributes(geometry);
+            var prim = mesh.CreatePrimitive();
+            prim.DrawPrimitiveType = GLTF.PrimitiveType.POINTS;
+            foreach (var att in attribs)
+            {
+                prim.SetVertexAccessor(att.Item1, att.Item2);
+            }
+
+            prim.SetIndexAccessor(MakeIndexAccessor(topology));
+
+            return mesh;
+        }
+
+        List<(string, GLTF.Accessor)> GetGeometryAttributes(Geometry geometry)
+        {
+            List<(string, GLTF.Accessor)> result;
+            if(vertexAttributesByGeometryId.TryGetValue(geometry.id, out result))
+            {
+                return result;
+            }
+            result = new List<(string, GLTF.Accessor)>();
+
+            var a_pos = MakeVertexAttributeAccessor("vpos", geometry.verts, 12, GLTF.DimensionType.VEC3, MathUtil.ToVector3, ma => ma.AsVector3Array());
+            result.Add(("POSITION", a_pos));
+
+            if (geometry.normals.Count > 0)
+            {
+                var a_norm = MakeVertexAttributeAccessor("vnorm", geometry.normals, 12, GLTF.DimensionType.VEC3, MathUtil.ToVector3, ma => ma.AsVector3Array());
+                result.Add(("NORMAL", a_norm));
+            }
+
+            if(geometry.vertex_colors.Count > 0)
+            {
+                var a_col = MakeVertexAttributeAccessor("vcol", geometry.vertex_colors, 16, GLTF.DimensionType.VEC4, MathUtil.ToVector4, ma => ma.AsVector4Array());
+                result.Add(("COLOR_0", a_col));
+            }
+
+            for (var i = 0; i < geometry.UVs.Length; i++)
+            {
+                var uvs = geometry.UVs[i];
+                if(uvs.Count > 0)
+                {
+                    var a_uv = MakeVertexAttributeAccessor($"vuv_{i}", uvs, 12, GLTF.DimensionType.VEC2, FixupUV, ma => ma.AsVector2Array());
+                    result.Add(($"TEXCOORD_{i}", a_uv));
+                }
+            }
+
+            return result;
+        }
+
+        System.Numerics.Vector2 FixupUV(Nexus.Vector2D input) => new System.Numerics.Vector2(input.X, -input.Y);
+
+        GLTF.Accessor MakeIndexAccessor(Topology topo)
+        {
+            var mai = new MemoryAccessInfo($"indices_{topo.hashname}", 0, topo.facelist.Count * 3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
+            var ma = new MemoryAccessor(new ArraySegment<byte>(new byte[topo.facelist.Count * 3 * 2]), mai);
+            var array = ma.AsIntegerArray();
+            for(int i = 0; i < topo.facelist.Count; i++)
+            {
+                array[i * 3 + 0] = topo.facelist[i].a;
+                array[i * 3 + 1] = topo.facelist[i].b;
+                array[i * 3 + 2] = topo.facelist[i].c;
+            }
+            var accessor = root.CreateAccessor();
+            accessor.SetIndexData(ma);
+            return accessor;
+        }
+
+        GLTF.Accessor MakeVertexAttributeAccessor<TSource, TResult>(string maiName, IList<TSource> source, int stride, GLTF.DimensionType dimtype, Func<TSource, TResult> conv, Func<MemoryAccessor, IList<TResult>> getcontainer, GLTF.EncodingType enc = GLTF.EncodingType.FLOAT, bool normalized = false)
+        {
+            var mai = new MemoryAccessInfo(maiName, 0, source.Count, stride, dimtype, enc, normalized);
+            var ma = new MemoryAccessor(new ArraySegment<byte>(new byte[source.Count * stride]), mai);
+            var array = getcontainer(ma);
+            for(int i = 0; i < source.Count; i++)
+            {
+                array[i] = conv(source[i]);
+            }
+            var accessor = root.CreateAccessor();
+            accessor.SetVertexData(ma);
+            return accessor;
+        }
+
+        List<Nodeoid> GenerateNodeoids()
         {
             return data.parsed_sections
                 .Where(i => i.Value is Object3D)
@@ -76,7 +170,7 @@ namespace PD2ModelParser.Exporters
             return n;
         }
 
-        void AddModelNodes(FullModelData data)
+        void AddModelNodes()
         {
             var models = data.parsed_sections
                 .Where(i => i.Value is Model)

@@ -117,6 +117,20 @@ namespace PD2ModelParser
             outstream.Write(matrix.M43);
             outstream.Write(matrix.M44);
         }
+
+        public static System.Numerics.Matrix4x4 ToMatrix4x4(this Matrix3D input)
+        {
+            return new System.Numerics.Matrix4x4(
+                input.M11, input.M12, input.M13, input.M14,
+                input.M21, input.M22, input.M23, input.M24,
+                input.M31, input.M32, input.M33, input.M34,
+                input.M41, input.M42, input.M43, input.M44
+            );
+        }
+
+        public static System.Numerics.Vector2 ToVector2(this Vector2D input) => new System.Numerics.Vector2(input.X, input.Y);
+        public static System.Numerics.Vector3 ToVector3(this Vector3D input) => new System.Numerics.Vector3(input.X, input.Y, input.Z);
+        public static System.Numerics.Vector4 ToVector4(this Sections.GeometryColor input) => new System.Numerics.Vector4(input.red, input.green, input.blue, input.alpha);
     }
 
     public static class MatrixExtensions
@@ -297,16 +311,6 @@ namespace PD2ModelParser
             }
 
             return result;*/
-        }
-
-        public static System.Numerics.Matrix4x4 ToMatrix4x4(this Matrix3D input)
-        {
-            return new System.Numerics.Matrix4x4(
-                input.M11, input.M12, input.M13, input.M14,
-                input.M21, input.M22, input.M23, input.M24,
-                input.M31, input.M32, input.M33, input.M34,
-                input.M41, input.M42, input.M43, input.M44
-            );
         }
     }
 
