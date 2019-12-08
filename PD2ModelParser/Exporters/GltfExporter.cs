@@ -23,14 +23,20 @@ namespace PD2ModelParser.Exporters
         GLTF.Scene scene;
         Dictionary<uint, Nodeoid> nodeoidsByObjectId;
         Dictionary<uint, List<(string, GLTF.Accessor)>> vertexAttributesByGeometryId;
+        Dictionary<uint, List<GLTF.Material>> materialsByMaterialGroupSlot;
+        Dictionary<uint, GLTF.Material> materialsBySectionId;
 
         GLTF.ModelRoot Convert(FullModelData data)
         {
             nodeoidsByObjectId = new Dictionary<uint, Nodeoid>();
             vertexAttributesByGeometryId = new Dictionary<uint, List<(string, GLTF.Accessor)>>();
+            materialsByMaterialGroupSlot = new Dictionary<uint, List<GLTF.Material>>();
+            materialsBySectionId = new Dictionary<uint, GLTF.Material>();
             this.data = data;
             root = GLTF.ModelRoot.CreateModel();
             scene = root.UseScene(0);
+
+            ProcessMaterialSections();
 
             var rootNodeoids = GenerateNodeoids();
             AddModelNodes();
@@ -43,6 +49,14 @@ namespace PD2ModelParser.Exporters
             root.MergeBuffers();
 
             return root;
+        }
+
+        void ProcessMaterialSections()
+        {
+            foreach(var ms in data.parsed_sections.Where(i => i.Value is Material).Select(i => i.Value as Material))
+            {
+                materialsBySectionId[ms.id] = root.CreateMaterial("");
+            }
         }
 
         void CreateNodeFromNodeoid(Nodeoid thing, GLTF.IVisualNodeContainer parent)
@@ -71,16 +85,79 @@ namespace PD2ModelParser.Exporters
             var topology = (Topology)data.parsed_sections[secPassthrough.topology_section];
 
             var attribs = GetGeometryAttributes(geometry);
-            var prim = mesh.CreatePrimitive();
-            prim.DrawPrimitiveType = GLTF.PrimitiveType.POINTS;
-            foreach (var att in attribs)
+
+            foreach (var indexAccessor in CreatePrimitiveIndices2(topology, model.renderAtoms))
             {
-                prim.SetVertexAccessor(att.Item1, att.Item2);
+                var prim = mesh.CreatePrimitive();
+                prim.DrawPrimitiveType = GLTF.PrimitiveType.TRIANGLES;
+                foreach (var att in attribs)
+                {
+                    prim.SetVertexAccessor(att.Item1, att.Item2);
+                }
+
+                prim.SetIndexAccessor(indexAccessor);
             }
 
-            prim.SetIndexAccessor(MakeIndexAccessor(topology));
-
             return mesh;
+        }
+
+        IEnumerable<GLTF.Accessor> CreatePrimitiveIndices2(Topology topo, IEnumerable<RenderAtom> atoms)
+        {
+            var buf = new ArraySegment<byte>(new byte[topo.facelist.Count * 3 * 2]);
+            var mai = new MemoryAccessInfo($"indices_{topo.hashname}", 0, topo.facelist.Count * 3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
+            var ma = new MemoryAccessor(buf, mai);
+            var array = ma.AsIntegerArray();
+            for (int i = 0; i < topo.facelist.Count; i++)
+            {
+                array[i * 3 + 0] = topo.facelist[i].a;
+                array[i * 3 + 1] = topo.facelist[i].b;
+                array[i * 3 + 2] = topo.facelist[i].c;
+            }
+
+            var nextvtx = 0;
+            var atomcount = 0;
+
+            foreach (var ra in atoms)
+            {
+                var atom_mai = new MemoryAccessInfo($"indices_{topo.hashname}_{atomcount++}", (int)ra.unknown2*2, (int)ra.vertCount*3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
+                var atom_ma = new MemoryAccessor(buf, atom_mai);
+                var accessor = root.CreateAccessor();
+                accessor.SetIndexData(atom_ma);
+                yield return accessor;
+                nextvtx += (int)ra.faceCount;
+            }
+        }
+
+        IEnumerable<GLTF.Accessor> CreatePrimitiveIndices(Topology topo, IEnumerable<RenderAtom> atoms)
+        {
+            var buf = new ArraySegment<byte>(new byte[topo.facelist.Count * 3 * 2]);
+            var mai = new MemoryAccessInfo($"indices_{topo.hashname}", 0, topo.facelist.Count * 3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
+            var ma = new MemoryAccessor(buf, mai);
+            var array = ma.AsIntegerArray();
+            for (int i = 0; i < topo.facelist.Count; i++)
+            {
+                array[i * 3 + 0] = topo.facelist[i].a;
+                array[i * 3 + 1] = topo.facelist[i].b;
+                array[i * 3 + 2] = topo.facelist[i].c;
+            }
+
+            var nextvtx = 0;
+            var atomcount = 0;
+
+            var accessor = root.CreateAccessor();
+            accessor.SetIndexData(ma);
+            yield return accessor;
+            yield break;
+
+            foreach (var ra in atoms)
+            {
+                var atom_mai = new MemoryAccessInfo($"indices_{topo.hashname}_{atomcount++}", nextvtx * 2, (int)ra.vertCount, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
+                var atom_ma = new MemoryAccessor(buf, atom_mai);
+                //var accessor = root.CreateAccessor();
+                accessor.SetIndexData(atom_ma);
+                yield return accessor;
+                nextvtx += (int)ra.vertCount;
+            }
         }
 
         List<(string, GLTF.Accessor)> GetGeometryAttributes(Geometry geometry)
