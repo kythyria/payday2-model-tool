@@ -144,8 +144,8 @@ namespace PD2ModelParser.Sections
         public List<GeometryColor> vertex_colors = new List<GeometryColor>();
         public List<GeometryWeightGroups> weight_groups = new List<GeometryWeightGroups>(); //4 - Weight Groups
         public List<Vector3D> weights = new List<Vector3D>(); //3 - Weights
-        public List<Vector3D> unknown20 = new List<Vector3D>(); //3 - Tangent/Binormal
-        public List<Vector3D> unknown21 = new List<Vector3D>(); //3 - Tangent/Binormal
+        public List<Vector3D> binormals = new List<Vector3D>(); //3 - Tangent/Binormal
+        public List<Vector3D> tangents = new List<Vector3D>(); //3 - Tangent/Binormal
 
         // Unknown items from this section. Includes colors and a few other items.
         public List<byte[]> unknown_item_data = new List<byte[]>();
@@ -177,8 +177,8 @@ namespace PD2ModelParser.Sections
             this.verts = newobject.verts;
             this.UVs[0] = newobject.uv;
             this.normals = newobject.normals;
-            //this.unknown20;
-            //this.unknown21;
+            //this.binormals;
+            //this.tangents;
 
             this.hashname = Hash64.HashString(newobject.object_name + ".Geometry");
         }
@@ -241,22 +241,22 @@ namespace PD2ModelParser.Sections
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        Vector3D unknown_20_entry = new Vector3D();
-                        unknown_20_entry.X = instream.ReadSingle();
-                        unknown_20_entry.Y = instream.ReadSingle();
-                        unknown_20_entry.Z = instream.ReadSingle();
-                        this.unknown20.Add(unknown_20_entry);
+                        Vector3D binormal_entry = new Vector3D();
+                        binormal_entry.X = instream.ReadSingle();
+                        binormal_entry.Y = instream.ReadSingle();
+                        binormal_entry.Z = instream.ReadSingle();
+                        this.binormals.Add(binormal_entry);
                     }
                 }
                 else if (head.item_type == GeometryChannelTypes.TANGENT0)
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        Vector3D unknown_21_entry = new Vector3D();
-                        unknown_21_entry.X = instream.ReadSingle();
-                        unknown_21_entry.Y = instream.ReadSingle();
-                        unknown_21_entry.Z = instream.ReadSingle();
-                        this.unknown21.Add(unknown_21_entry);
+                        Vector3D tangent_entry = new Vector3D();
+                        tangent_entry.X = instream.ReadSingle();
+                        tangent_entry.Y = instream.ReadSingle();
+                        tangent_entry.Z = instream.ReadSingle();
+                        this.tangents.Add(tangent_entry);
                     }
                 }
 
@@ -354,10 +354,10 @@ namespace PD2ModelParser.Sections
 
             List<GeometryWeightGroups> unknown_15s = this.weight_groups;
             int unknown_15s_pos = 0;
-            List<Vector3D> unknown_20s = this.unknown20;
-            int unknown_20s_pos = 0;
-            List<Vector3D> unknown_21s = this.unknown21;
-            int unknown_21s_pos = 0;
+            List<Vector3D> binormals = this.binormals;
+            int binormals_pos = 0;
+            List<Vector3D> tangents = this.tangents;
+            int tangents_pos = 0;
 
             List<byte[]> unknown_data = this.unknown_item_data;
             int unknown_data_pos = 0;
@@ -398,7 +398,7 @@ namespace PD2ModelParser.Sections
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        if (this.unknown20.Count != this.vert_count)
+                        if (this.binormals.Count != this.vert_count)
                         {
                             outstream.Write(0.0f);
                             outstream.Write(0.0f);
@@ -406,11 +406,11 @@ namespace PD2ModelParser.Sections
                         }
                         else
                         {
-                            Vector3D unknown_20_entry = unknown_20s[x];
-                            outstream.Write(unknown_20_entry.X);
-                            outstream.Write(unknown_20_entry.Y);
-                            outstream.Write(unknown_20_entry.Z);
-                            unknown_20s_pos++;
+                            Vector3D binormal_entry = binormals[x];
+                            outstream.Write(binormal_entry.X);
+                            outstream.Write(binormal_entry.Y);
+                            outstream.Write(binormal_entry.Z);
+                            binormals_pos++;
                         }
                     }
                 }
@@ -418,7 +418,7 @@ namespace PD2ModelParser.Sections
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        if (this.unknown21.Count != this.vert_count)
+                        if (this.tangents.Count != this.vert_count)
                         {
                             outstream.Write(0.0f);
                             outstream.Write(0.0f);
@@ -426,11 +426,11 @@ namespace PD2ModelParser.Sections
                         }
                         else
                         {
-                            Vector3D unknown_21_entry = unknown_21s[x];
-                            outstream.Write(unknown_21_entry.X);
-                            outstream.Write(unknown_21_entry.Y);
-                            outstream.Write(unknown_21_entry.Z);
-                            unknown_21s_pos++;
+                            Vector3D tangent_entry = tangents[x];
+                            outstream.Write(tangent_entry.X);
+                            outstream.Write(tangent_entry.Y);
+                            outstream.Write(tangent_entry.Z);
+                            tangents_pos++;
                         }
                     }
                 }
@@ -494,7 +494,7 @@ namespace PD2ModelParser.Sections
             //for debug purposes
             //following prints the suspected "weights" table
 
-            if (this.weight_groups.Count > 0 && this.unknown20.Count > 0 && this.unknown21.Count > 0 &&
+            if (this.weight_groups.Count > 0 && this.binormals.Count > 0 && this.tangents.Count > 0 &&
                 this.weights.Count > 0)
             {
                 outstream.WriteLine("Printing weights table for " + StaticStorage.hashindex.GetString(this.hashname));
@@ -517,19 +517,18 @@ namespace PD2ModelParser.Sections
                                             System.Globalization.CultureInfo.InvariantCulture) + "\t" +
                                         (this.weights[x].X + this.weights[x].Y + this.weights[x].Z).ToString("0.000000",
                                             System.Globalization.CultureInfo.InvariantCulture) + "\t" +
-                                        this.unknown20[x].X.ToString("0.000000",
+                                        this.binormals[x].X.ToString("0.000000",
                                             System.Globalization.CultureInfo.InvariantCulture) + "\t" +
-                                        this.unknown20[x].Y.ToString("0.000000",
+                                        this.binormals[x].Y.ToString("0.000000",
                                             System.Globalization.CultureInfo.InvariantCulture) + "\t" +
-                                        this.unknown20[x].Z.ToString("0.000000",
+                                        this.binormals[x].Z.ToString("0.000000",
                                             System.Globalization.CultureInfo.InvariantCulture) + "\t" +
-                                        this.unknown21[x].X.ToString("0.000000",
+                                        this.tangents[x].X.ToString("0.000000",
                                             System.Globalization.CultureInfo.InvariantCulture) + "\t" +
-                                        this.unknown21[x].Y.ToString("0.000000",
+                                        this.tangents[x].Y.ToString("0.000000",
                                             System.Globalization.CultureInfo.InvariantCulture) + "\t" +
-                                        this.unknown21[x].Z.ToString("0.000000",
+                                        this.tangents[x].Z.ToString("0.000000",
                                             System.Globalization.CultureInfo.InvariantCulture));
-                    //outstream.WriteLine(this.unknown15[x].X.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown15[x].Y.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.weights[x].X.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.weights[x].Y.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.weights[x].Z.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + (this.unknown15[x].X + this.unknown15[x].Y + this.weights[x].X + this.weights[x].Y + this.weights[x].Z).ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown20[x].X.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown20[x].Y.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown20[x].Z.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown21[x].X.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown21[x].Y.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + "\t" + this.unknown21[x].Z.ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture));
                 }
 
                 outstream.WriteLine("====================================================");
@@ -548,8 +547,8 @@ namespace PD2ModelParser.Sections
                    " Normals: " + this.normals.Count +
                    " unknown_15: " + this.weight_groups.Count +
                    " unknown_17: " + this.weights.Count +
-                   " unknown_20: " + this.unknown20.Count +
-                   " unknown_21: " + this.unknown21.Count +
+                   " binormals: " + this.binormals.Count +
+                   " tangents: " + this.tangents.Count +
                    " Geometry_unknown_item_data: " + this.unknown_item_data.Count +
                    " unknown_hash: " + StaticStorage.hashindex.GetString(this.hashname) +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");

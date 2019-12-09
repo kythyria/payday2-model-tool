@@ -450,8 +450,8 @@ namespace PD2ModelParser
             geometry_section.verts = obj.verts;
             geometry_section.normals = new_arranged_Normals.ToList();
             geometry_section.UVs[0] = new_arranged_UV.ToList();
-            geometry_section.unknown20 = new_arranged_unknown20.ToList();
-            geometry_section.unknown21 = new_arranged_unknown21.ToList();
+            geometry_section.binormals = new_arranged_unknown20.ToList();
+            geometry_section.tangents = new_arranged_unknown21.ToList();
 
             topology_section.facelist = new_faces;
         }

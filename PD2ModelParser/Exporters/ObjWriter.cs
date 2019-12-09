@@ -121,7 +121,7 @@ namespace PD2ModelParser
                             int unk20tangcount = 0;
                             int unk21tangcount = 0;
                             sw.WriteLine("Unknown 20 (float, float, float) - Normal tangents???");
-                            foreach (Vector3D unknown_20_entry in geometry_section.unknown20)
+                            foreach (Vector3D unknown_20_entry in geometry_section.binormals)
                             {
                                 sw.WriteLine(unknown_20_entry.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_20_entry.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_20_entry.Z.ToString("0.000000", CultureInfo.InvariantCulture));
                                 Vector3D normt = norm_tangents[unk20tangcount];
@@ -129,7 +129,7 @@ namespace PD2ModelParser
                                 unk20tangcount++;
                             }
                             sw.WriteLine("Unknown 21 (float, float, float) - Normal tangents???");
-                            foreach (Vector3D unknown_21_entry in geometry_section.unknown21)
+                            foreach (Vector3D unknown_21_entry in geometry_section.tangents)
                             {
                                 sw.WriteLine(unknown_21_entry.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_21_entry.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_21_entry.Z.ToString("0.000000", CultureInfo.InvariantCulture));
                                 Vector3D normt = norm_binorms[unk21tangcount];
