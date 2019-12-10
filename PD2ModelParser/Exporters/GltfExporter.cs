@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GLTF = SharpGLTF.Schema2;
+using System.Numerics;
 
 namespace PD2ModelParser.Exporters
 {
@@ -166,7 +167,7 @@ namespace PD2ModelParser.Exporters
             return result;
         }
 
-        System.Numerics.Vector2 FixupUV(Nexus.Vector2D input) => new System.Numerics.Vector2(input.X, 1-input.Y);
+        Vector2 FixupUV(Nexus.Vector2D input) => new Vector2(input.X, 1-input.Y);
 
         GLTF.Accessor MakeIndexAccessor(Topology topo)
         {
