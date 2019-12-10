@@ -177,7 +177,7 @@ namespace PD2ModelParser.Importers
         private Dictionary<ulong, Object3D> AddSkeleton(FbxNode rootNode, Model model,
             Object3D rootPoint, out Object3D rootBone)
         {
-            FbxSkeleton root_skeleton = rootNode.GetSkeleton();
+            FbxSkeleton root_skeleton = rootNode?.GetSkeleton();
             if (root_skeleton == null)
             {
                 rootBone = null;
