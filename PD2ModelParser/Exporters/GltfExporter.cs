@@ -148,7 +148,23 @@ namespace PD2ModelParser.Exporters
                 result.Add(("NORMAL", a_norm));
             }
 
-            if(geometry.vertex_colors.Count > 0)
+            if (geometry.tangents.Count > 0)
+            {
+                Func<Nexus.Vector3D, int, Vector4> makeTangent = (input, index) =>
+                {
+                    var tangent = input.ToVector3();
+                    var binorm = geometry.binormals[index].ToVector3();
+                    var normal = geometry.normals[index].ToVector3();
+
+                    var txn = Vector3.Cross(tangent, normal);
+                    return new Vector4(tangent, Math.Sign(Vector3.Dot(txn, binorm)));
+                };
+
+                var a_binorm = MakeVertexAttributeAccessor("vtan", geometry.tangents, 16, GLTF.DimensionType.VEC4, makeTangent, ma => ma.AsVector4Array());
+                result.Add(("TANGENT", a_binorm));
+            }
+
+            if (geometry.vertex_colors.Count > 0)
             {
                 var a_col = MakeVertexAttributeAccessor("vcol", geometry.vertex_colors, 16, GLTF.DimensionType.VEC4, MathUtil.ToVector4, ma => ma.AsVector4Array());
                 result.Add(("COLOR_0", a_col));
@@ -187,12 +203,17 @@ namespace PD2ModelParser.Exporters
 
         GLTF.Accessor MakeVertexAttributeAccessor<TSource, TResult>(string maiName, IList<TSource> source, int stride, GLTF.DimensionType dimtype, Func<TSource, TResult> conv, Func<MemoryAccessor, IList<TResult>> getcontainer, GLTF.EncodingType enc = GLTF.EncodingType.FLOAT, bool normalized = false)
         {
+            return MakeVertexAttributeAccessor(maiName, source, stride, dimtype, (s, i) => conv(s), getcontainer, enc, normalized);
+        }
+
+        GLTF.Accessor MakeVertexAttributeAccessor<TSource, TResult>(string maiName, IList<TSource> source, int stride, GLTF.DimensionType dimtype, Func<TSource, int, TResult> conv, Func<MemoryAccessor, IList<TResult>> getcontainer, GLTF.EncodingType enc = GLTF.EncodingType.FLOAT, bool normalized = false)
+        {
             var mai = new MemoryAccessInfo(maiName, 0, source.Count, stride, dimtype, enc, normalized);
             var ma = new MemoryAccessor(new ArraySegment<byte>(new byte[source.Count * stride]), mai);
             var array = getcontainer(ma);
             for(int i = 0; i < source.Count; i++)
             {
-                array[i] = conv(source[i]);
+                array[i] = conv(source[i], i);
             }
             var accessor = root.CreateAccessor();
             accessor.SetVertexData(ma);
