@@ -13,3 +13,7 @@
 /Libs/libFbxNetNative.so
 /Libs/libfbxsdk.dll
 /Libs/libfbxsdk.so
+
+# VS options file
+# https://docs.microsoft.com/en-us/visualstudio/extensibility/internals/solution-user-options-dot-suo-file
+*.suo
