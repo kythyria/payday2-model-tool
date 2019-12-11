@@ -97,6 +97,7 @@
     <Compile Include="Exporters\DieselExporter.cs" />
     <Compile Include="Exporters\GltfExporter.cs" />
     <Compile Include="Hash64.cs" />
+    <Compile Include="Importers\GltfImporter.cs" />
     <Compile Include="Importers\IOptionReceiver.cs" />
     <Compile Include="InternationalisationUtils.cs" />
     <Compile Include="Logging.cs" />

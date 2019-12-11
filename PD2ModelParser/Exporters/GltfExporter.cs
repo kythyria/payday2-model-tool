@@ -115,7 +115,6 @@ namespace PD2ModelParser.Exporters
                 array[i * 3 + 2] = topo.facelist[i].c;
             }
 
-            var nextvtx = 0;
             var atomcount = 0;
 
             foreach (var ra in atoms)
@@ -126,7 +125,6 @@ namespace PD2ModelParser.Exporters
                 accessor.SetIndexData(atom_ma);
                 var material = materialsBySectionId[materialGroup.items[(int)ra.material_id]];
                 yield return (accessor, material);
-                nextvtx += (int)ra.faceCount;
             }
         }
 
