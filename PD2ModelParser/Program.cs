@@ -286,6 +286,7 @@ namespace PD2ModelParser
 
                         break;
                     case CommandLineActions.Script:
+                        Log.Default.Status("Executing script {0}", entry.arg);
                         try
                         {
                             ModelScript.Execute(data, entry.arg);

@@ -177,7 +177,7 @@ namespace PD2ModelParser.Importers
         private Dictionary<ulong, Object3D> AddSkeleton(FbxNode rootNode, Model model,
             Object3D rootPoint, out Object3D rootBone)
         {
-            FbxSkeleton root_skeleton = rootNode.GetSkeleton();
+            FbxSkeleton root_skeleton = rootNode?.GetSkeleton();
             if (root_skeleton == null)
             {
                 rootBone = null;
@@ -553,21 +553,34 @@ namespace PD2ModelParser.Importers
                 geom.headers.Add(new GeometryHeader(3, GeometryChannelTypes.COLOR));
             FbxLayerElementVertexColor layer = mesh.GetElementVertexColor();
 
-            if (layer.GetMappingMode() != FbxLayerElement.EMappingMode.eByControlPoint)
-                throw new Exception("Vertex colour: only per-vertex colouring is supported");
-
-            if (layer.GetReferenceMode() != FbxLayerElement.EReferenceMode.eDirect)
-                throw new Exception("Vertex colour: only per-vertex colouring is supported");
+            List<int>[] cp_to_entries = FindPerVertEntries(mesh, layer, layer.GetIndexArray());
 
             FbxLayerElementArrayTemplateColour array = layer.GetDirectArray();
 
-            if (array.GetCount() != geom.vert_count)
-                throw new Exception("Vertex colour: mismatched vertex count");
-
-            for (int i = 0; i < array.GetCount(); i++)
+            for (int i = 0; i < geom.vert_count; i++)
             {
-                FbxColor colour = array.GetAt(i);
-                geom.vertex_colors.Add(colour.ToGeomColour());
+                int r = 0, g = 0, b = 0, a = 0;
+                int count = 0;
+
+                foreach (int idx in cp_to_entries[i])
+                {
+                    count++;
+                    GeometryColor point_colour = array.GetAt(idx).ToGeomColour();
+                    r += point_colour.red;
+                    g += point_colour.green;
+                    b += point_colour.blue;
+                    a += point_colour.alpha;
+                }
+
+                GeometryColor colour = new GeometryColor
+                {
+                    red = (byte) (r / count),
+                    green = (byte) (g / count),
+                    blue = (byte) (b / count),
+                    alpha = (byte) (a / count),
+                };
+
+                geom.vertex_colors.Add(colour);
             }
         }
 
