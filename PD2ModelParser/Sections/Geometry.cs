@@ -53,6 +53,14 @@ namespace PD2ModelParser.Sections
         {
         }
 
+        public GeometryColor(byte red, byte green, byte blue, byte alpha)
+        {
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
+            this.alpha = alpha;
+        }
+
         public GeometryColor(BinaryReader instream)
         {
             this.blue = instream.ReadByte();

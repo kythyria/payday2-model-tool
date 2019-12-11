@@ -130,7 +130,30 @@ namespace PD2ModelParser
 
         public static System.Numerics.Vector2 ToVector2(this Vector2D input) => new System.Numerics.Vector2(input.X, input.Y);
         public static System.Numerics.Vector3 ToVector3(this Vector3D input) => new System.Numerics.Vector3(input.X, input.Y, input.Z);
-        public static System.Numerics.Vector4 ToVector4(this Sections.GeometryColor input) => new System.Numerics.Vector4(input.red, input.green, input.blue, input.alpha);
+        public static System.Numerics.Vector4 ToVector4(this Sections.GeometryColor input) => new System.Numerics.Vector4(input.red/255.0f, input.green/255.0f, input.blue/255.0f, input.alpha/255.0f);
+
+        public static Vector2D ToNexusVector(this System.Numerics.Vector2 input) => new Vector2D(input.X, input.Y);
+        public static Vector3D ToNexusVector(this System.Numerics.Vector3 input) => new Vector3D(input.X, input.Y, input.Z);
+        public static Sections.GeometryColor ToGeometryColor(this System.Numerics.Vector4 input) {
+            return new Sections.GeometryColor(
+                ClampFloatToByte(input.X),
+                ClampFloatToByte(input.Y),
+                ClampFloatToByte(input.Z),
+                ClampFloatToByte(input.W));
+        }
+
+        /// <summary>
+        /// Clamp a float to 0..1 and rescale it to 0..255
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static byte ClampFloatToByte(double input)
+        {
+            var clamped = input > 1.0f ? 1.0f : input;
+            var scaled = input * 255;
+            var rounded = Math.Round(scaled);
+            return (byte)rounded;
+        }
     }
 
     public static class MatrixExtensions
@@ -357,6 +380,26 @@ namespace PD2ModelParser
             this.hash = hash;
             str = null;
             known = false;
+        }
+    }
+
+    static class NullableUtil
+    {
+        public static R WithValue<T,R>(this T? self, Func<T,R> cb) where T : struct
+        {
+            if(self.HasValue)
+            {
+                return cb(self.Value);
+            }
+            else
+            {
+                return default(R);
+            }
+        }
+
+        public static void WithValue<T>(this T? self, Action<T> cb) where T: struct
+        {
+            if (self.HasValue) { cb(self.Value); }
         }
     }
 }
