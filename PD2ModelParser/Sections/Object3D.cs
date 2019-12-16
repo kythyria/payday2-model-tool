@@ -39,6 +39,19 @@ namespace PD2ModelParser.Sections
 
         public List<Object3D> children = new List<Object3D>();
 
+        public void SetParent(Object3D newParent)
+        {
+            var oldParent = parent;
+            if(oldParent != null)
+            {
+                oldParent.children.Remove(this);
+                oldParent.child_ids.Remove(this.id);
+            }
+            newParent.children.Add(this);
+            newParent.child_ids.Add(this.id);
+            parent = newParent;
+        }
+
         public string Name => hashname.String;
 
         public override uint SectionId

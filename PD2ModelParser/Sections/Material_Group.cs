@@ -27,6 +27,14 @@ namespace PD2ModelParser.Sections
 
         }
 
+        public Material_Group(uint sec_id, IEnumerable<uint> mat_ids)
+        {
+            this.id = sec_id;
+            this.size = 0;
+            this.items = mat_ids.ToList();
+            this.count = (uint)this.items.Count;
+        }
+
         public Material_Group(BinaryReader instream, SectionHeader section)
         {
             this.id = section.id;

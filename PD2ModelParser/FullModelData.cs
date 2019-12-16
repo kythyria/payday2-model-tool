@@ -57,5 +57,10 @@ namespace PD2ModelParser
             parsed_sections.Remove(id);
             sections.Remove(header);
         }
+
+        public IEnumerable<T> SectionsOfType<T>() where T : class
+        {
+            return parsed_sections.Where(i => i.Value is T).Select(i => i.Value as T);
+        }
     }
 }

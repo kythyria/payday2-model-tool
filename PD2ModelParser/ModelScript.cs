@@ -372,6 +372,9 @@ namespace PD2ModelParser
                         (FilmboxImporter.FbxImportOptions) options);
                     break;
 #endif
+                case "gltf":
+                    GltfImporter.Import(data, file, create_objects, ParentFinder);
+                    break;
                 default:
                     throw new NotImplementedException($"Cannot import file with type '{type}', "
                                                       + "only OBJ and FBX are currently supported");
