@@ -28,7 +28,7 @@ namespace PD2ModelParser.Sections
         public abstract uint SectionId { get; set; }
         public abstract uint TypeCode { get; }
 
-        public void StreamWrite(BinaryWriter output)
+        public virtual void StreamWrite(BinaryWriter output)
         {
             output.Write(TypeCode);
             output.Write(SectionId);

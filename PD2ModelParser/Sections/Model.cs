@@ -22,11 +22,8 @@ namespace PD2ModelParser.Sections
         }
     }
     
-    class Model : ISection, IPostLoadable, IHashContainer
+    class Model : Object3D, ISection, IPostLoadable, IHashContainer
     {
-        private static uint model_data_tag = 0x62212D88; // Model data
-        public UInt32 size;
-
         public Object3D object3D;
         public UInt32 version;
         //Version 6
@@ -47,13 +44,12 @@ namespace PD2ModelParser.Sections
         public UInt32 unknown13;
         public UInt32 skinbones_ID;
 
-        public byte[] remaining_data = null;
-
         public Model(obj_data obj, PassthroughGP passGP, TopologyIP topoIP, Material_Group matg, Object3D parent)
+            : base(obj.object_name, parent)
         {
-            this.size = 0;
+            this.object3D = this as Object3D;
 
-            this.object3D = new Object3D(obj.object_name, parent);
+            this.size = 0;
             SectionId = (uint)obj.object_name.GetHashCode();
 
             this.version = 3;
@@ -88,10 +84,11 @@ namespace PD2ModelParser.Sections
         }
 
         public Model(BinaryReader instream, SectionHeader section)
+            : base(instream)
         {
-            this.size = section.size;
+            this.object3D = this as Object3D;
 
-            this.object3D = new Object3D(instream);
+            this.size = section.size;
             SectionId = section.id;
 
             this.version = instream.ReadUInt32();
@@ -154,9 +151,9 @@ namespace PD2ModelParser.Sections
 
         }
 
-        public void StreamWrite(BinaryWriter outstream)
+        public override void StreamWrite(BinaryWriter outstream)
         {
-            outstream.Write(model_data_tag);
+            outstream.Write(Tags.model_data_tag);
             outstream.Write(SectionId);
             long newsizestart = outstream.BaseStream.Position;
             outstream.Write(this.size);
@@ -171,7 +168,7 @@ namespace PD2ModelParser.Sections
             outstream.BaseStream.Position = newsizeend;
         }
 
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             this.object3D.StreamWriteData(outstream);
             outstream.Write(this.version);
@@ -241,22 +238,6 @@ namespace PD2ModelParser.Sections
             }
         }
 
-        public void CollectHashes(CustomHashlist hashlist)
-        {
-            object3D.CollectHashes(hashlist);
-        }
-
-        public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)
-        {
-            object3D.PostLoad(id, parsed_sections);
-        }
-
-        public uint SectionId
-        {
-            get => object3D.id;
-            set => object3D.id = value;
-        }
-
-        public uint TypeCode => Tags.model_data_tag;
+        public override uint TypeCode => Tags.model_data_tag;
     }
 }

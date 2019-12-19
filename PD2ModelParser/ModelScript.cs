@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using System.Linq;
 using Nexus;
 using PD2ModelParser.Importers;
 using PD2ModelParser.Sections;
@@ -52,29 +53,7 @@ namespace PD2ModelParser
 
         private static Object3D FindObjectByHashname(FullModelData data, ulong hashname)
         {
-            foreach (object section in data.parsed_sections.Values)
-            {
-                // Only look for Object3Ds (and models, which contain Object3Ds)
-                Object3D obj;
-                switch (section)
-                {
-                    case Object3D tmp:
-                        obj = tmp;
-                        break;
-                    case Model tmp:
-                        obj = tmp.object3D;
-                        break;
-                    default:
-                        continue;
-                }
-
-                // Check if this one has the right name
-                if (obj.hashname.Hash != hashname) continue;
-
-                return obj;
-            }
-
-            return null;
+            return data.SectionsOfType<Object3D>().Where(i => i.hashname.Hash == hashname).FirstOrDefault();
         }
 
         private static string CheckAttr(XElement elem, string attr)
