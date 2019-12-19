@@ -248,10 +248,10 @@ namespace PD2ModelParser
 
 
                             sw.WriteLine("#");
-                            sw.WriteLine("# object " + model_data.object3D.hashname.String);
+                            sw.WriteLine("# object " + model_data.Name);
                             sw.WriteLine("#");
                             sw.WriteLine();
-                            sw.WriteLine("o " + model_data.object3D.hashname.String);
+                            sw.WriteLine("o " + model_data.Name);
                             foreach (Vector3D vert in geometry_section.verts)
                             {
                                 sw.WriteLine("v " + vert.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + vert.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + vert.Z.ToString("0.000000", CultureInfo.InvariantCulture));
@@ -273,7 +273,7 @@ namespace PD2ModelParser
                             sw.WriteLine("# " + geometry_section.normals.Count + " Normals");
                             sw.WriteLine();
 
-                            sw.WriteLine("g " + model_data.object3D.hashname.String);
+                            sw.WriteLine("g " + model_data.Name);
                             foreach (Face face in topology_section.facelist)
                             {
                                 //x
@@ -352,10 +352,10 @@ namespace PD2ModelParser
 
 
                             sw.WriteLine("#");
-                            sw.WriteLine("# object " + model_data.object3D.hashname.String);
+                            sw.WriteLine("# object " + model_data.Name);
                             sw.WriteLine("#");
                             sw.WriteLine();
-                            sw.WriteLine("o " + model_data.object3D.hashname.String);
+                            sw.WriteLine("o " + model_data.Name);
                             foreach (Vector3D vert in geometry_section.verts)
                             {
                                 sw.WriteLine("v " + vert.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + vert.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + vert.Z.ToString("0.000000", CultureInfo.InvariantCulture));
@@ -377,7 +377,7 @@ namespace PD2ModelParser
                             sw.WriteLine("# " + geometry_section.normals.Count + " Normals");
                             sw.WriteLine();
 
-                            sw.WriteLine("g " + model_data.object3D.hashname.String);
+                            sw.WriteLine("g " + model_data.Name);
                             foreach (Face face in topology_section.facelist)
                             {
                                 //x

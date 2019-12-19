@@ -22,13 +22,11 @@ namespace PD2ModelParser.Exporters
         FullModelData data;
         GLTF.ModelRoot root;
         GLTF.Scene scene;
-        Dictionary<uint, Nodeoid> nodeoidsByObjectId;
         Dictionary<uint, List<(string, GLTF.Accessor)>> vertexAttributesByGeometryId;
         Dictionary<uint, GLTF.Material> materialsBySectionId;
 
         GLTF.ModelRoot Convert(FullModelData data)
         {
-            nodeoidsByObjectId = new Dictionary<uint, Nodeoid>();
             vertexAttributesByGeometryId = new Dictionary<uint, List<(string, GLTF.Accessor)>>();
             materialsBySectionId = new Dictionary<uint, GLTF.Material>();
             this.data = data;
@@ -40,12 +38,9 @@ namespace PD2ModelParser.Exporters
                 materialsBySectionId[ms.id] = root.CreateMaterial(ms.hashname.String);
             }
 
-            var rootNodeoids = GenerateNodeoids();
-            AddModelNodes();
-            foreach(var i in rootNodeoids)
+            foreach(var i in data.SectionsOfType<Object3D>().Where(i => i.parent == null))
             {
-                i.HoistMeshChild();
-                CreateNodeFromNodeoid(i, scene);
+                CreateNodeFromObject3D(i, scene);
             }
 
             root.MergeBuffers();
@@ -53,20 +48,20 @@ namespace PD2ModelParser.Exporters
             return root;
         }
 
-        void CreateNodeFromNodeoid(Nodeoid thing, GLTF.IVisualNodeContainer parent)
+        void CreateNodeFromObject3D(Object3D thing, GLTF.IVisualNodeContainer parent)
         {
-            var node = parent.CreateNode(thing.TryGetName());
-            if(thing.ObjectItem != null)
+            var node = parent.CreateNode(thing.Name);
+            if (thing != null)
             {
-                node.LocalMatrix = thing.ObjectItem.rotation.ToMatrix4x4();
+                node.LocalMatrix = thing.rotation.ToMatrix4x4();
             }
-            if(thing.Model != null)
+            if (thing is Model)
             {
-                node.Mesh = GetMeshForModel(thing.Model);
+                node.Mesh = GetMeshForModel(thing as Model);
             }
-            foreach (var i in thing.Children)
+            foreach (var i in thing.children)
             {
-                CreateNodeFromNodeoid(i, node);
+                CreateNodeFromObject3D(i, node);
             }
         }
 
@@ -77,7 +72,7 @@ namespace PD2ModelParser.Exporters
                 return null;
             }
 
-            var mesh = root.CreateMesh(model.object3D.Name);
+            var mesh = root.CreateMesh(model.Name);
 
             var secPassthrough = (PassthroughGP)data.parsed_sections[model.passthroughGP_ID];
             var geometry = (Geometry)data.parsed_sections[secPassthrough.geometry_section];
@@ -216,80 +211,6 @@ namespace PD2ModelParser.Exporters
             var accessor = root.CreateAccessor();
             accessor.SetVertexData(ma);
             return accessor;
-        }
-
-        List<Nodeoid> GenerateNodeoids()
-        {
-            return data.parsed_sections
-                .Where(i => i.Value is Object3D)
-                .Select(i => (Object3D)i.Value)
-                .Where(i => i.parent == null)
-                .Select(GenerateNodeoid)
-                .ToList();
-        }
-
-        Nodeoid GenerateNodeoid(Object3D whatfor)
-        {
-            var n = new Nodeoid { ObjectItem = whatfor };
-            n.Children.AddRange(whatfor.children.Select(GenerateNodeoid));
-            nodeoidsByObjectId[whatfor.id] = n;
-            return n;
-        }
-
-        void AddModelNodes()
-        {
-            var models = data.parsed_sections
-                .Where(i => i.Value is Model)
-                .Select(i => (Model)i.Value)
-                .Where(i => i.object3D != null);
-            foreach (var i in models)
-            {
-                var parentNode = nodeoidsByObjectId[i.object3D.id];
-                var modelNode = new Nodeoid { Model = i };
-                parentNode.Children.Add(modelNode);
-            }
-        }
-
-        class Nodeoid
-        {
-            public Nodeoid()
-            {
-                Children = new List<Nodeoid>();
-            }
-
-            public List<Nodeoid> Children { get; set; }
-            public Object3D ObjectItem { get; set; }
-            public Model Model { get; set; }
-
-            public void HoistMeshChild()
-            {
-                var meshChildren = Children.Where(i => i.Model != null && i.ObjectItem == null).ToList();
-                if(meshChildren.Count == 1)
-                {
-                    Model = meshChildren[0].Model;
-                    Children.Remove(meshChildren[0]);
-                }
-                foreach (var i in Children)
-                {
-                    i.HoistMeshChild();
-                }
-            }
-
-            public string TryGetName()
-            {
-                if(ObjectItem != null)
-                {
-                    return ObjectItem.Name;
-                }
-                else if(Model?.object3D != null)
-                {
-                    return Model.object3D.Name;
-                }
-                else
-                {
-                    return null;
-                }
-            }
         }
     }
 }

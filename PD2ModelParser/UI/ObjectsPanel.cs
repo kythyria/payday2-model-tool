@@ -14,7 +14,7 @@ namespace PD2ModelParser.UI
     public partial class ObjectsPanel : UserControl
     {
         private readonly Dictionary<uint, TreeNode> nodes = new Dictionary<uint, TreeNode>();
-        private readonly Dictionary<TreeNode, ObjectOrModel> reverseNodes = new Dictionary<TreeNode, ObjectOrModel>();
+        private readonly Dictionary<TreeNode, Object3D> reverseNodes = new Dictionary<TreeNode, Object3D>();
         private readonly TreeNode root = new TreeNode("<root>");
         private readonly ContextMenu nodeRightclickMenu;
         private TreeNode menuTarget;
@@ -67,17 +67,7 @@ namespace PD2ModelParser.UI
             }
 
             // Make a list of all the Object3Ds and Models to include in the tree
-            List<ObjectOrModel> objs = new List<ObjectOrModel>();
-
-            objs.AddRange(data.parsed_sections.Values
-                .Select(a => a as Object3D)
-                .Where(a => a != null)
-                .Select(a => new ObjectOrModel(a)));
-
-            objs.AddRange(data.parsed_sections.Values
-                .Select(a => a as Model)
-                .Where(a => a != null)
-                .Select(a => new ObjectOrModel(a)));
+            List<Object3D> objs = data.SectionsOfType<Object3D>().ToList();
 
             // Make a set with all the IDs of the nodes currently in the tree. As we
             // walk through the objects in the file, we remove them from this set. After
@@ -94,7 +84,7 @@ namespace PD2ModelParser.UI
             // Walk through and create a node (if it does not already exist) for each object.
             // Do this before attaching them to their parents, as otherwise the parent might
             // not exist when we build one if it's children.
-            foreach (ObjectOrModel obj in objs)
+            foreach (Object3D obj in objs)
             {
                 if (!nodes.ContainsKey(obj.id))
                     nodes[obj.id] = new TreeNode();
@@ -102,17 +92,17 @@ namespace PD2ModelParser.UI
             }
 
             // Set each object's label, and move it to the correct parent if needed.
-            foreach (ObjectOrModel obj in objs)
+            foreach (Object3D obj in objs)
             {
                 TreeNode node = nodes[obj.id];
                 TreeNode parent = obj.parent == null ? root : nodes[obj.parent.id];
 
                 reverseNodes[node] = obj;
 
-                if (obj.model == null)
-                    node.Text = obj.obj.Name;
+                if (obj is Model)
+                    node.Text = obj.Name + " (model)";
                 else
-                    node.Text = obj.obj.Name + " (model)";
+                    node.Text = obj.Name;
 
                 if (node.Parent == parent) continue;
 
@@ -149,27 +139,6 @@ namespace PD2ModelParser.UI
             Reload();
         }
 
-        private class ObjectOrModel
-        {
-            public readonly Object3D obj;
-            public readonly Model model; // may be null
-
-            public uint id => obj.id;
-
-            public Object3D parent => obj.parent;
-
-            public ObjectOrModel(Object3D obj)
-            {
-                this.obj = obj;
-            }
-
-            public ObjectOrModel(Model model)
-            {
-                this.model = model;
-                this.obj = model.object3D;
-            }
-        }
-
         private void treeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             // Only process right clicks
@@ -186,10 +155,10 @@ namespace PD2ModelParser.UI
 
         private void optProperties_Click(object sender, EventArgs e)
         {
-            ObjectOrModel obj = reverseNodes[menuTarget];
+            Object3D obj = reverseNodes[menuTarget];
 
             // TODO actually show some useful information
-            MessageBox.Show(obj.obj.Name);
+            MessageBox.Show(obj.Name);
         }
     }
 }

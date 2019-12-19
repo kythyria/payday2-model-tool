@@ -67,7 +67,7 @@ namespace PD2ModelParser
 
                     model_i++;
 
-                    string model_id = model_i + "-" + model_data.object3D.hashname.String;
+                    string model_id = model_i + "-" + model_data.hashname.String;
 
                     PassthroughGP passthrough_section = (PassthroughGP) parsed_sections[model_data.passthroughGP_ID];
                     Geometry geometry_section = (Geometry) parsed_sections[passthrough_section.geometry_section];

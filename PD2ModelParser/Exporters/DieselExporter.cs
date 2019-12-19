@@ -50,13 +50,13 @@ namespace PD2ModelParser
                 {
                     material_group_sections.Add(section as Material_Group);
                 }
+                else if (section is Model) // Has to be before Object3D, since it's a subclass.
+                {
+                    model_sections.Add(section as Model);
+                }
                 else if (section is Object3D)
                 {
                     object3D_sections.Add(section as Object3D);
-                }
-                else if (section is Model)
-                {
-                    model_sections.Add(section as Model);
                 }
 
                 if (section is IHashContainer container)

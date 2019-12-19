@@ -170,7 +170,7 @@ namespace PD2ModelParser.Sections
 
         public override void StreamWriteData(BinaryWriter outstream)
         {
-            this.object3D.StreamWriteData(outstream);
+            base.StreamWriteData(outstream);
             outstream.Write(this.version);
             if (this.version == 6)
             {
@@ -223,7 +223,7 @@ namespace PD2ModelParser.Sections
         public override string ToString()
         {
             if (this.version == 6)
-                return "[Model_v6] ID: " + SectionId + " size: " + this.size + " Object3D: [ " + this.object3D + " ] version: " + this.version + " unknown5: " + this.bounds_min + " unknown6: " + this.bounds_max + " unknown7: " + this.v6_unknown7 + " unknown8: " + this.v6_unknown8 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+                return "[Model_v6] ID: " + SectionId + " size: " + this.size + " Object3D: [ " + base.ToString() + " ] version: " + this.version + " unknown5: " + this.bounds_min + " unknown6: " + this.bounds_max + " unknown7: " + this.v6_unknown7 + " unknown8: " + this.v6_unknown8 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             else
             {
                 StringBuilder items_builder = new StringBuilder();
@@ -234,7 +234,7 @@ namespace PD2ModelParser.Sections
                     first = false;
                 }
 
-                return "[Model] ID: " + SectionId + " size: " + this.size + " Object3D: [ " + this.object3D + " ] version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " count: " + this.count + " items: [" + items_builder + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " unknown12: " + this.unknown12 + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+                return "[Model] ID: " + SectionId + " size: " + this.size + " Object3D: [ " + base.ToString() + " ] version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " count: " + this.count + " items: [" + items_builder + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " unknown12: " + this.unknown12 + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             }
         }
 

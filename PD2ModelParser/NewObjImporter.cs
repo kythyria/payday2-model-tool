@@ -200,12 +200,12 @@ namespace PD2ModelParser
                             UInt64 tryp;
                             if (UInt64.TryParse(obj.object_name, out tryp))
                             {
-                                if (tryp == ((Model)pair.Value).object3D.hashname.Hash)
+                                if (tryp == ((Model)pair.Value).hashname.Hash)
                                     modelSectionid = pair.Key;
                             }
                             else
                             {
-                                if (Hash64.HashString(obj.object_name) == ((Model)pair.Value).object3D.hashname.Hash)
+                                if (Hash64.HashString(obj.object_name) == ((Model)pair.Value).hashname.Hash)
                                     modelSectionid = pair.Key;
                             }
                         }
@@ -680,12 +680,12 @@ namespace PD2ModelParser
                             UInt64 tryp;
                             if (UInt64.TryParse(obj.object_name, out tryp))
                             {
-                                if (tryp == ((Model)pair.Value).object3D.hashname.Hash)
+                                if (tryp == ((Model)pair.Value).hashname.Hash)
                                     modelSectionid = pair.Key;
                             }
                             else
                             {
-                                if (Hash64.HashString(obj.object_name) == ((Model)pair.Value).object3D.hashname.Hash)
+                                if (Hash64.HashString(obj.object_name) == ((Model)pair.Value).hashname.Hash)
                                     modelSectionid = pair.Key;
                             }
                         }
