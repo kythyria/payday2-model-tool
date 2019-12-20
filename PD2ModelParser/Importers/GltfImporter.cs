@@ -171,16 +171,20 @@ namespace PD2ModelParser.Importers
 
             var ms = new MeshSections();
             ms.matg = matGroup;
-            ms.geom = new DM.Geometry((uint)(gmesh.Name + ".geom").GetHashCode());
-            ms.topo = new DM.Topology((uint)(gmesh.Name + ".Topology").GetHashCode(), gmesh.Name);
-            ms.topoip = new DM.TopologyIP((uint)(gmesh.Name + ".topoIP").GetHashCode(), ms.topo);
-            ms.passgp = new DM.PassthroughGP((uint)(gmesh.Name + ".passGP").GetHashCode(), ms.geom, ms.topo);
-            ms.atoms = md.renderAtoms;
 
+            ms.geom = new DM.Geometry((uint)(gmesh.Name + ".geom").GetHashCode());
             data.AddSection(ms.geom);
+
+            ms.topo = new DM.Topology((uint)(gmesh.Name + ".Topology").GetHashCode(), gmesh.Name);
             data.AddSection(ms.topo);
+
+            ms.topoip = new DM.TopologyIP((uint)(gmesh.Name + ".topoIP").GetHashCode(), ms.topo);
             data.AddSection(ms.topoip);
+
+            ms.passgp = new DM.PassthroughGP((uint)(gmesh.Name + ".passGP").GetHashCode(), ms.geom, ms.topo);
             data.AddSection(ms.passgp);
+
+            ms.atoms = md.renderAtoms;
 
             ms.PopulateFromMeshData(md);
 
