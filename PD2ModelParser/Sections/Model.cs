@@ -32,7 +32,6 @@ namespace PD2ModelParser.Sections
         //Other Versions
         public UInt32 passthroughGP_ID; //ID of associated PassthroughGP
         public UInt32 topologyIP_ID; //ID of associated TopologyIP
-        public UInt32 count;
         public List<RenderAtom> renderAtoms = new List<RenderAtom>();
         //public UInt32 unknown9;
         public UInt32 material_group_section_id;
@@ -55,7 +54,6 @@ namespace PD2ModelParser.Sections
             this.version = 3;
             this.passthroughGP_ID = passGP.id;
             this.topologyIP_ID = topoIP.id;
-            this.count = 1;
             this.renderAtoms = new List<RenderAtom>();
             RenderAtom nmi = new RenderAtom();
             nmi.unknown1 = 0;
@@ -110,9 +108,9 @@ namespace PD2ModelParser.Sections
             {
                 this.passthroughGP_ID = instream.ReadUInt32();
                 this.topologyIP_ID = instream.ReadUInt32();
-                this.count = instream.ReadUInt32();
+                var renderAtomCount = instream.ReadUInt32();
 
-                for (int x = 0; x < this.count; x++)
+                for (int x = 0; x < renderAtomCount; x++)
                 {
                     RenderAtom item = new RenderAtom();
                     item.unknown1 = instream.ReadUInt32();
@@ -187,7 +185,7 @@ namespace PD2ModelParser.Sections
             {
                 outstream.Write(this.passthroughGP_ID);
                 outstream.Write(this.topologyIP_ID);
-                outstream.Write(this.count);
+                outstream.Write((uint)this.renderAtoms.Count);
                 foreach (RenderAtom modelitem in this.renderAtoms)
                 {
                     outstream.Write(modelitem.unknown1);
@@ -234,7 +232,7 @@ namespace PD2ModelParser.Sections
                     first = false;
                 }
 
-                return "[Model] ID: " + SectionId + " size: " + this.size + " Object3D: [ " + base.ToString() + " ] version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " count: " + this.count + " items: [" + items_builder + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " unknown12: " + this.unknown12 + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+                return "[Model] ID: " + SectionId + " size: " + this.size + " Object3D: [ " + base.ToString() + " ] version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " RenderAtoms: " + this.renderAtoms.Count + " items: [" + items_builder + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " unknown12: " + this.unknown12 + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             }
         }
 
