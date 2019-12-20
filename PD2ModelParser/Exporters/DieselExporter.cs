@@ -86,13 +86,18 @@ namespace PD2ModelParser
                         author_sec.StreamWrite(bw);
                     }
 
+                    var writtenMaterials = new HashSet<uint>();
                     foreach (Material_Group mat_group_sec in material_group_sections)
                     {
                         mat_group_sec.StreamWrite(bw);
                         foreach (uint id in mat_group_sec.items)
                         {
                             if (data.parsed_sections.Keys.Contains(id))
-                                (data.parsed_sections[id] as Material).StreamWrite(bw);
+                                if (!writtenMaterials.Contains(id))
+                                {
+                                    (data.parsed_sections[id] as Material).StreamWrite(bw);
+                                    writtenMaterials.Add(id);
+                                }
                         }
                     }
 

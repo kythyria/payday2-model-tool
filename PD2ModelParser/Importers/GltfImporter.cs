@@ -325,7 +325,7 @@ namespace PD2ModelParser.Importers
                         vertCount = (uint)prim.IndexAccessor.Count,
                         faceCount = (uint)ms.faces.Count,
                         unknown1 = currentBaseFace,
-                        material_id = (uint)ms.materials.IndexOf(prim.Material.Name)
+                        material_id = (uint)ms.materials.IndexOf(prim.Material?.Name ?? "Material: Default Material")
                     };
                     ms.renderAtoms.Add(ra);
 
