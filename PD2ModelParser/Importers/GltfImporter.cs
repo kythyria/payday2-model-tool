@@ -64,13 +64,37 @@ namespace PD2ModelParser.Importers
 
             if (obj == null)
             {
-                if (createModels)
+                if (createModels && node.Mesh == null)
                 {
                     obj = new DM.Object3D(hashname.String, parent);
+                }
+                else if (createModels && node.Mesh != null)
+                {
+                    obj = CreateNewModel(node.Mesh, node.Name);
                 }
                 else
                 {
                     throw new Exception($"Object {node.Name} does not already exist and object creation is disabled.");
+                }
+                data.AddSection(obj);
+            }
+            else
+            {
+                if(node.Mesh != null && !(obj is DM.Model))
+                {
+                    if(!createModels)
+                    {
+                        throw new Exception($"Object {node.Name} already exists, isn't a model, and object creation is disabled.");
+                    }
+                    var newObj = CreateNewModel(node.Mesh, node.Name);
+                    foreach(var i in obj.children)
+                    {
+                        i.SetParent(newObj);
+                    }
+                }
+                else if (node.Mesh != null && obj is DM.Model)
+                {
+                    OverwriteModel(node.Mesh, obj as DM.Model);
                 }
             }
 
@@ -88,20 +112,14 @@ namespace PD2ModelParser.Importers
                 obj.rotation = node.LocalTransform.Matrix.ToNexusMatrix();
             }
 
-            if (node.Mesh != null)
-            {
-                AddOrOverwriteMesh(node.Mesh, obj);
-            }
-
             foreach(var child in node.VisualChildren)
             {
                 ImportNode(child, obj);
             }
         }
 
-        void AddOrOverwriteMesh(GLTF.Mesh gmesh, DM.Object3D obj)
+        void OverwriteModel(GLTF.Mesh gmesh, DM.Model model)
         {
-            var model = data.SectionsOfType<DM.Model>().Where(i => i.object3D == obj).FirstOrDefault();
             var md = MeshData.FromGltfMesh(gmesh);
 
             var mats = md.materials.Select(i =>
@@ -116,34 +134,60 @@ namespace PD2ModelParser.Importers
                 return mat;
             }).ToList();
 
-            DM.Material_Group matgroup = null;
-            if(model != null)
+            var matGroup = new DM.Material_Group((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats.Select(i => i.id));
+            data.AddSection(matGroup);
+
+            var ms = new MeshSections();
+            ms.matg = matGroup;
+            ms.topoip = data.parsed_sections[model.topologyIP_ID] as DM.TopologyIP;
+            ms.passgp = data.parsed_sections[model.passthroughGP_ID] as DM.PassthroughGP;
+            ms.geom = data.parsed_sections[ms.passgp.SectionId] as DM.Geometry;
+            ms.topo = data.parsed_sections[ms.topoip.SectionId] as DM.Topology;
+            ms.atoms = md.renderAtoms;
+
+            ms.PopulateFromMeshData(md);
+
+            model.renderAtoms = md.renderAtoms;
+        }
+
+        DM.Model CreateNewModel(GLTF.Mesh gmesh, string name)
+        {
+            var md = MeshData.FromGltfMesh(gmesh);
+
+            var mats = md.materials.Select(i =>
             {
-                if(data.parsed_sections.ContainsKey(model.material_group_section_id))
+                var hn = GetName(i);
+                var mat = data.SectionsOfType<DM.Material>().FirstOrDefault(j => j.hashname.Hash == hn.Hash);
+                if (mat == null)
                 {
-                    var existingMatgroup = data.parsed_sections[model.material_group_section_id] as DM.Material_Group;
-                    var matches = existingMatgroup.items.Zip(mats.Select(i => i.id), (x, y) => x == y).All(i => i);
-                    if(matches)
-                    {
-                        matgroup = existingMatgroup;
-                    }
+                    mat = new DM.Material((uint)(i + ".mat").GetHashCode(), i);
+                    data.AddSection(mat);
                 }
-            }
+                return mat;
+            }).ToList();
 
-            if(matgroup == null)
-            {
-                var matGroup = new DM.Material_Group((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats.Select(i => i.id));
-                data.AddSection(matGroup);
-            }
+            var matGroup = new DM.Material_Group((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats.Select(i => i.id));
+            data.AddSection(matGroup);
 
-            if (model != null)
-            {
-            }
-            else
-            {
+            var ms = new MeshSections();
+            ms.matg = matGroup;
+            ms.geom = new DM.Geometry((uint)(gmesh.Name + ".geom").GetHashCode());
+            ms.topo = new DM.Topology((uint)(gmesh.Name + ".Topology").GetHashCode(), gmesh.Name);
+            ms.topoip = new DM.TopologyIP((uint)(gmesh.Name + ".topoIP").GetHashCode(), ms.topo);
+            ms.passgp = new DM.PassthroughGP((uint)(gmesh.Name + ".passGP").GetHashCode(), ms.geom, ms.topo);
+            ms.atoms = md.renderAtoms;
 
+            data.AddSection(ms.geom);
+            data.AddSection(ms.topo);
+            data.AddSection(ms.topoip);
+            data.AddSection(ms.passgp);
 
-            }
+            ms.PopulateFromMeshData(md);
+
+            var model = new DM.Model(name, (uint)ms.geom.verts.Count, (uint)ms.topo.facelist.Count, ms.passgp, ms.topoip, ms.matg, null);
+            model.renderAtoms = md.renderAtoms;
+
+            return model;
         }
 
         HashName GetName(string input)
@@ -164,8 +208,39 @@ namespace PD2ModelParser.Importers
             public DM.Topology topo;
             public DM.TopologyIP topoip;
             public DM.PassthroughGP passgp;
+            public DM.Material_Group matg;
             public List<DM.RenderAtom> atoms = new List<DM.RenderAtom>();
-            public List<DM.Material> materials = new List<DM.Material>();
+
+            public void PopulateFromMeshData(MeshData md)
+            {
+                geom.headers.Clear();
+
+                // Have to specify conv, as the type inference isn't smart enough to figure that out.
+                void AddToGeom<TS,TD>(ref List<TD> dest, uint size, DM.GeometryChannelTypes ct, IList<TS> src, Func<TS,TD> conv)
+                {
+                    if(src.Count > 0)
+                    {
+                        geom.headers.Add(new DM.GeometryHeader(size, ct));
+                        dest = src.Select(conv).ToList();
+                    }
+                }
+
+                AddToGeom(ref geom.verts, 3, DM.GeometryChannelTypes.POSITION, md.verts, MathUtil.ToNexusVector);
+                AddToGeom(ref geom.normals, 3, DM.GeometryChannelTypes.NORMAL0, md.normals, MathUtil.ToNexusVector);
+                AddToGeom(ref geom.binormals, 3, DM.GeometryChannelTypes.BINORMAL0, md.binormals, MathUtil.ToNexusVector);
+                AddToGeom(ref geom.tangents, 3, DM.GeometryChannelTypes.TANGENT0, md.tangents, MathUtil.ToNexusVector);
+                AddToGeom(ref geom.vertex_colors, 3, DM.GeometryChannelTypes.COLOR0, md.vertex_colors, i => i);
+                for(var i = 0; i < md.uvs.Length; i++)
+                {
+                    var ct = (DM.GeometryChannelTypes)((int)DM.GeometryChannelTypes.TEXCOORD0 + i);
+                    AddToGeom(ref geom.UVs[i], 2, ct, md.uvs[i], MathUtil.ToNexusVector);
+                }
+
+                geom.vert_count = (uint)geom.verts.Count;
+
+                topo.facelist = md.faces;
+            }
+
         }
 
         public class MeshData
@@ -262,17 +337,20 @@ namespace PD2ModelParser.Importers
 
             static IEnumerable<Vertex> GetVerticesFromPrimitive(GLTF.MeshPrimitive prim)
             {
-                var pos = prim.GetVertexAccessor("POSITON");
-                var result = pos.AsVector3Array().Select((p, idx) => new Vertex { pos = p });
+                var pos = prim.VertexAccessors["POSITION"];
+                //pos = prim.GetVertexAccessor("POSITON");
+                var result = pos.AsVector3Array().Select((p, idx) => {
+                    return new Vertex { pos = p };
+                });
 
-                var normal = prim.GetVertexAccessor("NORMAL");
+                prim.VertexAccessors.TryGetValue("NORMAL", out var normal);
                 if (normal != null && normal.Count > 0)
                 {
                     var na = normal.AsVector3Array();
                     result = result.Select((vtx, idx) => { vtx.normal = na[idx]; return vtx; });
                 }
 
-                var tangent = prim.GetVertexAccessor("TANGENT");
+                prim.VertexAccessors.TryGetValue("TANGENT", out var tangent);
                 if (tangent != null && tangent.Count > 0)
                 {
                     var ta = tangent.AsVector4Array();
@@ -288,7 +366,7 @@ namespace PD2ModelParser.Importers
                     });
                 }
 
-                var vcols = prim.GetVertexAccessor("COLOR_0");
+                prim.VertexAccessors.TryGetValue("COLOR_0", out var vcols);
                 if (vcols != null && vcols.Count > 0)
                 {
                     if (vcols.Dimensions == GLTF.DimensionType.VEC4)
@@ -306,11 +384,12 @@ namespace PD2ModelParser.Importers
 
                 for (int i = 0; i < 8; i++)
                 {
-                    var uvs = prim.GetVertexAccessor($"TEXCOORD_{i}");
+                    var ii = i; // Closures capture by reference, and i is declared outside the loop body in for.
+                    prim.VertexAccessors.TryGetValue($"TEXCOORD_{ii}", out var uvs);
                     if (uvs != null && uvs.Count > 0)
                     {
                         var uva = uvs.AsVector2Array();
-                        result = result.Select((vtx, idx) => { vtx.uv[i] = uva[idx]; return vtx; });
+                        result = result.Select((vtx, idx) => { vtx.uv[ii] = uva[idx]; return vtx; });
                     }
                 }
 

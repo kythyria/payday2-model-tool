@@ -8,6 +8,13 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
+    [Flags]
+    public enum ModelProperties : uint
+    {
+        CastShadows = 0x00000001,
+        HasOpacity = 0x00000004
+    }
+
     public class RenderAtom
     {
         public UInt32 unknown1;
@@ -24,7 +31,7 @@ namespace PD2ModelParser.Sections
     
     class Model : Object3D, ISection, IPostLoadable, IHashContainer
     {
-        public Object3D object3D;
+        public Object3D object3D => this as Object3D;
         public UInt32 version;
         //Version 6
         public UInt32 v6_unknown7;
@@ -43,37 +50,32 @@ namespace PD2ModelParser.Sections
         public UInt32 unknown13;
         public UInt32 skinbones_ID;
 
-        public Model(obj_data obj, PassthroughGP passGP, TopologyIP topoIP, Material_Group matg, Object3D parent)
-            : base(obj.object_name, parent)
+        public Model(string object_name, uint vertCount, uint faceCount, PassthroughGP passGP, TopologyIP topoIP, Material_Group matg, Object3D parent)
+            : base(object_name, parent)
         {
-            this.object3D = this as Object3D;
-
             this.size = 0;
-            SectionId = (uint)obj.object_name.GetHashCode();
+            SectionId = (uint)object_name.GetHashCode();
 
             this.version = 3;
             this.passthroughGP_ID = passGP.id;
             this.topologyIP_ID = topoIP.id;
             this.renderAtoms = new List<RenderAtom>();
-            RenderAtom nmi = new RenderAtom();
-            nmi.unknown1 = 0;
-            nmi.vertCount = (uint)obj.verts.Count; //vert count
-            nmi.baseVertex = 0;
-            nmi.faceCount = (uint)obj.faces.Count; //face count
-            nmi.material_id = 0;
-            
+            RenderAtom nmi = new RenderAtom
+            {
+                unknown1 = 0,
+                vertCount = vertCount, //vert count
+                baseVertex = 0,
+                faceCount = faceCount, //face count
+                material_id = 0
+            };
 
             this.renderAtoms.Add(nmi);
 
             //this.unknown9 = 0;
             this.material_group_section_id = matg.id;
             this.lightset_ID = 0;
-            this.bounds_min.Z = 0.0f;
-            this.bounds_min.X = 0.0f;
-            this.bounds_min.Y = 0.0f;
-            this.bounds_max.Z = 0.0f;
-            this.bounds_max.X = 0.0f;
-            this.bounds_max.Y = 0.0f;
+            this.bounds_min = new Vector3D(0, 0, 0);
+            this.bounds_max = new Vector3D(0, 0, 0);
             this.properties_bitmap = 0;
             this.unknown12 = 1;
             this.unknown13 = 6;
@@ -81,11 +83,12 @@ namespace PD2ModelParser.Sections
 
         }
 
+        public Model(obj_data obj, PassthroughGP passGP, TopologyIP topoIP, Material_Group matg, Object3D parent)
+            : this(obj.object_name, (uint)obj.verts.Count, (uint)obj.faces.Count, passGP, topoIP, matg, parent) { }
+
         public Model(BinaryReader instream, SectionHeader section)
             : base(instream)
         {
-            this.object3D = this as Object3D;
-
             this.size = section.size;
             SectionId = section.id;
 
