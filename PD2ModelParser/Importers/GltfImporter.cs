@@ -289,7 +289,7 @@ namespace PD2ModelParser.Importers
                 }
 
                 var ms = new MeshData();
-                ms.materials = mesh.Primitives.Select(i => i.Material?.Name).Distinct().ToList();
+                ms.materials = mesh.Primitives.Select(i => i.Material?.Name ?? "Material: Default Material").Distinct().ToList();
 
                 if (ms.materials.Contains(null))
                 {

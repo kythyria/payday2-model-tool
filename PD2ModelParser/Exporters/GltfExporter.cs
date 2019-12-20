@@ -91,7 +91,10 @@ namespace PD2ModelParser.Exporters
                 }
 
                 prim.SetIndexAccessor(indexAccessor);
-                prim.Material = material;
+                if (material.Name != "Material: Default Material")
+                {
+                    prim.Material = material;
+                }
             }
 
             return mesh;
