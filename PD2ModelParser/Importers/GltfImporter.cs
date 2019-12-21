@@ -173,6 +173,7 @@ namespace PD2ModelParser.Importers
             ms.matg = matGroup;
 
             ms.geom = new DM.Geometry((uint)(gmesh.Name + ".geom").GetHashCode());
+            ms.geom.hashname = Hash64.HashString(gmesh.Name + ".Geometry");
             data.AddSection(ms.geom);
 
             ms.topo = new DM.Topology((uint)(gmesh.Name + ".Topology").GetHashCode(), gmesh.Name);

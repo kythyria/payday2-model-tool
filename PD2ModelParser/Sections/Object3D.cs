@@ -11,7 +11,7 @@ namespace PD2ModelParser.Sections
         public UInt32 size;
 
         public HashName hashname; //Hashed object root point name (see hashlist.txt)
-        private List<uint> child_ids = new List<uint>();
+        private List<uint> child_ids = new List<uint>(); // This is NOT a list of Object3Ds (or Models). Maybe animation related?
         private Matrix3D _rotation = new Matrix3D(); // 4x4 transform matrix - for translation/scale too
 
         public Matrix3D rotation
@@ -45,10 +45,8 @@ namespace PD2ModelParser.Sections
             if(oldParent != null)
             {
                 oldParent.children.Remove(this);
-                oldParent.child_ids.Remove(this.id);
             }
             newParent.children.Add(this);
-            newParent.child_ids.Add(this.id);
             parent = newParent;
         }
 
