@@ -11,7 +11,7 @@ cat << EOD > AssemblyInfo.cs
 //
 EOD
 
-if [ "$1" == "Release" ]; then
+if [[ "$1" =~ "Release" ]]; then
 	VER=`git describe --dirty=-modified`
 	if [[ $VER =~ v([0-9]+\.[0-9]+\.[0-9]+) ]]; then
 		VPRE=${BASH_REMATCH[1]}
