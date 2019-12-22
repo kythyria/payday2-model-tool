@@ -30,14 +30,13 @@ namespace PD2ModelParser.UI
                 exportBttn.Enabled = false;
                 return;
             }
-
-            model = ModelReader.Open(inputFileBox.Selected);
-
             exportBttn.Enabled = true;
         }
 
         private void exportBttn_Click(object sender, EventArgs e)
         {
+            model = ModelReader.Open(inputFileBox.Selected);
+
             string format = (string)formatBox.SelectedItem;
 
             string result;

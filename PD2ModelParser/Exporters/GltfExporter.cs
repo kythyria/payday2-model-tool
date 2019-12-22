@@ -14,7 +14,7 @@ namespace PD2ModelParser.Exporters
         {
             var exporter = new GltfExporter();
             var gltfmodel = exporter.Convert(data);
-            gltfmodel.SaveGLB(path);
+            gltfmodel.SaveGLTF(path, Newtonsoft.Json.Formatting.Indented);
 
             return path;
         }
@@ -43,7 +43,7 @@ namespace PD2ModelParser.Exporters
                 CreateNodeFromObject3D(i, scene);
             }
 
-            root.MergeBuffers();
+            //root.MergeBuffers();
 
             return root;
         }
@@ -117,7 +117,7 @@ namespace PD2ModelParser.Exporters
 
             foreach (var ra in atoms)
             {
-                var atom_mai = new MemoryAccessInfo($"indices_{topo.hashname}_{atomcount++}", (int)ra.baseVertex*2, (int)ra.vertCount*3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
+                var atom_mai = new MemoryAccessInfo($"indices_{topo.hashname}_{atomcount++}", (int)ra.baseVertex*2, (int)ra.vertCount, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
                 var atom_ma = new MemoryAccessor(buf, atom_mai);
                 var accessor = root.CreateAccessor();
                 accessor.SetIndexData(atom_ma);

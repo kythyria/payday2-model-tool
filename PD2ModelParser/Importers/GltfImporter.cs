@@ -201,8 +201,14 @@ namespace PD2ModelParser.Importers
         {
             if (positions.Count == 0) { return; }
 
-            mod.bounds_min = positions.Aggregate(positions[0], Vector3.Min).ToNexusVector();
-            mod.bounds_max = positions.Aggregate(positions[0], Vector3.Max).ToNexusVector();
+            mod.UpdateTransforms();
+
+            var transform = mod.world_transform.ToMatrix4x4();
+            var worldverts = positions.Select(i => Vector3.Transform(i, transform)).ToList();
+
+
+            mod.bounds_min = worldverts.Aggregate(positions[0], Vector3.Min).ToNexusVector();
+            mod.bounds_max = worldverts.Aggregate(positions[0], Vector3.Max).ToNexusVector();
         }
 
         HashName GetName(string input)
@@ -311,25 +317,25 @@ namespace PD2ModelParser.Importers
                     throw new Exception($"Missing material in mesh {mesh.Name}");
                 }
 
-                var indicesByVertex = new Dictionary<Vertex, int>();
                 uint currentBaseVertex = 0;
                 uint currentBaseFace = 0;
                 foreach (var prim in mesh.Primitives)
                 {
+                    //var indicesByVertex = new Dictionary<Vertex, int>();
                     var vertices = GetVerticesFromPrimitive(prim).ToList();
                     foreach (var vtx in vertices)
                     {
-                        if (indicesByVertex.ContainsKey(vtx)) { continue; }
-                        indicesByVertex[vtx] = ms.AppendVertex(vtx);
+                        //if (indicesByVertex.ContainsKey(vtx)) { continue; }
+                        /*indicesByVertex[vtx] =*/ ms.AppendVertex(vtx);
                     }
 
                     foreach (var (A, B, C) in prim.GetTriangleIndices())
                     {
                         var face = new DM.Face
                         {
-                            a = (ushort)indicesByVertex[vertices[A]],
-                            b = (ushort)indicesByVertex[vertices[B]],
-                            c = (ushort)indicesByVertex[vertices[C]],
+                            a = (ushort)(currentBaseVertex + A),// indicesByVertex[vertices[A]],
+                            b = (ushort)(currentBaseVertex + B),// indicesByVertex[vertices[B]],
+                            c = (ushort)(currentBaseVertex + C),// indicesByVertex[vertices[C]],
                         };
                         ms.faces.Add(face);
                     }
@@ -337,8 +343,8 @@ namespace PD2ModelParser.Importers
                     var ra = new DM.RenderAtom
                     {
                         baseVertex = currentBaseVertex,
-                        vertCount = (uint)prim.IndexAccessor.Count,
-                        faceCount = (uint)ms.faces.Count,
+                        vertCount = (uint)ms.faces.Count,
+                        faceCount = (uint)ms.verts.Count,
                         unknown1 = currentBaseFace,
                         material_id = (uint)ms.materials.IndexOf(prim.Material?.Name ?? "Material: Default Material")
                     };
@@ -404,7 +410,7 @@ namespace PD2ModelParser.Importers
                     if (uvs != null && uvs.Count > 0)
                     {
                         var uva = uvs.AsVector2Array();
-                        result = result.Select((vtx, idx) => { vtx.uv[ii] = uva[idx]; return vtx; });
+                        result = result.Select((vtx, idx) => { vtx.uv[ii] = new Vector2(uva[idx].X, 1-uva[idx].Y); return vtx; });
                     }
                 }
 
