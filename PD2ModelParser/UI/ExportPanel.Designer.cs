@@ -74,7 +74,7 @@
             "Object (.obj)",
             "Collada (.dae)",
             "Filmbox (.fbx)",
-            "glTF (.glb)"});
+            "glTF (.gltf)"});
             this.formatBox.Location = new System.Drawing.Point(70, 36);
             this.formatBox.Name = "formatBox";
             this.formatBox.Size = new System.Drawing.Size(353, 21);

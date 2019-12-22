@@ -47,6 +47,18 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseNoFBX|AnyCPU'">
+    <OutputPath>bin\ReleaseNoFBX\</OutputPath>
+    <DefineConstants>TRACE;NO_FBX</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="FbxNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="!$(DefineConstants.Contains('NO_FBX'))">
       <HintPath>../Libs/FbxNet.dll</HintPath>

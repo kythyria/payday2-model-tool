@@ -3,4 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <StartArguments>&gt;&gt; debugout.txt</StartArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseNoFBX|AnyCPU'">
+    <StartArguments>&gt;&gt; debugout.txt</StartArguments>
+  </PropertyGroup>
 </Project>
