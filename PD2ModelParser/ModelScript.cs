@@ -352,7 +352,7 @@ namespace PD2ModelParser
                     break;
 #endif
                 case "gltf":
-                    GltfImporter.Import(data, file, create_objects, ParentFinder);
+                    GltfImporter.Import(data, file, create_objects, name => object_rootpoints.ContainsKey(name) ? object_rootpoints[name] : default_rootpoint);
                     break;
                 default:
                     throw new NotImplementedException($"Cannot import file with type '{type}', "

@@ -36,19 +36,6 @@ namespace PD2ModelParser.UI
             exportBttn.Enabled = true;
         }
 
-        private void rootPoint_combobox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //MessageBox.Show("root_point configuration temporarally unavailable");
-            //if (Form1.fm.updateRP(this.rootPoint_combobox.Text))
-            //{
-            //    MessageBox.Show("Set model root_point successfully");
-            //    return;
-            //}
-            //MessageBox.Show("Failed setting model root_point!");
-
-            model = ModelReader.Open(inputFileBox.Selected);
-        }
-
         private void exportBttn_Click(object sender, EventArgs e)
         {
             string format = (string)formatBox.SelectedItem;

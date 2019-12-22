@@ -28,8 +28,8 @@ Importing is designed so you don't need a modelscript so much:
   (this may break animations).
 * Models with the same name as an existing *model* have their model data replaced.
 * Objects with a parent in the glTF file always keep that parent on import.
-* Objects with no parent in the glTF file are parented according to the modelscript, *except* that if you don't
-  specify a parent it'll become a root object.
+* Objects with no parent in the glTF file are parented according to the modelscript, except that not specifying a
+  rootpoint at all isn't an error.
 
 # Licence:
 
