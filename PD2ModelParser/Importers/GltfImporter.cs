@@ -201,14 +201,8 @@ namespace PD2ModelParser.Importers
         {
             if (positions.Count == 0) { return; }
 
-            mod.UpdateTransforms();
-
-            var transform = mod.world_transform.ToMatrix4x4();
-            var worldverts = positions.Select(i => Vector3.Transform(i, transform)).ToList();
-
-
-            mod.bounds_min = worldverts.Aggregate(positions[0], Vector3.Min).ToNexusVector();
-            mod.bounds_max = worldverts.Aggregate(positions[0], Vector3.Max).ToNexusVector();
+            mod.bounds_min = positions.Aggregate(positions[0], Vector3.Min).ToNexusVector();
+            mod.bounds_max = positions.Aggregate(positions[0], Vector3.Max).ToNexusVector();
         }
 
         HashName GetName(string input)
