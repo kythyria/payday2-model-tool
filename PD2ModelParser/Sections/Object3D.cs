@@ -184,7 +184,7 @@ namespace PD2ModelParser.Sections
             hashlist.Hint(hashname);
         }
 
-        public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)
+        public void PostLoad(uint id, Dictionary<uint, ISection> parsed_sections)
         {
             if (loading_parent_id == 0)
             {

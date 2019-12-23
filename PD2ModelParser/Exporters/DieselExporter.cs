@@ -41,7 +41,7 @@ namespace PD2ModelParser
                     continue;
                 }
 
-                ISection section = data.parsed_sections[sectionheader.id] as ISection;
+                var section = data.parsed_sections[sectionheader.id];
 
                 if (section is Animation)
                 {
@@ -55,7 +55,7 @@ namespace PD2ModelParser
                 {
                     foreach(var matid in (section as Material_Group).items)
                     {
-                        var matsec = data.parsed_sections[matid] as ISection;
+                        var matsec = data.parsed_sections[matid];
                         if(!material_sections.Contains(matsec))
                         {
                             material_sections.Add(matsec);

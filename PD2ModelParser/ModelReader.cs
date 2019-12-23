@@ -92,7 +92,7 @@ namespace PD2ModelParser
         private static void Read(FullModelData data, string filepath)
         {
             List<SectionHeader> sections = data.sections;
-            Dictionary<UInt32, object> parsed_sections = data.parsed_sections;
+            Dictionary<UInt32, ISection> parsed_sections = data.parsed_sections;
 
             using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
             {
@@ -103,7 +103,7 @@ namespace PD2ModelParser
 
                     foreach (SectionHeader sh in sections)
                     {
-                        object section = new object();
+                        ISection section;
 
                         fs.Position = sh.Start;
 

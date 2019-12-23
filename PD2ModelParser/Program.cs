@@ -321,7 +321,7 @@ namespace PD2ModelParser
             if (root_point == null)
                 return 0;
 
-            foreach (object section in data.parsed_sections.Values)
+            foreach (var section in data.parsed_sections.Values)
             {
                 if (!(section is Object3D obj))
                     continue;

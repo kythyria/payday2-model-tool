@@ -31,7 +31,7 @@ namespace PD2ModelParser
         private static void GenerateOutputInfo(FullModelData data, string path)
         {
             List<SectionHeader> sections = data.sections;
-            Dictionary<UInt32, object> parsed_sections = data.parsed_sections;
+            Dictionary<UInt32, ISection> parsed_sections = data.parsed_sections;
             byte[] leftover_data = data.leftover_data;
 
             //Generate outinfo.txt - Used for research and debug purposes
@@ -220,7 +220,7 @@ namespace PD2ModelParser
         private static void ExportObj(FullModelData data, string path)
         {
             List<SectionHeader> sections = data.sections;
-            Dictionary<UInt32, object> parsed_sections = data.parsed_sections;
+            Dictionary<UInt32, ISection> parsed_sections = data.parsed_sections;
             byte[] leftover_data = data.leftover_data;
 
             //Generate obj
@@ -324,7 +324,7 @@ namespace PD2ModelParser
         private static void ExportPatternUVObj(FullModelData data, string path)
         {
             List<SectionHeader> sections = data.sections;
-            Dictionary<UInt32, object> parsed_sections = data.parsed_sections;
+            Dictionary<UInt32, ISection> parsed_sections = data.parsed_sections;
             byte[] leftover_data = data.leftover_data;
 
             //Generate obj

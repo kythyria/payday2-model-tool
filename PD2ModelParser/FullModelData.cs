@@ -13,7 +13,7 @@ namespace PD2ModelParser
     public class FullModelData
     {
         public List<SectionHeader> sections = new List<SectionHeader>();
-        public Dictionary<UInt32, object> parsed_sections = new Dictionary<UInt32, object>();
+        public Dictionary<UInt32, ISection> parsed_sections = new Dictionary<UInt32, ISection>();
         public byte[] leftover_data = null;
 
         /// <summary>

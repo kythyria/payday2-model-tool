@@ -54,7 +54,7 @@ namespace PD2ModelParser.Importers
             this.data = data;
             _options = options;
 
-            foreach (object item in data.parsed_sections.Values)
+            foreach (var item in data.parsed_sections.Values)
             {
                 if (item is Model m)
                 {
@@ -148,7 +148,7 @@ namespace PD2ModelParser.Importers
                 model = CreateEmptyMesh(parent, name);
             }
 
-            Dictionary<uint, object> parsed = data.parsed_sections;
+            Dictionary<uint, ISection> parsed = data.parsed_sections;
             PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
             Geometry geom = (Geometry) parsed[pgp.geometry_section];
             Topology topo = (Topology) parsed[pgp.topology_section];

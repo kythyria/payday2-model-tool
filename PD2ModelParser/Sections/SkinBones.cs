@@ -114,7 +114,7 @@ namespace PD2ModelParser.Sections
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
-        public void PostLoad(uint id, Dictionary<uint, object> parsed_sections)
+        public void PostLoad(uint id, Dictionary<uint, ISection> parsed_sections)
         {
             SkinPositions = new List<Matrix3D>(count);
 

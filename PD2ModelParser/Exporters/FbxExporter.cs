@@ -58,7 +58,7 @@ namespace PD2ModelParser.Exporters
         {
             // Find all the Object3Ds that are actually part of an object
             HashSet<Object3D> model_objects = new HashSet<Object3D>();
-            foreach (object obj in data.parsed_sections.Values)
+            foreach (var obj in data.parsed_sections.Values)
             {
                 if (!(obj is Model m))
                     continue;
@@ -122,7 +122,7 @@ namespace PD2ModelParser.Exporters
 
         private static ModelInfo AddModel(FullModelData data, Model model)
         {
-            Dictionary<uint, object> parsed = data.parsed_sections;
+            Dictionary<uint, ISection> parsed = data.parsed_sections;
             PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
             Geometry geom = (Geometry) parsed[pgp.geometry_section];
             Topology topo = (Topology) parsed[pgp.topology_section];
@@ -207,7 +207,7 @@ namespace PD2ModelParser.Exporters
 
         private static SkeletonInfo AddSkeleton(FullModelData data, SkinBones bones, HashSet<Object3D> exclude)
         {
-            Dictionary<uint, object> parsed = data.parsed_sections;
+            Dictionary<uint, ISection> parsed = data.parsed_sections;
             Dictionary<Object3D, BoneInfo> bone_maps = new Dictionary<Object3D, BoneInfo>();
             Object3D root = (Object3D) parsed[bones.probably_root_bone];
             BoneInfo root_bone = AddBone(root, bone_maps, exclude, bones);
@@ -264,7 +264,7 @@ namespace PD2ModelParser.Exporters
         private static void AddWeights(FullModelData data, Model model, SkinBones sb,
             FbxMesh mesh, IReadOnlyDictionary<Object3D, BoneInfo> bones)
         {
-            Dictionary<uint, object> parsed = data.parsed_sections;
+            Dictionary<uint, ISection> parsed = data.parsed_sections;
             PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
             Geometry geom = (Geometry) parsed[pgp.geometry_section];
 

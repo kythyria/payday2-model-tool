@@ -28,7 +28,7 @@ namespace PD2ModelParser
             List<obj_data> toAddObjects = new List<obj_data>();
 
             ref List<SectionHeader> sections = ref fm.data.sections;
-            ref Dictionary<UInt32, object> parsed_sections = ref fm.data.parsed_sections;
+            ref Dictionary<UInt32, ISection> parsed_sections = ref fm.data.parsed_sections;
 
             try
             {
@@ -190,7 +190,7 @@ namespace PD2ModelParser
 
                     //Locate the proper model
                     uint modelSectionid = 0;
-                    foreach (KeyValuePair<uint, object> pair in parsed_sections)
+                    foreach (KeyValuePair<uint, ISection> pair in parsed_sections)
                     {
                         if (modelSectionid != 0)
                             break;
@@ -670,7 +670,7 @@ namespace PD2ModelParser
 
                     //Locate the proper model
                     uint modelSectionid = 0;
-                    foreach (KeyValuePair<uint, object> pair in fm.parsed_sections)
+                    foreach (KeyValuePair<uint, ISection> pair in fm.parsed_sections)
                     {
                         if (modelSectionid != 0)
                             break;

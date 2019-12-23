@@ -19,7 +19,7 @@ namespace PD2ModelParser
             path = path.Replace(".model", ".dae");
 
             List<SectionHeader> sections = data.sections;
-            Dictionary<UInt32, object> parsed_sections = data.parsed_sections;
+            Dictionary<UInt32, ISection> parsed_sections = data.parsed_sections;
             byte[] leftover_data = data.leftover_data;
 
             // Set up the XML structure

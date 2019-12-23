@@ -21,7 +21,7 @@ namespace PD2ModelParser.Sections
 
     public interface IPostLoadable
     {
-        void PostLoad(uint id, Dictionary<uint, object> parsed_sections);
+        void PostLoad(uint id, Dictionary<uint, ISection> parsed_sections);
     }
 
     public interface IHashContainer

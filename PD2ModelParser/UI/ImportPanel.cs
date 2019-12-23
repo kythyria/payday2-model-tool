@@ -147,12 +147,7 @@ namespace PD2ModelParser.UI
                 if (!success)
                     return;
 
-                // Make a list of all the Object3Ds to include in the tree
-                IEnumerable<Object3D> objects = data.parsed_sections.Values
-                    .Select(a => a as Object3D)
-                    .Where(a => a != null);
-
-                foreach (Object3D obj in objects)
+                foreach (Object3D obj in data.SectionsOfType<Object3D>())
                 {
                     root_point_items.Add(new RootPointItem(obj.Name, obj.id));
 
