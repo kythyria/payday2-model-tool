@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    class PassthroughGP : ISection
+    class PassthroughGP : AbstractSection, ISection
     {
         private static uint passthroughGP_tag = 0xE3A3B1CA; // PassthroughGP
         public UInt32 id;
@@ -37,24 +37,7 @@ namespace PD2ModelParser.Sections
                 this.remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(passthroughGP_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.geometry_section);
             outstream.Write(this.topology_section);
@@ -65,12 +48,12 @@ namespace PD2ModelParser.Sections
             return "[PassthroughGP] ID: " + this.id + " size: " + this.size + " PassthroughGP_geometry_section: " + this.geometry_section + " PassthroughGP_facelist_section: " + this.topology_section + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
-        public uint SectionId
+        public override uint SectionId
         {
             get => id;
             set => id = value;
         }
 
-        public uint TypeCode => Tags.passthroughGP_tag;
+        public override uint TypeCode => Tags.passthroughGP_tag;
     }
 }

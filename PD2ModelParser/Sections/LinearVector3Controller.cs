@@ -34,11 +34,12 @@ namespace PD2ModelParser.Sections
 
     }
 
-    class LinearVector3Controller
+    class LinearVector3Controller : AbstractSection, ISection
     {
 
         private static uint linearvector3controller_tag = 0x26A5128C; // LinearVector3Controller
-        public UInt32 id;
+        public override uint SectionId { get; set; }
+        public override uint TypeCode => linearvector3controller_tag;
         public UInt32 size;
 
         public UInt64 hashname; //Hashed material name (see hashlist.txt)
@@ -52,12 +53,11 @@ namespace PD2ModelParser.Sections
         public UInt32 keyframe_count;
         public List<LinearVector3Controller_KeyFrame> keyframes = new List<LinearVector3Controller_KeyFrame>();
 
-
         public byte[] remaining_data = null;
 
         public LinearVector3Controller(BinaryReader instream, SectionHeader section)
         {
-            this.id = section.id;
+            this.SectionId = section.id;
             this.size = section.size;
 
             this.hashname = instream.ReadUInt64();
@@ -79,24 +79,7 @@ namespace PD2ModelParser.Sections
                 this.remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(linearvector3controller_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.hashname);
             outstream.Write(this.flag0);
@@ -129,7 +112,7 @@ namespace PD2ModelParser.Sections
             }
 
             return "[LinearVector3Controller]" +
-                " ID: " + this.id +
+                " ID: " + SectionId +
                 " size: " + this.size +
                 " hashname: " + StaticStorage.hashindex.GetString(this.hashname) +
                 " flag0: " + this.flag0 +

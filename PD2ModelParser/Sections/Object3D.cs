@@ -5,7 +5,7 @@ using Nexus;
 
 namespace PD2ModelParser.Sections
 {
-    public class Object3D : AbstractSection, IPostLoadable, IHashContainer
+    public class Object3D : AbstractSection, ISection, IPostLoadable, IHashContainer
     {
         public UInt32 id;
         public UInt32 size;

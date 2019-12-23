@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    class Author
+    class Author : AbstractSection, ISection
     {
         private static uint author_tag = 0x7623C465; // Author tag
-        public UInt32 id;
+        public override uint SectionId { get; set; }
+        public override uint TypeCode => author_tag;
         public UInt32 size;
 
         public UInt64 hashname; //Hashed name (see hashlist.txt)
@@ -19,11 +20,10 @@ namespace PD2ModelParser.Sections
         public UInt32 unknown2;
 
         public byte[] remaining_data = null;
-        
 
         public Author(BinaryReader instream, SectionHeader section)
         {
-            this.id = section.id;
+            this.SectionId = section.id;
             this.size = section.size;
             this.hashname = instream.ReadUInt64();
 
@@ -45,24 +45,7 @@ namespace PD2ModelParser.Sections
                 this.remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(author_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             Byte zero = 0;
             outstream.Write(this.hashname);
@@ -78,7 +61,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return "[Author] ID: " + this.id + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString( this.hashname ) + " email: " + this.email + " Source file: " + this.source_file + " unknown2: " + this.unknown2 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return "[Author] ID: " + SectionId + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString( this.hashname ) + " email: " + this.email + " Source file: " + this.source_file + " unknown2: " + this.unknown2 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
     }

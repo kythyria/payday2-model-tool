@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    public class Animation
+    public class Animation : AbstractSection, ISection
     {
         private static uint animation_data_tag = 0x5DC011B8; // Animation data
-        public UInt32 id;
+        public override uint SectionId { get; set; }
+        public override uint TypeCode => animation_data_tag;
         public UInt32 size;
 
         public UInt64 hashname; //Hashed name for the animation (see hashlist.txt)
@@ -23,7 +24,7 @@ namespace PD2ModelParser.Sections
 
         public Animation(BinaryReader instream, SectionHeader section)
         {
-            this.id = section.id;
+            this.SectionId = section.id;
             this.size = section.size;
             this.hashname = instream.ReadUInt64();
             this.unknown2 = instream.ReadUInt32();
@@ -39,24 +40,7 @@ namespace PD2ModelParser.Sections
                 this.remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(animation_data_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.hashname);
             outstream.Write(this.unknown2);
@@ -73,7 +57,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return "[Animation] ID: " + this.id + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " unknown2: " + this.unknown2 + " keyframe_length: " + this.keyframe_length + " count: " + this.count + " items: (count=" + this.items.Count + ")" + (remaining_data != null ? " REMAINING DATA! " + remaining_data.Length + " bytes" : "");
+            return "[Animation] ID: " + this.SectionId + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " unknown2: " + this.unknown2 + " keyframe_length: " + this.keyframe_length + " count: " + this.count + " items: (count=" + this.items.Count + ")" + (remaining_data != null ? " REMAINING DATA! " + remaining_data.Length + " bytes" : "");
         }
     }
 }

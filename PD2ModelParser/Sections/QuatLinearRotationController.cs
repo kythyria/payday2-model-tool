@@ -35,11 +35,11 @@ namespace PD2ModelParser.Sections
 
     }
     
-    class QuatLinearRotationController
+    class QuatLinearRotationController : AbstractSection, ISection
     {
-
         private static uint quatlinearrotationcontroller_tag = 0x648A206C; // QuatLinearRotationController
-        public UInt32 id;
+        public override uint SectionId { get; set; }
+        public override uint TypeCode => quatlinearrotationcontroller_tag;
         public UInt32 size;
 
         public UInt64 hashname; //Hashed material name (see hashlist.txt)
@@ -58,7 +58,7 @@ namespace PD2ModelParser.Sections
 
         public QuatLinearRotationController(BinaryReader instream, SectionHeader section)
         {
-            this.id = section.id;
+            this.SectionId = section.id;
             this.size = section.size;
 
             this.hashname = instream.ReadUInt64();
@@ -80,24 +80,7 @@ namespace PD2ModelParser.Sections
                 this.remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(quatlinearrotationcontroller_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.hashname);
             outstream.Write(this.flag0);
@@ -130,7 +113,7 @@ namespace PD2ModelParser.Sections
             }
 
             return "[QuatLinearRotationController]" +
-                " ID: " + this.id + 
+                " ID: " + SectionId + 
                 " size: " + this.size +
                 " hashname: " + StaticStorage.hashindex.GetString(this.hashname) +
                 " flag0: " + this.flag0 +

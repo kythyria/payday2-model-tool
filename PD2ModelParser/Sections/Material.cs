@@ -18,7 +18,7 @@ namespace PD2ModelParser.Sections
         }
     }
 
-    class Material : ISection
+    class Material : AbstractSection, ISection
     {
         private static uint material_tag = 0x3C54609C; // Material
         public UInt32 id;
@@ -63,24 +63,7 @@ namespace PD2ModelParser.Sections
                     instream.ReadBytes((int) ((section.offset + 12 + section.size) - instream.BaseStream.Position));
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(material_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint) (newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.hashname.Hash);
             outstream.Write(this.skipped);
@@ -112,12 +95,12 @@ namespace PD2ModelParser.Sections
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
-        public uint SectionId
+        public override uint SectionId
         {
             get => id;
             set => id = value;
         }
 
-        public uint TypeCode => Tags.material_tag;
+        public override uint TypeCode => Tags.material_tag;
     }
 }

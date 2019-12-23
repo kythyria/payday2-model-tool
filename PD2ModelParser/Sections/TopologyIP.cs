@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    class TopologyIP : ISection
+    class TopologyIP : AbstractSection, ISection
     {
         private static uint topologyIP_tag = 0x03B634BD;  // TopologyIP
         public UInt32 id;
@@ -34,24 +34,7 @@ namespace PD2ModelParser.Sections
                 this.remaining_data = br.ReadBytes((int)((sh.offset + 12 + sh.size) - br.BaseStream.Position));
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(topologyIP_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.sectionID);
 
@@ -64,12 +47,12 @@ namespace PD2ModelParser.Sections
             return "[TopologyIP] ID: " + this.id + " size: " + this.size + " TopologyIP sectionID: " + this.sectionID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
-        public uint SectionId
+        public override uint SectionId
         {
             get => id;
             set => id = value;
         }
 
-        public uint TypeCode => Tags.topologyIP_tag;
+        public override uint TypeCode => Tags.topologyIP_tag;
     }
 }

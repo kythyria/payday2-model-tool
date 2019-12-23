@@ -133,7 +133,7 @@ namespace PD2ModelParser.Sections
         TANGENT0 = 21,
     }
 
-    class Geometry : ISection
+    class Geometry : AbstractSection, ISection
     {
         private static uint geometry_tag = 0x7AB072D3; // Geometry
         public UInt32 id;
@@ -328,24 +328,7 @@ namespace PD2ModelParser.Sections
             return headers.Any(h => h.item_type == type);
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(geometry_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write((uint) 0);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint) (newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.vert_count);
             outstream.Write(headers.Count);
@@ -562,12 +545,12 @@ namespace PD2ModelParser.Sections
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
-        public uint SectionId
+        public override uint SectionId
         {
             get => id;
             set => id = value;
         }
 
-        public uint TypeCode => Tags.geometry_tag;
+        public override uint TypeCode => Tags.geometry_tag;
     }
 }

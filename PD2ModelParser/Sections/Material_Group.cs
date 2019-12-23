@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    class Material_Group : ISection
+    class Material_Group : AbstractSection, ISection
     {
         private static uint material_group_tag = 0x29276B1D; // Material Group
         public UInt32 id;
@@ -24,7 +24,6 @@ namespace PD2ModelParser.Sections
             this.size = 0;
             this.count = 1;
             this.items.Add(mat_id);
-
         }
 
         public Material_Group(uint sec_id, IEnumerable<uint> mat_ids)
@@ -52,24 +51,7 @@ namespace PD2ModelParser.Sections
             }
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(material_group_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.count);
             foreach (UInt32 item in this.items)
@@ -91,12 +73,12 @@ namespace PD2ModelParser.Sections
             return "[Material Group] ID: " + this.id + " size: " + this.size + " Count: " + this.count + " Items: [ " + items_string + " ] " + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
-        public uint SectionId
+        public override uint SectionId
         {
             get => id;
             set => id = value;
         }
 
-        public uint TypeCode => Tags.material_group_tag;
+        public override uint TypeCode => Tags.material_group_tag;
     }
 }

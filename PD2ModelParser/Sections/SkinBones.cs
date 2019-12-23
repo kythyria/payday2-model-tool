@@ -10,7 +10,7 @@ namespace PD2ModelParser.Sections
 {
     // SkinBones should extend Bones (as it does in the game), but that'd
     // be a bit of a pain to do.
-    class SkinBones : ISection, IPostLoadable
+    class SkinBones : AbstractSection, ISection, IPostLoadable
     {
         private static uint skinbones_tag = 0x65CC1825; // SkinBones
 
@@ -25,13 +25,13 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
-        public uint SectionId
+        public override uint SectionId
         {
             get => id;
             set => id = value;
         }
 
-        public uint TypeCode => Tags.skinbones_tag;
+        public override uint TypeCode => Tags.skinbones_tag;
 
         // Post-loaded
         public List<Matrix3D> SkinPositions { get; private set; }
@@ -66,24 +66,7 @@ namespace PD2ModelParser.Sections
             }
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(skinbones_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(0); // Will be overwritten
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint) (newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             this.bones.StreamWriteData(outstream);
             outstream.Write(this.probably_root_bone);

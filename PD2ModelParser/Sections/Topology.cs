@@ -35,7 +35,7 @@ namespace PD2ModelParser.Sections
         }
     }
 
-    class Topology : ISection
+    class Topology : AbstractSection, ISection
     {
         private static uint topology_tag = 0x4C507A13; // Topology
         public UInt32 id;
@@ -89,24 +89,7 @@ namespace PD2ModelParser.Sections
                 remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(topology_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write((uint) 0);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint) (newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.unknown1);
             outstream.Write(facelist.Count * 3);
@@ -136,12 +119,12 @@ namespace PD2ModelParser.Sections
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
-        public uint SectionId
+        public override uint SectionId
         {
             get => id;
             set => id = value;
         }
 
-        public uint TypeCode => Tags.topology_tag;
+        public override uint TypeCode => Tags.topology_tag;
     }
 }

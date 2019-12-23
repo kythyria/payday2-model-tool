@@ -56,10 +56,11 @@ namespace PD2ModelParser.Sections
     /// As an abstract class, it can never be found by itself, only embedded within
     /// SkinBones (it's only known - and likely only - subclass).
     /// </remarks>
-    class Bones
+    class Bones : AbstractSection, ISection
     {
         private static uint bones_tag = 0xEB43C77; // Bones
-        public UInt32 id;
+        public override uint SectionId { get; set; }
+        public override uint TypeCode => bones_tag;
         public UInt32 size;
 
         public List<BoneMappingItem> bone_mappings = new List<BoneMappingItem>();
@@ -72,7 +73,7 @@ namespace PD2ModelParser.Sections
 
         public Bones(BinaryReader instream, SectionHeader section) : this(instream)
         {
-            this.id = section.id;
+            this.SectionId = section.id;
             this.size = section.size;
 
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
@@ -96,24 +97,7 @@ namespace PD2ModelParser.Sections
             this.remaining_data = null;
         }
 
-        public void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(bones_tag);
-            outstream.Write(this.id);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint) (newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
+        public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(bone_mappings.Count);
             foreach (BoneMappingItem bone in this.bone_mappings)
@@ -136,7 +120,7 @@ namespace PD2ModelParser.Sections
                 bones_string += bone + ", ";
             }
 
-            return "[Bones] ID: " + this.id + " size: " + this.size + " bones:[ " +
+            return "[Bones] ID: " + SectionId + " size: " + this.size + " bones:[ " +
                    bones_string + " ]" + (this.remaining_data != null
                        ? " REMAINING DATA! " + this.remaining_data.Length + " bytes"
                        : "");
