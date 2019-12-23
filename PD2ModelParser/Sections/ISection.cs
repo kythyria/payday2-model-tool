@@ -11,6 +11,12 @@ namespace PD2ModelParser.Sections
 
         // The section type code - see Tags for these
         uint TypeCode { get; }
+
+        /// <summary>
+        /// Write the section, including header, to the given stream in Diesel format.
+        /// </summary>
+        /// <param name="output">Stream to write to</param>
+        void StreamWrite(BinaryWriter output);
     }
 
     public interface IPostLoadable
