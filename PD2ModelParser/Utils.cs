@@ -412,4 +412,20 @@ namespace PD2ModelParser
             if (self.HasValue) { cb(self.Value); }
         }
     }
+
+    static class EnumerableUtil
+    {
+        public static IEnumerable<T> OrderedDistinct<T>(this IEnumerable<T> self)
+        {
+            var set = new HashSet<T>();
+            foreach(var i in self)
+            {
+                if(set.Add(i))
+                {
+                    yield return i;
+                    set.Add(i);
+                }
+            }
+        }
+    }
 }

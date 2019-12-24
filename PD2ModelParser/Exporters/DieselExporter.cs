@@ -93,6 +93,7 @@ namespace PD2ModelParser
                         .Concat(object3D_sections)
                         .Concat(model_sections)
                         .Concat(other_sections)
+                        .OrderedDistinct()
                         .ToList();
 
             //after each section, you go back and enter it's new size
