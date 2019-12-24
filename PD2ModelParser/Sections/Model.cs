@@ -31,7 +31,6 @@ namespace PD2ModelParser.Sections
     
     class Model : Object3D, ISection, IPostLoadable, IHashContainer
     {
-        public Object3D object3D => this as Object3D;
         public UInt32 version;
         //Version 6
         public UInt32 v6_unknown7;
