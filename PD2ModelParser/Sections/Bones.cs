@@ -58,9 +58,8 @@ namespace PD2ModelParser.Sections
     /// </remarks>
     class Bones : AbstractSection, ISection
     {
-        private static uint bones_tag = 0xEB43C77; // Bones
         public override uint SectionId { get; set; }
-        public override uint TypeCode => bones_tag;
+        public override uint TypeCode => Tags.bones_tag;
         public UInt32 size;
 
         public List<BoneMappingItem> bone_mappings = new List<BoneMappingItem>();
@@ -120,7 +119,7 @@ namespace PD2ModelParser.Sections
                 bones_string += bone + ", ";
             }
 
-            return "[Bones] ID: " + SectionId + " size: " + this.size + " bones:[ " +
+            return base.ToString() + " size: " + this.size + " bones:[ " +
                    bones_string + " ]" + (this.remaining_data != null
                        ? " REMAINING DATA! " + this.remaining_data.Length + " bytes"
                        : "");

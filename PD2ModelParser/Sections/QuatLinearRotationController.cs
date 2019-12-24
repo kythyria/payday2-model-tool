@@ -37,9 +37,8 @@ namespace PD2ModelParser.Sections
     
     class QuatLinearRotationController : AbstractSection, ISection
     {
-        private static uint quatlinearrotationcontroller_tag = 0x648A206C; // QuatLinearRotationController
         public override uint SectionId { get; set; }
-        public override uint TypeCode => quatlinearrotationcontroller_tag;
+        public override uint TypeCode => Tags.quatLinearRotationController_tag;
         public UInt32 size;
 
         public UInt64 hashname; //Hashed material name (see hashlist.txt)
@@ -112,8 +111,7 @@ namespace PD2ModelParser.Sections
                 first = false;
             }
 
-            return "[QuatLinearRotationController]" +
-                " ID: " + SectionId + 
+            return base.ToString() + 
                 " size: " + this.size +
                 " hashname: " + StaticStorage.hashindex.GetString(this.hashname) +
                 " flag0: " + this.flag0 +

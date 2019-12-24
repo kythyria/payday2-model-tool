@@ -36,7 +36,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return "[UNKNOWN] ID: " + SectionId + " size: " + this.size + " tag: " + this.tag + " Unknown_data: " + this.data.Length;
+            return base.ToString() + " size: " + this.size + " tag: " + this.tag + " Unknown_data: " + this.data.Length;
         }
     }
 }

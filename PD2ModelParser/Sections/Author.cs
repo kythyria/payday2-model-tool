@@ -9,9 +9,8 @@ namespace PD2ModelParser.Sections
 {
     class Author : AbstractSection, ISection
     {
-        private static uint author_tag = 0x7623C465; // Author tag
         public override uint SectionId { get; set; }
-        public override uint TypeCode => author_tag;
+        public override uint TypeCode => Tags.author_tag;
         public UInt32 size;
 
         public UInt64 hashname; //Hashed name (see hashlist.txt)
@@ -61,7 +60,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return "[Author] ID: " + SectionId + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString( this.hashname ) + " email: " + this.email + " Source file: " + this.source_file + " unknown2: " + this.unknown2 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return base.ToString() + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString( this.hashname ) + " email: " + this.email + " Source file: " + this.source_file + " unknown2: " + this.unknown2 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
     }

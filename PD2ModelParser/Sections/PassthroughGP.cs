@@ -9,7 +9,6 @@ namespace PD2ModelParser.Sections
 {
     class PassthroughGP : AbstractSection, ISection
     {
-        private static uint passthroughGP_tag = 0xE3A3B1CA; // PassthroughGP
         public UInt32 id;
         public UInt32 size;
 
@@ -45,7 +44,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return "[PassthroughGP] ID: " + this.id + " size: " + this.size + " PassthroughGP_geometry_section: " + this.geometry_section + " PassthroughGP_facelist_section: " + this.topology_section + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return base.ToString() + " size: " + this.size + " PassthroughGP_geometry_section: " + this.geometry_section + " PassthroughGP_facelist_section: " + this.topology_section + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
         public override uint SectionId

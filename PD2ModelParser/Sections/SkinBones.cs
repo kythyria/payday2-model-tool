@@ -12,8 +12,6 @@ namespace PD2ModelParser.Sections
     // be a bit of a pain to do.
     class SkinBones : AbstractSection, ISection, IPostLoadable
     {
-        private static uint skinbones_tag = 0x65CC1825; // SkinBones
-
         public UInt32 id;
 
         public Bones bones;
@@ -104,7 +102,7 @@ namespace PD2ModelParser.Sections
                 rotations_string += rotation + ", ";
             }
 
-            return "[SkinBones] ID: " + this.id +
+            return base.ToString() +
                    " bones: [ " + this.bones + " ]" +
                    " object3D_section_id: " + this.probably_root_bone +
                    " count: " + this.count + " objects" +

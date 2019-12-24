@@ -9,7 +9,6 @@ namespace PD2ModelParser.Sections
 {
     class Material_Group : AbstractSection, ISection
     {
-        private static uint material_group_tag = 0x29276B1D; // Material Group
         public UInt32 id;
         public UInt32 size;
 
@@ -70,7 +69,7 @@ namespace PD2ModelParser.Sections
                 items_string += item + ", ";
             }
 
-            return "[Material Group] ID: " + this.id + " size: " + this.size + " Count: " + this.count + " Items: [ " + items_string + " ] " + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return base.ToString() + " size: " + this.size + " Count: " + this.count + " Items: [ " + items_string + " ] " + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
         public override uint SectionId

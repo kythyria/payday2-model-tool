@@ -36,10 +36,8 @@ namespace PD2ModelParser.Sections
 
     class LinearVector3Controller : AbstractSection, ISection
     {
-
-        private static uint linearvector3controller_tag = 0x26A5128C; // LinearVector3Controller
         public override uint SectionId { get; set; }
-        public override uint TypeCode => linearvector3controller_tag;
+        public override uint TypeCode => Tags.linearVector3Controller_tag;
         public UInt32 size;
 
         public UInt64 hashname; //Hashed material name (see hashlist.txt)
@@ -111,8 +109,7 @@ namespace PD2ModelParser.Sections
                 first = false;
             }
 
-            return "[LinearVector3Controller]" +
-                " ID: " + SectionId +
+            return base.ToString() +
                 " size: " + this.size +
                 " hashname: " + StaticStorage.hashindex.GetString(this.hashname) +
                 " flag0: " + this.flag0 +

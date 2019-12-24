@@ -53,6 +53,11 @@ namespace PD2ModelParser.Sections
         }
 
         public abstract void StreamWriteData(BinaryWriter output);
+
+        public override string ToString()
+        {
+            return $"[{GetType().Name}] ID: {SectionId}";
+        }
     }
 
     public static class SectionUtils

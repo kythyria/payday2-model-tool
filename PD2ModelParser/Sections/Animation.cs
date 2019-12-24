@@ -9,9 +9,8 @@ namespace PD2ModelParser.Sections
 {
     public class Animation : AbstractSection, ISection
     {
-        private static uint animation_data_tag = 0x5DC011B8; // Animation data
         public override uint SectionId { get; set; }
-        public override uint TypeCode => animation_data_tag;
+        public override uint TypeCode => Tags.animation_data_tag;
         public UInt32 size;
 
         public UInt64 hashname; //Hashed name for the animation (see hashlist.txt)
@@ -57,7 +56,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return "[Animation] ID: " + this.SectionId + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " unknown2: " + this.unknown2 + " keyframe_length: " + this.keyframe_length + " count: " + this.count + " items: (count=" + this.items.Count + ")" + (remaining_data != null ? " REMAINING DATA! " + remaining_data.Length + " bytes" : "");
+            return base.ToString() + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " unknown2: " + this.unknown2 + " keyframe_length: " + this.keyframe_length + " count: " + this.count + " items: (count=" + this.items.Count + ")" + (remaining_data != null ? " REMAINING DATA! " + remaining_data.Length + " bytes" : "");
         }
     }
 }

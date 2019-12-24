@@ -20,7 +20,6 @@ namespace PD2ModelParser.Sections
 
     class Material : AbstractSection, ISection
     {
-        private static uint material_tag = 0x3C54609C; // Material
         public UInt32 id;
         public UInt32 size;
 
@@ -87,7 +86,7 @@ namespace PD2ModelParser.Sections
                 items_string += item + ", ";
             }
 
-            return "[Material] ID: " + this.id +
+            return base.ToString() +
                    " size: " + this.size +
                    " hashname: " + this.hashname.String +
                    " count: " + this.count +

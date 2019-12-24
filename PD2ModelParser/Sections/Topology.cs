@@ -33,11 +33,15 @@ namespace PD2ModelParser.Sections
         {
             return a >= 0 && b >= 0 && c >= 0 && a < vertlen && b < vertlen && c < vertlen;
         }
+
+        public override string ToString()
+        {
+            return $"{a}, {b}, {c}";
+        }
     }
 
     class Topology : AbstractSection, ISection
     {
-        private static uint topology_tag = 0x4C507A13; // Topology
         public UInt32 id;
 
         public UInt32 unknown1;
@@ -110,7 +114,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return "[Topology] ID: " + this.id +
+            return base.ToString() +
                    " unknown1: " + this.unknown1 +
                    " facelist: " + this.facelist.Count +
                    " count2: " + this.count2 +

@@ -169,7 +169,7 @@ namespace PD2ModelParser.Sections
             Quaternion rot = new Quaternion();
             Vector3D translation = new Vector3D();
             this.rotation.Decompose(out scale, out rot, out translation);
-            return "[Object3D] ID: " + this.id +
+            return base.ToString() +
                    " size: " + this.size +
                    " hashname: " + this.hashname.String +
                    " children: " + this.child_ids.Count +
