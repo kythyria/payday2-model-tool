@@ -46,7 +46,6 @@ namespace PD2ModelParser.Importers
 
         private readonly FullModelData data;
         private readonly FbxImportOptions _options;
-        private readonly Dictionary<Object3D, Model> _modelObjects = new Dictionary<Object3D, Model>();
         private readonly Dictionary<ulong, Object3D> _objects = new Dictionary<ulong, Object3D>();
 
         private FilmboxImporter(FullModelData data, FbxImportOptions options)
@@ -54,21 +53,9 @@ namespace PD2ModelParser.Importers
             this.data = data;
             _options = options;
 
-            foreach (var item in data.parsed_sections.Values)
+            foreach (var item in data.SectionsOfType<Object3D>())
             {
-                if (item is Model m)
-                {
-                    _modelObjects[m.object3D] = m;
-
-                    // While it's not a 'real' Object3D in that it's embedded into Model, make it
-                    // available for access later.
-                    _objects[m.object3D.hashname.Hash] = m.object3D;
-                }
-
-                if (!(item is Object3D obj))
-                    continue;
-
-                _objects[obj.hashname.Hash] = obj;
+                _objects[item.hashname.Hash] = item;
             }
         }
 
@@ -141,7 +128,7 @@ namespace PD2ModelParser.Importers
             Model model;
             if (_objects.TryGetValue(Hash64.HashString(name), out Object3D existing_object))
             {
-                model = _modelObjects[existing_object];
+                model = (Model)existing_object;
             }
             else
             {
@@ -167,7 +154,7 @@ namespace PD2ModelParser.Importers
             // the hip bone.
             // Note that the model only had one skeleton, shared between all models - this will probably break
             // it quite a bit if we try and export them all back in.
-            model.object3D.parent = root_bone;
+            model.parent = root_bone;
 
             AddWeights(mesh, skel, model, geom);
 
@@ -358,7 +345,7 @@ namespace PD2ModelParser.Importers
 
                 if (!bone_indices.ContainsKey(bone))
                 {
-                    throw new Exception($"EFBX008 Model {model.object3D.Name} uses bone {bone.Name} which is "
+                    throw new Exception($"EFBX008 Model {model.Name} uses bone {bone.Name} which is "
                                         + "unavailable in this model");
                 }
 
@@ -415,7 +402,7 @@ namespace PD2ModelParser.Importers
             if (processed.Count > 3)
             {
                 Vector3D vert = geom.verts[vertIdx];
-                string dbg = $"{model.object3D.Name}: vert at {vert.X},{vert.Y},{vert.Z}";
+                string dbg = $"{model.Name}: vert at {vert.X},{vert.Y},{vert.Z}";
                 dbg = processed.Aggregate(dbg, (current, part) => current + $"\n{part.Bone.Name} weight {part.weight}");
                 throw new Exception("EFBX010 Vertices cannot be affected by more than three bones:\n" + dbg);
             }

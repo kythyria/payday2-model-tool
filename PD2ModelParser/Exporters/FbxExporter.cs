@@ -57,14 +57,7 @@ namespace PD2ModelParser.Exporters
         private static void AddModelContents(FbxScene scene, FullModelData data)
         {
             // Find all the Object3Ds that are actually part of an object
-            HashSet<Object3D> model_objects = new HashSet<Object3D>();
-            foreach (var obj in data.parsed_sections.Values)
-            {
-                if (!(obj is Model m))
-                    continue;
-
-                model_objects.Add(m.object3D);
-            }
+            var model_objects = new HashSet<Object3D>(data.SectionsOfType<Model>());
 
             Dictionary<uint, SkeletonInfo> skeletons = new Dictionary<uint, SkeletonInfo>();
 
@@ -82,7 +75,7 @@ namespace PD2ModelParser.Exporters
                 if (model.skinbones_ID == 0)
                 {
                     // If there's no corresponding skeleton, remove the 'Object' suffix
-                    mesh.Node.SetName(model.object3D.Name);
+                    mesh.Node.SetName(model.Name);
 
                     scene.GetRootNode().AddChild(mesh.Node);
                     continue;
@@ -127,13 +120,13 @@ namespace PD2ModelParser.Exporters
             Geometry geom = (Geometry) parsed[pgp.geometry_section];
             Topology topo = (Topology) parsed[pgp.topology_section];
 
-            string name = model.object3D.Name;
+            string name = model.Name;
 
             FbxNode mesh_node = FbxNode.Create(fm, name + "Object");
             FbxMesh mesh = FbxMesh.Create(fm, name + "Mesh");
             mesh_node.SetNodeAttributeGeom(mesh);
 
-            CopyTransform(model.object3D.world_transform, mesh_node);
+            CopyTransform(model.world_transform, mesh_node);
 
             FbxLayerElementNormal normals = mesh.CreateElementNormal();
             normals.SetReferenceMode(FbxLayerElement.EReferenceMode.eIndexToDirect);
@@ -273,7 +266,7 @@ namespace PD2ModelParser.Exporters
             if (geom.weights.Count == 0)
                 return;
 
-            FbxSkin skin = FbxSkin.Create(fm, model.object3D.Name + "Skin");
+            FbxSkin skin = FbxSkin.Create(fm, model.Name + "Skin");
             mesh.AddDeformer(skin);
 
             for (int bone_idx = 0; bone_idx < sb.count; bone_idx++)
