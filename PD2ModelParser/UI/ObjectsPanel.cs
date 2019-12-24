@@ -98,6 +98,7 @@ namespace PD2ModelParser.UI
                 TreeNode parent = obj.parent == null ? root : nodes[obj.parent.id];
 
                 reverseNodes[node] = obj;
+                node.Tag = obj;
 
                 if (obj is Model)
                     node.Text = obj.Name + " (model)";
@@ -141,6 +142,7 @@ namespace PD2ModelParser.UI
 
         private void treeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
+            propertyGrid1.SelectedObject = e.Node.Tag;
             // Only process right clicks
             if (e.Button != MouseButtons.Right)
                 return;
@@ -158,7 +160,8 @@ namespace PD2ModelParser.UI
             Object3D obj = reverseNodes[menuTarget];
 
             // TODO actually show some useful information
-            MessageBox.Show(obj.Name);
+            //MessageBox.Show(obj.Name);
+            propertyGrid1.SelectedObject = obj;
         }
     }
 }
