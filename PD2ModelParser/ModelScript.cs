@@ -53,7 +53,7 @@ namespace PD2ModelParser
 
         private static Object3D FindObjectByHashname(FullModelData data, ulong hashname)
         {
-            return data.SectionsOfType<Object3D>().Where(i => i.hashname.Hash == hashname).FirstOrDefault();
+            return data.SectionsOfType<Object3D>().Where(i => i.HashName.Hash == hashname).FirstOrDefault();
         }
 
         private static string CheckAttr(XElement elem, string attr)

@@ -200,12 +200,12 @@ namespace PD2ModelParser
                             UInt64 tryp;
                             if (UInt64.TryParse(obj.object_name, out tryp))
                             {
-                                if (tryp == ((Model)pair.Value).hashname.Hash)
+                                if (tryp == ((Model)pair.Value).HashName.Hash)
                                     modelSectionid = pair.Key;
                             }
                             else
                             {
-                                if (Hash64.HashString(obj.object_name) == ((Model)pair.Value).hashname.Hash)
+                                if (Hash64.HashString(obj.object_name) == ((Model)pair.Value).HashName.Hash)
                                     modelSectionid = pair.Key;
                             }
                         }
@@ -442,8 +442,8 @@ namespace PD2ModelParser
 
             if (model_data_section.version != 6)
             {
-                model_data_section.bounds_min = new_Model_data_bounds_min;
-                model_data_section.bounds_max = new_Model_data_bounds_max;
+                model_data_section.BoundsMin = new_Model_data_bounds_min;
+                model_data_section.BoundsMax = new_Model_data_bounds_max;
             }
 
             geometry_section.vert_count = (uint)obj.verts.Count;
@@ -680,12 +680,12 @@ namespace PD2ModelParser
                             UInt64 tryp;
                             if (UInt64.TryParse(obj.object_name, out tryp))
                             {
-                                if (tryp == ((Model)pair.Value).hashname.Hash)
+                                if (tryp == ((Model)pair.Value).HashName.Hash)
                                     modelSectionid = pair.Key;
                             }
                             else
                             {
-                                if (Hash64.HashString(obj.object_name) == ((Model)pair.Value).hashname.Hash)
+                                if (Hash64.HashString(obj.object_name) == ((Model)pair.Value).HashName.Hash)
                                     modelSectionid = pair.Key;
                             }
                         }

@@ -55,7 +55,7 @@ namespace PD2ModelParser.Importers
 
             foreach (var item in data.SectionsOfType<Object3D>())
             {
-                _objects[item.hashname.Hash] = item;
+                _objects[item.HashName.Hash] = item;
             }
         }
 

@@ -119,7 +119,7 @@ namespace PD2ModelParser.Sections
                    " facelist: " + this.facelist.Count +
                    " count2: " + this.count2 +
                    " items2: " + this.items2.Length +
-                   " hashname: " + StaticStorage.hashindex.GetString(this.hashname) +
+                   " HashName: " + StaticStorage.hashindex.GetString(this.hashname) +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 

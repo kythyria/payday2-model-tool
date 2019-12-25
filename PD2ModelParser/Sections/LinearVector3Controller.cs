@@ -111,7 +111,7 @@ namespace PD2ModelParser.Sections
 
             return base.ToString() +
                 " size: " + this.size +
-                " hashname: " + StaticStorage.hashindex.GetString(this.hashname) +
+                " HashName: " + StaticStorage.hashindex.GetString(this.hashname) +
                 " flag0: " + this.flag0 +
                 " flag1: " + this.flag1 +
                 " flag2: " + this.flag2 +

@@ -88,7 +88,7 @@ namespace PD2ModelParser.Sections
 
             return base.ToString() +
                    " size: " + this.size +
-                   " hashname: " + this.hashname.String +
+                   " HashName: " + this.hashname.String +
                    " count: " + this.count +
                    " items: [ " + items_string + " ] " +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");

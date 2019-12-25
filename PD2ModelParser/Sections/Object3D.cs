@@ -1,19 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.ComponentModel;
 using Nexus;
 
 namespace PD2ModelParser.Sections
 {
+    //[System.ComponentModel.TypeConverter(typeof(Inspector.AbstractSectionConverter))]
     public class Object3D : AbstractSection, ISection, IPostLoadable, IHashContainer
     {
         public UInt32 id;
         public UInt32 size;
 
-        public HashName hashname; //Hashed object root point name (see hashlist.txt)
+        [Category("Object3D")]
+        [DisplayName("Name")]
+        public HashName HashName { get; set; } //Hashed object root point name (see hashlist.txt)
         private List<uint> child_ids = new List<uint>(); // This is NOT a list of Object3Ds (or Models). Maybe animation related?
         private Matrix3D _rotation = new Matrix3D(); // 4x4 transform matrix - for translation/scale too
 
+        [Category("Object3D")]
+        [DisplayName("Transform")]
+        [TypeConverter(typeof(Inspector.NexusMatrixConverter))]
         public Matrix3D rotation
         {
             get => _rotation;
@@ -24,6 +31,7 @@ namespace PD2ModelParser.Sections
             }
         }
 
+        [Browsable(false)]
         public uint parentID => parent?.id ?? 0;
 
         public byte[] remaining_data = null;
@@ -35,6 +43,9 @@ namespace PD2ModelParser.Sections
         // Set when read from a section, before PostLoad is called
         private uint loading_parent_id;
 
+        [Category("Object3D")]
+        [DisplayName("Parent")]
+        [TypeConverter(typeof(Inspector.Object3DReferenceConverter))]
         public Object3D parent { get; set; }
 
         public List<Object3D> children = new List<Object3D>();
@@ -50,7 +61,8 @@ namespace PD2ModelParser.Sections
             parent = newParent;
         }
 
-        public string Name => hashname.String;
+        [Browsable(false)]
+        public string Name => HashName.String;
 
         public override uint SectionId
         {
@@ -65,7 +77,7 @@ namespace PD2ModelParser.Sections
             this.id = 0;
             this.size = 0;
 
-            this.hashname = new HashName(object_name);
+            this.HashName = new HashName(object_name);
             this.child_ids = new List<uint>();
             this.rotation = Matrix3D.Identity;
 
@@ -86,7 +98,7 @@ namespace PD2ModelParser.Sections
         public Object3D(BinaryReader instream)
         {
             // In Object3D::load
-            this.hashname = new HashName(instream.ReadUInt64());
+            this.HashName = new HashName(instream.ReadUInt64());
 
             // in dsl::ParamBlock::load
             uint child_count = instream.ReadUInt32();
@@ -130,7 +142,7 @@ namespace PD2ModelParser.Sections
 
         public override void StreamWriteData(BinaryWriter outstream)
         {
-            outstream.Write(this.hashname.Hash);
+            outstream.Write(this.HashName.Hash);
             outstream.Write(child_ids.Count);
             foreach (uint item in this.child_ids)
             {
@@ -171,7 +183,7 @@ namespace PD2ModelParser.Sections
             this.rotation.Decompose(out scale, out rot, out translation);
             return base.ToString() +
                    " size: " + this.size +
-                   " hashname: " + this.hashname.String +
+                   " HashName: " + this.HashName.String +
                    " children: " + this.child_ids.Count +
                    " mat.scale: " + scale +
                    " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "]" +
@@ -181,7 +193,7 @@ namespace PD2ModelParser.Sections
 
         public void CollectHashes(CustomHashlist hashlist)
         {
-            hashlist.Hint(hashname);
+            hashlist.Hint(HashName);
         }
 
         public void PostLoad(uint id, Dictionary<uint, ISection> parsed_sections)

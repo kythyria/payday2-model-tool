@@ -347,12 +347,14 @@ namespace PD2ModelParser
         }
     }
 
+    [System.ComponentModel.TypeConverter(typeof(Inspector.HashNameConverter))]
     public class HashName
     {
         private ulong hash;
         private string str;
         private bool known;
-
+    
+        [System.ComponentModel.NotifyParentProperty(true)]
         public string String
         {
             get => str ?? StaticStorage.hashindex.GetString(hash);
@@ -363,6 +365,7 @@ namespace PD2ModelParser
             }
         }
 
+        [System.ComponentModel.NotifyParentProperty(true)]
         public ulong Hash
         {
             get => hash;

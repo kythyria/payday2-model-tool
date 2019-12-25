@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.ComponentModel;
 
 namespace PD2ModelParser.Sections
 {
@@ -10,6 +11,7 @@ namespace PD2ModelParser.Sections
         uint SectionId { get; set; }
 
         // The section type code - see Tags for these
+
         uint TypeCode { get; }
 
         /// <summary>
@@ -31,7 +33,17 @@ namespace PD2ModelParser.Sections
 
     public abstract class AbstractSection : ISection
     {
+        // These attributes are here because the auto lookup doesn't see them on interfaces.
+        [Category("Section")]
+        [DisplayName("ID")]
+        [Description("File-internal identifier for this section.")]
+        [ReadOnly(true)]
         public abstract uint SectionId { get; set; }
+
+        [Category("Section")]
+        [DisplayName("Type Code")]
+        [Description("Integer that serialises which class this section is.")]
+        [ReadOnly(true)]
         public abstract uint TypeCode { get; }
 
         public virtual void StreamWrite(BinaryWriter output)

@@ -60,7 +60,7 @@ namespace PD2ModelParser.Importers
             var obj = data.parsed_sections
                 .Select(i => i.Value as DM.Object3D)
                 .Where(i => i != null)
-                .FirstOrDefault(i => i.hashname.Hash == hashname.Hash);
+                .FirstOrDefault(i => i.HashName.Hash == hashname.Hash);
 
             if (obj == null)
             {
@@ -201,8 +201,8 @@ namespace PD2ModelParser.Importers
         {
             if (positions.Count == 0) { return; }
 
-            mod.bounds_min = positions.Aggregate(positions[0], Vector3.Min).ToNexusVector();
-            mod.bounds_max = positions.Aggregate(positions[0], Vector3.Max).ToNexusVector();
+            mod.BoundsMin = positions.Aggregate(positions[0], Vector3.Min).ToNexusVector();
+            mod.BoundsMax = positions.Aggregate(positions[0], Vector3.Max).ToNexusVector();
         }
 
         HashName GetName(string input)

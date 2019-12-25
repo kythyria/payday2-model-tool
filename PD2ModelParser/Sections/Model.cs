@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace PD2ModelParser.Sections
 {
@@ -28,26 +29,35 @@ namespace PD2ModelParser.Sections
             return "{unknown1=" + this.unknown1 + " vertCount=" + this.vertCount + " unknown2=" + this.baseVertex + " faceCount=" + this.faceCount + " material_id=" + this.material_id + "}";
         }
     }
-    
+
     class Model : Object3D, ISection, IPostLoadable, IHashContainer
     {
-        public UInt32 version;
+        [Category("Model")]
+        [DisplayName("Version")]
+        public UInt32 version { get; set; }
         //Version 6
-        public UInt32 v6_unknown7;
-        public UInt32 v6_unknown8;
+        [Category("Model")]
+        public UInt32 v6_unknown7 { get; set; }
+        [Category("Model")]
+        public UInt32 v6_unknown8 { get; set; }
         //Other Versions
-        public UInt32 passthroughGP_ID; //ID of associated PassthroughGP
-        public UInt32 topologyIP_ID; //ID of associated TopologyIP
+        [Category("Model")]
+        public UInt32 passthroughGP_ID { get; set; } //ID of associated PassthroughGP
+        [Category("Model")]
+        public UInt32 topologyIP_ID { get; set; } //ID of associated TopologyIP
         public List<RenderAtom> renderAtoms = new List<RenderAtom>();
         //public UInt32 unknown9;
-        public UInt32 material_group_section_id;
-        public UInt32 lightset_ID;
-        public Vector3D bounds_min; // Z (max), X (low), Y (low)
-        public Vector3D bounds_max; // Z (low), X (max), Y (max)
-        public UInt32 properties_bitmap;
-        public UInt32 unknown12;
-        public UInt32 unknown13;
-        public UInt32 skinbones_ID;
+        public UInt32 material_group_section_id { get; set; }
+        public UInt32 lightset_ID { get; set; }
+
+        private Vector3D bounds_min; // Z (max), X (low), Y (low)
+        private Vector3D bounds_max; // Z (low), X (max), Y (max)
+        [Category("Model"), DisplayName("Bounds Min"), Description("Minimum corner of the bounding box."), TypeConverter(typeof(Inspector.NexusVector3DConverter))] public Vector3D BoundsMin { get => bounds_min; set => bounds_min = value; }
+        [Category("Model"), DisplayName("Bounds Max"), Description("Maximum corner of the bounding box.")] public Vector3D BoundsMax { get => bounds_max; set => bounds_max = value; }
+        public UInt32 properties_bitmap { get; set; }
+        public UInt32 unknown12 { get; set; }
+        public UInt32 unknown13 { get; set; }
+        public UInt32 skinbones_ID { get; set; }
 
         public Model(string object_name, uint vertCount, uint faceCount, PassthroughGP passGP, TopologyIP topoIP, Material_Group matg, Object3D parent)
             : base(object_name, parent)

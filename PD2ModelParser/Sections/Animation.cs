@@ -56,7 +56,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return base.ToString() + " size: " + this.size + " hashname: " + StaticStorage.hashindex.GetString(this.hashname) + " unknown2: " + this.unknown2 + " keyframe_length: " + this.keyframe_length + " count: " + this.count + " items: (count=" + this.items.Count + ")" + (remaining_data != null ? " REMAINING DATA! " + remaining_data.Length + " bytes" : "");
+            return base.ToString() + " size: " + this.size + " HashName: " + StaticStorage.hashindex.GetString(this.hashname) + " unknown2: " + this.unknown2 + " keyframe_length: " + this.keyframe_length + " count: " + this.count + " items: (count=" + this.items.Count + ")" + (remaining_data != null ? " REMAINING DATA! " + remaining_data.Length + " bytes" : "");
         }
     }
 }

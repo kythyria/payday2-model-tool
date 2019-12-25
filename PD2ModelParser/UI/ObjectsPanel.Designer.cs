@@ -92,7 +92,7 @@ namespace PD2ModelParser.UI
             this.treeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView.Location = new System.Drawing.Point(0, 0);
             this.treeView.Name = "treeView";
-            this.treeView.Size = new System.Drawing.Size(434, 163);
+            this.treeView.Size = new System.Drawing.Size(383, 163);
             this.treeView.TabIndex = 6;
             this.treeView.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseClick);
             // 
@@ -101,8 +101,7 @@ namespace PD2ModelParser.UI
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.SelectedObject = this;
-            this.propertyGrid1.Size = new System.Drawing.Size(175, 163);
+            this.propertyGrid1.Size = new System.Drawing.Size(226, 163);
             this.propertyGrid1.TabIndex = 7;
             // 
             // scriptFile
@@ -147,7 +146,7 @@ namespace PD2ModelParser.UI
             // 
             this.splitContainer1.Panel2.Controls.Add(this.propertyGrid1);
             this.splitContainer1.Size = new System.Drawing.Size(613, 163);
-            this.splitContainer1.SplitterDistance = 434;
+            this.splitContainer1.SplitterDistance = 383;
             this.splitContainer1.TabIndex = 8;
             // 
             // ObjectsPanel

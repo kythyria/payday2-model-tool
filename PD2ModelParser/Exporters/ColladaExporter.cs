@@ -67,7 +67,7 @@ namespace PD2ModelParser
 
                     model_i++;
 
-                    string model_id = model_i + "-" + model_data.hashname.String;
+                    string model_id = model_i + "-" + model_data.HashName.String;
 
                     PassthroughGP passthrough_section = (PassthroughGP) parsed_sections[model_data.passthroughGP_ID];
                     Geometry geometry_section = (Geometry) parsed_sections[passthrough_section.geometry_section];
@@ -154,7 +154,7 @@ namespace PD2ModelParser
                         if (obj == null)
                             continue;
 
-                        string bonename = obj.hashname.String;
+                        string bonename = obj.HashName.String;
 
                         // Find the locators and such, and add them to the TODO list
                         foreach (Object3D child in obj.children)
