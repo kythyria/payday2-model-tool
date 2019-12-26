@@ -15,7 +15,7 @@ namespace PD2ModelParser.UI
     {
         private readonly Dictionary<uint, TreeNode> nodes = new Dictionary<uint, TreeNode>();
         private readonly Dictionary<TreeNode, Object3D> reverseNodes = new Dictionary<TreeNode, Object3D>();
-        private readonly TreeNode root = new TreeNode("<root>");
+        private readonly TreeNode root = new TreeNode("<objects>");
         private readonly ContextMenu nodeRightclickMenu;
         private TreeNode menuTarget;
 

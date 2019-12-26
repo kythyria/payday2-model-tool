@@ -151,6 +151,8 @@ namespace PD2ModelParser
                 ClampFloatToByte(input.Z),
                 ClampFloatToByte(input.W));
         }
+        public static Quaternion ToNexusQuaternion(this System.Numerics.Quaternion input) => new Quaternion(input.X, input.Y, input.Z, input.W);
+        public static System.Numerics.Quaternion ToQuaternion(this Quaternion input) => new System.Numerics.Quaternion(input.X, input.Y, input.Z, input.W);
 
         /// <summary>
         /// Clamp a float to 0..1 and rescale it to 0..255

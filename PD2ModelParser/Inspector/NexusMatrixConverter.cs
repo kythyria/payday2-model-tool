@@ -28,19 +28,89 @@ namespace PD2ModelParser.Inspector
                    $"({matrix.M41} {matrix.M42} {matrix.M43} {matrix.M44})";
         }
 
-        /*public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
+        public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
         {
-            var properties = base.GetProperties(context, value, attributes);
+            var affine = SharpGLTF.Transforms.AffineTransform.Create(((Nexus.Matrix3D)value).ToMatrix4x4());
 
-            if ((value is Nexus.Matrix3D matrix) && matrix.Decompose(out var scale, out var rotation, out var translation))
+            if (affine.IsValid)
             {
-                properties.Add(new RotationProperty());
-                properties.Add(new ScaleProperty());
+                return new PropertyDescriptorCollection(new PropertyDescriptor[]
+                {
+                    new TranslationProperty(),
+                    new RotationProperty(),
+                    new ScaleProperty()
+                });
             }
+            else
+            {
+                return base.GetProperties(context, value, attributes);
+            }
+        }
 
-            return properties;
-        }*/
+        class TranslationProperty : SimplePropertyDescriptor
+        {
+            public TranslationProperty() : base(typeof(Nexus.Matrix3D), "Translation", typeof(Nexus.Vector3D)) { }
+            public override object GetValue(object component)
+            {
+                var affine = SharpGLTF.Transforms.AffineTransform.Create(((Nexus.Matrix3D)component).ToMatrix4x4());
+                return affine.Translation.ToNexusVector();
+            }
+            public override void SetValue(object component, object value)
+            {
+                throw new NotImplementedException();
+            }
+            public override TypeConverter Converter => new NexusVector3DConverter();
+        }
 
+        class RotationProperty : SimplePropertyDescriptor
+        {
+            public RotationProperty() : base(typeof(Nexus.Matrix3D), "Rotation", typeof(Nexus.Quaternion)) { }
+            public override object GetValue(object component)
+            {
+                var affine = SharpGLTF.Transforms.AffineTransform.Create(((Nexus.Matrix3D)component).ToMatrix4x4());
+                return affine.Rotation.ToNexusQuaternion();
+            }
+            public override void SetValue(object component, object value)
+            {
+                throw new NotImplementedException();
+            }
+            public override TypeConverter Converter => new NexusQuaternionConverter();
+        }
+
+        class ScaleProperty : SimplePropertyDescriptor
+        {
+            public ScaleProperty() : base(typeof(Nexus.Matrix3D), "Scale", typeof(Nexus.Vector3D)) { }
+            public override object GetValue(object component)
+            {
+                var affine = SharpGLTF.Transforms.AffineTransform.Create(((Nexus.Matrix3D)component).ToMatrix4x4());
+                return affine.Scale.ToNexusVector();
+            }
+            public override void SetValue(object component, object value)
+            {
+                throw new NotImplementedException();
+            }
+            public override TypeConverter Converter => new NexusVector3DConverter();
+        }
+
+        public override bool GetCreateInstanceSupported(ITypeDescriptorContext context) => true;
+        public override object CreateInstance(ITypeDescriptorContext context, IDictionary propertyValues)
+        {
+            if (propertyValues == null)
+                throw new ArgumentNullException("propertyValues");
+
+            if(propertyValues.Contains("Scale") && propertyValues.Contains("Rotation") && propertyValues.Contains("Translation"))
+            {
+                var affine = new SharpGLTF.Transforms.AffineTransform();
+                affine.Rotation = ((Nexus.Quaternion)propertyValues["Rotation"]).ToQuaternion();
+                affine.Translation = ((Nexus.Vector3D)propertyValues["Translation"]).ToVector3();
+                affine.Scale = ((Nexus.Vector3D)propertyValues["Scale"]).ToVector3();
+                return affine.Matrix.ToNexusMatrix();
+            }
+            else
+            {
+                throw new ArgumentException("Affine transform parameters missing");
+            }
+        }
     }
 
     class StructFieldProperty<TObject, TField> : PropertyDescriptor
@@ -125,6 +195,69 @@ namespace PD2ModelParser.Inspector
                 return base.ConvertTo(context, culture, value, destinationType);
 
             return $"{{X:{vec.X.ToString("G9")} Y:{vec.Y.ToString("G9")} Z:{vec.Z.ToString("G9")}}}";
+        }
+    }
+
+    class NexusQuaternionConverter : ExpandableObjectConverter
+    {
+
+        public override bool GetCreateInstanceSupported(ITypeDescriptorContext context) => true;
+        public override object CreateInstance(ITypeDescriptorContext context, IDictionary propertyValues)
+        {
+            if (propertyValues == null)
+                throw new ArgumentNullException("propertyValues");
+
+            var result = new Nexus.Vector3D();
+            if (propertyValues.Contains("X")) { result.X = (float)Convert.ChangeType(propertyValues["X"], typeof(float)); }
+            if (propertyValues.Contains("Y")) { result.Y = (float)Convert.ChangeType(propertyValues["Y"], typeof(float)); }
+            if (propertyValues.Contains("Z")) { result.Z = (float)Convert.ChangeType(propertyValues["Z"], typeof(float)); }
+            if (propertyValues.Contains("W")) { result.Z = (float)Convert.ChangeType(propertyValues["W"], typeof(float)); }
+
+            object boxed = result;
+            return (Nexus.Vector3D)boxed;
+        }
+
+        public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
+        {
+            return new PropertyDescriptorCollection(new PropertyDescriptor[]
+            {
+                new StructFieldProperty<Nexus.Quaternion, float>("X"),
+                new StructFieldProperty<Nexus.Quaternion, float>("Y"),
+                new StructFieldProperty<Nexus.Quaternion, float>("Z"),
+                new StructFieldProperty<Nexus.Quaternion, float>("W")
+            });
+        }
+
+        private Regex vec3Parser = new Regex(@"\{?(?:X:)?([-+E\.0-9]+) *,? *(?:Y:)?([-+E\.0-9]+) *,? *(?:Z:)?([-+E\.0-9]+) *,? *(?:W:)?([-+E\.0-9]+)\}?", RegexOptions.IgnoreCase);
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) => sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        {
+            if (value.GetType() != typeof(string))
+                return base.ConvertFrom(context, culture, value);
+
+            var match = vec3Parser.Match((string)value);
+            if (!match.Success) return null;
+
+            if (float.TryParse(match.Groups[1].Value, out float X)
+                && float.TryParse(match.Groups[2].Value, out float Y)
+                && float.TryParse(match.Groups[3].Value, out float Z)
+                && float.TryParse(match.Groups[3].Value, out float W))
+            {
+                return new Nexus.Vector3D(X, Y, Z);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType) => destinationType == typeof(string) || base.CanConvertFrom(context, destinationType);
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        {
+            if (destinationType != typeof(string) || !(value is Nexus.Quaternion vec))
+                return base.ConvertTo(context, culture, value, destinationType);
+
+            return $"{{X:{vec.X.ToString("G9")} Y:{vec.Y.ToString("G9")} Z:{vec.Z.ToString("G9")} W:{vec.W.ToString("G9")}}}";
         }
     }
 
