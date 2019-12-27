@@ -154,6 +154,9 @@ namespace PD2ModelParser
         public static Quaternion ToNexusQuaternion(this System.Numerics.Quaternion input) => new Quaternion(input.X, input.Y, input.Z, input.W);
         public static System.Numerics.Quaternion ToQuaternion(this Quaternion input) => new System.Numerics.Quaternion(input.X, input.Y, input.Z, input.W);
 
+        public static Vector3D Max(Vector3D left, Vector3D right) => new Vector3D(Math.Max(left.X, right.X), Math.Max(left.Y, right.Y), Math.Max(left.Z, right.Z));
+        public static Vector3D Min(Vector3D left, Vector3D right) => new Vector3D(Math.Min(left.X, right.X), Math.Min(left.Y, right.Y), Math.Min(left.Z, right.Z));
+
         /// <summary>
         /// Clamp a float to 0..1 and rescale it to 0..255
         /// </summary>

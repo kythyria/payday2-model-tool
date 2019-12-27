@@ -146,7 +146,7 @@ namespace PD2ModelParser.Importers
             ms.atoms = md.renderAtoms;
 
             ms.PopulateFromMeshData(md);
-            UpdateBounds(md.verts, model);
+            model.UpdateBounds(data);
 
             model.renderAtoms = md.renderAtoms;
         }
@@ -191,18 +191,10 @@ namespace PD2ModelParser.Importers
             ms.PopulateFromMeshData(md);
 
             var model = new DM.Model(name, (uint)ms.geom.verts.Count, (uint)ms.topo.facelist.Count, ms.passgp, ms.topoip, ms.matg, null);
-            UpdateBounds(md.verts, model);
+            model.UpdateBounds(data);
             model.renderAtoms = md.renderAtoms;
 
             return model;
-        }
-
-        void UpdateBounds(List<Vector3> positions, DM.Model mod)
-        {
-            if (positions.Count == 0) { return; }
-
-            mod.BoundsMin = positions.Aggregate(positions[0], Vector3.Min).ToNexusVector();
-            mod.BoundsMax = positions.Aggregate(positions[0], Vector3.Max).ToNexusVector();
         }
 
         HashName GetName(string input)

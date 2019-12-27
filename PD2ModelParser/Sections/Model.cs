@@ -37,7 +37,7 @@ namespace PD2ModelParser.Sections
         public UInt32 version { get; set; }
         //Version 6
         [Category("Model")]
-        public UInt32 v6_unknown7 { get; set; }
+        public float v6_unknown7 { get; set; }
         [Category("Model")]
         public UInt32 v6_unknown8 { get; set; }
         //Other Versions
@@ -67,7 +67,7 @@ namespace PD2ModelParser.Sections
         public UInt32 properties_bitmap { get; set; }
 
         [Category("Model")]
-        public UInt32 unknown12 { get; set; }
+        public float BoundingRadius { get; set; }
 
         [Category("Model")]
         public UInt32 unknown13 { get; set; }
@@ -102,7 +102,7 @@ namespace PD2ModelParser.Sections
             this.bounds_min = new Vector3D(0, 0, 0);
             this.bounds_max = new Vector3D(0, 0, 0);
             this.properties_bitmap = 0;
-            this.unknown12 = 1;
+            this.BoundingRadius = 1;
             this.unknown13 = 6;
             this.skinbones_ID = 0;
 
@@ -129,7 +129,7 @@ namespace PD2ModelParser.Sections
                 this.bounds_max.Y = instream.ReadSingle();
                 this.bounds_max.Z = instream.ReadSingle();
                 
-                this.v6_unknown7 = instream.ReadUInt32();
+                this.v6_unknown7 = instream.ReadSingle();
                 this.v6_unknown8 = instream.ReadUInt32();
             }
             else
@@ -167,7 +167,7 @@ namespace PD2ModelParser.Sections
                 this.bounds_max.Y = instream.ReadSingle();
                 this.bounds_max.Z = instream.ReadSingle();
 
-                this.unknown12 = instream.ReadUInt32();
+                this.BoundingRadius = instream.ReadSingle();
                 this.unknown13 = instream.ReadUInt32();
                 this.skinbones_ID = instream.ReadUInt32();
             }
@@ -236,7 +236,7 @@ namespace PD2ModelParser.Sections
                 outstream.Write(this.bounds_max.Y);
                 outstream.Write(this.bounds_max.Z);
 
-                outstream.Write(this.unknown12);
+                outstream.Write(this.BoundingRadius);
                 outstream.Write(this.unknown13);
                 outstream.Write(this.skinbones_ID);
 
@@ -253,10 +253,27 @@ namespace PD2ModelParser.Sections
             else
             {
                 var atoms_string = string.Join(",", renderAtoms.Select(i => i.ToString()));
-                return base.ToString() + " version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " RenderAtoms: " + this.renderAtoms.Count + " items: [" + atoms_string + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " unknown12: " + this.unknown12 + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+                return base.ToString() + " version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " RenderAtoms: " + this.renderAtoms.Count + " items: [" + atoms_string + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " BoundingRadius: " + this.BoundingRadius + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             }
         }
 
         public override uint TypeCode => Tags.model_data_tag;
+
+        public void UpdateBounds(FullModelData fmd)
+        {
+            if (version != 3) { return; }
+
+            var gp = fmd.parsed_sections[passthroughGP_ID] as PassthroughGP;
+            if (gp == null) { return; }
+
+            var geo = fmd.parsed_sections[gp.geometry_section] as Geometry;
+            if (geo == null) { return; }
+
+            if(geo.verts.Count == 0) { return; }
+
+            BoundsMax = geo.verts.Aggregate(MathUtil.Max);
+            BoundsMin = geo.verts.Aggregate(MathUtil.Min);
+            BoundingRadius = geo.verts.Select(i => i.Length()).Max();
+        }
     }
 }

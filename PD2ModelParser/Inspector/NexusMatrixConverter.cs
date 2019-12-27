@@ -260,26 +260,4 @@ namespace PD2ModelParser.Inspector
             return $"{{X:{vec.X.ToString("G9")} Y:{vec.Y.ToString("G9")} Z:{vec.Z.ToString("G9")} W:{vec.W.ToString("G9")}}}";
         }
     }
-
-    class StructConverter<T> : ExpandableObjectConverter
-    {
-        public override bool GetCreateInstanceSupported(ITypeDescriptorContext context) => true;
-        public override object CreateInstance(ITypeDescriptorContext context, IDictionary propertyValues)
-        {
-            if (propertyValues == null)
-                throw new ArgumentNullException("propertyValues");
-
-            T ret = default(T);
-            object boxed = ret;
-            foreach (DictionaryEntry entry in propertyValues)
-            {
-                System.Reflection.PropertyInfo pi = ret.GetType().GetProperty(entry.Key.ToString());
-                if (pi != null && pi.CanWrite)
-                {
-                    pi.SetValue(boxed, Convert.ChangeType(entry.Value, pi.PropertyType), null);
-                }
-            }
-            return (T)boxed;
-        }
-    }
 }

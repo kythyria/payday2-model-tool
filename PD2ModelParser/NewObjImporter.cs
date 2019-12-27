@@ -444,6 +444,7 @@ namespace PD2ModelParser
             {
                 model_data_section.BoundsMin = new_Model_data_bounds_min;
                 model_data_section.BoundsMax = new_Model_data_bounds_max;
+                model_data_section.BoundingRadius = obj.verts.Select(i => i.Length()).Max();
             }
 
             geometry_section.vert_count = (uint)obj.verts.Count;
