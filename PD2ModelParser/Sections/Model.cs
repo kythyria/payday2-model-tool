@@ -177,23 +177,6 @@ namespace PD2ModelParser.Sections
 
         }
 
-        public override void StreamWrite(BinaryWriter outstream)
-        {
-            outstream.Write(Tags.model_data_tag);
-            outstream.Write(SectionId);
-            long newsizestart = outstream.BaseStream.Position;
-            outstream.Write(this.size);
-
-            this.StreamWriteData(outstream);
-
-            //update section size
-            long newsizeend = outstream.BaseStream.Position;
-            outstream.BaseStream.Position = newsizestart;
-            outstream.Write((uint)(newsizeend - (newsizestart + 4)));
-
-            outstream.BaseStream.Position = newsizeend;
-        }
-
         public override void StreamWriteData(BinaryWriter outstream)
         {
             base.StreamWriteData(outstream);

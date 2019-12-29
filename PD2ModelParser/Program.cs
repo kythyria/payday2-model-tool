@@ -58,6 +58,15 @@ namespace PD2ModelParser
             }
         }
 
+        static IEnumerable<(string, FullModelData)> EveryModel(string root)
+        {
+            foreach(var i in WalkDirectoryTreeDepth(new DirectoryInfo(root), "*.model"))
+            {
+                var fmd = ModelReader.Open(i.FullName);
+                yield return (i.FullName.Substring(root.Length), fmd);
+            }
+        }
+
         [STAThread]
         static void Main(string[] args)
         {

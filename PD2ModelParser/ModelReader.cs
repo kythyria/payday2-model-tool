@@ -169,6 +169,10 @@ namespace PD2ModelParser
                         {
                             section = new CustomHashlist(br, sh);
                         }
+                        else if (sh.type == light_tag)
+                        {
+                            section = new Light(br, sh);
+                        }
                         else
                         {
                             Log.Default.Warn("UNKNOWN Tag at {0} Size: {1}", sh.offset, sh.size);

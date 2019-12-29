@@ -100,10 +100,9 @@ namespace PD2ModelParser.UI
                 reverseNodes[node] = obj;
                 node.Tag = obj;
 
-                if (obj is Model)
-                    node.Text = obj.Name + " (model)";
-                else
-                    node.Text = obj.Name;
+                node.Text = obj.Name;
+                if (obj.GetType() != typeof(Object3D))
+                    node.Text += $" ({obj.GetType().Name})";
 
                 if (node.Parent == parent) continue;
 
