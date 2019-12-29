@@ -9,7 +9,6 @@ namespace PD2ModelParser.Sections
 {
     class TopologyIP : AbstractSection, ISection
     {
-        public UInt32 id;
         public UInt32 size;
 
         public UInt32 topology_id;
@@ -18,14 +17,14 @@ namespace PD2ModelParser.Sections
 
         public TopologyIP(uint sec_id, Topology top)
         {
-            this.id = sec_id;
+            this.SectionId = sec_id;
             this.size = 0;
-            this.topology_id = top.id;
+            this.topology_id = top.SectionId;
         }
 
         public TopologyIP(BinaryReader br, SectionHeader sh)
         {
-            this.id = sh.id;
+            this.SectionId = sh.id;
             this.size = sh.size;
             this.topology_id = br.ReadUInt32();
             this.remaining_data = null;
@@ -44,12 +43,6 @@ namespace PD2ModelParser.Sections
         public override string ToString()
         {
             return base.ToString() + " size: " + this.size + " Topology sectionID: " + this.topology_id + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
-        }
-
-        public override uint SectionId
-        {
-            get => id;
-            set => id = value;
         }
 
         public override uint TypeCode => Tags.topologyIP_tag;

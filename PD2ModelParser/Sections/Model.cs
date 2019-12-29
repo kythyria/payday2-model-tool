@@ -82,8 +82,8 @@ namespace PD2ModelParser.Sections
             SectionId = (uint)object_name.GetHashCode();
 
             this.version = 3;
-            this.passthroughGP_ID = passGP.id;
-            this.topologyIP_ID = topoIP.id;
+            this.passthroughGP_ID = passGP.SectionId;
+            this.topologyIP_ID = topoIP.SectionId;
             this.renderAtoms = new List<RenderAtom>();
             RenderAtom nmi = new RenderAtom
             {
@@ -97,7 +97,7 @@ namespace PD2ModelParser.Sections
             this.renderAtoms.Add(nmi);
 
             //this.unknown9 = 0;
-            this.material_group_section_id = matg.id;
+            this.material_group_section_id = matg.SectionId;
             this.lightset_ID = 0;
             this.bounds_min = new Vector3D(0, 0, 0);
             this.bounds_max = new Vector3D(0, 0, 0);

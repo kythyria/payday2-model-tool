@@ -9,7 +9,6 @@ namespace PD2ModelParser.Sections
 {
     class Material_Group : AbstractSection, ISection
     {
-        public UInt32 id;
         public UInt32 size;
 
         public UInt32 count;
@@ -19,7 +18,7 @@ namespace PD2ModelParser.Sections
 
         public Material_Group(uint sec_id, uint mat_id)
         {
-            this.id = sec_id;
+            this.SectionId = sec_id;
             this.size = 0;
             this.count = 1;
             this.items.Add(mat_id);
@@ -27,7 +26,7 @@ namespace PD2ModelParser.Sections
 
         public Material_Group(uint sec_id, IEnumerable<uint> mat_ids)
         {
-            this.id = sec_id;
+            this.SectionId = sec_id;
             this.size = 0;
             this.items = mat_ids.ToList();
             this.count = (uint)this.items.Count;
@@ -35,7 +34,7 @@ namespace PD2ModelParser.Sections
 
         public Material_Group(BinaryReader instream, SectionHeader section)
         {
-            this.id = section.id;
+            this.SectionId = section.id;
             this.size = section.size;
             
             this.count = instream.ReadUInt32();
@@ -70,12 +69,6 @@ namespace PD2ModelParser.Sections
             }
 
             return base.ToString() + " size: " + this.size + " Count: " + this.count + " Items: [ " + items_string + " ] " + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
-        }
-
-        public override uint SectionId
-        {
-            get => id;
-            set => id = value;
         }
 
         public override uint TypeCode => Tags.material_group_tag;

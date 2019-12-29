@@ -58,7 +58,6 @@ namespace PD2ModelParser.Sections
     /// </remarks>
     class Bones : AbstractSection, ISection
     {
-        public override uint SectionId { get; set; }
         public override uint TypeCode => Tags.bones_tag;
         public UInt32 size;
 

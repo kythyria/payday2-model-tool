@@ -78,7 +78,7 @@ namespace PD2ModelParser.Importers
             // TODO material setup
             Material mat = new Material(0, "");
             data.AddSection(mat);
-            Material_Group mat_g = new Material_Group(0, mat.id);
+            Material_Group mat_g = new Material_Group(0, mat.SectionId);
             data.AddSection(mat_g);
 
             // Used for some internal model stuff
@@ -184,7 +184,7 @@ namespace PD2ModelParser.Importers
 
             SkinBones sb = new SkinBones(0);
             data.AddSection(sb);
-            model.skinbones_ID = sb.id;
+            model.skinbones_ID = sb.SectionId;
 
             Recurse(rootNode, rootPoint, (node, parent) =>
             {
@@ -235,7 +235,7 @@ namespace PD2ModelParser.Importers
                 //     return obj;
 
                 // See above, wrt the hack to get around extra bones
-                if (!previous.objects.Contains(obj.id))
+                if (!previous.objects.Contains(obj.SectionId))
                     return obj;
 
                 // Bone transforms seem to get messed up really easily. Since changing bone
@@ -247,7 +247,7 @@ namespace PD2ModelParser.Importers
                     obj.rotation = node.GetNexusTransform();
                 }
 
-                sb.objects.Add(obj.id);
+                sb.objects.Add(obj.SectionId);
 
                 // TODO implement
                 // ZNix's 10/11/19 notes on how the rotation and global_skin_transform seem
@@ -268,7 +268,7 @@ namespace PD2ModelParser.Importers
             if (root_bone == null)
                 throw new Exception("EFBX005 Rigged model " + rootNode.GetName() + " has no bones");
 
-            sb.probably_root_bone = root_bone.id;
+            sb.probably_root_bone = root_bone.SectionId;
             rootBone = root_bone;
 
             // TODO more research into how this works

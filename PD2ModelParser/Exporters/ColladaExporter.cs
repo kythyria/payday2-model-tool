@@ -159,10 +159,10 @@ namespace PD2ModelParser
                         // Find the locators and such, and add them to the TODO list
                         foreach (Object3D child in obj.children)
                         {
-                            if (!parsed.Contains(child.id)) // Don't process something twice
+                            if (!parsed.Contains(child.SectionId)) // Don't process something twice
                             {
-                                parsed.Add(child.id);
-                                to_parse.Enqueue(child.id);
+                                parsed.Add(child.SectionId);
+                                to_parse.Enqueue(child.SectionId);
                             }
                         }
 

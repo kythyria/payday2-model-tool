@@ -219,7 +219,7 @@ namespace PD2ModelParser.Exporters
 
             // If it's not part of the SkinBones object list, then it's a locator that vertices can't bind to
             // This will be read later when importing
-            if (!sb.objects.Contains(obj.id))
+            if (!sb.objects.Contains(obj.SectionId))
             {
                 name += FbxUtils.LocatorSuffix;
             }

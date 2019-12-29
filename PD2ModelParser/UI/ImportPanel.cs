@@ -149,7 +149,7 @@ namespace PD2ModelParser.UI
 
                 foreach (Object3D obj in data.SectionsOfType<Object3D>())
                 {
-                    root_point_items.Add(new RootPointItem(obj.Name, obj.id));
+                    root_point_items.Add(new RootPointItem(obj.Name, obj.SectionId));
 
                     if (old_selected_name == obj.Name)
                     {

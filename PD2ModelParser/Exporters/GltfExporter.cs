@@ -35,7 +35,7 @@ namespace PD2ModelParser.Exporters
 
             foreach (var ms in data.parsed_sections.Where(i => i.Value is Material).Select(i => i.Value as Material))
             {
-                materialsBySectionId[ms.id] = root.CreateMaterial(ms.hashname.String);
+                materialsBySectionId[ms.SectionId] = root.CreateMaterial(ms.hashname.String);
             }
 
             foreach(var i in data.SectionsOfType<Object3D>().Where(i => i.parent == null))
@@ -129,7 +129,7 @@ namespace PD2ModelParser.Exporters
         List<(string, GLTF.Accessor)> GetGeometryAttributes(Geometry geometry)
         {
             List<(string, GLTF.Accessor)> result;
-            if(vertexAttributesByGeometryId.TryGetValue(geometry.id, out result))
+            if(vertexAttributesByGeometryId.TryGetValue(geometry.SectionId, out result))
             {
                 return result;
             }

@@ -9,7 +9,6 @@ namespace PD2ModelParser.Sections
     //[System.ComponentModel.TypeConverter(typeof(Inspector.AbstractSectionConverter))]
     public class Object3D : AbstractSection, ISection, IPostLoadable, IHashContainer
     {
-        public UInt32 id;
         public UInt32 size;
 
         [Category("Object3D")]
@@ -32,7 +31,7 @@ namespace PD2ModelParser.Sections
         }
 
         [Browsable(false)]
-        public uint parentID => parent?.id ?? 0;
+        public uint parentID => parent?.SectionId ?? 0;
 
         public byte[] remaining_data = null;
 
@@ -64,17 +63,11 @@ namespace PD2ModelParser.Sections
         [Browsable(false)]
         public string Name => HashName.String;
 
-        public override uint SectionId
-        {
-            get => id;
-            set => id = value;
-        }
-
         public override uint TypeCode => Tags.object3D_tag;
 
         public Object3D(string object_name, Object3D parent)
         {
-            this.id = 0;
+            this.SectionId = 0;
             this.size = 0;
 
             this.HashName = new HashName(object_name);
@@ -88,7 +81,7 @@ namespace PD2ModelParser.Sections
 
         public Object3D(BinaryReader instream, SectionHeader section) : this(instream)
         {
-            this.id = section.id;
+            this.SectionId = section.id;
             this.size = section.size;
 
             if (section.End > instream.BaseStream.Position)

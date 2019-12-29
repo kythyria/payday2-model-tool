@@ -38,7 +38,7 @@ namespace PD2ModelParser.Sections
         [DisplayName("ID")]
         [Description("File-internal identifier for this section.")]
         [ReadOnly(true)]
-        public abstract uint SectionId { get; set; }
+        public virtual uint SectionId { get; set; }
 
         [Category("Section")]
         [DisplayName("Type Code")]

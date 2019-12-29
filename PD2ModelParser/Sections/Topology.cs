@@ -42,8 +42,6 @@ namespace PD2ModelParser.Sections
 
     class Topology : AbstractSection, ISection
     {
-        public UInt32 id;
-
         public UInt32 unknown1;
         public List<Face> facelist = new List<Face>();
         public UInt32 count2;
@@ -54,7 +52,7 @@ namespace PD2ModelParser.Sections
 
         public Topology(uint secId)
         {
-            id = secId;
+            SectionId = secId;
         }
 
         public Topology(uint secId, string objectName) : this(secId)
@@ -121,12 +119,6 @@ namespace PD2ModelParser.Sections
                    " items2: " + this.items2.Length +
                    " HashName: " + StaticStorage.hashindex.GetString(this.hashname) +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
-        }
-
-        public override uint SectionId
-        {
-            get => id;
-            set => id = value;
         }
 
         public override uint TypeCode => Tags.topology_tag;

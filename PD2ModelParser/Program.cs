@@ -366,7 +366,7 @@ namespace PD2ModelParser
 
                 if (name == root_point)
                 {
-                    return obj.id;
+                    return obj.SectionId;
                 }
             }
 

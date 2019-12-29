@@ -37,7 +37,6 @@ namespace PD2ModelParser.Sections
     
     class QuatLinearRotationController : AbstractSection, ISection
     {
-        public override uint SectionId { get; set; }
         public override uint TypeCode => Tags.quatLinearRotationController_tag;
         public UInt32 size;
 

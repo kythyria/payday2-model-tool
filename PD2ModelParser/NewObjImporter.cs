@@ -236,7 +236,7 @@ namespace PD2ModelParser
                     {
                         //create new Model
                         Material newMat = new Material((uint)(obj.object_name + ".material").GetHashCode(), obj.material_name);
-                        Material_Group newMatG = new Material_Group((uint)(obj.object_name + ".materialGroup").GetHashCode(), newMat.id);
+                        Material_Group newMatG = new Material_Group((uint)(obj.object_name + ".materialGroup").GetHashCode(), newMat.SectionId);
                         Geometry newGeom = new Geometry((uint)(obj.object_name + ".geom").GetHashCode(), obj);
                         Topology newTopo = new Topology((uint)(obj.object_name + ".topo").GetHashCode(), obj);
 
@@ -250,18 +250,18 @@ namespace PD2ModelParser
                             newModel, newPassGP, newGeom, newTopo);
 
                         //Add new sections
-                        parsed_sections.Add(newMat.id, newMat);
-                        sections.Add(new SectionHeader(newMat.id));
-                        parsed_sections.Add(newMatG.id, newMatG);
-                        sections.Add(new SectionHeader(newMatG.id));
-                        parsed_sections.Add(newGeom.id, newGeom);
-                        sections.Add(new SectionHeader(newGeom.id));
-                        parsed_sections.Add(newTopo.id, newTopo);
-                        sections.Add(new SectionHeader(newTopo.id));
-                        parsed_sections.Add(newPassGP.id, newPassGP);
-                        sections.Add(new SectionHeader(newPassGP.id));
-                        parsed_sections.Add(newTopoIP.id, newTopoIP);
-                        sections.Add(new SectionHeader(newTopoIP.id));
+                        parsed_sections.Add(newMat.SectionId, newMat);
+                        sections.Add(new SectionHeader(newMat.SectionId));
+                        parsed_sections.Add(newMatG.SectionId, newMatG);
+                        sections.Add(new SectionHeader(newMatG.SectionId));
+                        parsed_sections.Add(newGeom.SectionId, newGeom);
+                        sections.Add(new SectionHeader(newGeom.SectionId));
+                        parsed_sections.Add(newTopo.SectionId, newTopo);
+                        sections.Add(new SectionHeader(newTopo.SectionId));
+                        parsed_sections.Add(newPassGP.SectionId, newPassGP);
+                        sections.Add(new SectionHeader(newPassGP.SectionId));
+                        parsed_sections.Add(newTopoIP.SectionId, newTopoIP);
+                        sections.Add(new SectionHeader(newTopoIP.SectionId));
                         parsed_sections.Add(newModel.SectionId, newModel);
                         sections.Add(new SectionHeader(newModel.SectionId));
                     }

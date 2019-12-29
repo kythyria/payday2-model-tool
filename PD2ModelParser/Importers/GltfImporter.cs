@@ -134,7 +134,7 @@ namespace PD2ModelParser.Importers
                 return mat;
             }).ToList();
 
-            var matGroup = new DM.Material_Group((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats.Select(i => i.id));
+            var matGroup = new DM.Material_Group((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats.Select(i => i.SectionId));
             data.AddSection(matGroup);
 
             var ms = new MeshSections();
@@ -167,7 +167,7 @@ namespace PD2ModelParser.Importers
                 return mat;
             }).ToList();
 
-            var matGroup = new DM.Material_Group((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats.Select(i => i.id));
+            var matGroup = new DM.Material_Group((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats.Select(i => i.SectionId));
             data.AddSection(matGroup);
 
             var ms = new MeshSections();

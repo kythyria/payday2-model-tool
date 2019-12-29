@@ -12,22 +12,14 @@ namespace PD2ModelParser.Sections
     // be a bit of a pain to do.
     class SkinBones : AbstractSection, ISection, IPostLoadable
     {
-        public UInt32 id;
-
         public Bones bones;
         public UInt32 probably_root_bone;
         public int count => objects.Count;
-        public List<UInt32> objects = new List<UInt32>();
+        public List<UInt32> objects = new List<UInt32>(); // of Object3D by SectionID
         public List<Matrix3D> rotations = new List<Matrix3D>();
         public Matrix3D global_skin_transform;
 
         public byte[] remaining_data = null;
-
-        public override uint SectionId
-        {
-            get => id;
-            set => id = value;
-        }
 
         public override uint TypeCode => Tags.skinbones_tag;
 
@@ -37,7 +29,7 @@ namespace PD2ModelParser.Sections
         public SkinBones(uint secId)
         {
             bones = new Bones();
-            id = secId;
+            SectionId = secId;
         }
 
         public SkinBones(BinaryReader instream, SectionHeader section) : this(section.id)

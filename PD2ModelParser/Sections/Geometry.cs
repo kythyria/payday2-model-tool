@@ -135,8 +135,6 @@ namespace PD2ModelParser.Sections
 
     class Geometry : AbstractSection, ISection
     {
-        public UInt32 id;
-
         // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
         public UInt32 vert_count;
 
@@ -163,7 +161,7 @@ namespace PD2ModelParser.Sections
 
         public Geometry(uint id)
         {
-            this.id = id;
+            this.SectionId = id;
 
             for (int i = 0; i < UVs.Length; i++)
             {
@@ -542,12 +540,6 @@ namespace PD2ModelParser.Sections
                    " Geometry_unknown_item_data: " + this.unknown_item_data.Count +
                    " unknown_hash: " + StaticStorage.hashindex.GetString(this.hashname) +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
-        }
-
-        public override uint SectionId
-        {
-            get => id;
-            set => id = value;
         }
 
         public override uint TypeCode => Tags.geometry_tag;

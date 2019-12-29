@@ -86,16 +86,16 @@ namespace PD2ModelParser.UI
             // not exist when we build one if it's children.
             foreach (Object3D obj in objs)
             {
-                if (!nodes.ContainsKey(obj.id))
-                    nodes[obj.id] = new TreeNode();
-                unused.Remove(obj.id);
+                if (!nodes.ContainsKey(obj.SectionId))
+                    nodes[obj.SectionId] = new TreeNode();
+                unused.Remove(obj.SectionId);
             }
 
             // Set each object's label, and move it to the correct parent if needed.
             foreach (Object3D obj in objs)
             {
-                TreeNode node = nodes[obj.id];
-                TreeNode parent = obj.parent == null ? root : nodes[obj.parent.id];
+                TreeNode node = nodes[obj.SectionId];
+                TreeNode parent = obj.parent == null ? root : nodes[obj.parent.SectionId];
 
                 reverseNodes[node] = obj;
                 node.Tag = obj;

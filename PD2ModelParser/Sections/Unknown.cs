@@ -11,7 +11,6 @@ namespace PD2ModelParser.Sections
     {
         public UInt32 tag;
 
-        public override uint SectionId { get; set; }
         public override uint TypeCode => this.tag;
 
         public UInt32 size;

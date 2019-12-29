@@ -9,7 +9,6 @@ namespace PD2ModelParser.Sections
 {
     class Author : AbstractSection, ISection
     {
-        public override uint SectionId { get; set; }
         public override uint TypeCode => Tags.author_tag;
         public UInt32 size;
 

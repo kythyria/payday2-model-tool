@@ -36,7 +36,6 @@ namespace PD2ModelParser.Sections
 
     class LinearVector3Controller : AbstractSection, ISection
     {
-        public override uint SectionId { get; set; }
         public override uint TypeCode => Tags.linearVector3Controller_tag;
         public UInt32 size;
 

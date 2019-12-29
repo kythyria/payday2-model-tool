@@ -20,7 +20,6 @@ namespace PD2ModelParser.Sections
 
     class Material : AbstractSection, ISection
     {
-        public UInt32 id;
         public UInt32 size;
 
         public HashName hashname; //Hashed material name (see hashlist.txt)
@@ -32,7 +31,7 @@ namespace PD2ModelParser.Sections
 
         public Material(uint sec_id, string mat_name)
         {
-            this.id = sec_id;
+            this.SectionId = sec_id;
             this.size = 0;
             this.hashname = new HashName(mat_name);
             this.skipped = new byte[48];
@@ -41,7 +40,7 @@ namespace PD2ModelParser.Sections
 
         public Material(BinaryReader instream, SectionHeader section)
         {
-            this.id = section.id;
+            this.SectionId = section.id;
             this.size = section.size;
 
             this.hashname = new HashName(instream.ReadUInt64());
@@ -92,12 +91,6 @@ namespace PD2ModelParser.Sections
                    " count: " + this.count +
                    " items: [ " + items_string + " ] " +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
-        }
-
-        public override uint SectionId
-        {
-            get => id;
-            set => id = value;
         }
 
         public override uint TypeCode => Tags.material_tag;
