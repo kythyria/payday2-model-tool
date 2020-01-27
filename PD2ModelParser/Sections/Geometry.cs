@@ -85,6 +85,15 @@ namespace PD2ModelParser.Sections
 
     public class GeometryHeader
     {
+        /// <summary>
+        /// Byte sizes for various types of geometry buffer. Official data is consistent regarding
+        /// which one goes with which <see cref="GeometryChannelTypes"/>.
+        /// </summary>
+        public static readonly IReadOnlyList<uint> ItemSizes = new List<uint> { 0, 4, 8, 12, 16, 4, 4, 8, 12 };
+
+        /// <summary>
+        /// Index into <see cref="ItemSizes"/>
+        /// </summary>
         public UInt32 item_size;
         public GeometryChannelTypes item_type;
 
@@ -97,6 +106,8 @@ namespace PD2ModelParser.Sections
             item_size = size;
             item_type = type;
         }
+
+        public uint ItemSizeBytes { get { return ItemSizes[(int)item_size]; } }
     }
 
     // Extracted from dsl::wd3d::D3DShaderProgram::compile
@@ -190,7 +201,6 @@ namespace PD2ModelParser.Sections
 
         public Geometry(BinaryReader instream, SectionHeader section) : this(section.id)
         {
-            UInt32[] size_index = {0, 4, 8, 12, 16, 4, 4, 8, 12};
             // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
             this.vert_count = instream.ReadUInt32();
             //Count of all headers for items in this section
@@ -201,7 +211,7 @@ namespace PD2ModelParser.Sections
                 GeometryHeader header = new GeometryHeader();
                 header.item_size = instream.ReadUInt32();
                 header.item_type = (GeometryChannelTypes) instream.ReadUInt32();
-                calc_size += size_index[(int) header.item_size];
+                calc_size += header.ItemSizeBytes;
                 this.headers.Add(header);
             }
 
@@ -305,7 +315,7 @@ namespace PD2ModelParser.Sections
                 else
                 {
                     this.unknown_item_data.Add(
-                        instream.ReadBytes((int) (size_index[head.item_size] * this.vert_count)));
+                        instream.ReadBytes((int) (head.ItemSizeBytes * this.vert_count)));
                 }
             }
 

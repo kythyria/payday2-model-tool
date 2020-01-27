@@ -236,7 +236,7 @@ namespace PD2ModelParser.Importers
                 AddToGeom(ref geom.normals, 3, DM.GeometryChannelTypes.NORMAL0, md.normals, MathUtil.ToNexusVector);
                 AddToGeom(ref geom.binormals, 3, DM.GeometryChannelTypes.BINORMAL0, md.binormals, MathUtil.ToNexusVector);
                 AddToGeom(ref geom.tangents, 3, DM.GeometryChannelTypes.TANGENT0, md.tangents, MathUtil.ToNexusVector);
-                AddToGeom(ref geom.vertex_colors, 3, DM.GeometryChannelTypes.COLOR0, md.vertex_colors, i => i);
+                AddToGeom(ref geom.vertex_colors, 5, DM.GeometryChannelTypes.COLOR0, md.vertex_colors, i => i);
                 for(var i = 0; i < md.uvs.Length; i++)
                 {
                     var ct = (DM.GeometryChannelTypes)((int)DM.GeometryChannelTypes.TEXCOORD0 + i);
