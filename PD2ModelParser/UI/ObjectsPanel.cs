@@ -15,7 +15,8 @@ namespace PD2ModelParser.UI
     {
         private readonly Dictionary<uint, TreeNode> nodes = new Dictionary<uint, TreeNode>();
         private readonly Dictionary<TreeNode, Object3D> reverseNodes = new Dictionary<TreeNode, Object3D>();
-        private readonly TreeNode root = new TreeNode("<objects>");
+        private readonly TreeNode objectRoot = new TreeNode("<Object3D>");
+        private readonly TreeNode geometryRoot = new TreeNode("<Geometry>");
         private readonly ContextMenu nodeRightclickMenu;
         private TreeNode menuTarget;
 
@@ -24,7 +25,8 @@ namespace PD2ModelParser.UI
             InitializeComponent();
 
             treeView.Nodes.Clear();
-            treeView.Nodes.Add(root);
+            treeView.Nodes.Add(objectRoot);
+            treeView.Nodes.Add(geometryRoot);
 
             nodeRightclickMenu = new ContextMenu();
 
@@ -95,7 +97,7 @@ namespace PD2ModelParser.UI
             foreach (Object3D obj in objs)
             {
                 TreeNode node = nodes[obj.SectionId];
-                TreeNode parent = obj.parent == null ? root : nodes[obj.parent.SectionId];
+                TreeNode parent = obj.parent == null ? objectRoot : nodes[obj.parent.SectionId];
 
                 reverseNodes[node] = obj;
                 node.Tag = obj;
@@ -117,6 +119,8 @@ namespace PD2ModelParser.UI
                 nodes[id].Remove();
                 nodes.Remove(id);
             }
+
+            ReloadGeometryList(data);
         }
 
         private void showScriptChanges_CheckedChanged(object sender, EventArgs e)
@@ -147,7 +151,7 @@ namespace PD2ModelParser.UI
                 return;
 
             // No properties for the root node
-            if (e.Node == root)
+            if (e.Node == objectRoot)
                 return;
 
             menuTarget = e.Node;
@@ -161,6 +165,35 @@ namespace PD2ModelParser.UI
             // TODO actually show some useful information
             //MessageBox.Show(obj.Name);
             propertyGrid1.SelectedObject = obj;
+        }
+
+        private void ReloadGeometryList(FullModelData fmd)
+        {
+            var newNodeIds = new HashSet<uint>(fmd.SectionsOfType<Geometry>().Select(i => i.SectionId));
+            var existingNodeIds = new HashSet<uint>(geometryRoot.Nodes.OfType<TreeNode>().Select(i => ((Geometry)i.Tag).SectionId));
+
+            var toRemove = new HashSet<uint>(existingNodeIds);
+            toRemove.ExceptWith(newNodeIds);
+            foreach(var i in toRemove)
+            {
+                geometryRoot.Nodes.RemoveByKey(i.ToString());
+            }
+
+            var toAddIds = new HashSet<uint>(newNodeIds);
+            toAddIds.ExceptWith(existingNodeIds);
+            var newNodeList = toAddIds.Select(i => {
+                var n = new TreeNode();
+                n.Tag = fmd.parsed_sections[i] as Geometry;
+                return n;
+            });
+
+            geometryRoot.Nodes.AddRange(newNodeList.ToArray());
+
+            foreach(TreeNode i in geometryRoot.Nodes)
+            {
+                var g = (Geometry)i.Tag;
+                i.Text = $"{g.SectionId} | Geometry ({new HashName(g.hashname).String})";
+            }
         }
     }
 }
