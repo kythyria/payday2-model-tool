@@ -254,9 +254,13 @@ namespace PD2ModelParser.Sections
 
             if(geo.verts.Count == 0) { return; }
 
+            rotation.Decompose(out Vector3D scale, out _, out _);
+
+            var scaled = geo.verts.Select(i => new Vector3D(i.X * scale.X, i.Y * scale.Y, i.Z * scale.Z)).ToList();
+
             BoundsMax = geo.verts.Aggregate(MathUtil.Max);
             BoundsMin = geo.verts.Aggregate(MathUtil.Min);
-            BoundingRadius = geo.verts.Select(i => i.Length()).Max();
+            BoundingRadius = scaled.Select(i => i.Length()).Max();
         }
     }
 }
