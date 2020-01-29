@@ -285,7 +285,83 @@ namespace PD2ModelParser.Importers
                 return idx;
             }
 
+            public void AppendVertices(IEnumerable<Vertex> vertices)
+            {
+                foreach(var i in vertices)
+                {
+                    AppendVertex(i);
+                }
+            }
+
             public static MeshData FromGltfMesh(GLTF.Mesh mesh)
+            {
+                var attribsUsed = mesh.Primitives.First().VertexAccessors.Select(i => i.Key).OrderBy(i => i);
+                var ok = mesh.Primitives.Select(i => i.VertexAccessors.Keys.OrderBy(j => j)).Aggregate(true, (acc, curr) => acc && curr.SequenceEqual(attribsUsed));
+                if (!ok)
+                {
+                    throw new Exception("Vertex attributes not consistent between Primitives. Diesel cannot represent this.");
+                }
+
+                var ms = new MeshData();
+                ms.materials = mesh.Primitives.Select(i => i.Material?.Name ?? "Material: Default Material").Distinct().ToList();
+
+                uint currentBaseVertex = 0;
+                uint currentBaseIndex = 0;
+
+                foreach (var prim in mesh.Primitives)
+                {
+                    var vertices = GetVerticesFromPrimitive(prim).ToList();
+                    var primFaces = prim.GetTriangleIndices().ToList();
+                    var matname = prim.Material?.Name ?? "Material: Default Material";
+
+                    var ra = new DM.RenderAtom
+                    {
+                        BaseIndex = currentBaseIndex,
+                        BaseVertex = currentBaseVertex,
+                        MaterialId = (uint)ms.materials.IndexOf(matname),
+                        TriangleCount = (uint)primFaces.Count
+                    };
+
+                    var vertexIds = new Dictionary<Vertex, int>();
+                    foreach(var (A,B,C) in primFaces)
+                    {
+                        var vtxA = vertices[A];
+                        var vtxB = vertices[B];
+                        var vtxC = vertices[C];
+
+                        if(!vertexIds.ContainsKey(vtxA))
+                        {
+                            vertexIds[vtxA] = ms.AppendVertex(vtxA);
+                        }
+                        if (!vertexIds.ContainsKey(vtxB))
+                        {
+                            vertexIds[vtxB] = ms.AppendVertex(vtxB);
+                        }
+                        if (!vertexIds.ContainsKey(vtxC))
+                        {
+                            vertexIds[vtxC] = ms.AppendVertex(vtxC);
+                        }
+
+                        var df = new DM.Face()
+                        {
+                            a = (ushort)vertexIds[vtxA],
+                            b = (ushort)vertexIds[vtxB],
+                            c = (ushort)vertexIds[vtxC]
+                        };
+
+                        ms.faces.Add(df);
+                    }
+
+                    ra.GeometrySliceLength = (uint)vertexIds.Count;
+                    ms.renderAtoms.Add(ra);
+
+                    currentBaseIndex += ra.TriangleCount * 3;
+                    currentBaseVertex += ra.GeometrySliceLength;
+                }
+                return ms;
+            }
+
+            public static MeshData FromGltfMesh0(GLTF.Mesh mesh)
             {
                 var attribsUsed = mesh.Primitives.First().VertexAccessors.Select(i => i.Key).OrderBy(i => i);
                 var ok = mesh.Primitives.Select(i => i.VertexAccessors.Keys.OrderBy(j => j)).Aggregate(true, (acc, curr) => acc && curr.SequenceEqual(attribsUsed));
@@ -302,41 +378,37 @@ namespace PD2ModelParser.Importers
                     throw new Exception($"Missing material in mesh {mesh.Name}");
                 }
 
-                uint currentBaseVertex = 0;
-                uint currentBaseFace = 0;
+                var atomoids = new List<(List<Vertex> verts, List<DM.Face> faces, string matName)>();
                 foreach (var prim in mesh.Primitives)
                 {
-                    //var indicesByVertex = new Dictionary<Vertex, int>();
                     var vertices = GetVerticesFromPrimitive(prim).ToList();
-                    foreach (var vtx in vertices)
-                    {
-                        //if (indicesByVertex.ContainsKey(vtx)) { continue; }
-                        /*indicesByVertex[vtx] =*/ ms.AppendVertex(vtx);
-                    }
+                    var faces = prim.GetTriangleIndices().Select(i => new DM.Face { a = (ushort)i.A, b = (ushort)i.B, c = (ushort)i.C }).ToList();
+                    var matname = prim.Material?.Name ?? "Material: Default Material";
+                    atomoids.Add((vertices, faces, matname));
+                }
 
-                    foreach (var (A, B, C) in prim.GetTriangleIndices())
-                    {
-                        var face = new DM.Face
-                        {
-                            a = (ushort)(currentBaseVertex + A),// indicesByVertex[vertices[A]],
-                            b = (ushort)(currentBaseVertex + B),// indicesByVertex[vertices[B]],
-                            c = (ushort)(currentBaseVertex + C),// indicesByVertex[vertices[C]],
-                        };
-                        ms.faces.Add(face);
-                    }
+                var md = new MeshData();
 
-                    var ra = new DM.RenderAtom
+                uint currentBaseVertex = 0;
+                uint currentBaseIndex = 0;
+                foreach (var i in atomoids)
+                {
+                    var ra = new DM.RenderAtom()
                     {
-                        BaseIndex = currentBaseVertex,
-                        TriangleCount = (uint)ms.faces.Count,
-                        GeometrySliceLength = (uint)ms.verts.Count,
-                        BaseVertex = currentBaseFace,
-                        MaterialId = (uint)ms.materials.IndexOf(prim.Material?.Name ?? "Material: Default Material")
+                        BaseIndex = currentBaseIndex,
+                        BaseVertex = currentBaseVertex,
+                        MaterialId = (uint)ms.materials.IndexOf(i.matName)
                     };
-                    ms.renderAtoms.Add(ra);
 
-                    currentBaseVertex += ra.TriangleCount;
-                    currentBaseFace += ra.GeometrySliceLength;
+                    ms.AppendVertices(i.verts);
+                    ra.GeometrySliceLength = (uint)i.verts.Count;
+                    currentBaseVertex += (uint)i.verts.Count;
+
+                    ms.faces.AddRange(i.faces);
+                    ra.TriangleCount = (uint)i.faces.Count;
+                    currentBaseIndex += (uint)i.faces.Count * 3;
+
+                    ms.renderAtoms.Add(ra);
                 }
                 return ms;
             }
