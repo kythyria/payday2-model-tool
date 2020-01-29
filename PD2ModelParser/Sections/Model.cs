@@ -18,15 +18,22 @@ namespace PD2ModelParser.Sections
 
     public class RenderAtom
     {
+        //In official models, counts up with faceCount
         public UInt32 unknown1;
-        public UInt32 vertCount;  //Number of vertices in this RenderAtom
-        public UInt32 baseVertex; //Probably the offset from the start of the Topology where this RA starts, in vertices.
-        public UInt32 faceCount;  //Face count
+
+        //Seems to be the number of triangles
+        public UInt32 vertCount;
+
+        //Probably the offset from the start of the Topology where this RA starts, in vertices. Counts up with vertcount*3
+        public UInt32 baseVertex;
+
+        // In offical models, sums to the number of vertices in the corresponding Geometry.
+        public UInt32 faceCount;
         public UInt32 material_id;
 
         public override string ToString()
         {
-            return "{unknown1=" + this.unknown1 + " vertCount=" + this.vertCount + " unknown2=" + this.baseVertex + " faceCount=" + this.faceCount + " material_id=" + this.material_id + "}";
+            return "{unknown1=" + this.unknown1 + " vertCount=" + this.vertCount + " baseVertex=" + this.baseVertex + " faceCount=" + this.faceCount + " material_id=" + this.material_id + "}";
         }
     }
 
