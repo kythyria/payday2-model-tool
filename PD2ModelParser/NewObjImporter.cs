@@ -426,7 +426,7 @@ namespace PD2ModelParser
 
             List<RenderAtom> new_Model_items2 = new List<RenderAtom>();
 
-            foreach (RenderAtom modelitem in model_data_section.renderAtoms)
+            foreach (RenderAtom modelitem in model_data_section.RenderAtoms)
             {
                 RenderAtom new_model_item = new RenderAtom();
                 new_model_item.BaseVertex = modelitem.BaseVertex;
@@ -438,7 +438,7 @@ namespace PD2ModelParser
                 new_Model_items2.Add(new_model_item);
             }
 
-            model_data_section.renderAtoms = new_Model_items2;
+            model_data_section.RenderAtoms = new_Model_items2;
 
             if (model_data_section.version != 6)
             {

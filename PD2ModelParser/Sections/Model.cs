@@ -64,7 +64,9 @@ namespace PD2ModelParser.Sections
         public UInt32 passthroughGP_ID { get; set; } //ID of associated PassthroughGP
         [Category("Model")]
         public UInt32 topologyIP_ID { get; set; } //ID of associated TopologyIP
-        public List<RenderAtom> renderAtoms = new List<RenderAtom>();
+
+        [Category("Model")]
+        public List<RenderAtom> RenderAtoms { get; set; }
         //public UInt32 unknown9;
         [Category("Model")]
         public UInt32 material_group_section_id { get; set; }
@@ -103,7 +105,7 @@ namespace PD2ModelParser.Sections
             this.version = 3;
             this.passthroughGP_ID = passGP.SectionId;
             this.topologyIP_ID = topoIP.SectionId;
-            this.renderAtoms = new List<RenderAtom>();
+            this.RenderAtoms = new List<RenderAtom>();
             RenderAtom nmi = new RenderAtom
             {
                 BaseVertex = 0,
@@ -113,7 +115,7 @@ namespace PD2ModelParser.Sections
                 MaterialId = 0
             };
 
-            this.renderAtoms.Add(nmi);
+            this.RenderAtoms.Add(nmi);
 
             //this.unknown9 = 0;
             this.material_group_section_id = matg.SectionId;
@@ -133,6 +135,8 @@ namespace PD2ModelParser.Sections
         public Model(BinaryReader instream, SectionHeader section)
             : base(instream)
         {
+            this.RenderAtoms = new List<RenderAtom>();
+
             this.size = section.size;
             SectionId = section.id;
 
@@ -165,7 +169,7 @@ namespace PD2ModelParser.Sections
                     item.BaseIndex = instream.ReadUInt32();
                     item.GeometrySliceLength = instream.ReadUInt32();
                     item.MaterialId = instream.ReadUInt32();
-                    this.renderAtoms.Add(item);
+                    this.RenderAtoms.Add(item);
                 }
 
                 //this.unknown9 = instream.ReadUInt32();
@@ -215,8 +219,8 @@ namespace PD2ModelParser.Sections
             {
                 outstream.Write(this.passthroughGP_ID);
                 outstream.Write(this.topologyIP_ID);
-                outstream.Write((uint)this.renderAtoms.Count);
-                foreach (RenderAtom modelitem in this.renderAtoms)
+                outstream.Write((uint)this.RenderAtoms.Count);
+                foreach (RenderAtom modelitem in this.RenderAtoms)
                 {
                     outstream.Write(modelitem.BaseVertex);
                     outstream.Write(modelitem.TriangleCount);
@@ -254,8 +258,8 @@ namespace PD2ModelParser.Sections
                 return "[Model_v6] " + base.ToString() + " version: " + this.version + " unknown5: " + this.bounds_min + " unknown6: " + this.bounds_max + " unknown7: " + this.v6_unknown7 + " unknown8: " + this.v6_unknown8 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             else
             {
-                var atoms_string = string.Join(",", renderAtoms.Select(i => i.ToString()));
-                return base.ToString() + " version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " RenderAtoms: " + this.renderAtoms.Count + " items: [" + atoms_string + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " BoundingRadius: " + this.BoundingRadius + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+                var atoms_string = string.Join(",", RenderAtoms.Select(i => i.ToString()));
+                return base.ToString() + " version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " RenderAtoms: " + this.RenderAtoms.Count + " items: [" + atoms_string + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " BoundingRadius: " + this.BoundingRadius + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             }
         }
 

@@ -81,7 +81,7 @@ namespace PD2ModelParser.Exporters
 
             var attribs = GetGeometryAttributes(geometry);
 
-            foreach (var (indexAccessor,material) in CreatePrimitiveIndices(topology, model.renderAtoms, materialGroup))
+            foreach (var (indexAccessor,material) in CreatePrimitiveIndices(topology, model.RenderAtoms, materialGroup))
             {
                 var prim = mesh.CreatePrimitive();
                 prim.DrawPrimitiveType = GLTF.PrimitiveType.TRIANGLES;
