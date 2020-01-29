@@ -327,16 +327,16 @@ namespace PD2ModelParser.Importers
 
                     var ra = new DM.RenderAtom
                     {
-                        baseVertex = currentBaseVertex,
-                        vertCount = (uint)ms.faces.Count,
-                        faceCount = (uint)ms.verts.Count,
-                        unknown1 = currentBaseFace,
-                        material_id = (uint)ms.materials.IndexOf(prim.Material?.Name ?? "Material: Default Material")
+                        BaseIndex = currentBaseVertex,
+                        TriangleCount = (uint)ms.faces.Count,
+                        GeometrySliceLength = (uint)ms.verts.Count,
+                        BaseVertex = currentBaseFace,
+                        MaterialId = (uint)ms.materials.IndexOf(prim.Material?.Name ?? "Material: Default Material")
                     };
                     ms.renderAtoms.Add(ra);
 
-                    currentBaseVertex += ra.vertCount;
-                    currentBaseFace += ra.faceCount;
+                    currentBaseVertex += ra.TriangleCount;
+                    currentBaseFace += ra.GeometrySliceLength;
                 }
                 return ms;
             }

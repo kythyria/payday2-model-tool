@@ -429,11 +429,11 @@ namespace PD2ModelParser
             foreach (RenderAtom modelitem in model_data_section.renderAtoms)
             {
                 RenderAtom new_model_item = new RenderAtom();
-                new_model_item.unknown1 = modelitem.unknown1;
-                new_model_item.vertCount = (uint)new_faces.Count;
-                new_model_item.baseVertex = modelitem.baseVertex;
-                new_model_item.faceCount = (uint)obj.verts.Count;
-                new_model_item.material_id = modelitem.material_id;
+                new_model_item.BaseVertex = modelitem.BaseVertex;
+                new_model_item.TriangleCount = (uint)new_faces.Count;
+                new_model_item.BaseIndex = modelitem.BaseIndex;
+                new_model_item.GeometrySliceLength = (uint)obj.verts.Count;
+                new_model_item.MaterialId = modelitem.MaterialId;
 
                 new_Model_items2.Add(new_model_item);
             }

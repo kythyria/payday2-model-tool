@@ -16,24 +16,36 @@ namespace PD2ModelParser.Sections
         HasOpacity = 0x00000004
     }
 
+    /// <summary>
+    /// Represents a unit of geometry small enough to be one drawcall, like a GLTF Primitive
+    /// </summary>
     public class RenderAtom
     {
-        //In official models, counts up with faceCount
-        public UInt32 unknown1;
+        /// <summary>
+        /// Where in the <see cref="Geometry"/> indexes are relative to.
+        /// </summary>
+        public UInt32 BaseVertex { get; set; }
 
-        //Seems to be the number of triangles
-        public UInt32 vertCount;
+        /// <summary>
+        /// Number of triangles to draw, ie, an IndexCount divided by three.
+        /// </summary>
+        public UInt32 TriangleCount { get; set; }
 
-        //Probably the offset from the start of the Topology where this RA starts, in vertices. Counts up with vertcount*3
-        public UInt32 baseVertex;
+        /// <summary>
+        /// Offset from the start of the Topology, measured in indexes, not triangles.
+        /// </summary>
+        public UInt32 BaseIndex { get; set; }
 
-        // In offical models, sums to the number of vertices in the corresponding Geometry.
-        public UInt32 faceCount;
-        public UInt32 material_id;
+        /// <summary>
+        /// Number of vertices after <see cref="BaseVertex"/> that are referenced by this atom.
+        /// </summary>
+        public UInt32 GeometrySliceLength { get; set; }
+
+        public UInt32 MaterialId { get; set; }
 
         public override string ToString()
         {
-            return "{unknown1=" + this.unknown1 + " vertCount=" + this.vertCount + " baseVertex=" + this.baseVertex + " faceCount=" + this.faceCount + " material_id=" + this.material_id + "}";
+            return "{BaseVertex=" + this.BaseVertex + " TriangleCount=" + this.TriangleCount + " BaseIndex=" + this.BaseIndex + " GeometrySliceLength=" + this.GeometrySliceLength + " MaterialId=" + this.MaterialId + "}";
         }
     }
 
@@ -82,7 +94,7 @@ namespace PD2ModelParser.Sections
         [Category("Model")]
         public UInt32 skinbones_ID { get; set; }
 
-        public Model(string object_name, uint vertCount, uint faceCount, PassthroughGP passGP, TopologyIP topoIP, Material_Group matg, Object3D parent)
+        public Model(string object_name, uint triangleCount, uint vertexCount, PassthroughGP passGP, TopologyIP topoIP, Material_Group matg, Object3D parent)
             : base(object_name, parent)
         {
             this.size = 0;
@@ -94,11 +106,11 @@ namespace PD2ModelParser.Sections
             this.renderAtoms = new List<RenderAtom>();
             RenderAtom nmi = new RenderAtom
             {
-                unknown1 = 0,
-                vertCount = vertCount, //vert count
-                baseVertex = 0,
-                faceCount = faceCount, //face count
-                material_id = 0
+                BaseVertex = 0,
+                TriangleCount = triangleCount,
+                BaseIndex = 0,
+                GeometrySliceLength = vertexCount,
+                MaterialId = 0
             };
 
             this.renderAtoms.Add(nmi);
@@ -148,11 +160,11 @@ namespace PD2ModelParser.Sections
                 for (int x = 0; x < renderAtomCount; x++)
                 {
                     RenderAtom item = new RenderAtom();
-                    item.unknown1 = instream.ReadUInt32();
-                    item.vertCount = instream.ReadUInt32(); //Verts/Uvs/Normals/etc Count
-                    item.baseVertex = instream.ReadUInt32();
-                    item.faceCount = instream.ReadUInt32(); //Face count
-                    item.material_id = instream.ReadUInt32();
+                    item.BaseVertex = instream.ReadUInt32();
+                    item.TriangleCount = instream.ReadUInt32();
+                    item.BaseIndex = instream.ReadUInt32();
+                    item.GeometrySliceLength = instream.ReadUInt32();
+                    item.MaterialId = instream.ReadUInt32();
                     this.renderAtoms.Add(item);
                 }
 
@@ -206,11 +218,11 @@ namespace PD2ModelParser.Sections
                 outstream.Write((uint)this.renderAtoms.Count);
                 foreach (RenderAtom modelitem in this.renderAtoms)
                 {
-                    outstream.Write(modelitem.unknown1);
-                    outstream.Write(modelitem.vertCount);
-                    outstream.Write(modelitem.baseVertex);
-                    outstream.Write(modelitem.faceCount);
-                    outstream.Write(modelitem.material_id);
+                    outstream.Write(modelitem.BaseVertex);
+                    outstream.Write(modelitem.TriangleCount);
+                    outstream.Write(modelitem.BaseIndex);
+                    outstream.Write(modelitem.GeometrySliceLength);
+                    outstream.Write(modelitem.MaterialId);
                 }
 
                 //outstream.Write(this.unknown9);
