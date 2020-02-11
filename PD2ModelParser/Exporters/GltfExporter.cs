@@ -25,6 +25,15 @@ namespace PD2ModelParser.Exporters
         Dictionary<uint, List<(string, GLTF.Accessor)>> vertexAttributesByGeometryId;
         Dictionary<uint, GLTF.Material> materialsBySectionId;
 
+        /// <summary>
+        /// How much to embiggen data as it's converted to GLTF.
+        /// </summary>
+        /// <remarks>
+        /// See the remarks of <see cref="PD2ModelParser.Importers.GltfImporter.scaleFactor"/> 
+        /// for why the implementation here works.
+        /// </remarks>
+        float scaleFactor = 0.01f;
+
         GLTF.ModelRoot Convert(FullModelData data)
         {
             vertexAttributesByGeometryId = new Dictionary<uint, List<(string, GLTF.Accessor)>>();
@@ -53,7 +62,18 @@ namespace PD2ModelParser.Exporters
             var node = parent.CreateNode(thing.Name);
             if (thing != null)
             {
-                node.LocalMatrix = thing.rotation.ToMatrix4x4();
+                var istrs = thing.rotation.Decompose(out var scale, out var rotation, out var translation);
+                if(!istrs)
+                {
+                    throw new Exception($"In object \"{thing.Name}\" ({thing.SectionId}), non-TRS matrix");
+                }
+
+                var lt = SharpGLTF.Transforms.AffineTransform.Create(
+                    scale.ToVector3(),
+                    rotation.ToQuaternion(),
+                    translation.ToVector3() * scaleFactor
+                );
+                
             }
             if (thing is Model)
             {
@@ -135,7 +155,7 @@ namespace PD2ModelParser.Exporters
             }
             result = new List<(string, GLTF.Accessor)>();
 
-            var a_pos = MakeVertexAttributeAccessor("vpos", geometry.verts, 12, GLTF.DimensionType.VEC3, MathUtil.ToVector3, ma => ma.AsVector3Array());
+            var a_pos = MakeVertexAttributeAccessor("vpos", geometry.verts.Select(i=>i*scaleFactor).ToList(), 12, GLTF.DimensionType.VEC3, MathUtil.ToVector3, ma => ma.AsVector3Array());
             result.Add(("POSITION", a_pos));
 
             if (geometry.normals.Count > 0)
