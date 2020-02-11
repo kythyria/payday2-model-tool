@@ -31,6 +31,22 @@ namespace PD2ModelParser.Importers
         Dictionary<GLTF.Mesh, MeshSections> meshSectionsByMesh = new Dictionary<GLTF.Mesh, MeshSections>();
         bool createModels;
 
+        /// <summary>
+        /// How much to embiggen incoming GLTF data.
+        /// </summary>
+        /// <remarks>
+        /// GLTF specifies a 1m scale and Diesel uses 1cm, so the default of 100 should normally
+        /// be useful.
+        /// 
+        /// The proof re how is longwinded, but if you work out how "apply scale" has to work
+        /// when all transformations are translate-rotate-scale (as in GLTF), you can discover that
+        /// because uniform scale commutes with rotate and with any scale, and it commutes with
+        /// translation by multiplying or dividing the translation's vector by the scale factor,
+        /// all we need to do is 1) scale every mesh on import, and 2) twiddle the translation
+        /// component of every node on import.
+        /// </remarks>
+        float scaleFactor = 100;
+
         public GltfImporter(FullModelData data)
         {
             this.data = data;
@@ -103,14 +119,10 @@ namespace PD2ModelParser.Importers
                 obj.SetParent(parent);
             }
 
-            if (node.LocalMatrix != null)
-            {
-                obj.rotation = node.LocalMatrix.ToNexusMatrix();
-            }
-            else
-            {
-                obj.rotation = node.LocalTransform.Matrix.ToNexusMatrix();
-            }
+            var lt = node.LocalTransform;
+            lt.Translation *= scaleFactor;
+            obj.rotation = lt.Matrix.ToNexusMatrix();
+
             (obj as DM.Model)?.UpdateBounds(data);
 
             foreach(var child in node.VisualChildren)
@@ -147,6 +159,7 @@ namespace PD2ModelParser.Importers
             ms.atoms = md.renderAtoms;
 
             ms.PopulateFromMeshData(md);
+            ms.Scale(this.scaleFactor);
 
             model.RenderAtoms = md.renderAtoms;
         }
@@ -189,6 +202,7 @@ namespace PD2ModelParser.Importers
             ms.atoms = md.renderAtoms;
 
             ms.PopulateFromMeshData(md);
+            ms.Scale(this.scaleFactor);
 
             var model = new DM.Model(name, (uint)ms.geom.verts.Count, (uint)ms.topo.facelist.Count, ms.passgp, ms.topoip, ms.matg, null);
             model.RenderAtoms = md.renderAtoms;
@@ -247,6 +261,13 @@ namespace PD2ModelParser.Importers
                 topo.facelist = md.faces;
             }
 
+            public void Scale(float fac)
+            {
+                for (var i = 0; i < geom.verts.Count; i++)
+                {
+                    geom.verts[i] = geom.verts[i] * fac;
+                }
+            }
         }
 
         public class MeshData
