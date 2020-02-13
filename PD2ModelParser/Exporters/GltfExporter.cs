@@ -173,7 +173,14 @@ namespace PD2ModelParser.Exporters
                     var normal = geometry.normals[index].ToVector3();
 
                     var txn = Vector3.Cross(tangent, normal);
-                    return new Vector4(tangent, Math.Sign(Vector3.Dot(txn, binorm)));
+                    var dot = Vector3.Dot(txn, binorm);
+                    var sgn = Math.Sign(dot);
+
+                    // A few models have vertices where tangent==binorm, which is silly
+                    // also breaks because SharpGLTF tries to do validation. So we return
+                    // 1 in that case, which is probably also unhelpful. I'm not 100% sure
+                    // how important having sane binormals is anyway.
+                    return new Vector4(tangent, sgn != 0 ? sgn : 1);
                 };
 
                 var a_binorm = MakeVertexAttributeAccessor("vtan", geometry.tangents, 16, GLTF.DimensionType.VEC4, makeTangent, ma => ma.AsVector4Array());
