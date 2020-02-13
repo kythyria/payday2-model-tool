@@ -8,33 +8,29 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    // SkinBones should extend Bones (as it does in the game), but that'd
-    // be a bit of a pain to do.
-    class SkinBones : AbstractSection, ISection, IPostLoadable
+    class SkinBones : Bones, ISection, IPostLoadable
     {
-        public Bones bones;
         public UInt32 probably_root_bone;
         public int count => objects.Count;
         public List<UInt32> objects = new List<UInt32>(); // of Object3D by SectionID
         public List<Matrix3D> rotations = new List<Matrix3D>();
         public Matrix3D global_skin_transform;
 
-        public byte[] remaining_data = null;
-
         public override uint TypeCode => Tags.skinbones_tag;
 
         // Post-loaded
         public List<Matrix3D> SkinPositions { get; private set; }
 
-        public SkinBones(uint secId)
+        public SkinBones(uint secId) : base()
         {
-            bones = new Bones();
             SectionId = secId;
         }
 
-        public SkinBones(BinaryReader instream, SectionHeader section) : this(section.id)
+        public SkinBones(BinaryReader instream, SectionHeader section) : base(instream)
         {
-            this.bones = new Bones(instream);
+            this.SectionId = section.id;
+            this.size = section.size;
+
             this.probably_root_bone = instream.ReadUInt32();
             uint count = instream.ReadUInt32();
             for (int x = 0; x < count; x++)
@@ -58,7 +54,7 @@ namespace PD2ModelParser.Sections
 
         public override void StreamWriteData(BinaryWriter outstream)
         {
-            this.bones.StreamWriteData(outstream);
+            base.StreamWriteData(outstream);
             outstream.Write(this.probably_root_bone);
             outstream.Write(this.count);
 
@@ -95,7 +91,6 @@ namespace PD2ModelParser.Sections
             }
 
             return base.ToString() +
-                   " bones: [ " + this.bones + " ]" +
                    " object3D_section_id: " + this.probably_root_bone +
                    " count: " + this.count + " objects" +
                    " count: " + this.objects.Count + " objects:[ " + objects_string + " ]" +
