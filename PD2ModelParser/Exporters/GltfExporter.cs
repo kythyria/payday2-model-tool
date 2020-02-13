@@ -73,6 +73,7 @@ namespace PD2ModelParser.Exporters
                     rotation.ToQuaternion(),
                     translation.ToVector3() * scaleFactor
                 );
+                node.LocalTransform = lt;
                 
             }
             if (thing is Model)
