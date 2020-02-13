@@ -204,6 +204,26 @@ namespace PD2ModelParser.Exporters
                 }
             }
 
+            if (geometry.weights.Count > 0)
+            {
+                Func<Nexus.Vector3D, Vector4> ConvertWeight = (weight) => {
+                    return new Vector4(weight.X, weight.Y, weight.Z, 1 - (weight.X + weight.Y + weight.Z));
+                };
+
+                var a_wght = MakeVertexAttributeAccessor("vweight", geometry.weights, 16, GLTF.DimensionType.VEC4, ConvertWeight, ma => ma.AsVector4Array());
+                result.Add(("WEIGHTS_0", a_wght));
+            }
+            
+            if(geometry.weight_groups.Count > 0)
+            {
+                // TODO: Is there a way that doesn't require round-tripping through float? It's unnecessary,
+                // even if it doesn't actually hurt as such.
+                Func<GeometryWeightGroups, Vector4> ConvertWeightGroup = (i)
+                    => new Vector4(i.Bones1, i.Bones2, i.Bones3, i.Bones4);
+                var a_joint = MakeVertexAttributeAccessor("vjoint", geometry.weight_groups, 8, GLTF.DimensionType.VEC4, ConvertWeightGroup, ma => ma.AsVector4Array(), GLTF.EncodingType.UNSIGNED_SHORT);
+                result.Add(("JOINTS_0", a_joint));
+            }
+
             return result;
         }
 
