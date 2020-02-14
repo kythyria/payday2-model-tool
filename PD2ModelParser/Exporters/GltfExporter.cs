@@ -71,7 +71,14 @@ namespace PD2ModelParser.Exporters
 
         void CreateNodeFromObject3D(Object3D thing, GLTF.IVisualNodeContainer parent)
         {
+            var isSkinned = thing is Model m && m.skinbones_ID != 0;
+            if (isSkinned)
+            {
+                parent = scene;
+            }
+
             var node = parent.CreateNode(thing.Name);
+
             nodesBySectionId[thing.SectionId] = node;
             if (thing != null)
             {
@@ -88,7 +95,7 @@ namespace PD2ModelParser.Exporters
                 var mat = thing.rotation.ToMatrix4x4();
                 mat.Translation = mat.Translation * scaleFactor;
 
-                node.LocalMatrix = mat;
+                node.LocalMatrix = isSkinned ? Matrix4x4.Identity : mat;
                 
             }
             if (thing is Model)
@@ -103,6 +110,12 @@ namespace PD2ModelParser.Exporters
             {
                 CreateNodeFromObject3D(i, node);
             }
+        }
+
+        void CreateModelNode(Model model, GLTF.IVisualNodeContainer parent)
+        {
+            var mesh = GetMeshForModel(model);
+            GLTF.Node node;
         }
 
         void SkinModel(Model model, GLTF.Node node)
@@ -244,7 +257,12 @@ namespace PD2ModelParser.Exporters
             if (geometry.weights.Count > 0)
             {
                 Func<Nexus.Vector3D, Vector4> ConvertWeight = (weight) => {
-                    return new Vector4(weight.X, weight.Y, weight.Z, 1 - (weight.X + weight.Y + weight.Z));
+                    var n = new Vector4(weight.X, weight.Y, weight.Z, 0);
+                    if((n.W < 0))
+                    {
+                        int a = 0;
+                    }
+                    return n;
                 };
 
                 var a_wght = MakeVertexAttributeAccessor("vweight", geometry.weights, 16, GLTF.DimensionType.VEC4, ConvertWeight, ma => ma.AsVector4Array());
