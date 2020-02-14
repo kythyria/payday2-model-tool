@@ -14,9 +14,6 @@ namespace PD2ModelParser.UI
     public partial class ObjectsPanel : UserControl
     {
         private readonly Dictionary<uint, TreeNode> nodes = new Dictionary<uint, TreeNode>();
-        private readonly Dictionary<TreeNode, Object3D> reverseNodes = new Dictionary<TreeNode, Object3D>();
-        private readonly TreeNode objectRoot = new TreeNode("<Object3D>");
-        private readonly TreeNode geometryRoot = new TreeNode("<Geometry>");
         private readonly ContextMenu nodeRightclickMenu;
         private TreeNode menuTarget;
 
@@ -25,8 +22,6 @@ namespace PD2ModelParser.UI
             InitializeComponent();
 
             treeView.Nodes.Clear();
-            treeView.Nodes.Add(objectRoot);
-            treeView.Nodes.Add(geometryRoot);
 
             nodeRightclickMenu = new ContextMenu();
 
@@ -68,59 +63,8 @@ namespace PD2ModelParser.UI
                     return;
             }
 
-            // Make a list of all the Object3Ds and Models to include in the tree
-            List<Object3D> objs = data.SectionsOfType<Object3D>().ToList();
-
-            // Make a set with all the IDs of the nodes currently in the tree. As we
-            // walk through the objects in the file, we remove them from this set. After
-            // we've done everything else, we remove the nodes still in this set.
-            //
-            // This will ensure nodes that used to be in the model but are not anymore will
-            // be deleted.
-            HashSet<uint> unused = new HashSet<uint>(nodes.Keys);
-
-            // Fill out the reverse nodes
-            // It maintains a node-to-object mapping, for stuff like the properties window
-            reverseNodes.Clear();
-
-            // Walk through and create a node (if it does not already exist) for each object.
-            // Do this before attaching them to their parents, as otherwise the parent might
-            // not exist when we build one if it's children.
-            foreach (Object3D obj in objs)
-            {
-                if (!nodes.ContainsKey(obj.SectionId))
-                    nodes[obj.SectionId] = new TreeNode();
-                unused.Remove(obj.SectionId);
-            }
-
-            // Set each object's label, and move it to the correct parent if needed.
-            foreach (Object3D obj in objs)
-            {
-                TreeNode node = nodes[obj.SectionId];
-                TreeNode parent = obj.parent == null ? objectRoot : nodes[obj.parent.SectionId];
-
-                reverseNodes[node] = obj;
-                node.Tag = obj;
-
-                node.Text = obj.Name;
-                if (obj.GetType() != typeof(Object3D))
-                    node.Text += $" ({obj.GetType().Name})";
-
-                if (node.Parent == parent) continue;
-
-                node.Remove();
-                parent.Nodes.Add(node);
-            }
-
-            // Remove any unused nodes. That is, nodes that existed on the last-viewed model
-            // that do not exist on the current model.
-            foreach (uint id in unused)
-            {
-                nodes[id].Remove();
-                nodes.Remove(id);
-            }
-
-            ReloadGeometryList(data);
+            var rootinspector = new Inspector.ModelRootNode(data);
+            ReconcileChildNodes(rootinspector, treeView.Nodes);
         }
 
         private void showScriptChanges_CheckedChanged(object sender, EventArgs e)
@@ -151,7 +95,7 @@ namespace PD2ModelParser.UI
                 return;
 
             // No properties for the root node
-            if (e.Node == objectRoot)
+            if (e.Node.Tag == null)
                 return;
 
             menuTarget = e.Node;
@@ -160,40 +104,40 @@ namespace PD2ModelParser.UI
 
         private void optProperties_Click(object sender, EventArgs e)
         {
-            Object3D obj = reverseNodes[menuTarget];
+            var obj = menuTarget.Tag;
 
             // TODO actually show some useful information
             //MessageBox.Show(obj.Name);
             propertyGrid1.SelectedObject = obj;
         }
 
-        private void ReloadGeometryList(FullModelData fmd)
+        private void ReconcileChildNodes(Inspector.IInspectorNode modelNode, TreeNodeCollection viewNodes)
         {
-            var newNodeIds = new HashSet<uint>(fmd.SectionsOfType<Geometry>().Select(i => i.SectionId));
-            var existingNodeIds = new HashSet<uint>(geometryRoot.Nodes.OfType<TreeNode>().Select(i => ((Geometry)i.Tag).SectionId));
+            var newModels = modelNode.GetChildren().ToList();
 
-            var toRemove = new HashSet<uint>(existingNodeIds);
-            toRemove.ExceptWith(newNodeIds);
+            var existingKeys = new HashSet<string>(viewNodes.OfType<TreeNode>().Select(i=>i.Name));
+            var newKeys = new HashSet<string>(newModels.Select(i => i.Key));
+
+            var toRemove = new HashSet<string>(existingKeys);
+            toRemove.ExceptWith(newKeys);
             foreach(var i in toRemove)
             {
-                geometryRoot.Nodes.RemoveByKey(i.ToString());
+                viewNodes.RemoveByKey(i);
             }
 
-            var toAddIds = new HashSet<uint>(newNodeIds);
-            toAddIds.ExceptWith(existingNodeIds);
-            var newNodeList = toAddIds.Select(i => {
-                var n = new TreeNode();
-                n.Tag = fmd.parsed_sections[i] as Geometry;
-                return n;
-            });
-
-            geometryRoot.Nodes.AddRange(newNodeList.ToArray());
-
-            foreach(TreeNode i in geometryRoot.Nodes)
+            List<TreeNode> toAdd = new List<TreeNode>(newKeys.Count - existingKeys.Count);
+            foreach(var i in newModels)
             {
-                var g = (Geometry)i.Tag;
-                i.Text = $"{g.SectionId} | Geometry ({new HashName(g.hashname).String})";
+                TreeNode[] mn = viewNodes.Find(i.Key, false);
+                TreeNode n;
+                if(mn.Length == 0) { n = new TreeNode(); toAdd.Add(n); }
+                else { n = mn[0]; }
+                n.Name = i.Key;
+                n.Tag =  i.PropertyItem;
+                n.Text = i.Label;
+                ReconcileChildNodes(i, n.Nodes);
             }
+            viewNodes.AddRange(toAdd.ToArray());
         }
     }
 }

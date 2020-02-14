@@ -112,6 +112,7 @@
     <Compile Include="Importers\GltfImporter.cs" />
     <Compile Include="Importers\IOptionReceiver.cs" />
     <Compile Include="Inspector\HashNameConverter.cs" />
+    <Compile Include="Inspector\InspectionTree.cs" />
     <Compile Include="Inspector\NexusMatrixConverter.cs" />
     <Compile Include="Inspector\Object3DConverter.cs" />
     <Compile Include="Inspector\Object3DReferenceConverter.cs" />
