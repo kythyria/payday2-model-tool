@@ -125,7 +125,7 @@ namespace PD2ModelParser.UI
                 viewNodes.RemoveByKey(i);
             }
 
-            List<TreeNode> toAdd = new List<TreeNode>(newKeys.Count - existingKeys.Count);
+            List<TreeNode> toAdd = new List<TreeNode>(newKeys.Count);
             foreach(var i in newModels)
             {
                 TreeNode[] mn = viewNodes.Find(i.Key, false);
