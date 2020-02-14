@@ -61,7 +61,7 @@ namespace PD2ModelParser.Sections
         public override uint TypeCode => Tags.bones_tag;
         public UInt32 size;
 
-        public List<BoneMappingItem> bone_mappings = new List<BoneMappingItem>();
+        public List<BoneMappingItem> bone_mappings { get; private set; } = new List<BoneMappingItem>();
 
         public byte[] remaining_data = null;
 

@@ -24,6 +24,8 @@ namespace PD2ModelParser.Exporters
         GLTF.Scene scene;
         Dictionary<uint, List<(string, GLTF.Accessor)>> vertexAttributesByGeometryId;
         Dictionary<uint, GLTF.Material> materialsBySectionId;
+        Dictionary<uint, GLTF.Node> nodesBySectionId;
+        List<(Model, GLTF.Node)> toSkin;
 
         /// <summary>
         /// How much to embiggen data as it's converted to GLTF.
@@ -38,6 +40,9 @@ namespace PD2ModelParser.Exporters
         {
             vertexAttributesByGeometryId = new Dictionary<uint, List<(string, GLTF.Accessor)>>();
             materialsBySectionId = new Dictionary<uint, GLTF.Material>();
+            nodesBySectionId = new Dictionary<uint, GLTF.Node>();
+            toSkin = new List<(Model, GLTF.Node)>();
+
             this.data = data;
             root = GLTF.ModelRoot.CreateModel();
             scene = root.UseScene(0);
@@ -52,6 +57,13 @@ namespace PD2ModelParser.Exporters
                 CreateNodeFromObject3D(i, scene);
             }
 
+            foreach(var (thing, node) in toSkin)
+            {
+                SkinModel(thing, node);
+                //node.LocalMatrix = Matrix4x4.Identity;
+                //node.Skin = GetSkinForModel(thing);
+            }
+
             //root.MergeBuffers();
 
             return root;
@@ -60,6 +72,7 @@ namespace PD2ModelParser.Exporters
         void CreateNodeFromObject3D(Object3D thing, GLTF.IVisualNodeContainer parent)
         {
             var node = parent.CreateNode(thing.Name);
+            nodesBySectionId[thing.SectionId] = node;
             if (thing != null)
             {
                 var istrs = thing.rotation.Decompose(out var scale, out var rotation, out var translation);
@@ -68,22 +81,46 @@ namespace PD2ModelParser.Exporters
                     throw new Exception($"In object \"{thing.Name}\" ({thing.SectionId}), non-TRS matrix");
                 }
 
-                var lt = SharpGLTF.Transforms.AffineTransform.Create(
-                    scale.ToVector3(),
-                    rotation.ToQuaternion(),
-                    translation.ToVector3() * scaleFactor
-                );
-                node.LocalTransform = lt;
+                // We only did that to be sure it was a TRS matrix. Knowing it is, and knowing we only
+                // want to affect the translation, less stability problems exist by directly changing
+                // just the cells that are the translation part.
+
+                var mat = thing.rotation.ToMatrix4x4();
+                mat.Translation = mat.Translation * scaleFactor;
+
+                node.LocalMatrix = mat;
                 
             }
             if (thing is Model)
             {
                 node.Mesh = GetMeshForModel(thing as Model);
+                if ((thing as Model).skinbones_ID != 0)
+                {
+                    toSkin.Add((thing as Model, node));
+                }
             }
             foreach (var i in thing.children)
             {
                 CreateNodeFromObject3D(i, node);
             }
+        }
+
+        void SkinModel(Model model, GLTF.Node node)
+        {
+            if (!data.parsed_sections.ContainsKey(model.skinbones_ID))
+            {
+                return;
+            }
+
+            var skinbones = data.parsed_sections[model.skinbones_ID] as SkinBones;
+            var skin = root.CreateSkin(model.Name + "_Skin");
+            skin.Skeleton = nodesBySectionId[skinbones.probably_root_bone];
+
+            var wt = node.WorldMatrix;
+            node.LocalTransform = Matrix4x4.Identity;
+
+            skin.BindJoints(wt, skinbones.bone_mappings[0].bones.Select(i => nodesBySectionId[skinbones.objects[(int)i]]).ToArray());
+            node.Skin = skin;
         }
 
         GLTF.Mesh GetMeshForModel(Model model)
