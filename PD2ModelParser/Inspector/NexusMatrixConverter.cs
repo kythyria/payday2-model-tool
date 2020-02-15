@@ -19,7 +19,7 @@ namespace PD2ModelParser.Inspector
 
             if(matrix.Decompose(out var scale, out var rotation, out var translation))
             {
-                return $"T:{translation.ToString()}, R:{rotation.ToString()}, S:{scale.ToString()}";
+                return $"T:{translation.ToString()}, R:{NexusQuaternionConverter.Instance.ConvertToString(rotation)}, S:{scale.ToString()}";
             }
 
             return $"({matrix.M11} {matrix.M12} {matrix.M13} {matrix.M14}) " +
@@ -200,6 +200,7 @@ namespace PD2ModelParser.Inspector
 
     class NexusQuaternionConverter : ExpandableObjectConverter
     {
+        public static NexusQuaternionConverter Instance = new NexusQuaternionConverter();
 
         public override bool GetCreateInstanceSupported(ITypeDescriptorContext context) => true;
         public override object CreateInstance(ITypeDescriptorContext context, IDictionary propertyValues)

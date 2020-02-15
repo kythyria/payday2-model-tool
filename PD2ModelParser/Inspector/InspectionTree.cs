@@ -99,7 +99,7 @@ namespace PD2ModelParser.Inspector
             data = fmd;
             this.obj = obj;
 
-            Label = obj.Name;
+            Label = $"{obj.SectionId} | {obj.Name}";
             if (obj.GetType() != typeof(Sections.Object3D))
             {
                 Label += $" ({obj.GetType().Name})";

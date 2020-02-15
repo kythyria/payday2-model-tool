@@ -39,13 +39,6 @@ namespace PD2ModelParser.UI
         /// seen how long it takes the tool to load a model when you
         /// first drag it in, it is <b>much</b> quicker on subsequent
         /// runs.
-        ///
-        /// Secondly, this method preserves TreeNodes whenever possible. Rather
-        /// than clearing the tree and rebuilding it (which would be the
-        /// simplest implementation), the nodes are rearranged and only
-        /// deleted if they no longer appear in the model. The reason for this
-        /// is to maintain their state - having the entire tree collapse whenever
-        /// it is reloaded would be very annoying.
         /// </remarks>
         private void Reload()
         {
@@ -62,6 +55,8 @@ namespace PD2ModelParser.UI
                 if (!success)
                     return;
             }
+
+            var sb = data.SectionsOfType<SkinBones>().ToList();
 
             var rootinspector = new Inspector.ModelRootNode(data);
             ReconcileChildNodes(rootinspector, treeView.Nodes);
@@ -111,6 +106,20 @@ namespace PD2ModelParser.UI
             propertyGrid1.SelectedObject = obj;
         }
 
+        /// <summary>
+        /// Merges the treeview nodes implied by an IInspectorNode into an existing tree.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// We use a TreeNodeCollection here to avoid the roots of the tree being special.
+        /// The root of the inspector node tree corresponds to the treeview as a whole and
+        /// is never rendered. But that's really a consideration for the caller.
+        /// </para><para>
+        /// Anyway, this method preserves the existing nodes if they match according to the
+        /// Key member of the inspector node and the name of the treeview node. Keys only
+        /// actually NEED to be 
+        /// </para>
+        /// </remarks>
         private void ReconcileChildNodes(Inspector.IInspectorNode modelNode, TreeNodeCollection viewNodes)
         {
             var newModels = modelNode.GetChildren().ToList();
