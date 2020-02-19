@@ -60,8 +60,6 @@ namespace PD2ModelParser.Exporters
             foreach(var (thing, node) in toSkin)
             {
                 SkinModel(thing, node);
-                //node.LocalMatrix = Matrix4x4.Identity;
-                //node.Skin = GetSkinForModel(thing);
             }
 
             //root.MergeBuffers();
@@ -112,12 +110,6 @@ namespace PD2ModelParser.Exporters
             }
         }
 
-        void CreateModelNode(Model model, GLTF.IVisualNodeContainer parent)
-        {
-            var mesh = GetMeshForModel(model);
-            GLTF.Node node;
-        }
-
         void SkinModel(Model model, GLTF.Node node)
         {
             if (!data.parsed_sections.ContainsKey(model.skinbones_ID))
@@ -132,7 +124,14 @@ namespace PD2ModelParser.Exporters
             var wt = node.WorldMatrix;
             node.LocalTransform = Matrix4x4.Identity;
 
-            skin.BindJoints(wt, skinbones.bone_mappings[0].bones.Select(i => nodesBySectionId[skinbones.objects[(int)i]]).ToArray());
+            var joints2 = skinbones.bone_mappings[0].bones.Select(b => {
+                var jointNode = nodesBySectionId[skinbones.objects[(int)b]];
+                var ibm = skinbones.rotations[(int)b].ToMatrix4x4();
+                ibm.Translation *= scaleFactor;
+                return (jointNode, ibm);
+            }).ToArray();
+
+            skin.BindJoints(joints2);
             node.Skin = skin;
         }
 
