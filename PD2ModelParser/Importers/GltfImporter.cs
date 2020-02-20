@@ -88,6 +88,10 @@ namespace PD2ModelParser.Importers
                 {
                     obj = CreateNewModel(node.Mesh, node.Name);
                 }
+                else if (createModels && node.PunctualLight != null)
+                {
+                    obj = CreateNewLamp(node.PunctualLight, node.Name);
+                }
                 else
                 {
                     throw new Exception($"Object {node.Name} does not already exist and object creation is disabled.");
@@ -111,6 +115,10 @@ namespace PD2ModelParser.Importers
                 else if (node.Mesh != null && obj is DM.Model)
                 {
                     OverwriteModel(node.Mesh, obj as DM.Model);
+                }
+                else if (node.PunctualLight != null)
+                {
+                    throw new Exception("Can't overwrite lights yet.");
                 }
             }
 
@@ -162,6 +170,49 @@ namespace PD2ModelParser.Importers
             ms.Scale(this.scaleFactor);
 
             model.RenderAtoms = md.renderAtoms;
+        }
+
+        DM.Light CreateNewLamp(GLTF.PunctualLight gl, string name)
+        {
+            var extras = gl.TryUseExtrasAsDictionary(false) ?? new SharpGLTF.IO.JsonDictionary();
+            float? maybeNearRange = extras["diesel.nearRange"] as float?;
+            float nearRange = 0.0f;
+            if(!maybeNearRange.HasValue)
+            {
+                Log.Default.Warn($"Light {name} has no near range specified. Defaulting to 0");
+            }
+            else
+            {
+                nearRange = maybeNearRange.Value;
+            }
+
+            var dl = new DM.Light(name, null)
+            {
+                unknown_1 = 1,
+                Colour = new DM.LightColour() { A = 1.0f, R = gl.Color.X, G = gl.Color.Y, B = gl.Color.Z },
+                FarRange = gl.Range * scaleFactor,
+                unknown_8 = BitConverter.ToSingle(new byte[4] { 4, 0, 0, 0 }, 0)
+            };
+            switch(gl.LightType)
+            {
+                case GLTF.PunctualLightType.Point:
+                    dl.LightType = 1;
+                    break;
+                case GLTF.PunctualLightType.Spot:
+                    dl.LightType = 2;
+                    break;
+                default:
+                    throw new Exception($"Light {name} is neither point nor spot.");
+            }
+            if(extras.TryGetValue("diesel.unknown_6", out object ov))
+            {
+                if(ov != null && ov is float) { dl.unknown_6 = (float)ov; }
+            }
+            if (extras.TryGetValue("diesel.unknown_7", out object ou7))
+            {
+                if (ou7 != null && ou7 is float) { dl.unknown_6 = (float)ou7; }
+            }
+            return dl;
         }
 
         DM.Model CreateNewModel(GLTF.Mesh gmesh, string name)

@@ -47,6 +47,14 @@ namespace PD2ModelParser.Exporters
             root = GLTF.ModelRoot.CreateModel();
             scene = root.UseScene(0);
 
+            // Blender's GLTF importer cares about some extras.
+            var extras = scene.TryUseExtrasAsDictionary(true);
+            extras.Add("glTF2ExportSettings", new SharpGLTF.IO.JsonDictionary
+            {
+                { "export_extras", 1 },
+                { "export_lights", 1 }
+            });
+
             foreach (var ms in data.parsed_sections.Where(i => i.Value is Material).Select(i => i.Value as Material))
             {
                 materialsBySectionId[ms.SectionId] = root.CreateMaterial(ms.hashname.String);
@@ -104,6 +112,31 @@ namespace PD2ModelParser.Exporters
                     toSkin.Add((thing as Model, node));
                 }
             }
+            else if (thing is Light dl)
+            {
+                GLTF.PunctualLight lamp;
+                switch(dl.LightType)
+                {
+                    case 1:
+                        lamp = root.CreatePunctualLight(GLTF.PunctualLightType.Point);
+                        break;
+                    case 2:
+                        lamp = root.CreatePunctualLight(GLTF.PunctualLightType.Spot);
+                        break;
+                    default:
+                        throw new Exception($"{thing.Name} is an unknown light type {dl.LightType}");
+                }
+
+                lamp.Color = new Vector3(dl.Colour.R, dl.Colour.G, dl.Colour.B);
+                lamp.Range = dl.FarRange * scaleFactor;
+                var extras = lamp.TryUseExtrasAsDictionary(false);
+                extras = lamp.TryUseExtrasAsDictionary(true);
+                extras.Add("diesel.nearRange", dl.NearRange);
+                extras.Add("diesel.unknown_6", dl.unknown_6);
+                extras.Add("diesel.unknown_7", dl.unknown_7);
+                node.PunctualLight = lamp;
+            }
+
             foreach (var i in thing.children)
             {
                 CreateNodeFromObject3D(i, node);
