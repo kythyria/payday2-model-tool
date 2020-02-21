@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
+    [SectionId(Tags.author_tag)]
     class Author : AbstractSection, ISection
     {
-        public override uint TypeCode => Tags.author_tag;
         public UInt32 size;
 
         public UInt64 hashname; //Hashed name (see hashlist.txt)
@@ -25,16 +25,8 @@ namespace PD2ModelParser.Sections
             this.size = section.size;
             this.hashname = instream.ReadUInt64();
 
-            StringBuilder email_sb = new StringBuilder();
-            int buf;
-            while ((buf = instream.ReadByte()) != 0)
-                email_sb.Append((char)buf);
-            this.email = email_sb.ToString();
-
-            StringBuilder source_file_sb = new StringBuilder();
-            while ((buf = instream.ReadByte()) != 0)
-                source_file_sb.Append((char)buf);
-            this.source_file = source_file_sb.ToString();
+            this.email = instream.ReadCString();
+            this.source_file = instream.ReadCString();
 
             this.unknown2 = instream.ReadUInt32();
 

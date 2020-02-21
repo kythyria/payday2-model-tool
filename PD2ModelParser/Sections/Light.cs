@@ -31,10 +31,9 @@ namespace PD2ModelParser.Sections
         }
     }
 
+    [SectionId(Tags.light_tag)]
     class Light : Object3D, ISection
     {
-        public override uint TypeCode => Tags.light_tag;
-
         public byte unknown_1 { get; set; } // 1 in all known lights
         public int LightType { get; set; } // it's 1 in light_omni and 2 in light_spot
         public LightColour Colour { get; set; }

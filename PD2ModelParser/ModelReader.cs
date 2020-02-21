@@ -1,19 +1,15 @@
 ﻿
-using Nexus;
-using PD2ModelParser.Sections;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 
-using static PD2ModelParser.Tags;
+using PD2ModelParser.Sections;
 
 namespace PD2ModelParser
 {
     static class ModelReader
     {
-
         public static FullModelData Open(string filepath)
         {
             FullModelData data = new FullModelData();
@@ -107,71 +103,9 @@ namespace PD2ModelParser
 
                         fs.Position = sh.Start;
 
-                        if (sh.type == animation_data_tag)
+                        if(SectionMetaInfo.TryGetForTag(sh.type, out var mi))
                         {
-                            section = new Animation(br, sh);
-                        }
-                        else if (sh.type == author_tag)
-                        {
-                            section = new Author(br, sh);
-                        }
-                        else if (sh.type == material_group_tag)
-                        {
-                            section = new Material_Group(br, sh);
-                        }
-                        else if (sh.type == material_tag)
-                        {
-                            section = new Material(br, sh);
-                        }
-                        else if (sh.type == object3D_tag)
-                        {
-                            section = new Object3D(br, sh);
-                        }
-                        else if (sh.type == geometry_tag)
-                        {
-                            section = new Geometry(br, sh);
-                        }
-                        else if (sh.type == model_data_tag)
-                        {
-                            section = new Model(br, sh);
-                        }
-                        else if (sh.type == topology_tag)
-                        {
-                            section = new Topology(br, sh);
-                        }
-                        else if (sh.type == passthroughGP_tag)
-                        {
-                            section = new PassthroughGP(br, sh);
-                        }
-                        else if (sh.type == topologyIP_tag)
-                        {
-                            section = new TopologyIP(br, sh);
-                        }
-                        else if (sh.type == bones_tag)
-                        {
-                            // I'm not sure this tag section ever appears in the model itself - instead, always at the start of a skinbones section
-
-                            section = new Bones(br, sh);
-                        }
-                        else if (sh.type == skinbones_tag)
-                        {
-                            section = new SkinBones(br, sh);
-                        }
-                        else if (sh.type == quatLinearRotationController_tag)
-                        {
-                            section = new QuatLinearRotationController(br, sh);
-                        }
-                        else if (sh.type == linearVector3Controller_tag)
-                        {
-                            section = new LinearVector3Controller(br, sh);
-                        }
-                        else if (sh.type == custom_hashlist_tag)
-                        {
-                            section = new CustomHashlist(br, sh);
-                        }
-                        else if (sh.type == light_tag)
-                        {
-                            section = new Light(br, sh);
+                            section = mi.Deserialise(br, sh);
                         }
                         else
                         {

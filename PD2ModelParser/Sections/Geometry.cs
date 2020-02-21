@@ -144,6 +144,7 @@ namespace PD2ModelParser.Sections
         TANGENT0 = 21,
     }
 
+    [SectionId(Tags.geometry_tag)]
     class Geometry : AbstractSection, ISection
     {
         // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
@@ -551,7 +552,5 @@ namespace PD2ModelParser.Sections
                    " unknown_hash: " + StaticStorage.hashindex.GetString(this.hashname) +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
-
-        public override uint TypeCode => Tags.geometry_tag;
     }
 }

@@ -4,10 +4,9 @@ using System.Text;
 
 namespace PD2ModelParser.Sections
 {
+    [SectionId(Tags.custom_hashlist_tag)]
     public class CustomHashlist : AbstractSection, ISection
     {
-        public override uint TypeCode => Tags.custom_hashlist_tag;
-
         public HashSet<string> Strings { get; } = new HashSet<string>();
 
         public CustomHashlist()

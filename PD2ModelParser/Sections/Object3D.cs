@@ -7,6 +7,7 @@ using Nexus;
 namespace PD2ModelParser.Sections
 {
     //[System.ComponentModel.TypeConverter(typeof(Inspector.AbstractSectionConverter))]
+    [SectionId(Tags.object3D_tag)]
     public class Object3D : AbstractSection, ISection, IPostLoadable, IHashContainer
     {
         public UInt32 size;
@@ -61,8 +62,6 @@ namespace PD2ModelParser.Sections
 
         [Browsable(false)]
         public string Name => HashName.String;
-
-        public override uint TypeCode => Tags.object3D_tag;
 
         public Object3D(string object_name, Object3D parent)
         {

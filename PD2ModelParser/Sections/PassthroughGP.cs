@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
+    [SectionId(Tags.passthroughGP_tag)]
     class PassthroughGP : AbstractSection, ISection
     {
         public UInt32 size;
@@ -45,7 +46,5 @@ namespace PD2ModelParser.Sections
         {
             return base.ToString() + " size: " + this.size + " PassthroughGP_geometry_section: " + this.geometry_section + " PassthroughGP_facelist_section: " + this.topology_section + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
-
-        public override uint TypeCode => Tags.passthroughGP_tag;
     }
 }

@@ -34,9 +34,9 @@ namespace PD2ModelParser.Sections
 
     }
 
+    [SectionId(Tags.linearVector3Controller_tag)]
     class LinearVector3Controller : AbstractSection, ISection
     {
-        public override uint TypeCode => Tags.linearVector3Controller_tag;
         public UInt32 size;
 
         public UInt64 hashname; //Hashed material name (see hashlist.txt)

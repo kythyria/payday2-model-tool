@@ -56,9 +56,9 @@ namespace PD2ModelParser.Sections
     /// As an abstract class, it can never be found by itself, only embedded within
     /// SkinBones (it's only known - and likely only - subclass).
     /// </remarks>
+    [SectionId(Tags.bones_tag)]
     class Bones : AbstractSection, ISection
     {
-        public override uint TypeCode => Tags.bones_tag;
         public UInt32 size;
 
         public List<BoneMappingItem> bone_mappings { get; private set; } = new List<BoneMappingItem>();
@@ -71,6 +71,7 @@ namespace PD2ModelParser.Sections
 
         public Bones(BinaryReader instream, SectionHeader section) : this(instream)
         {
+            Log.Default.Warn("Model contains a Bones that isn't a SkinBones!");
             this.SectionId = section.id;
             this.size = section.size;
 

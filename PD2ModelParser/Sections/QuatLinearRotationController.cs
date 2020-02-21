@@ -35,9 +35,9 @@ namespace PD2ModelParser.Sections
 
     }
     
+    [SectionId(Tags.quatLinearRotationController_tag)]
     class QuatLinearRotationController : AbstractSection, ISection
     {
-        public override uint TypeCode => Tags.quatLinearRotationController_tag;
         public UInt32 size;
 
         public UInt64 hashname; //Hashed material name (see hashlist.txt)

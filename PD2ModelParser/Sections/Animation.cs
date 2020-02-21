@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
+    [SectionId(Tags.animation_data_tag)]
     public class Animation : AbstractSection, ISection
     {
-        public override uint TypeCode => Tags.animation_data_tag;
         public UInt32 size;
 
         public UInt64 hashname; //Hashed name for the animation (see hashlist.txt)

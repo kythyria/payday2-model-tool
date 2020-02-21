@@ -18,6 +18,7 @@ namespace PD2ModelParser.Sections
         }
     }
 
+    [SectionId(Tags.material_tag)]
     class Material : AbstractSection, ISection
     {
         public UInt32 size;
@@ -92,7 +93,5 @@ namespace PD2ModelParser.Sections
                    " items: [ " + items_string + " ] " +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
-
-        public override uint TypeCode => Tags.material_tag;
     }
 }

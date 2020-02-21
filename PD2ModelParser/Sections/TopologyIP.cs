@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
+    [SectionId(Tags.topologyIP_tag)]
     class TopologyIP : AbstractSection, ISection
     {
         public UInt32 size;

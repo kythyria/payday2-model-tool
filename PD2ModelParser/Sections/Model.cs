@@ -49,6 +49,7 @@ namespace PD2ModelParser.Sections
         }
     }
 
+    [SectionId(Tags.model_data_tag)]
     class Model : Object3D, ISection, IPostLoadable, IHashContainer
     {
         [Category("Model")]
@@ -73,16 +74,13 @@ namespace PD2ModelParser.Sections
         [Category("Model")]
         public UInt32 lightset_ID { get; set; }
 
-        private Vector3D bounds_min; // Z (max), X (low), Y (low)
-        private Vector3D bounds_max; // Z (low), X (max), Y (max)
-
         [Category("Model"), DisplayName("Bounds Min"), Description("Minimum corner of the bounding box.")]
         [TypeConverter(typeof(Inspector.NexusVector3DConverter))]
-        public Vector3D BoundsMin { get => bounds_min; set => bounds_min = value; }
+        public Vector3D BoundsMin { get; set; } = new Vector3D(0, 0, 0);
 
         [Category("Model"), DisplayName("Bounds Max"), Description("Maximum corner of the bounding box.")]
         [TypeConverter(typeof(Inspector.NexusVector3DConverter))]
-        public Vector3D BoundsMax { get => bounds_max; set => bounds_max = value; }
+        public Vector3D BoundsMax { get; set; } = new Vector3D(0, 0, 0);
 
         [Category("Model")]
         public UInt32 properties_bitmap { get; set; }
@@ -120,8 +118,6 @@ namespace PD2ModelParser.Sections
             //this.unknown9 = 0;
             this.material_group_section_id = matg.SectionId;
             this.lightset_ID = 0;
-            this.bounds_min = new Vector3D(0, 0, 0);
-            this.bounds_max = new Vector3D(0, 0, 0);
             this.properties_bitmap = 0;
             this.BoundingRadius = 1;
             this.unknown13 = 6;
@@ -144,13 +140,8 @@ namespace PD2ModelParser.Sections
 
             if (this.version == 6)
             {
-                this.bounds_min.X = instream.ReadSingle();
-                this.bounds_min.Y = instream.ReadSingle();
-                this.bounds_min.Z = instream.ReadSingle();
-
-                this.bounds_max.X = instream.ReadSingle();
-                this.bounds_max.Y = instream.ReadSingle();
-                this.bounds_max.Z = instream.ReadSingle();
+                this.BoundsMin = instream.ReadNexusVector3D();
+                this.BoundsMax = instream.ReadNexusVector3D();
                 
                 this.v6_unknown7 = instream.ReadSingle();
                 this.v6_unknown8 = instream.ReadUInt32();
@@ -182,13 +173,8 @@ namespace PD2ModelParser.Sections
                 // 3: has_opacity
                 this.properties_bitmap = instream.ReadUInt32();
 
-                // Order: maxX, minX, minY, minZ, maxX, maxY - Don't ask why.
-                this.bounds_min.X = instream.ReadSingle();
-                this.bounds_min.Y = instream.ReadSingle();
-                this.bounds_min.Z = instream.ReadSingle();
-                this.bounds_max.X = instream.ReadSingle();
-                this.bounds_max.Y = instream.ReadSingle();
-                this.bounds_max.Z = instream.ReadSingle();
+                this.BoundsMin = instream.ReadNexusVector3D();
+                this.BoundsMax = instream.ReadNexusVector3D();
 
                 this.BoundingRadius = instream.ReadSingle();
                 this.unknown13 = instream.ReadUInt32();
@@ -206,12 +192,8 @@ namespace PD2ModelParser.Sections
             outstream.Write(this.version);
             if (this.version == 6)
             {
-                outstream.Write(this.bounds_min.X);
-                outstream.Write(this.bounds_min.Y);
-                outstream.Write(this.bounds_min.Z);
-                outstream.Write(this.bounds_max.X);
-                outstream.Write(this.bounds_max.Y);
-                outstream.Write(this.bounds_max.Z);
+                outstream.Write(this.BoundsMin);
+                outstream.Write(this.BoundsMax);
                 outstream.Write(this.v6_unknown7);
                 outstream.Write(this.v6_unknown8);
             }
@@ -235,12 +217,8 @@ namespace PD2ModelParser.Sections
 
                 outstream.Write(this.properties_bitmap);
 
-                outstream.Write(this.bounds_min.X);
-                outstream.Write(this.bounds_min.Y);
-                outstream.Write(this.bounds_min.Z);
-                outstream.Write(this.bounds_max.X);
-                outstream.Write(this.bounds_max.Y);
-                outstream.Write(this.bounds_max.Z);
+                outstream.Write(this.BoundsMin);
+                outstream.Write(this.BoundsMax);
 
                 outstream.Write(this.BoundingRadius);
                 outstream.Write(this.unknown13);
@@ -255,15 +233,13 @@ namespace PD2ModelParser.Sections
         public override string ToString()
         {
             if (this.version == 6)
-                return "[Model_v6] " + base.ToString() + " version: " + this.version + " unknown5: " + this.bounds_min + " unknown6: " + this.bounds_max + " unknown7: " + this.v6_unknown7 + " unknown8: " + this.v6_unknown8 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+                return "[Model_v6] " + base.ToString() + " version: " + this.version + " unknown5: " + this.BoundsMin + " unknown6: " + this.BoundsMax + " unknown7: " + this.v6_unknown7 + " unknown8: " + this.v6_unknown8 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             else
             {
                 var atoms_string = string.Join(",", RenderAtoms.Select(i => i.ToString()));
-                return base.ToString() + " version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " RenderAtoms: " + this.RenderAtoms.Count + " items: [" + atoms_string + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.bounds_min + " bounds_max: " + this.bounds_max + " unknown11: " + this.properties_bitmap + " BoundingRadius: " + this.BoundingRadius + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+                return base.ToString() + " version: " + this.version + " passthroughGP_ID: " + this.passthroughGP_ID + " topologyIP_ID: " + this.topologyIP_ID + " RenderAtoms: " + this.RenderAtoms.Count + " items: [" + atoms_string + "] material_group_section_id: " + this.material_group_section_id + " unknown10: " + this.lightset_ID + " bounds_min: " + this.BoundsMin + " bounds_max: " + this.BoundsMax + " unknown11: " + this.properties_bitmap + " BoundingRadius: " + this.BoundingRadius + " unknown13: " + this.unknown13 + " skinbones_ID: " + this.skinbones_ID + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
             }
         }
-
-        public override uint TypeCode => Tags.model_data_tag;
 
         public void UpdateBounds(FullModelData fmd)
         {

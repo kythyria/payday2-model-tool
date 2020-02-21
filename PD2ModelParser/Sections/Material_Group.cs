@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
+    [SectionId(Tags.material_group_tag)]
     class Material_Group : AbstractSection, ISection
     {
         public UInt32 size;
@@ -70,7 +71,5 @@ namespace PD2ModelParser.Sections
 
             return base.ToString() + " size: " + this.size + " Count: " + this.count + " Items: [ " + items_string + " ] " + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
-
-        public override uint TypeCode => Tags.material_group_tag;
     }
 }

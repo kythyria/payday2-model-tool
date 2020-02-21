@@ -40,6 +40,7 @@ namespace PD2ModelParser.Sections
         }
     }
 
+    [SectionId(Tags.topology_tag)]
     class Topology : AbstractSection, ISection
     {
         public UInt32 unknown1;
@@ -120,7 +121,5 @@ namespace PD2ModelParser.Sections
                    " HashName: " + StaticStorage.hashindex.GetString(this.hashname) +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
-
-        public override uint TypeCode => Tags.topology_tag;
     }
 }
