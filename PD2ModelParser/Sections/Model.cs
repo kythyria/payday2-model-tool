@@ -248,7 +248,7 @@ namespace PD2ModelParser.Sections
             var gp = fmd.parsed_sections[passthroughGP_ID] as PassthroughGP;
             if (gp == null) { return; }
 
-            var geo = fmd.parsed_sections[gp.geometry_section] as Geometry;
+            var geo = gp.Geometry;
             if (geo == null) { return; }
 
             if(geo.verts.Count == 0) { return; }

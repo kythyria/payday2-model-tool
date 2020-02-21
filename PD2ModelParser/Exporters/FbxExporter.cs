@@ -117,8 +117,8 @@ namespace PD2ModelParser.Exporters
         {
             Dictionary<uint, ISection> parsed = data.parsed_sections;
             PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
-            Geometry geom = (Geometry) parsed[pgp.geometry_section];
-            Topology topo = (Topology) parsed[pgp.topology_section];
+            Geometry geom = pgp.Geometry;
+            Topology topo = pgp.Topology;
 
             string name = model.Name;
 
@@ -259,7 +259,7 @@ namespace PD2ModelParser.Exporters
         {
             Dictionary<uint, ISection> parsed = data.parsed_sections;
             PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
-            Geometry geom = (Geometry) parsed[pgp.geometry_section];
+            Geometry geom = pgp.Geometry;
 
             // Mainly for testing stuff with bone exports, keep things working if
             // the model has a skeleton but no weights.

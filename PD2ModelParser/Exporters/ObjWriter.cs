@@ -44,8 +44,8 @@ namespace PD2ModelParser
                         if (sectionheader.type == passthroughGP_tag)
                         {
                             PassthroughGP passthrough_section = (PassthroughGP)parsed_sections[sectionheader.id];
-                            Geometry geometry_section = (Geometry)parsed_sections[passthrough_section.geometry_section];
-                            Topology topology_section = (Topology)parsed_sections[passthrough_section.topology_section];
+                            Geometry geometry_section = passthrough_section.Geometry;
+                            Topology topology_section = passthrough_section.Topology;
                             sw.WriteLine("Object ID: " + sectionheader.id);
                             sw.WriteLine("Verts (x, z, y)");
                             foreach (Vector3D vert in geometry_section.verts)
@@ -242,8 +242,8 @@ namespace PD2ModelParser
                             if (model_data.version == 6)
                                 continue;
                             PassthroughGP passthrough_section = (PassthroughGP)parsed_sections[model_data.passthroughGP_ID];
-                            Geometry geometry_section = (Geometry)parsed_sections[passthrough_section.geometry_section];
-                            Topology topology_section = (Topology)parsed_sections[passthrough_section.topology_section];
+                            Geometry geometry_section = passthrough_section.Geometry;
+                            Topology topology_section = passthrough_section.Topology;
 
 
 
@@ -346,10 +346,8 @@ namespace PD2ModelParser
                             if (model_data.version == 6)
                                 continue;
                             PassthroughGP passthrough_section = (PassthroughGP)parsed_sections[model_data.passthroughGP_ID];
-                            Geometry geometry_section = (Geometry)parsed_sections[passthrough_section.geometry_section];
-                            Topology topology_section = (Topology)parsed_sections[passthrough_section.topology_section];
-
-
+                            Geometry geometry_section = passthrough_section.Geometry;
+                            Topology topology_section = passthrough_section.Topology;
 
                             sw.WriteLine("#");
                             sw.WriteLine("# object " + model_data.Name);

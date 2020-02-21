@@ -9,7 +9,7 @@ namespace PD2ModelParser.Sections
 {
     class Unknown : AbstractSection, ISection
     {
-        public UInt32 tag;
+        UInt32 tag;
 
         public override uint TypeCode => this.tag;
 

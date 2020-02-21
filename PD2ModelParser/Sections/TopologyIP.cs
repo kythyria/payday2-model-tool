@@ -45,7 +45,5 @@ namespace PD2ModelParser.Sections
         {
             return base.ToString() + " size: " + this.size + " Topology sectionID: " + this.topology_id + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
-
-        public override uint TypeCode => Tags.topologyIP_tag;
     }
 }

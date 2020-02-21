@@ -220,8 +220,8 @@ namespace PD2ModelParser
 
                     Model model_data_section = (Model)parsed_sections[modelSectionid];
                     PassthroughGP passthrough_section = (PassthroughGP)parsed_sections[model_data_section.passthroughGP_ID];
-                    Geometry geometry_section = (Geometry)parsed_sections[passthrough_section.geometry_section];
-                    Topology topology_section = (Topology)parsed_sections[passthrough_section.topology_section];
+                    Geometry geometry_section = passthrough_section.Geometry;
+                    Topology topology_section = passthrough_section.Topology;
 
                     AddObject(false, obj,
                         model_data_section, passthrough_section,
@@ -698,8 +698,8 @@ namespace PD2ModelParser
 
                     Model model_data_section = (Model)fm.parsed_sections[modelSectionid];
                     PassthroughGP passthrough_section = (PassthroughGP)fm.parsed_sections[model_data_section.passthroughGP_ID];
-                    Geometry geometry_section = (Geometry)fm.parsed_sections[passthrough_section.geometry_section];
-                    Topology topology_section = (Topology)fm.parsed_sections[passthrough_section.topology_section];
+                    Geometry geometry_section = passthrough_section.Geometry;
+                    Topology topology_section = passthrough_section.Topology;
 
                     //Arrange UV and Normals
                     Vector2D[] new_arranged_UV = new Vector2D[geometry_section.verts.Count];
@@ -732,7 +732,7 @@ namespace PD2ModelParser
 
                     geometry_section.UVs[1] = new_arranged_UV.ToList();
 
-                    ((Geometry)fm.parsed_sections[passthrough_section.geometry_section]).UVs[1] = new_arranged_UV.ToList();
+                    passthrough_section.Geometry.UVs[1] = new_arranged_UV.ToList();
                 }
             }
             catch (Exception exc)

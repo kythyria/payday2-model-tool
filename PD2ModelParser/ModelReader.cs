@@ -121,21 +121,17 @@ namespace PD2ModelParser
                         parsed_sections.Add(sh.id, section);
                     }
 
-                    foreach(uint id in parsed_sections.Keys)
+                    foreach(var i in parsed_sections)
                     {
-                        if (parsed_sections[id] is IPostLoadable)
+                        if(i.Value is IPostLoadable pl)
                         {
-                            IPostLoadable obj = (IPostLoadable) parsed_sections[id];
-                            obj.PostLoad(id, parsed_sections);
+                            pl.PostLoad(i.Key, parsed_sections);
                         }
                     }
 
                     if (fs.Position < fs.Length)
                         data.leftover_data = br.ReadBytes((int)(fs.Length - fs.Position));
-
-                    br.Close();
                 }
-                fs.Close();
             }
         }
     }
