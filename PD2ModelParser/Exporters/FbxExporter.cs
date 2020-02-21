@@ -226,7 +226,7 @@ namespace PD2ModelParser.Exporters
 
             FbxNode node = FbxNode.Create(fm, name);
 
-            CopyTransform(obj.rotation, node);
+            CopyTransform(obj.Transform, node);
 
             FbxSkeleton skel = FbxSkeleton.Create(fm, obj.Name + "Skel");
             skel.Size.Set(1);

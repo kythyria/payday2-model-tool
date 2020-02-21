@@ -154,7 +154,7 @@ namespace PD2ModelParser.Importers
             // the hip bone.
             // Note that the model only had one skeleton, shared between all models - this will probably break
             // it quite a bit if we try and export them all back in.
-            model.parent = root_bone;
+            model.Parent = root_bone;
 
             AddWeights(mesh, skel, model, geom);
 
@@ -213,7 +213,7 @@ namespace PD2ModelParser.Importers
                 if (root_bone == null)
                 {
                     root_bone = obj;
-                    sb.global_skin_transform = obj.rotation;
+                    sb.global_skin_transform = obj.Transform;
                 }
                 else if (parent == rootPoint)
                 {
@@ -244,7 +244,7 @@ namespace PD2ModelParser.Importers
                 if (_options.ImportBoneTransforms)
                 {
                     // Note the field is named badly - it's a transform, not just a rotation
-                    obj.rotation = node.GetNexusTransform();
+                    obj.Transform = node.GetNexusTransform();
                 }
 
                 sb.objects.Add(obj.SectionId);

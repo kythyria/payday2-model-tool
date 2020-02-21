@@ -169,12 +169,12 @@ namespace PD2ModelParser
                         Vector3D translate;
                         Quaternion rotate;
                         Vector3D scale;
-                        obj.rotation.Decompose(out scale, out rotate, out translate);
+                        obj.Transform.Decompose(out scale, out rotate, out translate);
 
                         Matrix3D final_rot = Matrix3D.CreateFromQuaternion(rotate);
                         final_rot.Translation = translate;
 
-                        if (obj.parent == null || !sb.objects.Contains(obj.parentID))
+                        if (obj.Parent == null || !sb.objects.Contains(obj.parentID))
                         {
                             Matrix3D fixed_obj_transform = obj.world_transform;
                             fixed_obj_transform.Decompose(out scale, out rotate, out translate);

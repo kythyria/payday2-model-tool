@@ -18,9 +18,8 @@ namespace PD2ModelParser.Sections
         private Matrix3D _rotation = new Matrix3D(); // 4x4 transform matrix - for translation/scale too
 
         [Category("Object3D")]
-        [DisplayName("Transform")]
         [TypeConverter(typeof(Inspector.NexusMatrixConverter))]
-        public Matrix3D rotation
+        public Matrix3D Transform
         {
             get => _rotation;
             set
@@ -31,7 +30,7 @@ namespace PD2ModelParser.Sections
         }
 
         [Browsable(false)]
-        public uint parentID => parent?.SectionId ?? 0;
+        public uint parentID => Parent?.SectionId ?? 0;
 
         public byte[] remaining_data = null;
 
@@ -45,19 +44,19 @@ namespace PD2ModelParser.Sections
         [Category("Object3D")]
         [DisplayName("Parent")]
         [TypeConverter(typeof(Inspector.Object3DReferenceConverter))]
-        public Object3D parent { get; set; }
+        public Object3D Parent { get; set; }
 
         public List<Object3D> children = new List<Object3D>();
 
         public void SetParent(Object3D newParent)
         {
-            var oldParent = parent;
+            var oldParent = Parent;
             if(oldParent != null)
             {
                 oldParent.children.Remove(this);
             }
             newParent.children.Add(this);
-            parent = newParent;
+            Parent = newParent;
         }
 
         [Browsable(false)]
@@ -72,9 +71,9 @@ namespace PD2ModelParser.Sections
 
             this.HashName = new HashName(object_name);
             this.child_ids = new List<uint>();
-            this.rotation = Matrix3D.Identity;
+            this.Transform = Matrix3D.Identity;
 
-            this.parent = parent;
+            this.Parent = parent;
 
             UpdateTransforms();
         }
@@ -126,7 +125,7 @@ namespace PD2ModelParser.Sections
             transform.M42 = instream.ReadSingle();
             transform.M43 = instream.ReadSingle();
 
-            rotation = transform;
+            Transform = transform;
 
             loading_parent_id = instream.ReadUInt32();
 
@@ -143,25 +142,25 @@ namespace PD2ModelParser.Sections
                 outstream.Write((ulong) 0); // Bit to skip - the PD2 binary does the exact same thing
             }
 
-            outstream.Write(this.rotation.M11);
-            outstream.Write(this.rotation.M12);
-            outstream.Write(this.rotation.M13);
-            outstream.Write(this.rotation.M14);
-            outstream.Write(this.rotation.M21);
-            outstream.Write(this.rotation.M22);
-            outstream.Write(this.rotation.M23);
-            outstream.Write(this.rotation.M24);
-            outstream.Write(this.rotation.M31);
-            outstream.Write(this.rotation.M32);
-            outstream.Write(this.rotation.M33);
-            outstream.Write(this.rotation.M34);
-            outstream.Write(this.rotation.M41);
-            outstream.Write(this.rotation.M42);
-            outstream.Write(this.rotation.M43);
-            outstream.Write(this.rotation.M44);
-            outstream.Write(this.rotation.M41); // Write the position out again, as for some reason
-            outstream.Write(this.rotation.M42); // it's not stored in the main matrix
-            outstream.Write(this.rotation.M43);
+            outstream.Write(this.Transform.M11);
+            outstream.Write(this.Transform.M12);
+            outstream.Write(this.Transform.M13);
+            outstream.Write(this.Transform.M14);
+            outstream.Write(this.Transform.M21);
+            outstream.Write(this.Transform.M22);
+            outstream.Write(this.Transform.M23);
+            outstream.Write(this.Transform.M24);
+            outstream.Write(this.Transform.M31);
+            outstream.Write(this.Transform.M32);
+            outstream.Write(this.Transform.M33);
+            outstream.Write(this.Transform.M34);
+            outstream.Write(this.Transform.M41);
+            outstream.Write(this.Transform.M42);
+            outstream.Write(this.Transform.M43);
+            outstream.Write(this.Transform.M44);
+            outstream.Write(this.Transform.M41); // Write the position out again, as for some reason
+            outstream.Write(this.Transform.M42); // it's not stored in the main matrix
+            outstream.Write(this.Transform.M43);
             outstream.Write(this.parentID);
 
             if (this.remaining_data != null)
@@ -173,7 +172,7 @@ namespace PD2ModelParser.Sections
             Vector3D scale = new Vector3D();
             Quaternion rot = new Quaternion();
             Vector3D translation = new Vector3D();
-            this.rotation.Decompose(out scale, out rot, out translation);
+            this.Transform.Decompose(out scale, out rot, out translation);
             return base.ToString() +
                    " size: " + this.size +
                    " HashName: " + this.HashName.String +
@@ -193,18 +192,18 @@ namespace PD2ModelParser.Sections
         {
             if (loading_parent_id == 0)
             {
-                parent = null;
+                Parent = null;
             }
             else
             {
-                parent = (Object3D) parsed_sections[loading_parent_id];
+                Parent = (Object3D) parsed_sections[loading_parent_id];
 
-                if (!parent.has_post_loaded)
-                    parent.PostLoad(loading_parent_id, parsed_sections);
+                if (!Parent.has_post_loaded)
+                    Parent.PostLoad(loading_parent_id, parsed_sections);
 
-                if (!parent.children.Contains(this))
+                if (!Parent.children.Contains(this))
                 {
-                    parent.children.Add(this);
+                    Parent.children.Add(this);
                 }
             }
 
@@ -215,13 +214,13 @@ namespace PD2ModelParser.Sections
 
         public void UpdateTransforms()
         {
-            if (parent == null)
+            if (Parent == null)
             {
-                world_transform = rotation;
+                world_transform = Transform;
                 return;
             }
 
-            world_transform = rotation.MultDiesel(parent.world_transform);
+            world_transform = Transform.MultDiesel(Parent.world_transform);
         }
     }
 }

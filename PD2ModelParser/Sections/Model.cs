@@ -277,7 +277,7 @@ namespace PD2ModelParser.Sections
 
             if(geo.verts.Count == 0) { return; }
 
-            rotation.Decompose(out Vector3D scale, out _, out _);
+            Transform.Decompose(out Vector3D scale, out _, out _);
 
             var scaled = geo.verts.Select(i => new Vector3D(i.X * scale.X, i.Y * scale.Y, i.Z * scale.Z)).ToList();
 

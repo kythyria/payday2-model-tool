@@ -129,7 +129,7 @@ namespace PD2ModelParser.Importers
 
             var lt = node.LocalTransform;
             lt.Translation *= scaleFactor;
-            obj.rotation = lt.Matrix.ToNexusMatrix();
+            obj.Transform = lt.Matrix.ToNexusMatrix();
 
             (obj as DM.Model)?.UpdateBounds(data);
 

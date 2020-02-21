@@ -60,7 +60,7 @@ namespace PD2ModelParser.Exporters
                 materialsBySectionId[ms.SectionId] = root.CreateMaterial(ms.hashname.String);
             }
 
-            foreach(var i in data.SectionsOfType<Object3D>().Where(i => i.parent == null))
+            foreach(var i in data.SectionsOfType<Object3D>().Where(i => i.Parent == null))
             {
                 CreateNodeFromObject3D(i, scene);
             }
@@ -88,7 +88,7 @@ namespace PD2ModelParser.Exporters
             nodesBySectionId[thing.SectionId] = node;
             if (thing != null)
             {
-                var istrs = thing.rotation.Decompose(out var scale, out var rotation, out var translation);
+                var istrs = thing.Transform.Decompose(out var scale, out var rotation, out var translation);
                 if(!istrs)
                 {
                     throw new Exception($"In object \"{thing.Name}\" ({thing.SectionId}), non-TRS matrix");
@@ -98,7 +98,7 @@ namespace PD2ModelParser.Exporters
                 // want to affect the translation, less stability problems exist by directly changing
                 // just the cells that are the translation part.
 
-                var mat = thing.rotation.ToMatrix4x4();
+                var mat = thing.Transform.ToMatrix4x4();
                 mat.Translation = mat.Translation * scaleFactor;
 
                 node.LocalMatrix = isSkinned ? Matrix4x4.Identity : mat;

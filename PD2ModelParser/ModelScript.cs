@@ -90,7 +90,7 @@ namespace PD2ModelParser
                             $"Cannot create new Object3D named \"{name}\", as such "
                             + "an object already exists!");
 
-                    obj = new Object3D(name, null) {rotation = Matrix3D.Identity};
+                    obj = new Object3D(name, null) {Transform = Matrix3D.Identity};
                     data.AddSection(obj);
                     break;
                 }
@@ -119,9 +119,9 @@ namespace PD2ModelParser
                         Vector3D vec = CheckAttrVec(operation);
 
                         // TODO update the object's world_transform property
-                        Matrix3D transform = obj.rotation;
+                        Matrix3D transform = obj.Transform;
                         transform.Translation = vec;
-                        obj.rotation = transform;
+                        obj.Transform = transform;
 
                         break;
                     }
@@ -137,7 +137,7 @@ namespace PD2ModelParser
 
                         // Unfortunately, there's no clean way to replace the matrix's rotation
                         // So we break down the matrix into it's components, then rebuild it with the new rotation
-                        obj.rotation.Decompose(
+                        obj.Transform.Decompose(
                             out Vector3D scale,
                             out Quaternion _,
                             out Vector3D translation
@@ -150,7 +150,7 @@ namespace PD2ModelParser
                         Matrix3D mat = Matrix3D.CreateScale(scale) * Matrix3D.CreateFromQuaternion(quat);
                         mat.Translation = translation;
 
-                        obj.rotation = mat;
+                        obj.Transform = mat;
 
                         break;
                     }
@@ -163,7 +163,7 @@ namespace PD2ModelParser
                         Vector3D scale = CheckAttrVec(operation);
 
                         // Same story as rotation - split and rebuild the matrix.
-                        obj.rotation.Decompose(
+                        obj.Transform.Decompose(
                             out Vector3D _,
                             out Quaternion quat,
                             out Vector3D translation
@@ -176,7 +176,7 @@ namespace PD2ModelParser
                         Matrix3D mat = Matrix3D.CreateScale(scale) * Matrix3D.CreateFromQuaternion(quat);
                         mat.Translation = translation;
 
-                        obj.rotation = mat;
+                        obj.Transform = mat;
 
                         break;
                     }
@@ -189,14 +189,14 @@ namespace PD2ModelParser
                         if (root != null)
                         {
                             if (root.Value != "true")
-                                throw new Exception("parent element has root attribute set " +
+                                throw new Exception("Parent element has root attribute set " +
                                                     $"to \"{root.Value}\" - the root attribute " +
                                                     "must be set to \"true\", if it exists");
 
                             parent = null;
 
                             if (operation.Attribute("name") != null)
-                                throw new Exception("parent element cannot have a \"name\" " +
+                                throw new Exception("Parent element cannot have a \"name\" " +
                                                     "attribute if set to root");
                         }
                         else

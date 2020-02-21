@@ -86,7 +86,7 @@ namespace PD2ModelParser.Inspector
         public object PropertyItem => null;
         public IEnumerable<IInspectorNode> GetChildren()
         {
-            return data.SectionsOfType<Sections.Object3D>().Where(i => i.parent == null).Select(i => new ObjectNode(data, i));
+            return data.SectionsOfType<Sections.Object3D>().Where(i => i.Parent == null).Select(i => new ObjectNode(data, i));
         }
     }
 
@@ -112,7 +112,7 @@ namespace PD2ModelParser.Inspector
         public object PropertyItem => obj;
         public IEnumerable<IInspectorNode> GetChildren()
         {
-            return data.SectionsOfType<Sections.Object3D>().Where(i => i.parent == obj).Select(i => new ObjectNode(data, i));
+            return data.SectionsOfType<Sections.Object3D>().Where(i => i.Parent == obj).Select(i => new ObjectNode(data, i));
         }
     }
 }
