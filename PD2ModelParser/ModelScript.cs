@@ -210,10 +210,10 @@ namespace PD2ModelParser
                         }
 
                         // Remove the object from it's previous parent, if it had one
-                        obj.parent?.children.Remove(obj);
+                        obj.Parent?.children.Remove(obj);
 
                         // Set the object's parent attributes
-                        obj.parent = parent;
+                        obj.Parent = parent;
 
                         // And add it to the new parent's list of children
                         parent?.children.Add(obj);
