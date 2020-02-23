@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Windows.Forms;
+using System.Linq;
+using System.Text.RegularExpressions;
 using PD2ModelParser;
 
 namespace PD2Bundle
@@ -37,6 +36,7 @@ namespace PD2Bundle
         public void Clear()
         {
             this.hashes.Clear();
+            loaded = false;
         }
 
         bool loaded = false;
@@ -45,25 +45,19 @@ namespace PD2Bundle
         {
             if (loaded) return true;
 
-            string filename = "hashes.txt";
-
-            Stream stream;
-
-            // Use the file if we have it
-            if(File.Exists(filename))
+            foreach(var name in GetHashfileNames())
             {
-                stream = new FileStream(filename, FileMode.Open);
-            }
-            else
-            {
-                // Not very memory efficent, but in a world of almost all computers having 4+ GiB of RAM,
-                // what harm does 20MiB or so do?
-                stream = new MemoryStream(Encoding.UTF8.GetBytes(PD2ModelParser.Properties.Resources.hashes));
+                loaded |= TryLoad(name);
             }
 
+            return loaded;
+        }
+
+        public bool TryLoad(string filename)
+        {
             try
             {
-                using (StreamReader sr = new StreamReader(stream))
+                using (var sr = new StreamReader(filename))
                 {
                     string line = sr.ReadLine();
                     while (line != null)
@@ -71,15 +65,29 @@ namespace PD2Bundle
                         Hint(line);
                         line = sr.ReadLine();
                     }
-                    sr.Close();
                 }
+                return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Log.Default.Warn("Couldn't read hashlist file \"{0}\": {1}", filename, e.Message);
                 return false;
             }
-            loaded = true;
-            return true;
+        }
+
+        private IEnumerable<string> GetHashfileNames()
+        {
+            var exepath = System.Reflection.Assembly.GetEntryAssembly().Location;
+            var exedir = Path.GetDirectoryName(exepath);
+            var cwd = Directory.GetCurrentDirectory();
+
+            var hashregex = new Regex(@"hash(list|es)(-\d+)?(\.txt)?");
+            var names = Directory.GetFiles(cwd).Where(i=>hashregex.IsMatch(i));
+            if(exedir != cwd)
+            {
+                names = names.Concat(Directory.GetFiles(exedir).Where(i => hashregex.IsMatch(i)));
+            }
+            return names;
         }
 
         public void Hint(string line)

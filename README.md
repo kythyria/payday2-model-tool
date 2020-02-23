@@ -60,6 +60,18 @@ Partial bone/skinning support refers to the result not being read sensibly in al
 
 The GLTF importer completely ignores skinning data, so the results will be odd as well as effectively unrigged.
 
+# Hashlists
+Diesel very rarely stores actual names of things if it can store a hash of the name instead, so a list of
+names is needed in order to present something readable names instead of just large numbers. On export anything
+not in the list will be written as a number, while the GLTF importer will assume any name that's a valid
+`unsigned long` is the result of that process.
+
+A copy of [Luffyyy's version of the hashlist](https://github.com/Luffyyy/PAYDAY-2-Hashlist) is included; the
+tool looks for files called `hashlist`, `hashes`, with or without a numeric suffix like `-3`, with or without
+a `.txt` extension, in the current directory and next to the executable. Any it finds are interpreted as lists
+of unhashed names, one per line. If you change hashlists you will need to restart the tool in order to pick
+up the changes.
+
 # Licence:
 
 This program is Free Software under the terms of the GNU General Public Licence, version 3. A copy of

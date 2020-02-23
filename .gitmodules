@@ -1,0 +1,5 @@
+[submodule "PD2ModelParser/hashlist"]
+	path = PD2ModelParser/hashlist
+	url = https://github.com/Luffyyy/PAYDAY-2-Hashlist
+	branch = master
+	shallow = true
