@@ -11,8 +11,10 @@ namespace PD2ModelParser
             this.InitializeComponent();
 
             Assembly assembly = Assembly.GetExecutingAssembly();
-            AssemblyProductAttribute assemblyProduct = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false)[0] as AssemblyProductAttribute;
-            Text = assemblyProduct.Product;
+            var assemblyProduct = assembly.GetCustomAttribute<AssemblyProductAttribute>() as AssemblyProductAttribute;
+            var informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            var version = informationalVersion?.InformationalVersion ?? "BUG: AssemblyInformationalVersionAttribute missing!";
+            Text = $"{assemblyProduct.Product} ({informationalVersion.InformationalVersion})";
         }
 
         private void Form1_Load(object sender, EventArgs e)

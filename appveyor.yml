@@ -1,0 +1,60 @@
+version: '{branch}.{build}'
+image: Visual Studio 2017
+configuration: DebugNoFBX
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: $(INFORMATIONAL_VERSION)
+install:
+- ps: >-
+    $gitdescribe = git describe
+
+    $env:ASSEMBLY_VERSION_NUMBER = if ($gitdescribe -match "v(\d+(?:\.\d+){0,2})") {
+      $Matches.1 + "." + $env:APPVEYOR_BUILD_NUMBER.ToString()
+    }
+
+    else {
+      "0.0.0" + $env:APPVEYOR_BUILD_NUMBER.ToString()
+    }
+
+    Update-AppveyorBuild -Version $env:ASSEMBLY_VERSION_NUMBER
+
+    Set-AppveyorBuildVariable -Name INFORMATIONAL_VERSION -Value "{0}-{1}" -f $gitdescribe,$env:CONFIGURATION
+
+    git submodule -q init
+
+    git submodule -q update
+
+
+    $env:OUTPUT_FILENAME = if ($env:APPVEYOR_REPO_TAG -eq "true") {
+      "pd2modelparser-$($env:APPVEYOR_REPO_TAG_NAME)-$($env:CONFIGURATION)"
+    }
+
+    else {
+      "pd2modelparser-{0}-{1}" -f $gitdescribe,$env:CONFIGURATION
+    }
+
+    $env:OUTPUT_FILENAME += ".zip"
+before_build:
+- cmd: >-
+    nuget restore
+
+    copy .\PD2ModelParser\Properties\AssemblyInfo.i.cs .\PD2ModelParser\Properties\AssemblyInfo.cs
+build:
+  project: PD2ModelParser.sln
+  verbosity: minimal
+after_build:
+- ps: >-
+    7z a "$env:OUTPUT_FILENAME" "$env:APPVEYOR_BUILD_FOLDER\PD2ModelParser\bin\$env:CONFIGURATION"
+
+    Push-AppveyorArtifact "$env:OUTPUT_FILENAME" -Filename $env:OUTPUT_FILENAME
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: L4MkfzcxXQWZBVDlHK3Y7G+FHUWDk0fcnVwDJ6n/cvCmRqDku818Ut4EVeWPmoZj
+  artifact: $(OUTPUT_FILENAME)
+  draft: true
+  on:
+    APPVEYOR_REPO_TAG: true
