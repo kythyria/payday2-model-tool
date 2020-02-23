@@ -21,7 +21,7 @@ install:
 
     Update-AppveyorBuild -Version $env:ASSEMBLY_VERSION_NUMBER
 
-    Set-AppveyorBuildVariable -Name INFORMATIONAL_VERSION -Value "{0}-{1}" -Value $gitdescribe,$env:CONFIGURATION
+    Set-AppveyorBuildVariable -Name INFORMATIONAL_VERSION -Value ("{0}-{1}" -f $gitdescribe,$env:CONFIGURATION)
 
     git submodule -q init
 
