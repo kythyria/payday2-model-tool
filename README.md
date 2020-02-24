@@ -42,19 +42,19 @@ the downside that if you're importing into Blender bones and empties are drawn m
 |--------|--------|--------|
 | OBJ    | ✓      | ✓      |
 | DAE    |        | ✓      | 
-| FBX    |        | ✓      |
+| FBX    | ✓      | ✓      |
 | GLTF   | ✓      | ✓      |
 
-| Data             | FBX  | DAE | GLTF In | GLTF Out |
-|------------------|------|-----|---------|----------|
-| Triangles        | ✓    | ✓   | ✓       | ✓        |
-| UV channels      | ✓    | One | ✓       | ✓        |
-| Vertex colours   | ✓    | ✗   | ✓       | ✓        |
-| Vertex weights   | ✓    | ✗   | ✓       | ✓        |
-| Material slots   | ✓    | ✗   | ✓       | ✓        |
-| Object hierarchy | ✓    | ✓   | ✓       | ✓        |
-| Bones            | ✓    | As objects | As objects | Partial |
-| Skinning         | ✓    | ✗   | Ignored | Partial    |
+| Data             | FBX Out | FBX In | DAE | GLTF In | GLTF Out |
+|------------------|---------|--------|-----|---------|----------|
+| Triangles        | ✓       | ✓      | ✓   | ✓       | ✓        |
+| UV channels      | ✓       | ✓      | One | ✓       | ✓        |
+| Vertex colours   | ✓       | ?     | ✗   | ✓       | ✓        |
+| Vertex weights   | ✓       | ✓     | ✗   | ✓       | ✓        |
+| Material slots   | ✓       | ✗     | ✗   | ✓       | ✓        |
+| Object hierarchy | ✓       | ✓     | ✓   | ✓       | ✓        |
+| Bones            | ✓       | ✓     | As objects | As objects | Partial |
+| Skinning         | ✓       | ✓     | ✗   | Ignored | Partial    |
 
 Partial bone/skinning support refers to the result not being read sensibly in all implementations.
 
