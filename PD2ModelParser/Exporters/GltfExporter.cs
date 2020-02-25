@@ -288,14 +288,7 @@ namespace PD2ModelParser.Exporters
 
             if (geometry.weights.Count > 0)
             {
-                Func<Nexus.Vector3D, Vector4> ConvertWeight = (weight) => {
-                    var n = new Vector4(weight.X, weight.Y, weight.Z, 0);
-                    if((n.W < 0))
-                    {
-                        int a = 0;
-                    }
-                    return n;
-                };
+                Vector4 ConvertWeight(Nexus.Vector3D weight) => new Vector4(weight.X, weight.Y, weight.Z, 0);
 
                 var a_wght = MakeVertexAttributeAccessor("vweight", geometry.weights, 16, GLTF.DimensionType.VEC4, ConvertWeight, ma => ma.AsVector4Array());
                 result.Add(("WEIGHTS_0", a_wght));

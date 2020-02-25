@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
+using BindingFlags = System.Reflection.BindingFlags;
 
 namespace PD2ModelParser.Sections
 {
@@ -60,7 +62,7 @@ namespace PD2ModelParser.Sections
             //update section size
             long end_pos = output.BaseStream.Position;
             output.BaseStream.Position = size_pos;
-            output.Write((uint) (end_pos - start_pos));
+            output.Write((uint)(end_pos - start_pos));
 
             output.BaseStream.Position = end_pos;
         }
@@ -70,6 +72,43 @@ namespace PD2ModelParser.Sections
         public override string ToString()
         {
             return $"[{GetType().Name}] ID: {SectionId}";
+        }
+
+        delegate void PostLoadCallback(ISection self, Dictionary<uint, ISection> sections);
+        List<PostLoadCallback> postloadCallbacks = new List<PostLoadCallback>();
+        /// <summary>
+        /// Record that a section ID was read, for assigning the actual section later when all sections exist.
+        /// </summary>
+        /// <param name="id">Section ID.</param>
+        /// <param name="self">Object which has the reference property on it.</param>
+        /// <param name="prop">Expression reading the property in question.</param>
+        protected void PostloadRef<TSelf, TRef>(uint id, TSelf self, Expression<Func<TSelf, TRef>> prop)
+        {
+            var body = prop.Body as MemberExpression;
+            var propinfo = body.Member as System.Reflection.PropertyInfo;
+            postloadCallbacks.Add((thisSection, secs) => DeferredRefAssignment(secs, propinfo, id));
+        }
+
+        private void DeferredRefAssignment(Dictionary<uint, ISection> sections, System.Reflection.PropertyInfo pi, uint id)
+        {
+            ISection target;
+            try
+            {
+                target = id != 0 ? sections[id] : null;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Couldn't load {pi.DeclaringType.Name}.{pi.Name}: Section {SectionId} points to non-section {id}", e);
+            }
+            pi.SetValue(this, target);
+        }
+
+        public virtual void PostLoad(uint id, Dictionary<uint, ISection> sections)
+        {
+            foreach (var cb in postloadCallbacks)
+            {
+                cb(this, sections);
+            }
         }
     }
 
@@ -110,7 +149,9 @@ namespace PD2ModelParser.Sections
 
         public Type Type { get; private set; }
         public uint Tag { get; private set; }
-        public ISection Deserialise(BinaryReader br, SectionHeader sh) {
+
+        public ISection Deserialise(BinaryReader br, SectionHeader sh)
+        {
             return (ISection)deserialiseConstructor.Invoke(new object[] { br, sh });
         }
 
@@ -133,6 +174,6 @@ namespace PD2ModelParser.Sections
             Tag = tag;
         }
 
-        public uint Tag { get; private set;  }
+        public uint Tag { get; private set; }
     }
 }

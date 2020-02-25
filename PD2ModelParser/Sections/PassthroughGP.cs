@@ -11,16 +11,9 @@ namespace PD2ModelParser.Sections
     class PassthroughGP : AbstractSection, ISection, IPostLoadable
     {
         public UInt32 size;
-
-        UInt32 geometry_section;
-        UInt32 topology_section;
-
-        public Geometry Geometry { get => _geometry; set { geometry_section = value.SectionId; _geometry = value; } }
-        public Topology Topology { get => _topology; set { topology_section = value.SectionId; _topology = value; } }
-
+        public Geometry Geometry { get; set; }
+        public Topology Topology { get; set; }
         public byte[] remaining_data = null;
-        private Geometry _geometry;
-        private Topology _topology;
 
         public PassthroughGP(uint sec_id, Geometry geom, Topology topo)
         {
@@ -34,8 +27,8 @@ namespace PD2ModelParser.Sections
         {
             this.SectionId = section.id;
             this.size = section.size;
-            this.geometry_section = instream.ReadUInt32();
-            this.topology_section = instream.ReadUInt32();
+            PostloadRef(instream.ReadUInt32(), this, i => i.Geometry);
+            PostloadRef(instream.ReadUInt32(), this, i => i.Topology);
             this.remaining_data = null;
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
                 this.remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
@@ -43,34 +36,13 @@ namespace PD2ModelParser.Sections
 
         public override void StreamWriteData(BinaryWriter outstream)
         {
-            outstream.Write(this.geometry_section);
-            outstream.Write(this.topology_section);
+            outstream.Write(this.Geometry.SectionId);
+            outstream.Write(this.Topology.SectionId);
         }
 
         public override string ToString()
         {
-            return $"{base.ToString()} size: {this.size} geometry_section: {this.geometry_section} topology_section: {this.topology_section}" + (this.remaining_data != null ? $" REMAINING DATA! {this.remaining_data.Length} bytes" : "");
-        }
-
-        public void PostLoad(uint id, Dictionary<uint, ISection> parsed_sections)
-        {
-            try
-            {
-                Geometry = (Geometry)parsed_sections[geometry_section];
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"PassthroughGP {SectionId} isn't pointing to a valid Geometry", e);
-            }
-
-            try
-            {
-                Topology = (Topology)parsed_sections[topology_section];
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"PassthroughGP {SectionId} isn't pointing to a valid Topology", e);
-            }
+            return $"{base.ToString()} size: {this.size} geometry_section: {this.Geometry.SectionId} topology_section: {this.Topology.SectionId}" + (this.remaining_data != null ? $" REMAINING DATA! {this.remaining_data.Length} bytes" : "");
         }
     }
 }

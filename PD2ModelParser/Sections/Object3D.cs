@@ -39,9 +39,6 @@ namespace PD2ModelParser.Sections
         private bool has_post_loaded;
         public Matrix3D world_transform;
 
-        // Set when read from a section, before PostLoad is called
-        private uint loading_parent_id;
-
         [Category("Object3D")]
         [DisplayName("Parent")]
         [TypeConverter(typeof(Inspector.Object3DReferenceConverter))]
@@ -126,7 +123,7 @@ namespace PD2ModelParser.Sections
 
             Transform = transform;
 
-            loading_parent_id = instream.ReadUInt32();
+            PostloadRef(instream.ReadUInt32(), this, i => i.Parent);
 
             this.remaining_data = null;
         }
@@ -187,18 +184,13 @@ namespace PD2ModelParser.Sections
             hashlist.Hint(HashName);
         }
 
-        public void PostLoad(uint id, Dictionary<uint, ISection> parsed_sections)
+        public override void PostLoad(uint id, Dictionary<uint, ISection> parsed_sections)
         {
-            if (loading_parent_id == 0)
+            base.PostLoad(id, parsed_sections);
+            if (Parent != null)
             {
-                Parent = null;
-            }
-            else
-            {
-                Parent = (Object3D) parsed_sections[loading_parent_id];
-
                 if (!Parent.has_post_loaded)
-                    Parent.PostLoad(loading_parent_id, parsed_sections);
+                    Parent.PostLoad(Parent.SectionId, parsed_sections);
 
                 if (!Parent.children.Contains(this))
                 {
