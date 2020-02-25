@@ -269,17 +269,10 @@ namespace PD2ModelParser
             string create_objects_str = CheckAttr(element, "create_objects");
             bool create_objects;
 
-            switch (create_objects_str)
+            if(!bool.TryParse(create_objects_str, out create_objects))
             {
-                case "true":
-                    create_objects = true;
-                    break;
-                case "false":
-                    create_objects = false;
-                    break;
-                default:
-                    throw new Exception($"Invalid value '{create_objects_str}' for create_objects: "
-                                        + "must either be true or false");
+                throw new Exception($"Invalid value '{create_objects_str}' for create_objects: "
+                                    + "must either be true or false");
             }
 
             IOptionReceiver options;
@@ -384,8 +377,7 @@ namespace PD2ModelParser
                     GltfImporter.Import(data, file, create_objects, name => object_rootpoints.ContainsKey(name) ? object_rootpoints[name] : default_rootpoint);
                     break;
                 default:
-                    throw new NotImplementedException($"Cannot import file with type '{type}', "
-                                                      + "only OBJ and FBX are currently supported");
+                    throw new NotImplementedException($"Cannot import file with type '{type}'.");
             }
         }
 

@@ -57,7 +57,6 @@ namespace PD2ModelParser.UI
                     return;
             }
 
-            uint root_point;
             if(rootPoints.SelectedIndex > 0)
             {
                 RootPointItem item = root_point_items[rootPoints.SelectedIndex];
@@ -70,40 +69,39 @@ namespace PD2ModelParser.UI
                     UpdateRootPointBox();
                     return;
                 }
-
-                root_point = item.Id;
-            }
-            else
-            {
-                // Don't bind to a parent
-                root_point = 0;
             }
 
+            XElement import_root = new XElement("modelscript");
             if (objectFile.Selected != null)
             {
-                bool result = NewObjImporter.ImportNewObj(model, objectFile.Selected, createNewObjects, root_point);
-                if (!result)
+                XElement import_directive = new XElement("import");
+                import_directive.SetAttributeValue("file", objectFile.Selected);
+                import_directive.SetAttributeValue("create_objects", createNewObjects);
+                if (rootPoints.SelectedIndex > 0)
                 {
-                    MessageBox.Show("There was an error importing OBJ - see console");
-                    return;
+                    RootPointItem item = root_point_items[rootPoints.SelectedIndex];
+
+                    XElement rootpoint_directive = new XElement("rootpoint", new XElement("default"));
+                    rootpoint_directive.SetAttributeValue("name", item.Name);
+                    import_directive.Add(rootpoint_directive);
                 }
+                import_root.Add(import_directive);
             }
 
-            XElement root = new XElement("modelscript");
             if (patternUVFile.Selected != null)
             {
                 XElement elPUV = new XElement("patternuv");
                 elPUV.SetAttributeValue("file", patternUVFile.Selected);
-                root.Add(elPUV);
+                import_root.Add(elPUV);
             }
 
             try
             {
-                ModelScript.Execute(model, root, System.IO.Directory.GetCurrentDirectory());
+                ModelScript.Execute(model, import_root, System.IO.Directory.GetCurrentDirectory());
             }
             catch
             {
-                MessageBox.Show("There was an error importing Pattern UV OBJ - see console");
+                MessageBox.Show("There was an error importing the data - see console");
                 return;
             }
 
