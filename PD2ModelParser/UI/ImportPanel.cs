@@ -42,17 +42,16 @@ namespace PD2ModelParser.UI
 
             bool createNewObjects = createNewModel.Checked || createNewObjectsBox.Checked;
 
-            FileManager fm = new FileManager();
+            FullModelData model = new FullModelData();
 
             if (!createNewModel.Checked)
             {
-                FullModelData model = ModelReader.Open(baseModelFileBrowser.Selected);
-                fm = new FileManager(model);
+                model = ModelReader.Open(baseModelFileBrowser.Selected);
             }
 
             if (scriptFile.Selected != null)
             {
-                bool success = ModelScript.ExecuteHandled(fm.data, scriptFile.Selected);
+                bool success = ModelScript.ExecuteHandled(model, scriptFile.Selected);
                 if (!success)
                     return;
             }
@@ -61,7 +60,7 @@ namespace PD2ModelParser.UI
             if(rootPoints.SelectedIndex > 0)
             {
                 RootPointItem item = root_point_items[rootPoints.SelectedIndex];
-                Object3D rp = fm.data.parsed_sections[item.Id] as Object3D;
+                Object3D rp = model.parsed_sections[item.Id] as Object3D;
 
                 if(rp == null || rp.Name != item.Name)
                 {
@@ -81,7 +80,7 @@ namespace PD2ModelParser.UI
 
             if (objectFile.Selected != null)
             {
-                bool result = NewObjImporter.ImportNewObj(fm.data, objectFile.Selected, createNewObjects, root_point);
+                bool result = NewObjImporter.ImportNewObj(model, objectFile.Selected, createNewObjects, root_point);
                 if (!result)
                 {
                     MessageBox.Show("There was an error importing OBJ - see console");
@@ -91,7 +90,7 @@ namespace PD2ModelParser.UI
 
             if (patternUVFile.Selected != null)
             {
-                bool result = NewObjImporter.ImportNewObjPatternUV(fm.data, patternUVFile.Selected);
+                bool result = NewObjImporter.ImportNewObjPatternUV(model, patternUVFile.Selected);
                 if (!result)
                 {
                     MessageBox.Show("There was an error importing Pattern UV OBJ - see console");
@@ -101,7 +100,7 @@ namespace PD2ModelParser.UI
 
             try
             {
-                DieselExporter.ExportFile(fm.data, outputBox.Selected);
+                DieselExporter.ExportFile(model, outputBox.Selected);
             }
             catch (Exception exc)
             {
