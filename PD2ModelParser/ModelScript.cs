@@ -249,7 +249,22 @@ namespace PD2ModelParser
         private static void ExecImport(FullModelData data, XElement element, string directory)
         {
             string file = Path.Combine(directory, CheckAttr(element, "file"));
-            string type = CheckAttr(element, "type");
+            string type = element.Attribute("type")?.Value;
+
+            if(type == null)
+            {
+                var ext = Path.GetExtension(file);
+                switch(ext)
+                {
+                    case ".fbx": type = "fbx"; break;
+                    case ".obj": type = "obj"; break;
+                    case ".gltf":
+                    case ".glb":
+                        type = "gltf"; break;
+                    default:
+                        throw new Exception($"Unrecognised file extension \"{ext}\", specify the type as a recognised extension or the \"type\" attribute.");
+                }
+            }
 
             string create_objects_str = CheckAttr(element, "create_objects");
             bool create_objects;
