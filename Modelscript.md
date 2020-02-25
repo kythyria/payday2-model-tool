@@ -207,6 +207,16 @@ advisable on a model where models are split between many different objects - thi
 forgot to set a model's rootpoint, rather than setting it to the default one (which you probably don't
 want in this case), it will throw an error to tell you to set it's parent.
 
+# PatternUVs
+This is the same functionality as the "Pattern UV" box in the GUI.
+
+If you have a .obj file whose vertices precisely match the order and number of the vertices in the model
+up to this point, you can set the second UV attribute of the model to the UV attribute of the .obj file.
+
+```xml
+<patternuv file="uvs.obj"/>
+```
+
 # Misc info
 
 The contents of the modelscript is run top-down - if you try to define your root object at the

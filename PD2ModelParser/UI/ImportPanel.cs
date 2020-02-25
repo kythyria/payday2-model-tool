@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace PD2ModelParser.UI
 {
@@ -88,14 +89,22 @@ namespace PD2ModelParser.UI
                 }
             }
 
+            XElement root = new XElement("modelscript");
             if (patternUVFile.Selected != null)
             {
-                bool result = NewObjImporter.ImportNewObjPatternUV(model, patternUVFile.Selected);
-                if (!result)
-                {
-                    MessageBox.Show("There was an error importing Pattern UV OBJ - see console");
-                    return;
-                }
+                XElement elPUV = new XElement("patternuv");
+                elPUV.SetAttributeValue("file", patternUVFile.Selected);
+                root.Add(elPUV);
+            }
+
+            try
+            {
+                ModelScript.Execute(model, root, System.IO.Directory.GetCurrentDirectory());
+            }
+            catch
+            {
+                MessageBox.Show("There was an error importing Pattern UV OBJ - see console");
+                return;
             }
 
             try

@@ -34,6 +34,9 @@ namespace PD2ModelParser
                     case "import":
                         ExecImport(data, element, workdir);
                         break;
+                    case "patternuv":
+                        ExecPatternUV(data, element, workdir);
+                        break;
                     default:
                         throw new Exception($"Unknown node name \"{element.Name}\"");
                 }
@@ -96,23 +99,23 @@ namespace PD2ModelParser
             switch (mode)
             {
                 case "add":
-                {
-                    if (obj != null)
-                        throw new Exception(
-                            $"Cannot create new Object3D named \"{name}\", as such "
-                            + "an object already exists!");
+                    {
+                        if (obj != null)
+                            throw new Exception(
+                                $"Cannot create new Object3D named \"{name}\", as such "
+                                + "an object already exists!");
 
-                    obj = new Object3D(name, null) {Transform = Matrix3D.Identity};
-                    data.AddSection(obj);
-                    break;
-                }
+                        obj = new Object3D(name, null) { Transform = Matrix3D.Identity };
+                        data.AddSection(obj);
+                        break;
+                    }
                 case "edit":
-                {
-                    if (obj == null)
-                        throw new Exception($"Cannot find Object3D named \"{name}\"");
+                    {
+                        if (obj == null)
+                            throw new Exception($"Cannot find Object3D named \"{name}\"");
 
-                    break;
-                }
+                        break;
+                    }
                 default:
                     throw new Exception($"Invalid Object3D mode \"{mode}\"");
             }
@@ -127,113 +130,113 @@ namespace PD2ModelParser
                 switch (operation.Name.ToString())
                 {
                     case "position":
-                    {
-                        Vector3D vec = CheckAttrVec(operation);
+                        {
+                            Vector3D vec = CheckAttrVec(operation);
 
-                        // TODO update the object's world_transform property
-                        Matrix3D transform = obj.Transform;
-                        transform.Translation = vec;
-                        obj.Transform = transform;
+                            // TODO update the object's world_transform property
+                            Matrix3D transform = obj.Transform;
+                            transform.Translation = vec;
+                            obj.Transform = transform;
 
-                        break;
-                    }
+                            break;
+                        }
                     case "rotation":
-                    {
-                        Quaternion quat;
+                        {
+                            Quaternion quat;
 
-                        quat.X = CheckAttr(operation, "x").ParseFloat();
-                        quat.Y = CheckAttr(operation, "y").ParseFloat();
-                        quat.Z = CheckAttr(operation, "z").ParseFloat();
-                        quat.W = CheckAttr(operation, "w").ParseFloat();
-                        quat.Normalize();
+                            quat.X = CheckAttr(operation, "x").ParseFloat();
+                            quat.Y = CheckAttr(operation, "y").ParseFloat();
+                            quat.Z = CheckAttr(operation, "z").ParseFloat();
+                            quat.W = CheckAttr(operation, "w").ParseFloat();
+                            quat.Normalize();
 
-                        // Unfortunately, there's no clean way to replace the matrix's rotation
-                        // So we break down the matrix into it's components, then rebuild it with the new rotation
-                        obj.Transform.Decompose(
-                            out Vector3D scale,
-                            out Quaternion _,
-                            out Vector3D translation
-                        );
+                            // Unfortunately, there's no clean way to replace the matrix's rotation
+                            // So we break down the matrix into it's components, then rebuild it with the new rotation
+                            obj.Transform.Decompose(
+                                out Vector3D scale,
+                                out Quaternion _,
+                                out Vector3D translation
+                            );
 
-                        // Nexus's matrix multiplications work backwards, which is why this looks like it's
-                        // in the wrong order.
-                        // If this was the wrong way around, the scaling would be fixed, rather than relative
-                        // to the object.
-                        Matrix3D mat = Matrix3D.CreateScale(scale) * Matrix3D.CreateFromQuaternion(quat);
-                        mat.Translation = translation;
+                            // Nexus's matrix multiplications work backwards, which is why this looks like it's
+                            // in the wrong order.
+                            // If this was the wrong way around, the scaling would be fixed, rather than relative
+                            // to the object.
+                            Matrix3D mat = Matrix3D.CreateScale(scale) * Matrix3D.CreateFromQuaternion(quat);
+                            mat.Translation = translation;
 
-                        obj.Transform = mat;
+                            obj.Transform = mat;
 
-                        break;
-                    }
+                            break;
+                        }
                     case "scale":
-                    {
-                        // WARNING:
-                        // DieselX probably doesn't expect you to scale stuff, so be careful with this!
-                        // If something blows up in your face when scaled, check that first.
+                        {
+                            // WARNING:
+                            // DieselX probably doesn't expect you to scale stuff, so be careful with this!
+                            // If something blows up in your face when scaled, check that first.
 
-                        Vector3D scale = CheckAttrVec(operation);
+                            Vector3D scale = CheckAttrVec(operation);
 
-                        // Same story as rotation - split and rebuild the matrix.
-                        obj.Transform.Decompose(
-                            out Vector3D _,
-                            out Quaternion quat,
-                            out Vector3D translation
-                        );
+                            // Same story as rotation - split and rebuild the matrix.
+                            obj.Transform.Decompose(
+                                out Vector3D _,
+                                out Quaternion quat,
+                                out Vector3D translation
+                            );
 
-                        // Nexus's matrix multiplications work backwards, which is why this looks like it's
-                        // in the wrong order.
-                        // If this was the wrong way around, the scaling would be fixed, rather than relative
-                        // to the object.
-                        Matrix3D mat = Matrix3D.CreateScale(scale) * Matrix3D.CreateFromQuaternion(quat);
-                        mat.Translation = translation;
+                            // Nexus's matrix multiplications work backwards, which is why this looks like it's
+                            // in the wrong order.
+                            // If this was the wrong way around, the scaling would be fixed, rather than relative
+                            // to the object.
+                            Matrix3D mat = Matrix3D.CreateScale(scale) * Matrix3D.CreateFromQuaternion(quat);
+                            mat.Translation = translation;
 
-                        obj.Transform = mat;
+                            obj.Transform = mat;
 
-                        break;
-                    }
+                            break;
+                        }
                     case "parent":
-                    {
-                        XAttribute root = operation.Attribute("root");
-
-                        Object3D parent;
-
-                        if (root != null)
                         {
-                            if (root.Value != "true")
-                                throw new Exception("Parent element has root attribute set " +
-                                                    $"to \"{root.Value}\" - the root attribute " +
-                                                    "must be set to \"true\", if it exists");
+                            XAttribute root = operation.Attribute("root");
 
-                            parent = null;
+                            Object3D parent;
 
-                            if (operation.Attribute("name") != null)
-                                throw new Exception("Parent element cannot have a \"name\" " +
-                                                    "attribute if set to root");
+                            if (root != null)
+                            {
+                                if (root.Value != "true")
+                                    throw new Exception("Parent element has root attribute set " +
+                                                        $"to \"{root.Value}\" - the root attribute " +
+                                                        "must be set to \"true\", if it exists");
+
+                                parent = null;
+
+                                if (operation.Attribute("name") != null)
+                                    throw new Exception("Parent element cannot have a \"name\" " +
+                                                        "attribute if set to root");
+                            }
+                            else
+                            {
+                                string parent_name = CheckAttr(operation, "name");
+
+                                parent = FindObjectByHashname(data, Hash64.HashString(parent_name));
+
+                                if (parent == null)
+                                    throw new Exception($"Could not find parent object named \"{parent_name}\"");
+                            }
+
+                            // Remove the object from it's previous parent, if it had one
+                            obj.Parent?.children.Remove(obj);
+
+                            // Set the object's parent attributes
+                            obj.Parent = parent;
+
+                            // And add it to the new parent's list of children
+                            parent?.children.Add(obj);
+
+                            set_parent = true;
+
+                            break;
                         }
-                        else
-                        {
-                            string parent_name = CheckAttr(operation, "name");
-
-                            parent = FindObjectByHashname(data, Hash64.HashString(parent_name));
-
-                            if (parent == null)
-                                throw new Exception($"Could not find parent object named \"{parent_name}\"");
-                        }
-
-                        // Remove the object from it's previous parent, if it had one
-                        obj.Parent?.children.Remove(obj);
-
-                        // Set the object's parent attributes
-                        obj.Parent = parent;
-
-                        // And add it to the new parent's list of children
-                        parent?.children.Add(obj);
-
-                        set_parent = true;
-
-                        break;
-                    }
                     default:
                         throw new Exception($"Invalid Object3D child element \"{operation.Name}\"");
                 }
@@ -285,53 +288,53 @@ namespace PD2ModelParser
                 switch (child.Name.ToString())
                 {
                     case "rootpoint":
-                    {
-                        string id_str = CheckAttr(child, "name");
-                        Object3D obj = FindObjectByHashname(data, Hash64.HashString(id_str)) ??
-                                       throw new Exception($"Cannot find rootpoint element {id_str}");
-
-                        foreach (XElement elem in child.Elements())
                         {
-                            switch (elem.Name.ToString())
+                            string id_str = CheckAttr(child, "name");
+                            Object3D obj = FindObjectByHashname(data, Hash64.HashString(id_str)) ??
+                                           throw new Exception($"Cannot find rootpoint element {id_str}");
+
+                            foreach (XElement elem in child.Elements())
                             {
-                                case "object":
-                                    string obj_name = CheckAttr(elem, "name");
-                                    if (object_rootpoints.ContainsKey(obj_name))
-                                        throw new Exception($"Cannot redefine rootpoint for object {obj_name}");
-                                    object_rootpoints[obj_name] = obj;
-                                    break;
-                                case "default":
-                                    if (default_rootpoint == null)
-                                        default_rootpoint = obj;
-                                    else
-                                        throw new Exception($"Cannot redefine default rootpoint - '{id_str}'");
-                                    break;
-                                default:
-                                    throw new Exception($"Invalid rootpoint child element \"{elem.Name}\"");
+                                switch (elem.Name.ToString())
+                                {
+                                    case "object":
+                                        string obj_name = CheckAttr(elem, "name");
+                                        if (object_rootpoints.ContainsKey(obj_name))
+                                            throw new Exception($"Cannot redefine rootpoint for object {obj_name}");
+                                        object_rootpoints[obj_name] = obj;
+                                        break;
+                                    case "default":
+                                        if (default_rootpoint == null)
+                                            default_rootpoint = obj;
+                                        else
+                                            throw new Exception($"Cannot redefine default rootpoint - '{id_str}'");
+                                        break;
+                                    default:
+                                        throw new Exception($"Invalid rootpoint child element \"{elem.Name}\"");
+                                }
                             }
-                        }
 
-                        break;
-                    }
+                            break;
+                        }
                     case "option":
-                    {
-                        if (options == null)
-                            throw new Exception($"Options are not supported on {type} imports");
-
-                        string name = CheckAttr(child, "name");
-                        string value = child.Value.Trim();
-
-                        try
                         {
-                            options.AddOption(name, value);
-                        }
-                        catch (FormatException ex)
-                        {
-                            throw new Exception($"Error parsing value for option {name} value '{value}'", ex);
-                        }
+                            if (options == null)
+                                throw new Exception($"Options are not supported on {type} imports");
 
-                        break;
-                    }
+                            string name = CheckAttr(child, "name");
+                            string value = child.Value.Trim();
+
+                            try
+                            {
+                                options.AddOption(name, value);
+                            }
+                            catch (FormatException ex)
+                            {
+                                throw new Exception($"Error parsing value for option {name} value '{value}'", ex);
+                            }
+
+                            break;
+                        }
                     default:
                         throw new Exception($"Invalid Import child element \"{child.Name}\"");
                 }
@@ -368,6 +371,16 @@ namespace PD2ModelParser
                 default:
                     throw new NotImplementedException($"Cannot import file with type '{type}', "
                                                       + "only OBJ and FBX are currently supported");
+            }
+        }
+
+        private static void ExecPatternUV(FullModelData data, XElement element, string directory)
+        {
+            string file = Path.Combine(directory, CheckAttr(element, "file"));
+            bool result = NewObjImporter.ImportNewObjPatternUV(data, file);
+            if (!result)
+            {
+                throw new Exception("There was an error importing Pattern UV OBJ - see console");
             }
         }
     }
