@@ -53,7 +53,10 @@ namespace PD2ModelParser.Sections
             {
                 oldParent.children.Remove(this);
             }
-            newParent.children.Add(this);
+            if (newParent != null)
+            {
+                newParent.children.Add(this);
+            }
             Parent = newParent;
         }
 

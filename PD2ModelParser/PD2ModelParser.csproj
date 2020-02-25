@@ -164,7 +164,7 @@
     <Compile Include="FullModelData.cs" />
     <Compile Include="NewObjImporter.cs" />
     <Compile Include="ModelReader.cs" />
-    <Compile Include="FileManager.cs" />
+    <Compile Include="StaticStorage.cs" />
     <Compile Include="Exporters\ObjWriter.cs" />
     <Compile Include="UI\Form1.cs">
       <SubType>Form</SubType>

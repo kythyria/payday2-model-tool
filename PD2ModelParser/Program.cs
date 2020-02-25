@@ -246,7 +246,7 @@ namespace PD2ModelParser
                         if (entry.arg.EndsWith(".obj"))
                         {
                             bool result = NewObjImporter.ImportNewObj(
-                                new FileManager(data),
+                                data,
                                 entry.arg,
                                 new_obj,
                                 FindRootPoint(data, root_point));

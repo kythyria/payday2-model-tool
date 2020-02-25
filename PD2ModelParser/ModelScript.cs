@@ -15,7 +15,12 @@ namespace PD2ModelParser
         public static void Execute(FullModelData data, string filename)
         {
             XElement root = XElement.Parse(System.IO.File.ReadAllText(filename));
+            string workdir = Directory.GetParent(filename).FullName;
+            Execute(data, root, workdir);
+        }
 
+        public static void Execute(FullModelData data, XElement root, string workdir)
+        {
             if (root.Name != "modelscript")
                 throw new Exception("Script root node is not named \"modelscript\"");
 
@@ -27,7 +32,7 @@ namespace PD2ModelParser
                         ExecObject3DElement(data, element);
                         break;
                     case "import":
-                        ExecImport(data, element, Directory.GetParent(filename).FullName);
+                        ExecImport(data, element, workdir);
                         break;
                     default:
                         throw new Exception($"Unknown node name \"{element.Name}\"");
@@ -35,11 +40,11 @@ namespace PD2ModelParser
             }
         }
 
-        public static bool ExecuteHandled(FullModelData data, string filename)
+        public static bool ExecuteHandled(FullModelData data, XElement script, string workdir)
         {
             try
             {
-                ModelScript.Execute(data, filename);
+                ModelScript.Execute(data, script, workdir);
                 return true;
             }
             catch (Exception exc)
@@ -49,6 +54,13 @@ namespace PD2ModelParser
                                 "(check the readme on GitLab for more information)\n" + exc.Message);
                 return false;
             }
+        }
+
+        public static bool ExecuteHandled(FullModelData data, string filename)
+        {
+            XElement root = XElement.Parse(System.IO.File.ReadAllText(filename));
+            string workdir = Directory.GetParent(filename).FullName;
+            return ExecuteHandled(data, root, workdir);
         }
 
         private static Object3D FindObjectByHashname(FullModelData data, ulong hashname)
@@ -336,8 +348,7 @@ namespace PD2ModelParser
             switch (type)
             {
                 case "obj":
-                    FileManager fm = new FileManager(data);
-                    bool result = NewObjImporter.ImportNewObj(fm, file, create_objects,
+                    bool result = NewObjImporter.ImportNewObj(data, file, create_objects,
                         objData => ParentFinder(objData.object_name));
 
                     if (!result)

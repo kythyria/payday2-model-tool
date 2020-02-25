@@ -81,7 +81,7 @@ namespace PD2ModelParser.UI
 
             if (objectFile.Selected != null)
             {
-                bool result = NewObjImporter.ImportNewObj(fm, objectFile.Selected, createNewObjects, root_point);
+                bool result = NewObjImporter.ImportNewObj(fm.data, objectFile.Selected, createNewObjects, root_point);
                 if (!result)
                 {
                     MessageBox.Show("There was an error importing OBJ - see console");

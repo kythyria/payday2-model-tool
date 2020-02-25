@@ -12,14 +12,13 @@ namespace PD2ModelParser
 {
     static class NewObjImporter
     {
-
-        public static bool ImportNewObj(FileManager fm, String filepath, bool addNew = false, uint root_point = 0)
+        public static bool ImportNewObj(FullModelData fmd, String filepath, bool addNew = false, uint root_point = 0)
         {
-            Object3D root_object = root_point == 0 ? null : (Object3D) fm.data.parsed_sections[root_point];
-            return ImportNewObj(fm, filepath, addNew, obj => root_object);
+            Object3D root_object = root_point == 0 ? null : (Object3D)fmd.parsed_sections[root_point];
+            return ImportNewObj(fmd, filepath, addNew, obj => root_object);
         }
 
-        public static bool ImportNewObj(FileManager fm, String filepath, bool addNew, Func<obj_data, Object3D> root_point)
+        public static bool ImportNewObj(FullModelData fmd, String filepath, bool addNew, Func<obj_data, Object3D> root_point)
         {
             Log.Default.Info("Importing new obj with file: {0}", filepath);
 
@@ -27,8 +26,8 @@ namespace PD2ModelParser
             List<obj_data> objects = new List<obj_data>();
             List<obj_data> toAddObjects = new List<obj_data>();
 
-            ref List<SectionHeader> sections = ref fm.data.sections;
-            ref Dictionary<UInt32, ISection> parsed_sections = ref fm.data.parsed_sections;
+            ref List<SectionHeader> sections = ref fmd.sections;
+            ref Dictionary<UInt32, ISection> parsed_sections = ref fmd.parsed_sections;
 
             try
             {
