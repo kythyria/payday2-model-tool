@@ -272,6 +272,10 @@ namespace PD2ModelParser
                                 entry.arg);
                             return false;
                         }
+                        else if (entry.arg.EndsWith(".gltf") || entry.arg.EndsWith(".glb"))
+                        {
+                            Importers.GltfImporter.Import(data, entry.arg, new_obj, obj => null);
+                        }
                         else
                         {
                             Console.WriteLine(
@@ -320,6 +324,10 @@ namespace PD2ModelParser
                         else if (entry.arg.EndsWith(".obj"))
                         {
                             ObjWriter.ExportFile(data, entry.arg);
+                        }
+                        else if (entry.arg.EndsWith(".gltf") || entry.arg.EndsWith(".glb"))
+                        {
+                            Exporters.GltfExporter.ExportFile(data, entry.arg);
                         }
                         else
                         {
