@@ -1,12 +1,18 @@
 using System;
+using System.Collections;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Windows.Forms.Design;
+using System.Linq;
+using System.Windows.Forms.Design.Behavior;
 
 namespace PD2ModelParser.UI
 {
     [DefaultEvent("FileSelected")]
+    [Designer(typeof(FileBrowserDesigner))]
     public partial class FileBrowserControl : UserControl
     {
         // See https://stackoverflow.com/a/8531166
@@ -172,6 +178,51 @@ namespace PD2ModelParser.UI
         private void ClearFileSelected(object sender, EventArgs e)
         {
             Selected = null;
+        }
+
+        protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified)
+        {
+            base.SetBoundsCore(x, y, width, Math.Max(inputFileBox.Height, browseBttn.Height), specified);
+        }
+
+        class FileBrowserDesigner : ControlDesigner
+        {
+            public FileBrowserDesigner()
+            {
+                base.AutoResizeHandles = true;
+            }
+
+            public override SelectionRules SelectionRules => SelectionRules.LeftSizeable | SelectionRules.RightSizeable | SelectionRules.Moveable;
+
+            public override IList SnapLines
+            {
+                get {
+                    // https://stackoverflow.com/questions/93541/baseline-snaplines-in-custom-winforms-controls
+                    // This isn't pretty, but it works.
+
+                    var snaplines = base.SnapLines;
+                    var fbc = Control as FileBrowserControl;
+                    if (fbc == null) { return snaplines; }
+
+                    var designer = TypeDescriptor.CreateDesigner(fbc.inputFileBox, typeof(IDesigner));
+                    designer.Initialize(fbc.inputFileBox);
+                    
+                    using(designer)
+                    {
+                        var boxDesigner = designer as ControlDesigner;
+                        if(boxDesigner == null) { return snaplines; }
+
+                        foreach(SnapLine i in boxDesigner.SnapLines)
+                        {
+                            if(i.SnapLineType == SnapLineType.Baseline)
+                            {
+                                snaplines.Add(new SnapLine(SnapLineType.Baseline, i.Offset + fbc.inputFileBox.Top, i.Filter, i.Priority));
+                            }
+                        }
+                    }
+                    return snaplines;
+                }
+            }
         }
     }
 }

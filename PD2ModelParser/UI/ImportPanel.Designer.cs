@@ -47,10 +47,19 @@ namespace PD2ModelParser.UI
             lblScript = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
+            // lblScript
+            // 
+            lblScript.AutoSize = true;
+            lblScript.Location = new System.Drawing.Point(65, 60);
+            lblScript.Name = "lblScript";
+            lblScript.Size = new System.Drawing.Size(37, 13);
+            lblScript.TabIndex = 15;
+            lblScript.Text = "Script:";
+            // 
             // labelSelBaseModel
             // 
             this.labelSelBaseModel.AutoSize = true;
-            this.labelSelBaseModel.Location = new System.Drawing.Point(3, 9);
+            this.labelSelBaseModel.Location = new System.Drawing.Point(3, 8);
             this.labelSelBaseModel.Name = "labelSelBaseModel";
             this.labelSelBaseModel.Size = new System.Drawing.Size(99, 13);
             this.labelSelBaseModel.TabIndex = 1;
@@ -59,7 +68,7 @@ namespace PD2ModelParser.UI
             // createNewModel
             // 
             this.createNewModel.AutoSize = true;
-            this.createNewModel.Location = new System.Drawing.Point(108, 36);
+            this.createNewModel.Location = new System.Drawing.Point(108, 32);
             this.createNewModel.Name = "createNewModel";
             this.createNewModel.Size = new System.Drawing.Size(133, 17);
             this.createNewModel.TabIndex = 2;
@@ -80,7 +89,7 @@ namespace PD2ModelParser.UI
             // labelObj
             // 
             this.labelObj.AutoSize = true;
-            this.labelObj.Location = new System.Drawing.Point(61, 99);
+            this.labelObj.Location = new System.Drawing.Point(61, 89);
             this.labelObj.Name = "labelObj";
             this.labelObj.Size = new System.Drawing.Size(41, 13);
             this.labelObj.TabIndex = 7;
@@ -89,7 +98,7 @@ namespace PD2ModelParser.UI
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(40, 133);
+            this.label1.Location = new System.Drawing.Point(42, 118);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(62, 13);
             this.label1.TabIndex = 8;
@@ -110,7 +119,7 @@ namespace PD2ModelParser.UI
             // createNewObjectsBox
             // 
             this.createNewObjectsBox.AutoSize = true;
-            this.createNewObjectsBox.Location = new System.Drawing.Point(108, 159);
+            this.createNewObjectsBox.Location = new System.Drawing.Point(108, 142);
             this.createNewObjectsBox.Name = "createNewObjectsBox";
             this.createNewObjectsBox.Size = new System.Drawing.Size(163, 17);
             this.createNewObjectsBox.TabIndex = 10;
@@ -123,7 +132,7 @@ namespace PD2ModelParser.UI
             | System.Windows.Forms.AnchorStyles.Right)));
             this.rootPoints.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.rootPoints.FormattingEnabled = true;
-            this.rootPoints.Location = new System.Drawing.Point(108, 183);
+            this.rootPoints.Location = new System.Drawing.Point(108, 165);
             this.rootPoints.Name = "rootPoints";
             this.rootPoints.Size = new System.Drawing.Size(377, 21);
             this.rootPoints.TabIndex = 11;
@@ -131,7 +140,7 @@ namespace PD2ModelParser.UI
             // labelRootPoint
             // 
             this.labelRootPoint.AutoSize = true;
-            this.labelRootPoint.Location = new System.Drawing.Point(42, 186);
+            this.labelRootPoint.Location = new System.Drawing.Point(44, 168);
             this.labelRootPoint.Name = "labelRootPoint";
             this.labelRootPoint.Size = new System.Drawing.Size(60, 13);
             this.labelRootPoint.TabIndex = 12;
@@ -143,10 +152,10 @@ namespace PD2ModelParser.UI
             this.patternUVFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.patternUVFile.Filter = "Object File (*.obj)|*.obj";
-            this.patternUVFile.Location = new System.Drawing.Point(108, 126);
+            this.patternUVFile.Location = new System.Drawing.Point(108, 113);
             this.patternUVFile.Name = "patternUVFile";
             this.patternUVFile.SaveMode = false;
-            this.patternUVFile.Size = new System.Drawing.Size(377, 27);
+            this.patternUVFile.Size = new System.Drawing.Size(377, 23);
             this.patternUVFile.TabIndex = 6;
             // 
             // objectFile
@@ -157,10 +166,10 @@ namespace PD2ModelParser.UI
             this.objectFile.Filter = "Model files (*.gltf, *.glb, *.obj, *.fbx)|*.gltf;*.glb;*.obj;*.fbx|glTF files (*." +
     "gltf, *.glb)|*.gltf;*.glb|Wavefront OBJ files (*.obj)|*.obj|Filmbox files (*.fbx" +
     ")|*.fbx";
-            this.objectFile.Location = new System.Drawing.Point(108, 92);
+            this.objectFile.Location = new System.Drawing.Point(108, 84);
             this.objectFile.Name = "objectFile";
             this.objectFile.SaveMode = false;
-            this.objectFile.Size = new System.Drawing.Size(377, 27);
+            this.objectFile.Size = new System.Drawing.Size(377, 23);
             this.objectFile.TabIndex = 5;
             // 
             // outputBox
@@ -172,7 +181,7 @@ namespace PD2ModelParser.UI
             this.outputBox.Location = new System.Drawing.Point(108, 244);
             this.outputBox.Name = "outputBox";
             this.outputBox.SaveMode = true;
-            this.outputBox.Size = new System.Drawing.Size(377, 27);
+            this.outputBox.Size = new System.Drawing.Size(377, 23);
             this.outputBox.TabIndex = 4;
             // 
             // baseModelFileBrowser
@@ -184,27 +193,18 @@ namespace PD2ModelParser.UI
             this.baseModelFileBrowser.Location = new System.Drawing.Point(108, 3);
             this.baseModelFileBrowser.Name = "baseModelFileBrowser";
             this.baseModelFileBrowser.SaveMode = false;
-            this.baseModelFileBrowser.Size = new System.Drawing.Size(377, 27);
+            this.baseModelFileBrowser.Size = new System.Drawing.Size(377, 23);
             this.baseModelFileBrowser.TabIndex = 0;
             this.baseModelFileBrowser.FileSelected += new System.EventHandler(this.baseModelFileBrowser_FileSelected);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(42, 207);
+            this.label2.Location = new System.Drawing.Point(44, 189);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(234, 13);
             this.label2.TabIndex = 13;
             this.label2.Text = "(which bone new objects should be attached to)";
-            // 
-            // lblScript
-            // 
-            lblScript.AutoSize = true;
-            lblScript.Location = new System.Drawing.Point(65, 66);
-            lblScript.Name = "lblScript";
-            lblScript.Size = new System.Drawing.Size(37, 13);
-            lblScript.TabIndex = 15;
-            lblScript.Text = "Script:";
             // 
             // scriptFile
             // 
@@ -212,10 +212,10 @@ namespace PD2ModelParser.UI
             this.scriptFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.scriptFile.Filter = "Model Script (*.mscript)|*.mscript";
-            this.scriptFile.Location = new System.Drawing.Point(108, 59);
+            this.scriptFile.Location = new System.Drawing.Point(108, 55);
             this.scriptFile.Name = "scriptFile";
             this.scriptFile.SaveMode = false;
-            this.scriptFile.Size = new System.Drawing.Size(377, 27);
+            this.scriptFile.Size = new System.Drawing.Size(377, 23);
             this.scriptFile.TabIndex = 14;
             this.scriptFile.FileSelected += new System.EventHandler(this.scriptFile_FileSelected);
             // 
