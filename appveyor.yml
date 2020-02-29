@@ -25,7 +25,7 @@ install:
 
     git submodule -q init
 
-    git submodule -q update
+    git submodule -q update --remote
 
 
     $env:OUTPUT_FILENAME = if ($env:APPVEYOR_REPO_TAG -eq "true") {
