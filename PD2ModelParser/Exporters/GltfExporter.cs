@@ -14,7 +14,18 @@ namespace PD2ModelParser.Exporters
         {
             var exporter = new GltfExporter();
             var gltfmodel = exporter.Convert(data);
-            gltfmodel.SaveGLTF(path, Newtonsoft.Json.Formatting.Indented);
+            if (path.EndsWith(".gltf"))
+            {
+                gltfmodel.SaveGLTF(path, Newtonsoft.Json.Formatting.Indented);
+            }
+            else if(path.EndsWith(".glb"))
+            {
+                gltfmodel.SaveGLB(path);
+            }
+            else
+            {
+                throw new Exception("Unknown filetype requested when saving GLTF");
+            }
 
             return path;
         }

@@ -57,7 +57,7 @@ namespace PD2ModelParser.UI
                 result = Exporters.FbxExporter.ExportFile(model, inputFileBox.Selected);
 #endif
             }
-            else if (format.Contains(".gltf"))
+            else if (format.Contains(".gltf") || format.Contains(".glb"))
             {
                 result = Exporters.GltfExporter.ExportFile(model, inputFileBox.Selected);
             }
