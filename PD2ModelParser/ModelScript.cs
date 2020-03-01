@@ -378,12 +378,14 @@ namespace PD2ModelParser
 
         private static void ExecPatternUV(FullModelData data, XElement element, string directory)
         {
-            string file = Path.Combine(directory, CheckAttr(element, "file"));
-            bool result = NewObjImporter.ImportNewObjPatternUV(data, file);
-            if (!result)
+            string file = CheckAttr(element, "file");
+            var state = new Modelscript.ScriptState
             {
-                throw new Exception("There was an error importing Pattern UV OBJ - see console");
-            }
+                Data = data,
+                WorkDir = directory
+            };
+            var cmd = new Modelscript.PatternUV { File = file };
+            cmd.Execute(state);
         }
     }
 }
