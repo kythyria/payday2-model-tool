@@ -247,16 +247,13 @@ namespace PD2ModelParser
                         {
                             uint rpid = FindRootPoint(data, root_point);
                             var root_object = data.parsed_sections[rpid] as Object3D;
-                            bool result = NewObjImporter.ImportNewObj(
+                            NewObjImporter.ImportNewObj(
                                 data,
                                 entry.arg,
                                 new_obj,
-                                obj => root_object
+                                obj => root_object,
+                                null
                                 );
-                            if (!result)
-                            {
-                                return false;
-                            }
                         }
                         else if (entry.arg.EndsWith(".fbx"))
                         {
@@ -264,8 +261,8 @@ namespace PD2ModelParser
                             Console.WriteLine("FBX support disabled");
                             return false;
 #else
-                            FilmboxImporter.FbxImportOptions options = new FilmboxImporter.FbxImportOptions();
-                            FilmboxImporter.Import(data, entry.arg, new_obj, obj => null, options);
+                            var options = new FilmboxImporter.FbxImportOptions();
+                            FilmboxImporter.Import(data, entry.arg, new_obj, name => null, options);
 #endif
                         }
                         else if (entry.arg.EndsWith(".dae"))
@@ -277,7 +274,7 @@ namespace PD2ModelParser
                         }
                         else if (entry.arg.EndsWith(".gltf") || entry.arg.EndsWith(".glb"))
                         {
-                            Importers.GltfImporter.Import(data, entry.arg, new_obj, obj => null);
+                            Importers.GltfImporter.Import(data, entry.arg, new_obj, obj => null, null);
                         }
                         else
                         {

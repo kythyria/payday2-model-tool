@@ -19,7 +19,7 @@ namespace PD2ModelParser.Importers
         /// <param name="fmd">Diesel model to add the contents to.</param>
         /// <param name="path">Path of the GLTF file to import</param>
         /// <param name="getParentByName">Callback to find the parent of a particular model.</param>
-        public static void Import(FullModelData fmd, string path, bool createModels, Func<string, DM.Object3D> parentFinder)
+        public static void Import(FullModelData fmd, string path, bool createModels, Func<string, DM.Object3D> parentFinder, IOptionReceiver _)
         {
             var gltf = GLTF.ModelRoot.Load(path);
             var importer = new GltfImporter(fmd);

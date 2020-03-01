@@ -359,22 +359,17 @@ namespace PD2ModelParser
             switch (type)
             {
                 case "obj":
-                    bool result = NewObjImporter.ImportNewObj(data, file, create_objects,
-                        objData => ParentFinder(objData.object_name));
-
-                    if (!result)
-                        throw new Exception($"Could not import OBJ file {file} - see console");
+                    NewObjImporter.ImportNewObj(data, file, create_objects, ParentFinder, null);
                     break;
 #if !NO_FBX
                 case "fbx":
                     if (create_objects)
                         throw new Exception("Creating objects is not yet supported for FBX");
-                    FilmboxImporter.Import(data, file, create_objects, fn => null,
-                        (FilmboxImporter.FbxImportOptions) options);
+                    FilmboxImporter.Import(data, file, create_objects, name => null, options);
                     break;
 #endif
                 case "gltf":
-                    GltfImporter.Import(data, file, create_objects, name => object_rootpoints.ContainsKey(name) ? object_rootpoints[name] : default_rootpoint);
+                    GltfImporter.Import(data, file, create_objects, name => object_rootpoints.ContainsKey(name) ? object_rootpoints[name] : default_rootpoint, null);
                     break;
                 default:
                     throw new NotImplementedException($"Cannot import file with type '{type}'.");

@@ -13,7 +13,13 @@ namespace PD2ModelParser.Importers
         private static FbxManager _fm;
 
         public static void Import(FullModelData data, string filepath, bool addNew,
-            Func<FbxNode, Object3D> rootPointResolver, FbxImportOptions options)
+            Func<string, Object3D> rootPointResolver, IOptionReceiver options)
+        {
+            Import(data, filepath, addNew, rootPointResolver, (FbxImportOptions)options);
+        }
+
+        public static void Import(FullModelData data, string filepath, bool addNew,
+            Func<string, Object3D> rootPointResolver, FbxImportOptions options)
         {
             if (_fm == null)
                 _fm = FbxManager.Create();
@@ -38,7 +44,7 @@ namespace PD2ModelParser.Importers
             {
                 FbxMesh mesh = node.GetMesh();
 
-                Object3D parent = rootPointResolver.Invoke(node);
+                Object3D parent = rootPointResolver.Invoke(node.GetName());
 
                 imp.AddMesh(parent, node, mesh);
             }
