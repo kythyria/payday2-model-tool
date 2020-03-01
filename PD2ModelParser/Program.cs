@@ -245,11 +245,14 @@ namespace PD2ModelParser
                         Log.Default.Status("Importing file {0}", entry.arg);
                         if (entry.arg.EndsWith(".obj"))
                         {
+                            uint rpid = FindRootPoint(data, root_point);
+                            var root_object = data.parsed_sections[rpid] as Object3D;
                             bool result = NewObjImporter.ImportNewObj(
                                 data,
                                 entry.arg,
                                 new_obj,
-                                FindRootPoint(data, root_point));
+                                obj => root_object
+                                );
                             if (!result)
                             {
                                 return false;
@@ -374,20 +377,10 @@ namespace PD2ModelParser
             if (root_point == null)
                 return 0;
 
-            foreach (var section in data.parsed_sections.Values)
-            {
-                if (!(section is Object3D obj))
-                    continue;
-
-                string name = obj.Name;
-
-                if (name == root_point)
-                {
-                    return obj.SectionId;
-                }
-            }
-
-            throw new Exception($"Root point {root_point} not found!");
+            var point = data.SectionsOfType<Object3D>()
+                .Where(o => o.Name == root_point)
+                .FirstOrDefault();
+            return point?.SectionId ?? throw new Exception($"Root point {root_point} not found!");
         }
 
         private static void ShowHelp(OptionSet p)

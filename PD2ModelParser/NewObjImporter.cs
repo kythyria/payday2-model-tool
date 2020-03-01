@@ -5,19 +5,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PD2ModelParser
 {
     static class NewObjImporter
     {
-        public static bool ImportNewObj(FullModelData fmd, String filepath, bool addNew = false, uint root_point = 0)
-        {
-            Object3D root_object = root_point == 0 ? null : (Object3D)fmd.parsed_sections[root_point];
-            return ImportNewObj(fmd, filepath, addNew, obj => root_object);
-        }
-
         public static bool ImportNewObj(FullModelData fmd, String filepath, bool addNew, Func<obj_data, Object3D> root_point)
         {
             Log.Default.Info("Importing new obj with file: {0}", filepath);
