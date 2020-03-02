@@ -8,18 +8,23 @@ namespace PD2ModelParser.Modelscript
 {
     public static class Script
     {
-        public static FullModelData ExecuteItems(IEnumerable<IScriptItem> items, string workDir)
+        public static FullModelData ExecuteItems(IEnumerable<IScriptItem> items, string workDir, FullModelData initialModel)
         {
             var state = new ScriptState
             {
-                Data = new FullModelData(),
+                Data = initialModel,
                 WorkDir = workDir
             };
-            foreach(var i in items)
+            foreach (var i in items)
             {
                 i.Execute(state);
             }
             return state.Data;
+        }
+
+        public static FullModelData ExecuteItems(IEnumerable<IScriptItem> items, string workDir)
+        {
+            return ExecuteItems(items, workDir, new FullModelData());
         }
 
         public static IEnumerable<string> GetSourceFilenames(IEnumerable<IScriptItem> items)

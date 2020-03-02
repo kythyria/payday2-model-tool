@@ -29,6 +29,7 @@ namespace PD2ModelParser.UI
 
         private void convert_Click(object sender, EventArgs e)
         {
+
             if (baseModelFileBrowser.Selected == null && !createNewModel.Checked)
             {
                 MessageBox.Show("Either select a valid base model or select the create new model box");
@@ -57,62 +58,36 @@ namespace PD2ModelParser.UI
                     return;
             }
 
-            if(rootPoints.SelectedIndex > 0)
-            {
-                RootPointItem item = root_point_items[rootPoints.SelectedIndex];
-                Object3D rp = model.parsed_sections[item.Id] as Object3D;
-
-                if(rp == null || rp.Name != item.Name)
-                {
-                    MessageBox.Show("Rootpoint mismatch - the root point has been\n"
-                        + "updated, please verify it is still correct and try again");
-                    UpdateRootPointBox();
-                    return;
-                }
-            }
-
-            XElement import_root = new XElement("modelscript");
+            var script = new List<Modelscript.IScriptItem>();
             if (objectFile.Selected != null)
             {
-                XElement import_directive = new XElement("import");
-                import_directive.SetAttributeValue("file", objectFile.Selected);
-                import_directive.SetAttributeValue("create_objects", createNewObjects);
-                if (rootPoints.SelectedIndex > 0)
+                script.Add(new Modelscript.CreateNewObjects() { Create = createNewObjects });
+                var importDirective = new Modelscript.Import() { File = objectFile.Selected };
+
+                if(rootPoints.SelectedIndex > 0)
                 {
                     RootPointItem item = root_point_items[rootPoints.SelectedIndex];
-
-                    XElement rootpoint_directive = new XElement("rootpoint", new XElement("default"));
-                    rootpoint_directive.SetAttributeValue("name", item.Name);
-                    import_directive.Add(rootpoint_directive);
+                    importDirective.DefaultRootPoint = item.Name;
                 }
-                import_root.Add(import_directive);
+
+                script.Add(importDirective);
             }
 
             if (patternUVFile.Selected != null)
             {
-                XElement elPUV = new XElement("patternuv");
-                elPUV.SetAttributeValue("file", patternUVFile.Selected);
-                import_root.Add(elPUV);
+                script.Add(new Modelscript.PatternUV() { File = patternUVFile.Selected });
             }
+
+            script.Add(new Modelscript.SaveModel() { File = outputBox.Selected });
 
             try
             {
-                ModelScript.Execute(model, import_root, System.IO.Directory.GetCurrentDirectory());
+                Modelscript.Script.ExecuteItems(script, System.IO.Directory.GetCurrentDirectory(), model);
             }
-            catch
+            catch(Exception exc)
             {
+                Log.Default.Warn("Exception generating Diesel file: {0}", exc);
                 MessageBox.Show("There was an error importing the data - see console");
-                return;
-            }
-
-            try
-            {
-                DieselExporter.ExportFile(model, outputBox.Selected);
-            }
-            catch (Exception exc)
-            {
-                Log.Default.Warn("Exception exporting Diesel file: {0}", exc);
-                MessageBox.Show("There was an error generating the output file - see console");
                 return;
             }
 
