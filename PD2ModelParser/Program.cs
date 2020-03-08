@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -332,7 +332,7 @@ namespace PD2ModelParser
                         else
                         {
                             Console.WriteLine(
-                                "Unknown or unsupported file extension for export for {0}",
+                                "Unknown or unsupported file extension for export for \"{0}\"",
                                 entry.arg);
                             return false;
                         }
@@ -382,6 +382,10 @@ namespace PD2ModelParser
 
         private static void ShowHelp(OptionSet p)
         {
+            var assembly = Assembly.GetExecutingAssembly();
+            var informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            Console.WriteLine("Version: {0}", informationalVersion?.InformationalVersion);
+            Console.WriteLine();
             Console.WriteLine("Usage: {0} [OPTIONS]+", AppDomain.CurrentDomain.FriendlyName);
             Console.WriteLine("Import and export DieselX .model files");
             Console.WriteLine("If the program is called without any arguments,");
