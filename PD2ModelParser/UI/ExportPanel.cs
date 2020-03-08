@@ -59,7 +59,9 @@ namespace PD2ModelParser.UI
             }
             else if (format.Contains(".gltf") || format.Contains(".glb"))
             {
-                result = Exporters.GltfExporter.ExportFile(model, inputFileBox.Selected);
+                var ext = format.Contains(".gltf") ? "gltf" : "glb";
+                var name = System.IO.Path.ChangeExtension(inputFileBox.Selected, ext);
+                result = Exporters.GltfExporter.ExportFile(model, name);
             }
             else
             {
