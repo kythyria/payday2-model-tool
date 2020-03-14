@@ -254,7 +254,11 @@ namespace PD2ModelParser.Exporters
 
             if (geometry.normals.Count > 0)
             {
-                var a_norm = MakeVertexAttributeAccessor("vnorm", geometry.normals, 12, GLTF.DimensionType.VEC3, MathUtil.ToVector3, ma => ma.AsVector3Array());
+                Vector3 MakeNormal(Nexus.Vector3D norm)
+                {
+                    return Vector3.Normalize(norm.ToVector3());
+                }
+                var a_norm = MakeVertexAttributeAccessor("vnorm", geometry.normals, 12, GLTF.DimensionType.VEC3, MakeNormal, ma => ma.AsVector3Array());
                 result.Add(("NORMAL", a_norm));
             }
 
