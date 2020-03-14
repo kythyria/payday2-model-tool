@@ -254,9 +254,20 @@ namespace PD2ModelParser.Exporters
 
             if (geometry.normals.Count > 0)
             {
-                Vector3 MakeNormal(Nexus.Vector3D norm)
+                Vector3 MakeNormal(Nexus.Vector3D norm, int idx)
                 {
-                    return Vector3.Normalize(norm.ToVector3());
+                    var normalized = Vector3.Normalize(norm.ToVector3());
+                    if(!normalized.IsFinite())
+                    {
+                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} is bogus ({3})", idx, geometry.SectionId, geometry.hashname, norm);
+                        return new Vector3(1, 0, 0);
+                    }
+                    if(!normalized.IsUnitLength())
+                    {
+                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} is bogus length {4} ({3})", idx, geometry.SectionId, geometry.hashname, norm, norm.Length());
+                        return new Vector3(1, 0, 0);
+                    }
+                    return normalized;
                 }
                 var a_norm = MakeVertexAttributeAccessor("vnorm", geometry.normals, 12, GLTF.DimensionType.VEC3, MakeNormal, ma => ma.AsVector3Array());
                 result.Add(("NORMAL", a_norm));

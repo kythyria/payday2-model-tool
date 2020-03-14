@@ -169,6 +169,26 @@ namespace PD2ModelParser
             var rounded = Math.Round(scaled);
             return (byte)rounded;
         }
+
+        public static Boolean IsFinite(this System.Numerics.Vector3 vec)
+        {
+            return !(
+                float.IsInfinity(vec.X)
+                || float.IsInfinity(vec.Y)
+                || float.IsInfinity(vec.Z)
+                || float.IsNaN(vec.X)
+                || float.IsNaN(vec.Y)
+                || float.IsNaN(vec.Z)
+            );
+        }
+
+        // From https://github.com/KhronosGroup/glTF-Validator/blob/master/lib/src/errors.dart
+        // which says, "these values are slightly greater than the maximum error from signed 8-bit quantization"
+        const float UnitLengthThresholdVec3 = 0.00674f;
+        const float UnitLengthThresholdVec4 = 0.00769f;
+
+        public static Boolean IsUnitLength(this System.Numerics.Vector3 vec) =>
+            Math.Abs(vec.Length() - 1) <= UnitLengthThresholdVec3;
     }
 
     public static class MatrixExtensions
