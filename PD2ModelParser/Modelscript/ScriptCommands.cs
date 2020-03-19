@@ -59,7 +59,7 @@ namespace PD2ModelParser.Modelscript
         public string File { get; set; }
         public ImportFileType? ForceType { get; set; }
         public string DefaultRootPoint { get; set; }
-        public Dictionary<string, string> Parents { get; set; }
+        public Dictionary<string, string> Parents { get; set; } = new Dictionary<string, string>();
         public Importers.IOptionReceiver ImporterOptions { get; set; }
 
         public void Execute(ScriptState state)
