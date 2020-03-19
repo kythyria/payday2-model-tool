@@ -119,6 +119,7 @@
     <Compile Include="Inspector\Object3DReferenceConverter.cs" />
     <Compile Include="InternationalisationUtils.cs" />
     <Compile Include="Logging.cs" />
+    <Compile Include="Misc\BulkFunctions.cs" />
     <Compile Include="Misc\SerializeUtils.cs" />
     <Compile Include="Misc\Updates.cs" />
     <Compile Include="ModelScript.cs" />

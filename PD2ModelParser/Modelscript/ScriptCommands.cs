@@ -209,4 +209,20 @@ namespace PD2ModelParser.Modelscript
             exporter(state.Data, path);
         }
     }
+
+    public class BatchExport : IScriptItem
+    {
+        public string Directory { get; set; }
+        public void Execute(ScriptState state)
+        {
+            foreach(var (path, relpath, fmd) in BulkFunctions.EveryModel(state.ResolvePath(Directory))) {
+                state.Data = fmd;
+                new Export
+                {
+                    // TODO: Better extension handling
+                    File = System.IO.Path.ChangeExtension(path, state.DefaultExportType.ToString().ToLower())
+                }.Execute(state);
+            }
+        }
+    }
 }

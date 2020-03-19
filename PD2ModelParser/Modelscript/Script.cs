@@ -155,6 +155,7 @@ namespace PD2ModelParser.Modelscript
         public string ResolvePath(string path) => System.IO.Path.Combine(WorkDir, path);
         public bool CreateNewObjects { get; set; }
         public Sections.Object3D DefaultRootPoint { get; set; }
+        public ExportFileType DefaultExportType { get; set; }
     }
 
     public interface IScriptItem

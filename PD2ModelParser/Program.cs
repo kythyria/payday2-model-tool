@@ -22,50 +22,6 @@ namespace PD2ModelParser
 {
     class Program
     {
-        static IEnumerable<FileInfo> WalkDirectoryTreeDepth(DirectoryInfo dir, string filepattern)
-        {
-            foreach(var i in dir.EnumerateFiles(filepattern))
-            {
-                if (i.Attributes.HasFlag(FileAttributes.Directory)) continue;
-                yield return i;
-            }
-
-            foreach(var i in dir.EnumerateDirectories())
-            {
-                foreach(var f in WalkDirectoryTreeDepth(i, filepattern))
-                {
-                    yield return f;
-                }
-            }
-        }
-
-        static void WriteSimpleCsvLike<T>(TextWriter tw, IEnumerable<T> items)
-        {
-            var fields = typeof(T).GetFields().OrderBy(i => i.MetadataToken).ToList();
-            tw.WriteLine(string.Join(",",fields.Select(i=>i.Name)));
-            var count = 1000;
-            var inc = 0;
-            foreach(var i in items)
-            {
-                var values = fields.Select(field => field.GetValue(i));
-                tw.WriteLine(string.Join(",", values));
-                if(count-- == 0)
-                {
-                    count = 1000;
-                    tw.Flush();
-                    Log.Default.Status($"{++inc}");
-                }
-            }
-        }
-
-        static IEnumerable<(string, FullModelData)> EveryModel(string root)
-        {
-            foreach(var i in WalkDirectoryTreeDepth(new DirectoryInfo(root), "*.model"))
-            {
-                var fmd = ModelReader.Open(i.FullName);
-                yield return (i.FullName.Substring(root.Length), fmd);
-            }
-        }
 
         [STAThread]
         static void Main(string[] args)
@@ -78,6 +34,7 @@ namespace PD2ModelParser
 
             Updates.Startup();
 
+            Application.EnableVisualStyles();
             Form1 form = new Form1();
             Application.Run(form);
         }
@@ -149,12 +106,20 @@ namespace PD2ModelParser
                     v => actions.Add(new CommandLineEntry(CommandLineActions.ImportPatternUv, v))
                 },
                 {
-                    "export=", "Exports to a .model file",
+                    "export=", "Exports to a 3D model file",
                     v => actions.Add(new CommandLineEntry(CommandLineActions.Export, v))
+                },
+                {
+                    "export_type=", "Sets the type for mass exports",
+                    v => actions.Add(new CommandLineEntry(CommandLineActions.SetDefaultExportType, v))
                 },
                 {
                     "script=", "Executes a model script",
                     v => actions.Add(new CommandLineEntry(CommandLineActions.Script, v))
+                },
+                {
+                    "batch_export=", "Recursively scans a directory for .model files and exports them all",
+                    v => actions.Add(new CommandLineEntry(CommandLineActions.BatchExport, v))
                 },
                 {
                     "h|help", "show this message and exit",
@@ -204,6 +169,7 @@ namespace PD2ModelParser
 
             bool new_obj = false;
             string root_point = null;
+            Modelscript.ExportFileType exportType = Modelscript.ExportFileType.Gltf;
             int i = 0;
             foreach (CommandLineEntry entry in actions)
             {
@@ -212,6 +178,8 @@ namespace PD2ModelParser
                 // Check the model data exists unless we're loading or creating a new model
                 if (entry.type != CommandLineActions.New
                     && entry.type != CommandLineActions.Load
+                    && entry.type != CommandLineActions.SetDefaultExportType
+                    && entry.type != CommandLineActions.BatchExport
                     && data == null)
                 {
                     Console.WriteLine("Action {0}:{1} is run before a model is created or loaded!",
@@ -336,7 +304,15 @@ namespace PD2ModelParser
                                 entry.arg);
                             return false;
                         }
-
+                        break;
+                    case CommandLineActions.SetDefaultExportType:
+                        if(Enum.TryParse<Modelscript.ExportFileType>(entry.arg, true, out var type)) {
+                            exportType = type;
+                        }
+                        else
+                        {
+                            Log.Default.Error("Unknown export filetype {0}", entry.arg);
+                        }
                         break;
                     case CommandLineActions.Script:
                         Log.Default.Status("Executing script {0}", entry.arg);
@@ -350,8 +326,21 @@ namespace PD2ModelParser
                             Log.Default.Error("Error executing model script {0}: {1}",
                                 entry.arg, ex.Message);
                         }
-
                         break;
+
+                    case CommandLineActions.BatchExport:
+                        Log.Default.Status("Batch exporting from {0}", entry.arg);
+                        var state = new Modelscript.ScriptState()
+                        {
+                            WorkDir = System.IO.Directory.GetCurrentDirectory(),
+                            DefaultExportType = exportType
+                        };
+                        new Modelscript.BatchExport
+                        {
+                            Directory = entry.arg
+                        }.Execute(state);
+                        break;
+
                     default:
                         Log.Default.Error("Unknown action {0}", entry.type);
                         break;
@@ -412,6 +401,8 @@ namespace PD2ModelParser
             Import,
             ImportPatternUv,
             Export,
+            SetDefaultExportType,
+            BatchExport,
             Script,
         }
 
