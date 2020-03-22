@@ -82,7 +82,7 @@ namespace PD2ModelParser
                     v => actions.Add(new CommandLineEntry(CommandLineActions.SetNewObj, v))
                 },
                 {
-                    "r|root_point:", "Sets the default bone for new objects to be attached to",
+                    "r|root-point:", "Sets the default bone for new objects to be attached to",
                     v => actions.Add(new CommandLineEntry(CommandLineActions.SetRootPoint, v))
                 },
                 {
@@ -110,7 +110,7 @@ namespace PD2ModelParser
                     v => actions.Add(new CommandLineEntry(CommandLineActions.Export, v))
                 },
                 {
-                    "export_type=", "Sets the type for mass exports",
+                    "export-type=", "Sets the type for mass exports",
                     v => actions.Add(new CommandLineEntry(CommandLineActions.SetDefaultExportType, v))
                 },
                 {
@@ -118,7 +118,7 @@ namespace PD2ModelParser
                     v => actions.Add(new CommandLineEntry(CommandLineActions.Script, v))
                 },
                 {
-                    "batch_export=", "Recursively scans a directory for .model files and exports them all",
+                    "batch-export=", "Recursively scans a directory for .model files and exports them all",
                     v => actions.Add(new CommandLineEntry(CommandLineActions.BatchExport, v))
                 },
                 {
