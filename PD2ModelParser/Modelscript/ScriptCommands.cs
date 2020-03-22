@@ -60,7 +60,7 @@ namespace PD2ModelParser.Modelscript
         public ImportFileType? ForceType { get; set; }
         public string DefaultRootPoint { get; set; }
         public Dictionary<string, string> Parents { get; set; } = new Dictionary<string, string>();
-        public Importers.IOptionReceiver ImporterOptions { get; set; }
+        public Dictionary<string, string> ImporterOptions { get; set; } = new Dictionary<string, string>();
 
         public void Execute(ScriptState state)
         {
@@ -134,7 +134,16 @@ namespace PD2ModelParser.Modelscript
                     throw new Exception($"BUG: No importer for {effectiveType}");
             }
 
-            importer(state.Data, filepath, state.CreateNewObjects, ParentFinder, ImporterOptions);
+            Importers.IOptionReceiver opts = new Importers.GenericOptionReceiver();
+#if !NO_FBX
+            opts = new Importers.FilmboxImporter.FbxImportOptions()
+#endif
+            foreach(var kv in ImporterOptions)
+            {
+                opts.AddOption(kv.Key, kv.Value);
+            }
+
+            importer(state.Data, filepath, state.CreateNewObjects, ParentFinder, opts);
         }
     }
 

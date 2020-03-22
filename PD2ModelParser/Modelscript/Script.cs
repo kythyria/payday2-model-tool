@@ -61,6 +61,7 @@ namespace PD2ModelParser.Modelscript
                     case "load": yield return ParseXmlLoadModel(element); break;
                     case "save": yield return ParseXmlSaveModel(element); break;
                     case "import": yield return ParseXmlImport(element); break;
+                    case "patternuv": yield return ParseXmlPatternuv(element); break;
                 }
             }
         }
@@ -78,29 +79,39 @@ namespace PD2ModelParser.Modelscript
             else if (strType.ToLower() == "glb") { item.ForceType = ImportFileType.Gltf; }
             else { item.ForceType = null; }
 
-            var options = new Dictionary<string, string>();
             foreach(var child in element.Elements())
             {
                 switch(child.Name.ToString())
                 {
                     case "rootpoint":
+                        var targetname = RequiredAttr(child, "name");
                         foreach(var rpitem in child.Elements())
                         {
                             switch(rpitem.Name.ToString())
                             {
                                 case "object":
+                                    var childName = RequiredAttr(rpitem, "name");
+                                    if(item.Parents.ContainsKey(childName))
+                                        throw new Exception($"Cannot redefine rootpoint for object {childName}");
+                                    item.Parents.Add(childName, targetname);
                                     break;
                                 case "default":
+                                    if(item.DefaultRootPoint == null)
+                                        item.DefaultRootPoint = targetname;
+                                    else
+                                        throw new Exception($"Cannot redefine default rootpoint to {targetname}");
                                     break;
+                                default:
+                                    throw new Exception($"Invalid <rootpoint> child: {rpitem.Name}");
                             }
                         }
                         break;
                     case "option":
-                        options.Add(RequiredAttr(child, "name"), child.Value.Trim());
+                        item.ImporterOptions.Add(RequiredAttr(child, "name"), child.Value.Trim());
                         break;
                 }
             }
-            return null;
+            return item;
         }
 
         private static IScriptItem ParseXmlSaveModel(XElement elem)
@@ -125,6 +136,12 @@ namespace PD2ModelParser.Modelscript
         {
             var name = elem.Attribute("name")?.Value;
             return new SetRootPoint() { Name = name };
+        }
+
+        private static IScriptItem ParseXmlPatternuv(XElement elem)
+        {
+            var file = RequiredAttr(elem, "file");
+            return new PatternUV() { File = file };
         }
 
         private static string RequiredAttr(XElement elem, string attr)
