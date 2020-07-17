@@ -62,6 +62,9 @@ namespace PD2ModelParser.Modelscript
                     case "save": yield return ParseXmlSaveModel(element); break;
                     case "import": yield return ParseXmlImport(element); break;
                     case "patternuv": yield return ParseXmlPatternuv(element); break;
+                    case "export": yield return ParseXmlExport(element); break;
+                    case "exporttype": yield return ParseXmlExportType(element); break;
+                    case "batchexport": yield return ParseXmlBatchExport(element); break;
                 }
             }
         }
@@ -144,6 +147,33 @@ namespace PD2ModelParser.Modelscript
             return new PatternUV() { File = file };
         }
 
+        private static IScriptItem ParseXmlExport(XElement elem)
+        {
+            var file = RequiredAttr(elem, "file");
+            return new Export() { File = file };
+        }
+
+        private static IScriptItem ParseXmlExportType(XElement elem)
+        {
+            var type = RequiredAttr(elem, "type");
+            if (FileTypeInfo.TryGetByExtension(type, out var fti))
+            {
+                return new SetDefaultType() { FileType = fti.ExportType };
+            }
+            throw new Exception($"Invalid value {type} for type: Unrecognised format.");
+        }
+
+        private static IScriptItem ParseXmlBatchExport(XElement elem)
+        {
+            var dir = RequiredAttr(elem, "sourcedir");
+            var res = new BatchExport() { Directory = dir };
+            var typeish = elem.Attribute("type")?.Value;
+            if (typeish != null && FileTypeInfo.TryGetByExtension(typeish, out var fti)) {
+                res.FileType = fti.ExportType;
+            }
+            return res;
+        }
+
         private static string RequiredAttr(XElement elem, string attr)
         {
             return elem.Attribute(attr)?.Value ??
@@ -155,7 +185,7 @@ namespace PD2ModelParser.Modelscript
             var str = RequiredAttr(elem, attrName);
             if(!bool.TryParse(str, out var result))
             {
-                throw new Exception($"Invalid value '{str}' for create_objects: "
+                throw new Exception($"Invalid value '{str}' for {attrName}: "
                                     + "must either be true or false");
             }
             else
