@@ -123,7 +123,6 @@
     <Compile Include="Misc\BulkFunctions.cs" />
     <Compile Include="Misc\SerializeUtils.cs" />
     <Compile Include="Misc\Updates.cs" />
-    <Compile Include="ModelScript.cs" />
     <Compile Include="Modelscript\Script.cs" />
     <Compile Include="Modelscript\ScriptCommands.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
