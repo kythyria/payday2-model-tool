@@ -198,24 +198,12 @@ namespace PD2ModelParser
 
             ConsoleLogger.minimumLevel = (LoggerLevel) verbosity;
 
-            var dataWillExist = false;
-            var i = 0;
-            foreach(var item in script)
-            {
-                dataWillExist |= item is NewModel || item is LoadModel;
-                if(!(item is SetDefaultType || item is BatchExport)) {
-                    Console.WriteLine("Action {0}:{1} is run before a model is created or loaded!",
-                        i, item.GetType().Name);
-                    return false;
-                }
-                i++;
-            }
-
             var state = new Modelscript.ScriptState()
             {
                 WorkDir = System.IO.Directory.GetCurrentDirectory(),
                 DefaultExportType = Modelscript.ExportFileType.Gltf,
-                CreateNewObjects = false
+                CreateNewObjects = false,
+                Data = new FullModelData()
             };
             state.ExecuteItems(script);
 
