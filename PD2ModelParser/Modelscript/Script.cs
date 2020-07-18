@@ -212,6 +212,8 @@ namespace PD2ModelParser.Modelscript
                 i.Execute(this);
             }
         }
+
+        public ILogger Log => PD2ModelParser.Log.Default;
     }
 
     public interface IScriptItem

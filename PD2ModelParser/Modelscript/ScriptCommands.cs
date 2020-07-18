@@ -9,7 +9,11 @@ namespace PD2ModelParser.Modelscript
     public class CreateNewObjects : IScriptItem
     {
         public bool Create { get; set; }
-        public void Execute(ScriptState state) => state.CreateNewObjects = Create;
+        public void Execute(ScriptState state)
+        {
+            state.Log.Status(Create ? "New objects will be created" : "New objects will NOT be created");
+            state.CreateNewObjects = Create;
+        }
     }
 
     public class SetRootPoint : IScriptItem
@@ -19,10 +23,12 @@ namespace PD2ModelParser.Modelscript
         {
             if(Name == null)
             {
+                state.Log.Status("Clearing default root point");
                 state.DefaultRootPoint = null;
             }
             else
             {
+                state.Log.Status($"Setting default root point to {Name}");
                 var point = state.Data.SectionsOfType<S.Object3D>()
                     .FirstOrDefault(o => o.Name == Name);
                 state.DefaultRootPoint =  point ?? throw new Exception($"Root point {Name} not found!");
@@ -32,19 +38,33 @@ namespace PD2ModelParser.Modelscript
 
     public class NewModel : IScriptItem
     {
-        public void Execute(ScriptState state) => state.Data = new FullModelData();
+        public void Execute(ScriptState state)
+        {
+            state.Log.Status("Creating new model");
+            state.Data = new FullModelData();
+        }
+
     }
 
     public class LoadModel : IScriptItem, IReadsFile
     {
         public string File { get; set; }
-        public void Execute(ScriptState state) => state.Data = ModelReader.Open(state.ResolvePath(File));
+        public void Execute(ScriptState state)
+        {
+            state.Log.Status($"Loading model from {File}");
+            state.Data = ModelReader.Open(state.ResolvePath(File));
+        }
     }
 
     public class SaveModel : IScriptItem
     {
+        public string StatusMessage => $"Save model to {0}";
         public string File { get; set; }
-        public void Execute(ScriptState state) => DieselExporter.ExportFile(state.Data, state.ResolvePath(File));
+        public void Execute(ScriptState state)
+        {
+            state.Log.Status($"Saving model to {File}");
+            DieselExporter.ExportFile(state.Data, state.ResolvePath(File));
+        }
     }
 
     public enum ImportFileType
@@ -64,6 +84,7 @@ namespace PD2ModelParser.Modelscript
 
         public void Execute(ScriptState state)
         {
+            state.Log.Status($"Importing from {File}");
             var filepath = state.ResolvePath(File);
             ImportFileType effectiveType;
             if(ForceType.HasValue)
@@ -152,6 +173,7 @@ namespace PD2ModelParser.Modelscript
         public string File { get; set; }
         public void Execute(ScriptState state)
         {
+            state.Log.Status($"Reading pattern UVs from {File}");
             string path = state.ResolvePath(File);
             if(!path.EndsWith(".obj"))
             {
@@ -179,6 +201,7 @@ namespace PD2ModelParser.Modelscript
         public ExportFileType? ForceType { get; set; }
         public void Execute(ScriptState state)
         {
+            state.Log.Status($"Exporting to {File}");
             string path = state.ResolvePath(File);
             ExportFileType effectiveType;
             if(ForceType.HasValue)
@@ -230,6 +253,7 @@ namespace PD2ModelParser.Modelscript
 
         public void Execute(ScriptState state)
         {
+            state.Log.Status($"Batch exporting in {Directory}");
             var actualType = FileType ?? state.DefaultExportType;
             foreach(var (path, relpath, fmd) in BulkFunctions.EveryModel(state.ResolvePath(Directory))) {
                 state.Data = fmd;
@@ -247,18 +271,21 @@ namespace PD2ModelParser.Modelscript
         public ExportFileType FileType { get; set; }
         public void Execute(ScriptState state)
         {
+            state.Log.Status($"Default batch export type is {FileType}");
             state.DefaultExportType = FileType;
         }
     }
 
-    public class RunScript : IScriptItem
+    public class RunScript : IScriptItem, IReadsFile
     {
         public string File { get; set; }
         public void Execute(ScriptState state)
         {
+            state.Log.Status($"Running other modelscript {File}");
             string path = state.ResolvePath(File);
             var script = Script.ParseXml(path);
             state.ExecuteItems(script);
+            state.Log.Status($"Finished running {File}");
         }
     }
 }

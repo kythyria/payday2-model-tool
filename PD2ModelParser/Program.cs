@@ -55,12 +55,30 @@ namespace PD2ModelParser
             bool gui = false;
             int verbosity = (int) LoggerLevel.Info;
 
-            List<CommandLineEntry> actions = new List<CommandLineEntry>();
+            var script = new List<IScriptItem>();
+
+            var assembly = Assembly.GetExecutingAssembly();
+            var informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
 
             OptionSet p = new OptionSet
             {
+                $"Version: {informationalVersion?.InformationalVersion}",
+                "",
+                $"Usage: {AppDomain.CurrentDomain.FriendlyName} [OPTIONS]+",
+                "Import and export DieselX .model files",
+                "If the program is called without any arguments,",
+                " GUI mode is enabled by default",
+                "If the program is running in command-line mode, then",
+                " the file commands will be run in sequence",
+                " eg, --load=a.model --import=b.obj --root-point=Hips "
+                + "--import-pattern-uv=b_pattern_uv.obj --save=c.model",
+                " Will import a model called a.model, add an object, and save it as c.model",
+                " Note you can process many models in one run of the program, which is faster",
+                " than running the program once for each model",
+                "",
+                "General options:",
                 {
-                    "g|gui", "Enable the GUI"
+                    "g|gui", "Enable the GUI",
                     v => gui = v != null
                 },
                 {
@@ -78,54 +96,64 @@ namespace PD2ModelParser
                     }
                 },
                 {
+                    "h|help", "show this message and exit",
+                    v => show_help = v != null
+                },
+                "",
+                "Actions:",
+                {
                     "n|new-objects", "Sets whether or not new objects will be "
                                      + "created (append + or - to set this) default false",
-                    v => actions.Add(new CommandLineEntry(CommandLineActions.SetNewObj, v))
+                    v => script.Add(new CreateNewObjects() { Create = v != null })
                 },
                 {
                     // Colon means an optional value
                     "r|root-point:", "Sets the default bone for new objects to be attached to",
-                    v => actions.Add(new CommandLineEntry(CommandLineActions.SetRootPoint, v))
+                    v => script.Add(new SetRootPoint() { Name = v })
                 },
                 {
                     "new", "Creates an entirely new model",
-                    v => actions.Add(new CommandLineEntry(CommandLineActions.New, v))
+                    v => script.Add(new NewModel())
                 },
                 {
                     "load=", "Load a .model file",
-                    v => actions.Add(new CommandLineEntry(CommandLineActions.Load, v))
+                    v => script.Add(new LoadModel() { File = v })
                 },
                 {
                     "save=", "Save to a .model file",
-                    v => actions.Add(new CommandLineEntry(CommandLineActions.Save, v))
+                    v => script.Add(new SaveModel() { File = v })
                 },
                 {
                     "import=", "Imports from a 3D model file",
-                    v => actions.Add(new CommandLineEntry(CommandLineActions.Import, v))
+                    v => script.Add(new Import() { File = v })
                 },
                 {
                     "import-pattern-uv=", "Imports a pattern UV .OBJ file",
-                    v => actions.Add(new CommandLineEntry(CommandLineActions.ImportPatternUv, v))
+                    v => script.Add(new PatternUV() { File = v })
                 },
                 {
                     "export=", "Exports to a 3D model file",
-                    v => actions.Add(new CommandLineEntry(CommandLineActions.Export, v))
+                    v => script.Add(new Export() { File = v })
                 },
                 {
                     "export-type=", "Sets the type for mass exports",
-                    v => actions.Add(new CommandLineEntry(CommandLineActions.SetDefaultExportType, v))
+                    v => {
+                        if(Enum.TryParse<Modelscript.ExportFileType>(v, true, out var type)) {
+                            script.Add(new SetDefaultType() { FileType = type });
+                        }
+                        else
+                        {
+                            Log.Default.Error("Unknown export filetype {0}", v);
+                        }
+                    }
                 },
                 {
                     "script=", "Executes a model script",
-                    v => actions.Add(new CommandLineEntry(CommandLineActions.Script, v))
+                    v => script.Add(new RunScript() { File = v })
                 },
                 {
                     "batch-export=", "Recursively scans a directory for .model files and exports them all",
-                    v => actions.Add(new CommandLineEntry(CommandLineActions.BatchExport, v))
-                },
-                {
-                    "h|help", "show this message and exit",
-                    v => show_help = v != null
+                    v => script.Add(new BatchExport { Directory = v })
                 },
             };
 
@@ -142,7 +170,7 @@ namespace PD2ModelParser
 
             if (show_help)
             {
-                ShowHelp(p);
+                p.WriteOptionDescriptions(Console.Out);
                 return false;
             }
 
@@ -152,7 +180,7 @@ namespace PD2ModelParser
                 return false;
             }
 
-            if (actions.Count != 0 && gui)
+            if (script.Count != 0 && gui)
             {
                 ShowError("Cannot process files in GUI mode!");
                 return false;
@@ -167,97 +195,26 @@ namespace PD2ModelParser
 
             ConsoleLogger.minimumLevel = (LoggerLevel) verbosity;
 
+            var dataWillExist = false;
+            var i = 0;
+            foreach(var item in script)
+            {
+                dataWillExist |= item is NewModel || item is LoadModel;
+                if(!(item is SetDefaultType || item is BatchExport)) {
+                    Console.WriteLine("Action {0}:{1} is run before a model is created or loaded!",
+                        i, item.GetType().Name);
+                    return false;
+                }
+                i++;
+            }
+
             var state = new Modelscript.ScriptState()
             {
                 WorkDir = System.IO.Directory.GetCurrentDirectory(),
                 DefaultExportType = Modelscript.ExportFileType.Gltf,
                 CreateNewObjects = false
             };
-
-            int i = 0;
-            foreach (CommandLineEntry entry in actions)
-            {
-                i++;
-
-                // Check the model data exists unless we're loading or creating a new model
-                if (entry.type != CommandLineActions.New
-                    && entry.type != CommandLineActions.Load
-                    && entry.type != CommandLineActions.SetDefaultExportType
-                    && entry.type != CommandLineActions.BatchExport
-                    && state.Data == null)
-                {
-                    Console.WriteLine("Action {0}:{1} is run before a model is created or loaded!",
-                        i, entry.type);
-                    return false;
-                }
-
-                switch (entry.type)
-                {
-                    case CommandLineActions.SetNewObj:
-                        Log.Default.Status("Setting new-objects to {0}", state.CreateNewObjects);
-                        new CreateNewObjects() { Create = entry.arg != null }.Execute(state);
-                        break;
-                    case CommandLineActions.SetRootPoint:
-                        Log.Default.Status("Setting root-point to {0}", entry.arg);
-                        new SetRootPoint() { Name = entry.arg }.Execute(state);
-                        break;
-                    case CommandLineActions.New:
-                        Log.Default.Status("Creating a new model");
-                        new NewModel().Execute(state);
-                        break;
-                    case CommandLineActions.Load:
-                        Log.Default.Status("Loading .model {0}", entry.arg);
-                        new LoadModel() { File = entry.arg }.Execute(state);
-                        break;
-                    case CommandLineActions.Save:
-                        Log.Default.Status("Saving .model {0}", entry.arg);
-                        new SaveModel() { File = entry.arg }.Execute(state);
-                        break;
-                    case CommandLineActions.Import:
-                        Log.Default.Status("Importing file {0}", entry.arg);
-                        new Import() { File = entry.arg }.Execute(state);
-                        break;
-                    case CommandLineActions.ImportPatternUv:
-                        Log.Default.Status("Importing pattern UV {0}", entry.arg);
-                        new PatternUV() { File = entry.arg }.Execute(state);
-                        break;
-                    case CommandLineActions.Export:
-                        Log.Default.Status("Exporting to {0}", entry.arg);
-                        new Export() { File = entry.arg }.Execute(state);
-                        break;
-                    case CommandLineActions.SetDefaultExportType:
-                        if(Enum.TryParse<Modelscript.ExportFileType>(entry.arg, true, out var type)) {
-                            new SetDefaultType() { FileType = type }.Execute(state);
-                        }
-                        else
-                        {
-                            Log.Default.Error("Unknown export filetype {0}", entry.arg);
-                        }
-                        break;
-                    case CommandLineActions.Script:
-                        Log.Default.Status("Executing script {0}", entry.arg);
-                        try
-                        {
-                            new RunScript() { File = entry.arg }.Execute(state);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Default.Warn("Stacktrace: {0}", ex.StackTrace);
-                            Log.Default.Error("Error executing model script {0}: {1}",
-                                entry.arg, ex.Message);
-                        }
-                        break;
-
-                    case CommandLineActions.BatchExport:
-                        Log.Default.Status("Batch exporting from {0}", entry.arg);
-                        new BatchExport { Directory = entry.arg }.Execute(state);
-                        break;
-
-                    default:
-                        Log.Default.Error("Unknown action {0}", entry.type);
-                        break;
-                }
-            }
+            state.ExecuteItems(script);
 
             return gui;
         }
@@ -268,65 +225,6 @@ namespace PD2ModelParser
             Console.Write("{0}:", exe_name);
             Console.WriteLine(err);
             Console.WriteLine("Try `{0} --help' for more information.", exe_name);
-        }
-
-        private static uint FindRootPoint(FullModelData data, string root_point)
-        {
-            if (root_point == null)
-                return 0;
-
-            var point = data.SectionsOfType<Object3D>()
-                .FirstOrDefault(o => o.Name == root_point);
-            return point?.SectionId ?? throw new Exception($"Root point {root_point} not found!");
-        }
-
-        private static void ShowHelp(OptionSet p)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            Console.WriteLine("Version: {0}", informationalVersion?.InformationalVersion);
-            Console.WriteLine();
-            Console.WriteLine("Usage: {0} [OPTIONS]+", AppDomain.CurrentDomain.FriendlyName);
-            Console.WriteLine("Import and export DieselX .model files");
-            Console.WriteLine("If the program is called without any arguments,");
-            Console.WriteLine(" GUI mode is enabled by default");
-            Console.WriteLine("If the program is running in command-line mode, then");
-            Console.WriteLine(" the file commands will be run in sequence");
-            Console.WriteLine(" eg, --load=a.model --import=b.obj --root-point=Hips "
-                              + "--import-pattern-uv=b_pattern_uv.obj --save=c.model");
-            Console.WriteLine(" Will import a model called a.model, add an object, and save it as c.model");
-            Console.WriteLine(" Note you can process many models in one run of the program, which is faster");
-            Console.WriteLine(" than running the program once for each model");
-            Console.WriteLine();
-            Console.WriteLine("Options:");
-            p.WriteOptionDescriptions(Console.Out);
-        }
-
-        private enum CommandLineActions
-        {
-            SetNewObj,
-            SetRootPoint,
-            New,
-            Load,
-            Save,
-            Import,
-            ImportPatternUv,
-            Export,
-            SetDefaultExportType,
-            BatchExport,
-            Script,
-        }
-
-        private struct CommandLineEntry
-        {
-            internal readonly CommandLineActions type;
-            internal readonly string arg;
-
-            public CommandLineEntry(CommandLineActions type, string arg)
-            {
-                this.type = type;
-                this.arg = arg;
-            }
         }
     }
 
