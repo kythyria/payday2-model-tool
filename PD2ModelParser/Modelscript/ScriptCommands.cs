@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Xml.Linq;
 using S = PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Modelscript
@@ -153,6 +153,10 @@ namespace PD2ModelParser.Modelscript
         public void Execute(ScriptState state)
         {
             string path = state.ResolvePath(File);
+            if(!path.EndsWith(".obj"))
+            {
+                throw new Exception($"Using \"{0}\" for pattern UV import requires it be OBJ format");
+            }
             bool result = NewObjImporter.ImportNewObjPatternUV(state.Data, path);
             if (!result)
             {
@@ -244,6 +248,17 @@ namespace PD2ModelParser.Modelscript
         public void Execute(ScriptState state)
         {
             state.DefaultExportType = FileType;
+        }
+    }
+
+    public class RunScript : IScriptItem
+    {
+        public string File { get; set; }
+        public void Execute(ScriptState state)
+        {
+            string path = state.ResolvePath(File);
+            var script = Script.ParseXml(path);
+            state.ExecuteItems(script);
         }
     }
 }

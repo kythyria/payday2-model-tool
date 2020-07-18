@@ -8,6 +8,7 @@ namespace PD2ModelParser.Modelscript
 {
     public static class Script
     {
+
         public static FullModelData ExecuteItems(IEnumerable<IScriptItem> items, string workDir, FullModelData initialModel)
         {
             var state = new ScriptState
@@ -203,6 +204,14 @@ namespace PD2ModelParser.Modelscript
         public bool CreateNewObjects { get; set; }
         public Sections.Object3D DefaultRootPoint { get; set; }
         public ExportFileType DefaultExportType { get; set; }
+
+        public void ExecuteItems(IEnumerable<IScriptItem> items)
+        {
+            foreach (var i in items)
+            {
+                i.Execute(this);
+            }
+        }
     }
 
     public interface IScriptItem

@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Mono.Options;
+using PD2ModelParser.Modelscript;
 // Currently the FBX exporter is the only class in the namespace, the others are in the PD2ModelParser namespace
 #if !NO_FBX
 using PD2ModelParser.Exporters;
@@ -59,7 +60,7 @@ namespace PD2ModelParser
             OptionSet p = new OptionSet
             {
                 {
-                    "g|gui", "Enable the GUI",
+                    "g|gui", "Enable the GUI"
                     v => gui = v != null
                 },
                 {
@@ -82,6 +83,7 @@ namespace PD2ModelParser
                     v => actions.Add(new CommandLineEntry(CommandLineActions.SetNewObj, v))
                 },
                 {
+                    // Colon means an optional value
                     "r|root-point:", "Sets the default bone for new objects to be attached to",
                     v => actions.Add(new CommandLineEntry(CommandLineActions.SetRootPoint, v))
                 },
@@ -165,11 +167,13 @@ namespace PD2ModelParser
 
             ConsoleLogger.minimumLevel = (LoggerLevel) verbosity;
 
-            FullModelData data = null;
+            var state = new Modelscript.ScriptState()
+            {
+                WorkDir = System.IO.Directory.GetCurrentDirectory(),
+                DefaultExportType = Modelscript.ExportFileType.Gltf,
+                CreateNewObjects = false
+            };
 
-            bool new_obj = false;
-            string root_point = null;
-            Modelscript.ExportFileType exportType = Modelscript.ExportFileType.Gltf;
             int i = 0;
             foreach (CommandLineEntry entry in actions)
             {
@@ -180,7 +184,7 @@ namespace PD2ModelParser
                     && entry.type != CommandLineActions.Load
                     && entry.type != CommandLineActions.SetDefaultExportType
                     && entry.type != CommandLineActions.BatchExport
-                    && data == null)
+                    && state.Data == null)
                 {
                     Console.WriteLine("Action {0}:{1} is run before a model is created or loaded!",
                         i, entry.type);
@@ -190,124 +194,40 @@ namespace PD2ModelParser
                 switch (entry.type)
                 {
                     case CommandLineActions.SetNewObj:
-                        new_obj = entry.arg != null;
-                        Log.Default.Status("Setting new-objects to {0}", new_obj);
+                        Log.Default.Status("Setting new-objects to {0}", state.CreateNewObjects);
+                        new CreateNewObjects() { Create = entry.arg != null }.Execute(state);
                         break;
                     case CommandLineActions.SetRootPoint:
-                        root_point = entry.arg;
-                        Log.Default.Status("Setting root-point to {0}", root_point);
+                        Log.Default.Status("Setting root-point to {0}", entry.arg);
+                        new SetRootPoint() { Name = entry.arg }.Execute(state);
                         break;
                     case CommandLineActions.New:
                         Log.Default.Status("Creating a new model");
-                        data = new FullModelData();
+                        new NewModel().Execute(state);
                         break;
                     case CommandLineActions.Load:
                         Log.Default.Status("Loading .model {0}", entry.arg);
-                        data = ModelReader.Open(entry.arg);
+                        new LoadModel() { File = entry.arg }.Execute(state);
                         break;
                     case CommandLineActions.Save:
                         Log.Default.Status("Saving .model {0}", entry.arg);
-                        DieselExporter.ExportFile(data, entry.arg);
+                        new SaveModel() { File = entry.arg }.Execute(state);
                         break;
                     case CommandLineActions.Import:
                         Log.Default.Status("Importing file {0}", entry.arg);
-                        if (entry.arg.EndsWith(".obj"))
-                        {
-                            uint rpid = FindRootPoint(data, root_point);
-                            var root_object = data.parsed_sections[rpid] as Object3D;
-                            NewObjImporter.ImportNewObj(
-                                data,
-                                entry.arg,
-                                new_obj,
-                                obj => root_object,
-                                null
-                                );
-                        }
-                        else if (entry.arg.EndsWith(".fbx"))
-                        {
-#if NO_FBX
-                            Console.WriteLine("FBX support disabled");
-                            return false;
-#else
-                            var options = new FilmboxImporter.FbxImportOptions();
-                            FilmboxImporter.Import(data, entry.arg, new_obj, name => null, options);
-#endif
-                        }
-                        else if (entry.arg.EndsWith(".dae"))
-                        {
-                            Console.WriteLine(
-                                "Currently Collada imports are not yet supported (for {0})",
-                                entry.arg);
-                            return false;
-                        }
-                        else if (entry.arg.EndsWith(".gltf") || entry.arg.EndsWith(".glb"))
-                        {
-                            Importers.GltfImporter.Import(data, entry.arg, new_obj, obj => null, null);
-                        }
-                        else
-                        {
-                            Console.WriteLine(
-                                "Unknown or unsupported file extension for import for {0}",
-                                entry.arg);
-                            return false;
-                        }
-
+                        new Import() { File = entry.arg }.Execute(state);
                         break;
                     case CommandLineActions.ImportPatternUv:
                         Log.Default.Status("Importing pattern UV {0}", entry.arg);
-                        if (entry.arg.EndsWith(".obj"))
-                        {
-                            bool result = NewObjImporter.ImportNewObjPatternUV(
-                                data,
-                                entry.arg);
-                            if (!result)
-                            {
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine(
-                                "Only OBJ needs pattern imports (for {0})",
-                                entry.arg);
-                            return false;
-                        }
-
+                        new PatternUV() { File = entry.arg }.Execute(state);
                         break;
                     case CommandLineActions.Export:
                         Log.Default.Status("Exporting to {0}", entry.arg);
-                        if (entry.arg.EndsWith(".dae"))
-                        {
-                            ColladaExporter.ExportFile(data, entry.arg);
-                        }
-                        else if (entry.arg.EndsWith(".fbx"))
-                        {
-#if NO_FBX
-                            Console.WriteLine("FBX support disabled");
-                            return false;
-#else
-                            FbxExporter.ExportFile(data, entry.arg);
-#endif
-                        }
-                        else if (entry.arg.EndsWith(".obj"))
-                        {
-                            ObjWriter.ExportFile(data, entry.arg);
-                        }
-                        else if (entry.arg.EndsWith(".gltf") || entry.arg.EndsWith(".glb"))
-                        {
-                            Exporters.GltfExporter.ExportFile(data, entry.arg);
-                        }
-                        else
-                        {
-                            Console.WriteLine(
-                                "Unknown or unsupported file extension for export for \"{0}\"",
-                                entry.arg);
-                            return false;
-                        }
+                        new Export() { File = entry.arg }.Execute(state);
                         break;
                     case CommandLineActions.SetDefaultExportType:
                         if(Enum.TryParse<Modelscript.ExportFileType>(entry.arg, true, out var type)) {
-                            exportType = type;
+                            new SetDefaultType() { FileType = type }.Execute(state);
                         }
                         else
                         {
@@ -318,7 +238,7 @@ namespace PD2ModelParser
                         Log.Default.Status("Executing script {0}", entry.arg);
                         try
                         {
-                            ModelScript.Execute(data, entry.arg);
+                            new RunScript() { File = entry.arg }.Execute(state);
                         }
                         catch (Exception ex)
                         {
@@ -330,15 +250,7 @@ namespace PD2ModelParser
 
                     case CommandLineActions.BatchExport:
                         Log.Default.Status("Batch exporting from {0}", entry.arg);
-                        var state = new Modelscript.ScriptState()
-                        {
-                            WorkDir = System.IO.Directory.GetCurrentDirectory(),
-                            DefaultExportType = exportType
-                        };
-                        new Modelscript.BatchExport
-                        {
-                            Directory = entry.arg
-                        }.Execute(state);
+                        new BatchExport { Directory = entry.arg }.Execute(state);
                         break;
 
                     default:
@@ -364,8 +276,7 @@ namespace PD2ModelParser
                 return 0;
 
             var point = data.SectionsOfType<Object3D>()
-                .Where(o => o.Name == root_point)
-                .FirstOrDefault();
+                .FirstOrDefault(o => o.Name == root_point);
             return point?.SectionId ?? throw new Exception($"Root point {root_point} not found!");
         }
 
