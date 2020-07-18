@@ -51,7 +51,7 @@ namespace PD2ModelParser.UI
             if (scriptFile.Selected != null && showScriptChanges.Checked)
             {
                 // TODO display the errors in a less intrusive way
-                bool success = ModelScript.ExecuteHandled(data, scriptFile.Selected);
+                bool success = Modelscript.Script.ExecuteFileWithMsgBox(ref data, scriptFile.Selected);
                 if (!success)
                     return;
             }

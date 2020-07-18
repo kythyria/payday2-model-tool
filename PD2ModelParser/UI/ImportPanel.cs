@@ -53,7 +53,7 @@ namespace PD2ModelParser.UI
 
             if (scriptFile.Selected != null)
             {
-                bool success = ModelScript.ExecuteHandled(model, scriptFile.Selected);
+                bool success = Modelscript.Script.ExecuteFileWithMsgBox(ref model, scriptFile.Selected);
                 if (!success)
                     return;
             }
@@ -124,7 +124,7 @@ namespace PD2ModelParser.UI
                 string model_file = baseModelFileBrowser.Enabled ? baseModelFileBrowser.Selected : null;
                 FullModelData data = model_file != null ? ModelReader.Open(model_file) : new FullModelData();
                 // TODO display the errors in a less intrusive way
-                bool success = ModelScript.ExecuteHandled(data, scriptFile.Selected);
+                bool success = Modelscript.Script.ExecuteFileWithMsgBox(ref data, scriptFile.Selected);
                 if (!success)
                     return;
 

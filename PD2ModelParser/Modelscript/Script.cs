@@ -8,6 +8,23 @@ namespace PD2ModelParser.Modelscript
 {
     public static class Script
     {
+        public static bool ExecuteFileWithMsgBox(ref FullModelData data, string file)
+        {
+            try
+            {
+                XElement root = XElement.Parse(File.ReadAllText(file));
+                var script = ParseXml(root);
+                data = ExecuteItems(script, Directory.GetCurrentDirectory(), data);
+                return true;
+            }
+            catch (Exception exc)
+            {
+                Log.Default.Warn("Exception in script file: {0}", exc);
+                System.Windows.Forms.MessageBox.Show("There was an error in the script file:\n" +
+                                "(check the readme on GitLab for more information)\n" + exc.Message);
+                return false;
+            }
+        }
 
         public static FullModelData ExecuteItems(IEnumerable<IScriptItem> items, string workDir, FullModelData initialModel)
         {
