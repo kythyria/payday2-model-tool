@@ -71,7 +71,7 @@ namespace PD2ModelParser.Importers
 
         void ImportNode(GLTF.Node node, DM.Object3D parent)
         {
-            var hashname = GetName(node.Name);
+            var hashname = HashName.FromNumberOrString(node.Name);
 
             var obj = data.parsed_sections
                 .Select(i => i.Value as DM.Object3D)
@@ -145,7 +145,7 @@ namespace PD2ModelParser.Importers
 
             var mats = md.materials.Select(i =>
             {
-                var hn = GetName(i);
+                var hn = HashName.FromNumberOrString(i);
                 var mat = data.SectionsOfType<DM.Material>().FirstOrDefault(j => j.hashname.Hash == hn.Hash);
                 if (mat == null)
                 {
@@ -221,7 +221,7 @@ namespace PD2ModelParser.Importers
 
             var mats = md.materials.Select(i =>
             {
-                var hn = GetName(i);
+                var hn = HashName.FromNumberOrString(i);
                 var mat = data.SectionsOfType<DM.Material>().FirstOrDefault(j => j.hashname.Hash == hn.Hash);
                 if (mat == null)
                 {
@@ -259,18 +259,6 @@ namespace PD2ModelParser.Importers
             model.RenderAtoms = md.renderAtoms;
 
             return model;
-        }
-
-        HashName GetName(string input)
-        {
-            if (ulong.TryParse(input, out ulong hashnum))
-            {
-                return new HashName(hashnum);
-            }
-            else
-            {
-                return new HashName(input); 
-            }
         }
 
         public class MeshSections

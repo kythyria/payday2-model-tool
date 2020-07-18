@@ -419,6 +419,18 @@ namespace PD2ModelParser
             str = null;
             known = false;
         }
+
+        public static HashName FromNumberOrString(string input)
+        {
+            if (ulong.TryParse(input, out ulong hashnum))
+            {
+                return new HashName(hashnum);
+            }
+            else
+            {
+                return new HashName(input);
+            }
+        }
     }
 
     static class NullableUtil
