@@ -68,7 +68,7 @@ namespace PD2ModelParser.Sections
             this.SectionId = 0;
             this.size = 0;
 
-            this.HashName = new HashName(object_name);
+            this.HashName = HashName.FromNumberOrString(object_name);
             this.child_ids = new List<uint>();
             this.Transform = Matrix3D.Identity;
 
