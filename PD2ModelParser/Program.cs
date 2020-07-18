@@ -65,15 +65,18 @@ namespace PD2ModelParser
                 $"Version: {informationalVersion?.InformationalVersion}",
                 "",
                 $"Usage: {AppDomain.CurrentDomain.FriendlyName} [OPTIONS]+",
+                "",
                 "Import and export DieselX .model files",
-                "If the program is called without any arguments,",
-                " GUI mode is enabled by default",
-                "If the program is running in command-line mode, then",
-                " the file commands will be run in sequence",
-                " eg, --load=a.model --import=b.obj --root-point=Hips "
-                + "--import-pattern-uv=b_pattern_uv.obj --save=c.model",
-                " Will import a model called a.model, add an object, and save it as c.model",
-                " Note you can process many models in one run of the program, which is faster",
+                "",
+                "If the program is called without any arguments," +
+                " GUI mode is enabled by default.",
+                "If the program is running in command-line mode, then" +
+                " the file commands will be run in sequence, eg.,",
+                "--load=a.model --import=b.obj --root-point=Hips ",
+                "    --import-pattern-uv=b_pattern_uv.obj --save=c.model",
+                "Will import a model called a.model, add an object, and save it as c.model",
+                "",
+                "Note you can process many models in one run of the program, which is faster" +
                 " than running the program once for each model",
                 "",
                 "General options:",
