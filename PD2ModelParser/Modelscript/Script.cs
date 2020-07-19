@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Xml.Linq;
 
 namespace PD2ModelParser.Modelscript
@@ -83,6 +84,7 @@ namespace PD2ModelParser.Modelscript
                     case "export": yield return ParseXmlExport(element); break;
                     case "exporttype": yield return ParseXmlExportType(element); break;
                     case "batchexport": yield return ParseXmlBatchExport(element); break;
+                    case "object3d": yield return ParseXmlObject3d(element); break;
                 }
             }
         }
@@ -192,6 +194,78 @@ namespace PD2ModelParser.Modelscript
             return res;
         }
 
+        private static IScriptItem ParseXmlObject3d(XElement elem)
+        {
+            var name = RequiredAttr(elem, "name");
+            var mode = RequiredAttr(elem, "mode");
+
+            var pos = new Vector3?();
+            var scale = new Vector3?();
+            var rot = new Quaternion?();
+
+            var setParent = false;
+            string parent = null;
+            foreach(var child in elem.Elements())
+            {
+                switch(child.Name.ToString())
+                {
+                    case "position":
+                        pos = VectorElement(child);
+                        break;
+                    case "rotation":
+                        rot = QuaternionElement(child);
+                        break;
+                    case "scale":
+                        scale = VectorElement(child);
+                        break;
+                    case "parent":
+                        var root = child.Attribute("root")?.Value;
+                        var parentname = child.Attribute("name")?.Value;
+                        if (root != null && root != "true")
+                            throw new Exception("parent/@root must be missing or \"true\"");
+                        else if (root != null && parentname != null)
+                            throw new Exception("parent must have either root or name attributes, not both");
+                        else
+                            parent = parentname;
+                        setParent = true;
+                        break;
+                    default:
+                        throw new Exception($"Invalid Object3D child element {elem.Name.ToString()}");
+                }
+            }
+
+            if(mode == "add")
+            {
+                if (!setParent)
+                    throw new Exception("Newly created objects must have their parents explicitly given");
+                var result = new CreateObject3d()
+                {
+                    Name = name,
+                    Parent = parent
+                };
+                pos.WithValue(p => result.Position = p);
+                scale.WithValue(s => result.Scale = s);
+                rot.WithValue(r => result.Rotation = r);
+                return result;
+            }
+            else if(mode == "edit")
+            {
+                return new ModifyObject3d
+                {
+                    Name = name,
+                    Parent = parent,
+                    SetParent = setParent,
+                    Position = pos,
+                    Rotation = rot,
+                    Scale = scale
+                };
+            }
+            else
+            {
+                throw new Exception($"Object3D mode must be \"edit\" or \"add\".");
+            }
+        }
+
         private static string RequiredAttr(XElement elem, string attr)
         {
             return elem.Attribute(attr)?.Value ??
@@ -210,6 +284,35 @@ namespace PD2ModelParser.Modelscript
             {
                 return result;
             }
+        }
+
+        private static float RequiredFloat(XElement elem, string attr)
+        {
+            var str = RequiredAttr(elem, attr);
+            if(!float.TryParse(str, out var result))
+            {
+                throw new Exception($"Invalid value '{str}' for {attr}: "
+                    + "must be a valid float according to System.Float.TryParse");
+            }
+            else
+            {
+                return result;
+            }
+        }
+
+        private static Vector3 VectorElement(XElement elem)
+        {
+            var X = RequiredFloat(elem, "x");
+            var Y = RequiredFloat(elem, "y");
+            var Z = RequiredFloat(elem, "z");
+            return new Vector3(X, Y, Z);
+        }
+
+        private static Quaternion QuaternionElement(XElement elem)
+        {
+            var vec = VectorElement(elem);
+            var W = RequiredFloat(elem, "w");
+            return new Quaternion(vec, W);
         }
     }
 

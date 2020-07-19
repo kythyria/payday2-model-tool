@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Numerics;
 using System.Xml.Linq;
 using S = PD2ModelParser.Sections;
 
@@ -286,6 +288,94 @@ namespace PD2ModelParser.Modelscript
             var script = Script.ParseXml(path);
             state.ExecuteItems(script);
             state.Log.Status($"Finished running {File}");
+        }
+    }
+
+    public class CreateObject3d : IScriptItem
+    {
+        public string Name { get; set; }
+        public string Parent { get; set; }
+        public Vector3 Position { get; set; } = new Vector3(0, 0, 0);
+        public Quaternion Rotation { get; set; } = new Quaternion(0, 0, 0, 1);
+        public Vector3 Scale { get; set; } = new Vector3(1, 1, 1);
+
+        public void Execute(ScriptState state)
+        {
+            state.Log.Status($"Creating object {Name}");
+            var extant = state.Data.SectionsOfType<S.Object3D>()
+                .Where(i => i.Name == Name)
+                .FirstOrDefault();
+            if(extant != null)
+            {
+                throw new Exception($"Cannot create object {Name}: Already exists.");
+            }
+
+            S.Object3D parent = null;
+            if (Parent != null)
+            {
+                parent = state.Data.SectionsOfType<S.Object3D>()
+                    .Where(i => i.Name == Parent)
+                    .FirstOrDefault();
+                if (parent == null)
+                {
+                    throw new Exception($"Cannot find Object3D named \"{Parent}\" to use as a parent for {Name}");
+                }
+            }
+
+            var obj = new S.Object3D(Name, parent);
+            var tf = Matrix4x4.CreateScale(Scale) * Matrix4x4.CreateFromQuaternion(Rotation);
+            tf.Translation = Position;
+            obj.Transform = tf.ToNexusMatrix();
+        }
+    }
+
+    public class ModifyObject3d : IScriptItem
+    {
+        public string Name { get; set; }
+        public bool SetParent { get; set; }
+        public string Parent { get; set; }
+        public Vector3? Position { get; set; }
+        public Quaternion? Rotation { get; set; }
+        public Vector3? Scale { get; set; }
+
+        public void Execute(ScriptState state)
+        {
+            state.Log.Status($"Modifying object {Name}");
+            var extant = state.Data.SectionsOfType<S.Object3D>()
+                .Where(i => i.Name == Name)
+                .FirstOrDefault();
+            if (extant == null)
+            {
+                throw new Exception($"Cannot modify object {Name} Does not exist.");
+            }
+
+            if (SetParent && Parent != null)
+            {
+                var parent = state.Data.SectionsOfType<S.Object3D>()
+                    .Where(i => i.Name == Parent)
+                    .FirstOrDefault();
+                if (parent == null)
+                {
+                    throw new Exception($"Cannot find Object3D named \"{Parent}\" to use as a parent for {Name}");
+                }
+                extant.SetParent(parent);
+            }
+            else if (SetParent)
+            {
+                extant.SetParent(null);
+            }
+
+            var tf = extant.Transform;
+            if (Rotation.HasValue || Scale.HasValue)
+            {
+                tf.Decompose(out var scale, out var rotation, out var translation);
+                Rotation.WithValue(r => rotation = r.ToNexusQuaternion());
+                Scale.WithValue(s => scale = s.ToNexusVector());
+                tf = Nexus.Matrix3D.CreateScale(scale) * Nexus.Matrix3D.CreateFromQuaternion(rotation);
+            }
+            Position.WithValue(p => tf.Translation = p.ToNexusVector());
+
+            extant.Transform = tf;
         }
     }
 }
