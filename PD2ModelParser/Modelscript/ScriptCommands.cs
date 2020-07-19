@@ -83,6 +83,7 @@ namespace PD2ModelParser.Modelscript
         public string DefaultRootPoint { get; set; }
         public Dictionary<string, string> Parents { get; set; } = new Dictionary<string, string>();
         public Dictionary<string, string> ImporterOptions { get; set; } = new Dictionary<string, string>();
+        public bool? CreateNewObjects { get; set; }
 
         public void Execute(ScriptState state)
         {
@@ -166,7 +167,11 @@ namespace PD2ModelParser.Modelscript
                 opts.AddOption(kv.Key, kv.Value);
             }
 
-            importer(state.Data, filepath, state.CreateNewObjects, ParentFinder, opts);
+            bool createObjects = CreateNewObjects ?? state.CreateNewObjects;
+            if(effectiveType == ImportFileType.Fbx && createObjects)
+                throw new Exception("Creating objects is not yet supported for FBX");
+
+            importer(state.Data, filepath, createObjects, ParentFinder, opts);
         }
     }
 

@@ -102,7 +102,17 @@ namespace PD2ModelParser.Modelscript
             else if (strType.ToLower() == "glb") { item.ForceType = ImportFileType.Gltf; }
             else { item.ForceType = null; }
 
-            foreach(var child in element.Elements())
+            var strCreateObjects = element.Attribute("create_objects")?.Value;
+            if(strCreateObjects != null && bool.TryParse(strCreateObjects, out var createObjects))
+            {
+                item.CreateNewObjects = createObjects;
+            }
+            else if(strCreateObjects != null)
+            {
+                throw new Exception($"create_objects must be boolean, \"{bool.TrueString}\" or \"{bool.FalseString}\"");
+            }
+
+            foreach (var child in element.Elements())
             {
                 switch(child.Name.ToString())
                 {
