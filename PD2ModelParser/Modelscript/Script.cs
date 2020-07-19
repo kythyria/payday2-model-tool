@@ -221,8 +221,7 @@ namespace PD2ModelParser.Modelscript
                     case "parent":
                         var root = child.Attribute("root")?.Value;
                         var parentname = child.Attribute("name")?.Value;
-                        if (root != null && root != "true")
-                            throw new Exception("parent/@root must be missing or \"true\"");
+                        if (root != null) { }
                         else if (root != null && parentname != null)
                             throw new Exception("parent must have either root or name attributes, not both");
                         else
@@ -230,7 +229,7 @@ namespace PD2ModelParser.Modelscript
                         setParent = true;
                         break;
                     default:
-                        throw new Exception($"Invalid Object3D child element {elem.Name.ToString()}");
+                        throw new Exception($"Invalid Object3D child element {elem.Name}");
                 }
             }
 
