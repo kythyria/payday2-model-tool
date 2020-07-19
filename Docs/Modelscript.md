@@ -225,3 +225,57 @@ end of the file, all the previous references to it will cause errors.
 
 This also means that if you want to move or reparent objects in an OBJ file, you must do that
 after the import tag, as the objects don't exist before that.
+
+# Element reference
+Most of these exist to reflect command-line arguments or the GUI, but here they are.
+
+## `<createnew create="bool"/>`
+Control the default setting of `import/@create_objects`. Has one attribute `create` which must
+be either `true` or `false`.
+
+## `<rootpoint/>`
+Set or clear the default rootpoint. `<rootpoint name="foo"/>` is equivalent to putting
+```xml
+<rootpoint name="foo">
+    <default/>
+</rootpoint>
+```
+in subsequent `<import>` elements. Omitting `name` cancels this behaviour.
+
+## `<new/>`
+Creates a blank model. 
+
+## `<load file="whatever.model/>`
+Load a Diesel model file, replacing what was already loaded.
+
+## `<save file="whatever.model"/>`
+Write the current model to a file.
+
+## `<import>`
+Import a model. `file` specifies the name, optionally `type` overrides the type (it will be
+guessed from the filename otherwise). Can contain `<rootpoint>` and `<option/>`. `create_objects`
+if set to false causes the import to fail if a new Object3D/Model/etc has to be created.
+
+The latter gives the `name` of an option, and the value as the element content. The meaning of
+these options is format-specific.
+
+`<rootpoint name="str"/>` gives the name of an object that must exist in the model being imported
+into, and its children indicate what should be parented to that object: `<object name="foo"/>`
+parents the newly-imported object `foo`, and `<default/>` sucks up everything that isn't otherise
+specified.
+
+## `<object3d name="name" mode="add|edit">`
+Create an Object3D (GLTF calls this a Node, Blender calls it an Empty), edit one, oredit a subclass
+thereof (meshes, lamps, collision shapes). `name` specifies what to create/modify. Modifications are
+given as one of a few elements:
+```xml
+<position x="0" y="0" z="0" />
+<rotation x="0" y="0" z="0" w="1" />
+<scale x="0" y="0" z="0" />
+<parent root="true" />
+<parent name="whatever" />
+```
+Which respectively set the position, rotation, or scale, clear the object's parent entirely, or set it
+to the object named "whatever".
+
+
