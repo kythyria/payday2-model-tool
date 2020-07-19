@@ -9,11 +9,12 @@ namespace PD2ModelParser
 {
     public abstract class FileTypeInfo
     {
-        public abstract Modelscript.ExportFileType ExportType { get; }
+        public abstract string Extension { get; }
         public abstract bool CanExport { get; }
         public abstract bool CanImport { get; }
         public abstract string Export(FullModelData data, string path);
         public virtual IOptionReceiver CreateOptionReceiver() => new GenericOptionReceiver();
+        public override string ToString() => Extension.ToUpper();
 
         public static bool TryGetByExtension(string extension, out FileTypeInfo result)
         {
@@ -31,14 +32,13 @@ namespace PD2ModelParser
 
         class FbxType : FileTypeInfo
         {
-
+            public override string Extension => "fbx";
 #if !NO_FBX
             public override bool CanExport => true;
             public override bool CanImport => true;
             public override string Export(FullModelData data, string path) => Exporters.FbxExporter.ExportFile(data, path);
             public override IOptionReceiver CreateOptionReceiver() => new FilmboxImporter.FbxImportOptions();
 #else
-            public override Modelscript.ExportFileType ExportType => Modelscript.ExportFileType.Fbx;
             public override bool CanExport => false;
             public override bool CanImport => false;
             public override string Export(FullModelData data, string path) => throw new NotSupportedException("Model tool was built without FBX support");
@@ -49,7 +49,7 @@ namespace PD2ModelParser
 
         class ObjType : FileTypeInfo
         {
-            public override Modelscript.ExportFileType ExportType => Modelscript.ExportFileType.Obj;
+            public override string Extension => "obj";
             public override bool CanExport => true;
             public override bool CanImport => true;
             public override string Export(FullModelData data, string path) => ObjWriter.ExportFile(data, path);
@@ -58,7 +58,7 @@ namespace PD2ModelParser
 
         class DaeType : FileTypeInfo
         {
-            public override Modelscript.ExportFileType ExportType => Modelscript.ExportFileType.Dae;
+            public override string Extension => "dae";
             public override bool CanExport => true;
             public override bool CanImport => false;
             public override string Export(FullModelData data, string path) => ColladaExporter.ExportFile(data, path);
@@ -67,7 +67,7 @@ namespace PD2ModelParser
 
         class GltfType : FileTypeInfo
         {
-            public override Modelscript.ExportFileType ExportType => Modelscript.ExportFileType.Gltf;
+            public override string Extension => "gltf";
             public override bool CanExport => true;
             public override bool CanImport => true;
             public override string Export(FullModelData data, string path) => Exporters.GltfExporter.ExportFile(data, path);

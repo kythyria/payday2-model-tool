@@ -180,7 +180,17 @@ namespace PD2ModelParser.Modelscript
         private static IScriptItem ParseXmlExport(XElement elem)
         {
             var file = RequiredAttr(elem, "file");
-            return new Export() { File = file };
+            var ext = elem.Attribute("type")?.Value;
+            var item = new Export() { File = file };
+            if(FileTypeInfo.TryGetByExtension(ext, out var type))
+            {
+                item.ForceType = type;
+            }
+            else if(ext != null)
+            {
+                throw new Exception($"Invalid value {type} for type: Unrecognised format.");
+            }
+            return item;
         }
 
         private static IScriptItem ParseXmlExportType(XElement elem)
@@ -188,7 +198,7 @@ namespace PD2ModelParser.Modelscript
             var type = RequiredAttr(elem, "type");
             if (FileTypeInfo.TryGetByExtension(type, out var fti))
             {
-                return new SetDefaultType() { FileType = fti.ExportType };
+                return new SetDefaultType() { FileType = fti };
             }
             throw new Exception($"Invalid value {type} for type: Unrecognised format.");
         }
@@ -199,7 +209,7 @@ namespace PD2ModelParser.Modelscript
             var res = new BatchExport() { Directory = dir };
             var typeish = elem.Attribute("type")?.Value;
             if (typeish != null && FileTypeInfo.TryGetByExtension(typeish, out var fti)) {
-                res.FileType = fti.ExportType;
+                res.FileType = fti;
             }
             return res;
         }
@@ -332,7 +342,7 @@ namespace PD2ModelParser.Modelscript
         public string ResolvePath(string path) => System.IO.Path.Combine(WorkDir, path);
         public bool CreateNewObjects { get; set; }
         public Sections.Object3D DefaultRootPoint { get; set; }
-        public ExportFileType DefaultExportType { get; set; }
+        public FileTypeInfo DefaultExportType { get; set; } = FileTypeInfo.Gltf;
 
         public void ExecuteItems(IEnumerable<IScriptItem> items)
         {

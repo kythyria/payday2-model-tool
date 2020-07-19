@@ -194,60 +194,28 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public enum ExportFileType
-    {
-        Obj,
-        Fbx,
-        Gltf,
-        Dae
-    }
-
     public class Export : IScriptItem
     {
         public string File { get; set; }
-        public ExportFileType? ForceType { get; set; }
+        public FileTypeInfo ForceType { get; set; }
         public void Execute(ScriptState state)
         {
             state.Log.Status($"Exporting to {File}");
             string path = state.ResolvePath(File);
-            ExportFileType effectiveType;
-            if(ForceType.HasValue)
-            {
-                effectiveType = ForceType.Value;
-            }
-            else
+            FileTypeInfo fti = ForceType;
+            if(ForceType != null)
             {
                 var ext = System.IO.Path.GetExtension(path);
-                switch (ext)
+                if(!FileTypeInfo.TryGetByExtension(ext, out fti))
                 {
-                    case ".fbx": effectiveType = ExportFileType.Fbx; break;
-                    case ".obj": effectiveType = ExportFileType.Obj; break;
-                    case ".gltf":
-                    case ".glb":
-                        effectiveType = ExportFileType.Gltf; break;
-                    case ".dae": effectiveType = ExportFileType.Dae; break;
-                    default:
-                        throw new Exception($"Unrecognised file extension \"{ext}\". Use a conventional extension or specify the type explicitly.");
+                    throw new Exception($"Unrecognised file extension \"{ext}\". Use a conventional extension or specify the type explicitly.");
                 }
             }
 
-#if NO_FBX
-            if (effectiveType == ExportFileType.Fbx)
+            if (fti == FileTypeInfo.Fbx && !fti.CanExport)
                 throw new Exception("FBX support was not enabled at compile time");
-#endif
 
-            Func<FullModelData, string, string> exporter;
-            switch(effectiveType)
-            {
-                case ExportFileType.Dae: exporter = ColladaExporter.ExportFile; break;
-#if !NO_FBX
-                case ExportFileType.Fbx: exporter = Exporters.FbxExporter.ExportFile; break;
-#endif
-                case ExportFileType.Gltf: exporter = Exporters.GltfExporter.ExportFile; break;
-                case ExportFileType.Obj: exporter = ObjWriter.ExportFile; break;
-                default:
-                    throw new Exception($"BUG: No exporter for {effectiveType}");
-            }
+            Func<FullModelData, string, string> exporter = fti.Export;
 
             exporter(state.Data, path);
         }
@@ -255,7 +223,7 @@ namespace PD2ModelParser.Modelscript
 
     public class BatchExport : IScriptItem
     {
-        public ExportFileType? FileType { get; set; }
+        public FileTypeInfo FileType { get; set; }
         public string Directory { get; set; }
 
         public void Execute(ScriptState state)
@@ -267,7 +235,8 @@ namespace PD2ModelParser.Modelscript
                 new Export
                 {
                     // TODO: Better extension handling
-                    File = System.IO.Path.ChangeExtension(path, actualType.ToString().ToLower())
+                    File = System.IO.Path.ChangeExtension(path, actualType.Extension),
+                    ForceType = actualType
                 }.Execute(state);
             }
         }
@@ -275,7 +244,7 @@ namespace PD2ModelParser.Modelscript
 
     public class SetDefaultType : IScriptItem
     {
-        public ExportFileType FileType { get; set; }
+        public FileTypeInfo FileType { get; set; }
         public void Execute(ScriptState state)
         {
             state.Log.Status($"Default batch export type is {FileType}");

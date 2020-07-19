@@ -141,8 +141,9 @@ namespace PD2ModelParser
                 {
                     "export-type=", "Sets the type for mass exports",
                     v => {
-                        if(Enum.TryParse<Modelscript.ExportFileType>(v, true, out var type)) {
-                            script.Add(new SetDefaultType() { FileType = type });
+                        if(FileTypeInfo.TryGetByExtension(v, out var type))
+                        {
+                            script.Add(new SetDefaultType() {FileType = type});
                         }
                         else
                         {
@@ -201,7 +202,6 @@ namespace PD2ModelParser
             var state = new Modelscript.ScriptState()
             {
                 WorkDir = System.IO.Directory.GetCurrentDirectory(),
-                DefaultExportType = Modelscript.ExportFileType.Gltf,
                 CreateNewObjects = false,
                 Data = new FullModelData()
             };
