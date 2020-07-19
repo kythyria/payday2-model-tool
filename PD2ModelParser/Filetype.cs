@@ -13,6 +13,7 @@ namespace PD2ModelParser
         public abstract bool CanExport { get; }
         public abstract bool CanImport { get; }
         public abstract string Export(FullModelData data, string path);
+        public abstract void Import(FullModelData data, string path, bool createModels, Func<string, Sections.Object3D> parentFinder, IOptionReceiver options);
         public virtual IOptionReceiver CreateOptionReceiver() => new GenericOptionReceiver();
         public override string ToString() => Extension.ToUpper();
 
@@ -37,10 +38,14 @@ namespace PD2ModelParser
             public override bool CanExport => true;
             public override bool CanImport => true;
             public override string Export(FullModelData data, string path) => Exporters.FbxExporter.ExportFile(data, path);
+            public override void Import(FullModelData data, string path, bool createModels, Func<string, Sections.Object3D> parentFinder, IOptionReceiver options)
+                => FilmboxImporter.Import(data, path, createModels, parentFidner, options);
             public override IOptionReceiver CreateOptionReceiver() => new FilmboxImporter.FbxImportOptions();
 #else
             public override bool CanExport => false;
             public override bool CanImport => false;
+            public override void Import(FullModelData data, string path, bool createModels, Func<string, Sections.Object3D> parentFinder, IOptionReceiver options)
+                => throw new NotSupportedException("Model tool was built without FBX support");
             public override string Export(FullModelData data, string path) => throw new NotSupportedException("Model tool was built without FBX support");
             public override IOptionReceiver CreateOptionReceiver() => throw new NotSupportedException("Model tool was built without FBX support");
 #endif
@@ -52,6 +57,8 @@ namespace PD2ModelParser
             public override string Extension => "obj";
             public override bool CanExport => true;
             public override bool CanImport => true;
+            public override void Import(FullModelData data, string path, bool createModels, Func<string, Sections.Object3D> parentFinder, IOptionReceiver options)
+                => NewObjImporter.ImportNewObj(data, path, createModels, parentFinder, options);
             public override string Export(FullModelData data, string path) => ObjWriter.ExportFile(data, path);
         }
         public static FileTypeInfo Obj = new ObjType();
@@ -61,6 +68,8 @@ namespace PD2ModelParser
             public override string Extension => "dae";
             public override bool CanExport => true;
             public override bool CanImport => false;
+            public override void Import(FullModelData data, string path, bool createModels, Func<string, Sections.Object3D> parentFinder, IOptionReceiver options)
+                => throw new Exception("Importing DAE files is not supported.");
             public override string Export(FullModelData data, string path) => ColladaExporter.ExportFile(data, path);
         }
         public static FileTypeInfo Dae = new DaeType();
@@ -70,6 +79,8 @@ namespace PD2ModelParser
             public override string Extension => "gltf";
             public override bool CanExport => true;
             public override bool CanImport => true;
+            public override void Import(FullModelData data, string path, bool createModels, Func<string, Sections.Object3D> parentFinder, IOptionReceiver options)
+                => GltfImporter.Import(data, path, createModels, parentFinder, options);
             public override string Export(FullModelData data, string path) => Exporters.GltfExporter.ExportFile(data, path);
         }
         public static FileTypeInfo Gltf = new GltfType();

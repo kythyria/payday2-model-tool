@@ -3,21 +3,10 @@
 using PD2ModelParser.Misc;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Mono.Options;
 using PD2ModelParser.Modelscript;
-// Currently the FBX exporter is the only class in the namespace, the others are in the PD2ModelParser namespace
-#if !NO_FBX
-using PD2ModelParser.Exporters;
-using PD2ModelParser.Importers;
-#endif
-using PD2ModelParser.Sections;
 
 namespace PD2ModelParser
 {

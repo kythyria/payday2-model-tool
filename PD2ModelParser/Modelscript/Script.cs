@@ -96,10 +96,9 @@ namespace PD2ModelParser.Modelscript
             item.File = RequiredAttr(element, "file");
 
             var strType = element.Attribute("type")?.Value;
-            if(Enum.TryParse<ImportFileType>(strType, true, out var type)) {
+            if(FileTypeInfo.TryGetByExtension(strType, out var type)) {
                 item.ForceType = type;
             }
-            else if (strType.ToLower() == "glb") { item.ForceType = ImportFileType.Gltf; }
             else { item.ForceType = null; }
 
             var strCreateObjects = element.Attribute("create_objects")?.Value;

@@ -69,17 +69,10 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public enum ImportFileType
-    {
-        Obj,
-        Fbx,
-        Gltf
-    }
-
     public class Import : IScriptItem, IReadsFile
     {
         public string File { get; set; }
-        public ImportFileType? ForceType { get; set; }
+        public FileTypeInfo ForceType { get; set; }
         public string DefaultRootPoint { get; set; }
         public Dictionary<string, string> Parents { get; set; } = new Dictionary<string, string>();
         public Dictionary<string, string> ImporterOptions { get; set; } = new Dictionary<string, string>();
@@ -89,30 +82,27 @@ namespace PD2ModelParser.Modelscript
         {
             state.Log.Status($"Importing from {File}");
             var filepath = state.ResolvePath(File);
-            ImportFileType effectiveType;
-            if(ForceType.HasValue)
+            FileTypeInfo effectiveType = null;
+            if(ForceType != null)
             {
-                effectiveType = ForceType.Value;
+                effectiveType = ForceType;
             }
             else
             {
                 var ext = System.IO.Path.GetExtension(filepath);
-                switch(ext)
+                if(!FileTypeInfo.TryGetByExtension(ext, out effectiveType))
                 {
-                    case ".fbx": effectiveType = ImportFileType.Fbx; break;
-                    case ".obj": effectiveType = ImportFileType.Obj; break;
-                    case ".gltf":
-                    case ".glb":
-                        effectiveType = ImportFileType.Gltf; break;
-                    default:
-                        throw new Exception($"Unrecognised file extension \"{ext}\". Use a conventional extension or specify the type explicitly.");
+                    throw new Exception($"Unrecognised file extension \"{ext}\". Use a conventional extension or specify the type explicitly.");
                 }
             }
 
-#if NO_FBX
-            if(effectiveType == ImportFileType.Fbx)
-                throw new Exception("FBX support was not enabled at compile time");
-#endif
+            if (!effectiveType.CanImport)
+            {
+                if (effectiveType == FileTypeInfo.Fbx)
+                    throw new Exception("FBX support was not enabled at compile time");
+                else
+                    throw new Exception($"No import support for {effectiveType}");
+            }
 
             var parentObjects = new Dictionary<string, S.Object3D>();
             foreach(var kv in Parents)
@@ -132,7 +122,7 @@ namespace PD2ModelParser.Modelscript
             {
                 defaultRootObject = state.DefaultRootPoint;
             }
-            var throwOnNoParent = effectiveType == ImportFileType.Obj;
+            var throwOnNoParent = effectiveType == FileTypeInfo.Obj;
 
             S.Object3D ParentFinder(string name)
             {
@@ -144,34 +134,18 @@ namespace PD2ModelParser.Modelscript
                 return defaultRootObject;
             }
 
-            Action<FullModelData, string, bool, Func<string, S.Object3D>, Importers.IOptionReceiver> importer;
-            switch (effectiveType)
-            {
-                case ImportFileType.Obj:
-                    importer = NewObjImporter.ImportNewObj;
-                    break;
-#if !NO_FBX
-                case ImportFileType.Fbx: importer = Importers.FilmboxImporter.Import; break;
-#endif
-                case ImportFileType.Gltf: importer = Importers.GltfImporter.Import; break;
-                default:
-                    throw new Exception($"BUG: No importer for {effectiveType}");
-            }
+            Importers.IOptionReceiver opts = effectiveType.CreateOptionReceiver();
 
-            Importers.IOptionReceiver opts = new Importers.GenericOptionReceiver();
-#if !NO_FBX
-            opts = new Importers.FilmboxImporter.FbxImportOptions()
-#endif
             foreach(var kv in ImporterOptions)
             {
                 opts.AddOption(kv.Key, kv.Value);
             }
 
             bool createObjects = CreateNewObjects ?? state.CreateNewObjects;
-            if(effectiveType == ImportFileType.Fbx && createObjects)
+            if(effectiveType == FileTypeInfo.Fbx && createObjects)
                 throw new Exception("Creating objects is not yet supported for FBX");
 
-            importer(state.Data, filepath, createObjects, ParentFinder, opts);
+            effectiveType.Import(state.Data, filepath, createObjects, ParentFinder, opts);
         }
     }
 
@@ -215,9 +189,7 @@ namespace PD2ModelParser.Modelscript
             if (fti == FileTypeInfo.Fbx && !fti.CanExport)
                 throw new Exception("FBX support was not enabled at compile time");
 
-            Func<FullModelData, string, string> exporter = fti.Export;
-
-            exporter(state.Data, path);
+            fti.Export(state.Data, path);
         }
     }
 
