@@ -42,21 +42,26 @@ namespace PD2ModelParser.UI
         /// </remarks>
         private void Reload()
         {
-            // Load in the model file, if selected
-            FullModelData data = modelFile.Selected != null
-                ? ModelReader.Open(modelFile.Selected)
-                : new FullModelData();
-
-            // Apply the script, if selected and enabled
-            if (scriptFile.Selected != null && showScriptChanges.Checked)
+            FullModelData data = null;
+            var script = new List<Modelscript.IScriptItem>();
+            if(modelFile.Selected != null)
             {
-                // TODO display the errors in a less intrusive way
-                bool success = Modelscript.Script.ExecuteFileWithMsgBox(ref data, scriptFile.Selected);
-                if (!success)
-                    return;
+                script.Add(new Modelscript.LoadModel() { File = modelFile.Selected });
+            }
+            else
+            {
+                script.Add(new Modelscript.NewModel());
             }
 
-            var sb = data.SectionsOfType<SkinBones>().ToList();
+            if(scriptFile.Selected != null && showScriptChanges.Checked)
+            {
+                script.Add(new Modelscript.RunScript() { File = scriptFile.Selected });
+            }
+
+            // TODO: There must be a better way to deal with errors.
+            bool success = Modelscript.Script.ExecuteWithMsgBox(script, ref data);
+            if (!success)
+                return;
 
             var rootinspector = new Inspector.ModelRootNode(data);
             ReconcileChildNodes(rootinspector, treeView.Nodes);
@@ -101,8 +106,6 @@ namespace PD2ModelParser.UI
         {
             var obj = menuTarget.Tag;
 
-            // TODO actually show some useful information
-            //MessageBox.Show(obj.Name);
             propertyGrid1.SelectedObject = obj;
         }
 

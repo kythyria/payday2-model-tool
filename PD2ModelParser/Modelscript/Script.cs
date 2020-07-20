@@ -27,6 +27,22 @@ namespace PD2ModelParser.Modelscript
             }
         }
 
+        public static bool ExecuteWithMsgBox(IEnumerable<IScriptItem> items, ref FullModelData initialModel)
+        {
+            try
+            {
+                initialModel = ExecuteItems(items, Directory.GetCurrentDirectory(), initialModel);
+                return true;
+            }
+            catch (Exception exc)
+            {
+                Log.Default.Warn("Exception in script file: {0}", exc);
+                System.Windows.Forms.MessageBox.Show("There was an error in the script file:\n" +
+                                "(check the readme on GitLab for more information)\n" + exc.Message);
+                return false;
+            }
+        }
+
         public static FullModelData ExecuteItems(IEnumerable<IScriptItem> items, string workDir, FullModelData initialModel)
         {
             var state = new ScriptState
@@ -337,8 +353,8 @@ namespace PD2ModelParser.Modelscript
     public class ScriptState
     {
         public FullModelData Data { get; set; }
-        public string WorkDir { get; set; }
-        public string ResolvePath(string path) => System.IO.Path.Combine(WorkDir, path);
+        public string WorkDir { get; set; } = Directory.GetCurrentDirectory();
+        public string ResolvePath(string path) => Path.Combine(WorkDir, path);
         public bool CreateNewObjects { get; set; }
         public Sections.Object3D DefaultRootPoint { get; set; }
         public FileTypeInfo DefaultExportType { get; set; } = FileTypeInfo.Gltf;
