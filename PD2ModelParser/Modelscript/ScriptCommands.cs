@@ -90,7 +90,7 @@ namespace PD2ModelParser.Modelscript
             else
             {
                 var ext = System.IO.Path.GetExtension(filepath);
-                if(!FileTypeInfo.TryGetByExtension(ext, out effectiveType))
+                if(!FileTypeInfo.TryParseName(ext, out effectiveType))
                 {
                     throw new Exception($"Unrecognised file extension \"{ext}\". Use a conventional extension or specify the type explicitly.");
                 }
@@ -180,7 +180,7 @@ namespace PD2ModelParser.Modelscript
             if(ForceType != null)
             {
                 var ext = System.IO.Path.GetExtension(path);
-                if(!FileTypeInfo.TryGetByExtension(ext, out fti))
+                if(!FileTypeInfo.TryParseName(ext, out fti))
                 {
                     throw new Exception($"Unrecognised file extension \"{ext}\". Use a conventional extension or specify the type explicitly.");
                 }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using PD2ModelParser.Modelscript;
 
 namespace PD2ModelParser.UI
 {
@@ -18,9 +19,18 @@ namespace PD2ModelParser.UI
         {
             InitializeComponent();
 
+            formatBox.BeginUpdate();
+
+            // Fill in the actual list of exporters
+            formatBox.Items.Clear();
+            formatBox.Items.AddRange(FileTypeInfo.Types.Where(i => i.CanExport).ToArray());
+            formatBox.DisplayMember = nameof(FileTypeInfo.FormatName);
             // Select the default item, since for whatever reason we can't
             // do that in the designer.
             formatBox.SelectedIndex = 0;
+
+            formatBox.EndUpdate();
+
         }
 
         private void inputFileBox_FileSelected(object sender, EventArgs e)
@@ -35,43 +45,25 @@ namespace PD2ModelParser.UI
 
         private void exportBttn_Click(object sender, EventArgs e)
         {
+            var script = new List<IScriptItem>();
+
+            script.Add(new LoadModel() { File = inputFileBox.Selected });
             model = ModelReader.Open(inputFileBox.Selected);
 
-            string format = (string)formatBox.SelectedItem;
+            var exportCmd = new Export();
 
-            string result;
-            if (format.Contains(".obj"))
+            var type = formatBox.SelectedItem as FileTypeInfo;
+            if(type == null)
             {
-                result = ObjWriter.ExportFile(model, inputFileBox.Selected);
-            }
-            else if (format.Contains(".dae"))
-            {
-                result = ColladaExporter.ExportFile(model, inputFileBox.Selected);
-            }
-            else if (format.Contains(".fbx"))
-            {
-#if NO_FBX
-                MessageBox.Show("This copy of the model tool was compiled without the FBX SDK", "FBX Export Unavailable");
-                return;
-#else
-                result = Exporters.FbxExporter.ExportFile(model, inputFileBox.Selected);
-#endif
-            }
-            else if (format.Contains(".gltf") || format.Contains(".glb"))
-            {
-                var ext = format.Contains(".gltf") ? "gltf" : "glb";
-                var name = System.IO.Path.ChangeExtension(inputFileBox.Selected, ext);
-                result = Exporters.GltfExporter.ExportFile(model, name);
-            }
-            else
-            {
-                MessageBox.Show("Unknown format '" + format + "'");
+                MessageBox.Show("Unknown format '{format}'");
                 return;
             }
+            var outName = System.IO.Path.ChangeExtension(inputFileBox.Selected, type.Extension);
+            exportCmd.File = outName;
+            script.Add(exportCmd);
+            Script.ExecuteItems(script, System.IO.Directory.GetCurrentDirectory());
 
-            MessageBox.Show("Successfully exported model " + result.Split('\\').Last() + " (placed in the input model folder)");
-
-            //DieselExporter.ExportFile(model, inputFileBox.Text);
+            MessageBox.Show($"Successfully exported model {inputFileBox.Selected.Split('\\').Last()} (placed in the input model folder)");
         }
     }
 }

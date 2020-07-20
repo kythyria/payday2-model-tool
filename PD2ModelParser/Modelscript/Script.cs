@@ -96,7 +96,7 @@ namespace PD2ModelParser.Modelscript
             item.File = RequiredAttr(element, "file");
 
             var strType = element.Attribute("type")?.Value;
-            if(FileTypeInfo.TryGetByExtension(strType, out var type)) {
+            if(FileTypeInfo.TryParseName(strType, out var type)) {
                 item.ForceType = type;
             }
             else { item.ForceType = null; }
@@ -181,7 +181,7 @@ namespace PD2ModelParser.Modelscript
             var file = RequiredAttr(elem, "file");
             var ext = elem.Attribute("type")?.Value;
             var item = new Export() { File = file };
-            if(FileTypeInfo.TryGetByExtension(ext, out var type))
+            if(FileTypeInfo.TryParseName(ext, out var type))
             {
                 item.ForceType = type;
             }
@@ -195,7 +195,7 @@ namespace PD2ModelParser.Modelscript
         private static IScriptItem ParseXmlExportType(XElement elem)
         {
             var type = RequiredAttr(elem, "type");
-            if (FileTypeInfo.TryGetByExtension(type, out var fti))
+            if (FileTypeInfo.TryParseName(type, out var fti))
             {
                 return new SetDefaultType() { FileType = fti };
             }
@@ -207,7 +207,7 @@ namespace PD2ModelParser.Modelscript
             var dir = RequiredAttr(elem, "sourcedir");
             var res = new BatchExport() { Directory = dir };
             var typeish = elem.Attribute("type")?.Value;
-            if (typeish != null && FileTypeInfo.TryGetByExtension(typeish, out var fti)) {
+            if (typeish != null && FileTypeInfo.TryParseName(typeish, out var fti)) {
                 res.FileType = fti;
             }
             return res;

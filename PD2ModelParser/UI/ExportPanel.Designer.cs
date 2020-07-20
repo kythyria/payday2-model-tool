@@ -71,11 +71,7 @@
             this.formatBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.formatBox.FormattingEnabled = true;
             this.formatBox.Items.AddRange(new object[] {
-            "Object (.obj)",
-            "Collada (.dae)",
-            "Filmbox (.fbx)",
-            "glTF (.gltf)",
-            "glTF Binary (.glb)"});
+            "If you can see this at runtime, something strange has happened."});
             this.formatBox.Location = new System.Drawing.Point(70, 36);
             this.formatBox.Name = "formatBox";
             this.formatBox.Size = new System.Drawing.Size(353, 21);

@@ -130,7 +130,7 @@ namespace PD2ModelParser
                 {
                     "export-type=", "Sets the type for mass exports",
                     v => {
-                        if(FileTypeInfo.TryGetByExtension(v, out var type))
+                        if(FileTypeInfo.TryParseName(v, out var type))
                         {
                             script.Add(new SetDefaultType() {FileType = type});
                         }
