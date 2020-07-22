@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Numerics;
-using System.Xml.Linq;
 using S = PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Modelscript

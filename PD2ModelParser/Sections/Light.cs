@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using BinaryReader = System.IO.BinaryReader;
+﻿using BinaryReader = System.IO.BinaryReader;
 
 namespace PD2ModelParser.Sections
 {

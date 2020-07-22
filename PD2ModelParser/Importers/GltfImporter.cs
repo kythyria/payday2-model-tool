@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Numerics;
+
 using GLTF = SharpGLTF.Schema2;
 using DM = PD2ModelParser.Sections;
-using ET = System.Linq.Expressions;
-using System.Numerics;
 
 namespace PD2ModelParser.Importers
 {

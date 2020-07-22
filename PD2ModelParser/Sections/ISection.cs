@@ -5,7 +5,6 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
-using BindingFlags = System.Reflection.BindingFlags;
 
 namespace PD2ModelParser.Sections
 {

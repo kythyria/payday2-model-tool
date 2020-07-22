@@ -1,9 +1,8 @@
-using PD2ModelParser.Sections;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
-using System.Xml.Linq;
+
+using PD2ModelParser.Sections;
 
 namespace PD2ModelParser.UI
 {

@@ -1,12 +1,7 @@
 ﻿using PD2ModelParser.Sections;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using static PD2ModelParser.Tags;
 
 namespace PD2ModelParser
 {

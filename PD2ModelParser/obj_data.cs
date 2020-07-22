@@ -1,10 +1,9 @@
-﻿using Nexus;
-using PD2ModelParser.Sections;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Nexus;
+
+using PD2ModelParser.Sections;
 
 namespace PD2ModelParser
 {

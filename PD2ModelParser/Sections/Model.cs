@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel;
 
 namespace PD2ModelParser.Sections
@@ -98,6 +96,7 @@ namespace PD2ModelParser.Sections
             : base(object_name, parent)
         {
             this.size = 0;
+            // TODO: Get rid of all referring to things by section ID outside of read/write of model files so we don't have to do this.
             SectionId = (uint)object_name.GetHashCode();
 
             this.version = 3;

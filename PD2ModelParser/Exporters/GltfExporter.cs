@@ -1,10 +1,12 @@
-﻿using PD2ModelParser.Sections;
-using SharpGLTF.Memory;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GLTF = SharpGLTF.Schema2;
 using System.Numerics;
+using SharpGLTF.Memory;
+
+using GLTF = SharpGLTF.Schema2;
+
+using PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Exporters
 {
@@ -329,22 +331,6 @@ namespace PD2ModelParser.Exporters
         }
 
         Vector2 FixupUV(Nexus.Vector2D input) => new Vector2(input.X, 1-input.Y);
-
-        GLTF.Accessor MakeIndexAccessor(Topology topo)
-        {
-            var mai = new MemoryAccessInfo($"indices_{topo.hashname}", 0, topo.facelist.Count * 3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
-            var ma = new MemoryAccessor(new ArraySegment<byte>(new byte[topo.facelist.Count * 3 * 2]), mai);
-            var array = ma.AsIntegerArray();
-            for(int i = 0; i < topo.facelist.Count; i++)
-            {
-                array[i * 3 + 0] = topo.facelist[i].a;
-                array[i * 3 + 1] = topo.facelist[i].b;
-                array[i * 3 + 2] = topo.facelist[i].c;
-            }
-            var accessor = root.CreateAccessor();
-            accessor.SetIndexData(ma);
-            return accessor;
-        }
 
         GLTF.Accessor MakeVertexAttributeAccessor<TSource, TResult>(string maiName, IList<TSource> source, int stride, GLTF.DimensionType dimtype, Func<TSource, TResult> conv, Func<MemoryAccessor, IList<TResult>> getcontainer, GLTF.EncodingType enc = GLTF.EncodingType.FLOAT, bool normalized = false)
         {

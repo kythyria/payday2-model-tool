@@ -137,7 +137,7 @@ namespace PD2ModelParser.Misc
 
             result = MessageBox.Show(message, caption, buttons);
 
-            Enabled = result == System.Windows.Forms.DialogResult.Yes;
+            Enabled = result == DialogResult.Yes;
         }
     }
 }
