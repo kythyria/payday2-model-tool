@@ -50,10 +50,7 @@ namespace PD2ModelParser.Modelscript
                 Data = initialModel,
                 WorkDir = workDir
             };
-            foreach (var i in items)
-            {
-                i.Execute(state);
-            }
+            state.ExecuteItems(items);
             return state.Data;
         }
 

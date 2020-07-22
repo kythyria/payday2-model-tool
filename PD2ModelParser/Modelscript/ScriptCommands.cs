@@ -177,7 +177,7 @@ namespace PD2ModelParser.Modelscript
             state.Log.Status($"Exporting to {File}");
             string path = state.ResolvePath(File);
             FileTypeInfo fti = ForceType;
-            if(ForceType != null)
+            if(ForceType == null)
             {
                 var ext = System.IO.Path.GetExtension(path);
                 if(!FileTypeInfo.TryParseName(ext, out fti))

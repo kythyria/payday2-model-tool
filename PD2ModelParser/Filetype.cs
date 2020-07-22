@@ -19,14 +19,6 @@ namespace PD2ModelParser
         public virtual IOptionReceiver CreateOptionReceiver() => new GenericOptionReceiver();
         public override string ToString() => Extension.ToUpper();
 
-        public static IReadOnlyList<FileTypeInfo> Types { get; } = new List<FileTypeInfo>() {
-            FileTypeInfo.Fbx,
-            FileTypeInfo.Dae,
-            FileTypeInfo.Obj,
-            FileTypeInfo.Gltf,
-            FileTypeInfo.Glb
-        };
-
         public static bool TryParseName(string name, out FileTypeInfo result)
         {
             var ident = name.ToLower().TrimStart('.');
@@ -106,5 +98,13 @@ namespace PD2ModelParser
                 => Exporters.GltfExporter.ExportFile(data, path, true);
         }
         public static readonly FileTypeInfo Glb = new GlbType();
+
+        public static IReadOnlyList<FileTypeInfo> Types { get; } = new List<FileTypeInfo>() {
+            FileTypeInfo.Fbx,
+            FileTypeInfo.Dae,
+            FileTypeInfo.Obj,
+            FileTypeInfo.Gltf,
+            FileTypeInfo.Glb
+        };
     }
 }
