@@ -1,4 +1,5 @@
 ﻿using BinaryReader = System.IO.BinaryReader;
+using BinaryWriter = System.IO.BinaryWriter;
 
 namespace PD2ModelParser.Sections
 {
