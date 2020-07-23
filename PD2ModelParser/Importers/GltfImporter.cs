@@ -110,9 +110,9 @@ namespace PD2ModelParser.Importers
                         i.SetParent(newObj);
                     }
                 }
-                else if (node.Mesh != null && obj is DM.Model)
+                else if (node.Mesh != null && obj is DM.Model mod)
                 {
-                    OverwriteModel(node.Mesh, obj as DM.Model);
+                    OverwriteModel(node.Mesh, mod);
                 }
                 else if (node.PunctualLight != null)
                 {
