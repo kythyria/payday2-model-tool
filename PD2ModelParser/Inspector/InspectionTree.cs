@@ -29,6 +29,7 @@ namespace PD2ModelParser.Inspector
             yield return new ObjectsRootNode(data);
             yield return new AllSectionsNode<Sections.Geometry>(data, "<geometries>", "<Geometry>", g => $"{g.SectionId} | Geometry ({new HashName(g.hashname).String})");
             yield return new AllSectionsNode<Sections.SkinBones>(data, "<skinbones>", "<SkinBones>", sb => $"{sb.SectionId} | SkinBones");
+            yield return new AllSectionsNode<Sections.PassthroughGP>(data, "<passthroughgp>", "<PassthroughGP>", pgp => $"{pgp.SectionId}");
         }
     }
 

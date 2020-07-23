@@ -8,14 +8,14 @@ namespace PD2ModelParser.Sections
     [SectionId(Tags.skinbones_tag)]
     class SkinBones : Bones, ISection, IPostLoadable
     {
-        public UInt32 probably_root_bone { get; set; }
+        public uint probably_root_bone { get; set; }
         public int count => objects.Count;
-        public List<UInt32> objects { get; private set; } = new List<UInt32>(); // of Object3D by SectionID
+        public List<uint> objects { get; private set; } = new List<uint>(); // of Object3D by SectionID
         public List<Matrix3D> rotations { get; private set; } = new List<Matrix3D>();
-        public Matrix3D global_skin_transform { get; private set; }
+        public Matrix3D global_skin_transform { get; set; }
 
         // Post-loaded
-        public List<Matrix3D> SkinPositions { get; private set; }
+        public List<Matrix3D> SkinPositions { get; set; }
 
         public SkinBones(uint secId) : base()
         {

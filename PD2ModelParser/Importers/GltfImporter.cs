@@ -27,7 +27,9 @@ namespace PD2ModelParser.Importers
         GLTF.ModelRoot root;
         FullModelData data;
         Dictionary<GLTF.Mesh, MeshSections> meshSectionsByMesh = new Dictionary<GLTF.Mesh, MeshSections>();
+        Dictionary<GLTF.Skin, DM.SkinBones> skinBonesBySkin = new Dictionary<GLTF.Skin, DM.SkinBones>();
         bool createModels;
+        List<(GLTF.Node node, DM.Model model)> toSkin = new List<(GLTF.Node node, DM.Model model)>();
 
         /// <summary>
         /// How much to embiggen incoming GLTF data.
@@ -85,6 +87,11 @@ namespace PD2ModelParser.Importers
                 else if (createModels && node.Mesh != null)
                 {
                     obj = CreateNewModel(node.Mesh, node.Name);
+
+                    if (node.Skin != null)
+                    {
+                        toSkin.Add((node, obj as DM.Model));
+                    }
                 }
                 else if (createModels && node.PunctualLight != null)
                 {
@@ -257,6 +264,33 @@ namespace PD2ModelParser.Importers
             model.RenderAtoms = md.renderAtoms;
 
             return model;
+        }
+
+        void ImportSkin(GLTF.Node node, DM.Model model)
+        {
+            DM.SkinBones skinBones;
+            if(skinBonesBySkin.TryGetValue(node.Skin, out skinBones))
+            {
+                model.skinbones_ID = skinBones.SectionId;
+                return;
+            }
+
+            var random = new Random();
+            var randomBytes = new byte[4];
+            random.NextBytes(randomBytes);
+            // TODO: Generate section IDs in a properly safe way, perhaps at write time.
+            skinBones = new DM.SkinBones(BitConverter.ToUInt32(randomBytes, 0));
+
+            skinBones.global_skin_transform = Nexus.Matrix3D.Identity;
+            skinBones.probably_root_bone = data.SectionsOfType<DM.Object3D>()
+                .FirstOrDefault(i => i.Name == node.Skin.Skeleton.Name).SectionId;
+
+            var bmi = new DM.BoneMappingItem();
+            for(var i = 0; i < node.Skin.JointsCount; i++)
+            {
+                var (jointNode, ibm) = node.Skin.GetJoint(i);
+                ibm.Translation *= scaleFactor;
+            }
         }
 
         public class MeshSections
