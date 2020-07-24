@@ -202,7 +202,7 @@ namespace PD2ModelParser.Exporters
             var secPassthrough = (PassthroughGP)data.parsed_sections[model.passthroughGP_ID];
             var geometry = secPassthrough.Geometry;
             var topology = secPassthrough.Topology;
-            var materialGroup = (Material_Group)data.parsed_sections[model.material_group_section_id];
+            var materialGroup = model.MaterialGroup;
 
             var attribs = GetGeometryAttributes(geometry);
 

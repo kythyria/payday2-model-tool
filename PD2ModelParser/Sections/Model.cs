@@ -66,9 +66,8 @@ namespace PD2ModelParser.Sections
 
         [Category("Model")]
         public List<RenderAtom> RenderAtoms { get; set; }
-        //public UInt32 unknown9;
         [Category("Model")]
-        public UInt32 material_group_section_id { get; set; }
+        public Material_Group MaterialGroup { get; set; }
         [Category("Model")]
         public UInt32 lightset_ID { get; set; }
 
@@ -177,7 +176,7 @@ namespace PD2ModelParser.Sections
                 }
 
                 //this.unknown9 = instream.ReadUInt32();
-                this.material_group_section_id = instream.ReadUInt32();
+                PostloadRef(instream.ReadUInt32(), this, i => MaterialGroup);
                 this.lightset_ID = instream.ReadUInt32(); // this is a section id afaik
 
                 // Bitmap that stores properties about the model
@@ -225,7 +224,7 @@ namespace PD2ModelParser.Sections
                 }
 
                 //outstream.Write(this.unknown9);
-                outstream.Write(this.material_group_section_id);
+                outstream.Write(this.MaterialGroup?.SectionId ?? 0);
                 outstream.Write(this.lightset_ID);
 
                 outstream.Write(this.properties_bitmap);
@@ -250,7 +249,7 @@ namespace PD2ModelParser.Sections
             else
             {
                 var atoms_string = string.Join(",", RenderAtoms.Select(i => i.ToString()));
-                return $"{base.ToString()} version: {this.version} passthroughGP_ID: {this.passthroughGP_ID} topologyIP_ID: {this.topologyIP_ID} RenderAtoms: {this.RenderAtoms.Count} items: [{atoms_string}] material_group_section_id: {this.material_group_section_id} unknown10: {this.lightset_ID} bounds_min: {this.BoundsMin} bounds_max: {this.BoundsMax} unknown11: {this.properties_bitmap} BoundingRadius: {this.BoundingRadius} unknown13: {this.unknown13} skinbones_ID: {this.SkinBones.SectionId}{(this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "")}";
+                return $"{base.ToString()} version: {this.version} passthroughGP_ID: {this.passthroughGP_ID} topologyIP_ID: {this.topologyIP_ID} RenderAtoms: {this.RenderAtoms.Count} items: [{atoms_string}] MaterialGroup: {this.MaterialGroup.SectionId} unknown10: {this.lightset_ID} bounds_min: {this.BoundsMin} bounds_max: {this.BoundsMax} unknown11: {this.properties_bitmap} BoundingRadius: {this.BoundingRadius} unknown13: {this.unknown13} skinbones_ID: {this.SkinBones.SectionId}{(this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "")}";
             }
         }
 

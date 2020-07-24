@@ -283,7 +283,7 @@ namespace PD2ModelParser.Importers
             for (uint i = 0; i < sb.count; i++)
                 bmi.bones.Add(i);
 
-            for (int i = 0; i < model.renderAtoms.Count; i++)
+            for (int i = 0; i < model.RenderAtoms.Count; i++)
                 sb.bone_mappings.Add(bmi);
 
             // TODO setup the other SkinBones fields - probably very important for Diesel
