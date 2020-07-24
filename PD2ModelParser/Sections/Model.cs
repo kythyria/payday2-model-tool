@@ -124,6 +124,20 @@ namespace PD2ModelParser.Sections
 
         }
 
+        public Model(string object_name, float v6_unknown7, System.Numerics.Vector3 bounds_min, System.Numerics.Vector3 bounds_max, Object3D parent)
+            : base(object_name, parent)
+        {
+            this.size = 0;
+            // TODO: Get rid of all referring to things by section ID outside of read/write of model files so we don't have to do this.
+            SectionId = (uint) object_name.GetHashCode();
+
+            this.version = 6;
+            this.BoundsMin = bounds_min.ToNexusVector();
+            this.BoundsMax = bounds_max.ToNexusVector();
+            this.v6_unknown7 = v6_unknown7;
+            this.v6_unknown8 = 0;
+        }
+
         public Model(obj_data obj, PassthroughGP passGP, TopologyIP topoIP, Material_Group matg, Object3D parent)
             : this(obj.object_name, (uint)obj.verts.Count, (uint)obj.faces.Count, passGP, topoIP, matg, parent) { }
 

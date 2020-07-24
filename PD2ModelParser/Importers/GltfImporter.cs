@@ -84,7 +84,12 @@ namespace PD2ModelParser.Importers
 
             if (obj == null)
             {
-                if (createModels && node.Mesh == null)
+                var extras = node.TryUseExtrasAsDictionary(false);
+                if(createModels && extras != null && extras.ContainsKey("diesel.modelv6.unk7"))
+                {
+                    obj = CreateNewModelv6(node, parent);
+                }
+                else if (createModels && node.Mesh == null)
                 {
                     obj = new DM.Object3D(hashname.String, parent);
                 }
@@ -270,6 +275,44 @@ namespace PD2ModelParser.Importers
             model.RenderAtoms = md.renderAtoms;
 
             return model;
+        }
+
+        DM.Model CreateNewModelv6(GLTF.Node node, DM.Object3D parent)
+        {
+            var extras = node.TryUseExtrasAsDictionary(true);
+            object o_unk7, o_bmin, o_bmax;
+            Vector3 v_bmin, v_bmax;
+
+            if(!extras.TryGetValue("diesel.modelv6.unk7", out o_unk7) || !(o_unk7 is float || o_unk7 is double))
+            {
+                throw new Exception($"Node {node.Name} doesn't contain extra \"diesel.modelv6.unk7\" or it's not a float");
+            }
+            if(!extras.TryGetValue("diesel.modelv6.bound_min", out o_bmin))
+            {
+                throw new Exception($"Node {node.Name} is a v6 model and doesn't contain \"diesel.modelv6.bound_min\"");
+            }
+            if (!extras.TryGetValue("diesel.modelv6.bound_max", out o_bmax))
+            {
+                throw new Exception($"Node {node.Name} is a v6 model and doesn't contain \"diesel.modelv6.bound_max\"");
+            }
+
+            if(!(o_bmin is SharpGLTF.IO.JsonList jl_bmin) || (jl_bmin.Aggregate(true, (m, v) => m && (v is float || v is double)) == false)) {
+                throw new Exception($"Node {node.Name} is a v6 model and \"diesel.modelv6.bound_min\" is not float[]");
+            }
+            else
+            {
+                v_bmin = new Vector3(Convert.ToSingle(jl_bmin[0]), Convert.ToSingle(jl_bmin[1]), Convert.ToSingle(jl_bmin[2]));
+            }
+
+            if (!(o_bmax is SharpGLTF.IO.JsonList jl_bmax) || (jl_bmax.Aggregate(true, (m, v) => m && (v is float || v is double)) == false)) {
+                throw new Exception($"Node {node.Name} is a v6 model and \"diesel.modelv6.bound_max\" is not float[]");
+            }
+            else
+            {
+                v_bmax = new Vector3(Convert.ToSingle(jl_bmax[0]), Convert.ToSingle(jl_bmax[1]), Convert.ToSingle(jl_bmax[2]));
+            }
+
+            return new DM.Model(node.Name, Convert.ToSingle(o_unk7), v_bmin, v_bmax, parent);
         }
 
         void ImportSkin(GLTF.Node node, DM.Model model)

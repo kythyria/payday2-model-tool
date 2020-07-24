@@ -112,12 +112,26 @@ namespace PD2ModelParser.Exporters
                 node.LocalMatrix = isSkinned ? Matrix4x4.Identity : mat;
                 
             }
-            if (thing is Model)
+            if (thing is Model mod)
             {
-                node.Mesh = GetMeshForModel(thing as Model);
-                if ((thing as Model).skinbones_ID != 0)
+                if (mod.version == 3)
                 {
-                    toSkin.Add((thing as Model, node));
+                    node.Mesh = GetMeshForModel(mod);
+                    if ((thing as Model).skinbones_ID != 0)
+                    {
+                        toSkin.Add((mod, node));
+                    }
+                }
+                else if (mod.version == 6)
+                {
+                    var extras = node.TryUseExtrasAsDictionary(true);
+                    extras.Add("diesel.modelv6.unk7", mod.v6_unknown7);
+                    extras.Add("diesel.modelv6.bound_min", new float[] { mod.BoundsMin.X, mod.BoundsMin.Y, mod.BoundsMin.Z });
+                    extras.Add("diesel.modelv6.bound_max", new float[] { mod.BoundsMax.X, mod.BoundsMax.Y, mod.BoundsMax.Z });
+                }
+                else
+                {
+                    throw new Exception($"Model {mod.Name} is of unknown version {mod.version}");
                 }
             }
             else if (thing is Light dl)
