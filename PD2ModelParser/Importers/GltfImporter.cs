@@ -350,6 +350,13 @@ namespace PD2ModelParser.Importers
                 bmi.bones.Add((uint) i);
             }
 
+            // It makes no sense that diesel wants this, but diesel wants this.
+            // And it's consistent with the FBX importer, which worked.
+            foreach(var ra in model.RenderAtoms)
+            {
+                skinBones.bone_mappings.Add(bmi);
+            }
+
             skinBonesBySkin.Add(node.Skin, skinBones);
             data.AddSection(skinBones);
             model.SkinBones = skinBones;
