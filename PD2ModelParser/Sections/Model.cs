@@ -114,7 +114,7 @@ namespace PD2ModelParser.Sections
             this.RenderAtoms.Add(nmi);
 
             //this.unknown9 = 0;
-            this.material_group_section_id = matg.SectionId;
+            this.MaterialGroup = matg;
             this.lightset_ID = 0;
             this.properties_bitmap = 0;
             this.BoundingRadius = 1;
