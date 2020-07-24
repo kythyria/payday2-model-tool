@@ -5,6 +5,7 @@ using System.Numerics;
 
 using GLTF = SharpGLTF.Schema2;
 using DM = PD2ModelParser.Sections;
+//using PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Importers
 {
@@ -24,9 +25,8 @@ namespace PD2ModelParser.Importers
             importer.ImportTree(gltf, createModels, parentFinder);
         }
 
-        GLTF.ModelRoot root;
         FullModelData data;
-        Dictionary<GLTF.Mesh, MeshSections> meshSectionsByMesh = new Dictionary<GLTF.Mesh, MeshSections>();
+        Dictionary<GLTF.Node, DM.Object3D> objectsByNode = new Dictionary<GLTF.Node, DM.Object3D>();
         Dictionary<GLTF.Skin, DM.SkinBones> skinBonesBySkin = new Dictionary<GLTF.Skin, DM.SkinBones>();
         bool createModels;
         List<(GLTF.Node node, DM.Model model)> toSkin = new List<(GLTF.Node node, DM.Model model)>();
@@ -54,7 +54,6 @@ namespace PD2ModelParser.Importers
 
         public void ImportTree(GLTF.ModelRoot root, bool createModels, Func<string, DM.Object3D> parentFinder)
         {
-            this.root = root;
             this.createModels = createModels;
 
             foreach(var node in root.DefaultScene.VisualChildren)
@@ -66,6 +65,11 @@ namespace PD2ModelParser.Importers
                 }
                 catch { } // TODO: Call with a better parentFinder that doesn't need this.
                 ImportNode(node, parent);
+            }
+
+            foreach (var i in toSkin)
+            {
+                ImportSkin(i.node, i.model);
             }
         }
 
@@ -126,6 +130,8 @@ namespace PD2ModelParser.Importers
                     throw new Exception("Can't overwrite lights yet.");
                 }
             }
+
+            objectsByNode.Add(node, obj);
 
             if(parent != null)
             {
@@ -286,11 +292,18 @@ namespace PD2ModelParser.Importers
                 .FirstOrDefault(i => i.Name == node.Skin.Skeleton.Name).SectionId;
 
             var bmi = new DM.BoneMappingItem();
+            skinBones.bone_mappings.Add(bmi);
             for(var i = 0; i < node.Skin.JointsCount; i++)
             {
                 var (jointNode, ibm) = node.Skin.GetJoint(i);
                 ibm.Translation *= scaleFactor;
+                skinBones.rotations.Add(ibm.ToNexusMatrix());
+                skinBones.objects.Add(objectsByNode[jointNode].SectionId);
+                bmi.bones.Add((uint) i);
             }
+
+            skinBonesBySkin.Add(node.Skin, skinBones);
+            data.AddSection(skinBones);
         }
 
         public class MeshSections
@@ -326,6 +339,8 @@ namespace PD2ModelParser.Importers
                     var ct = (DM.GeometryChannelTypes)((int)DM.GeometryChannelTypes.TEXCOORD0 + i);
                     AddToGeom(ref geom.UVs[i], 2, ct, md.uvs[i], MathUtil.ToNexusVector);
                 }
+                AddToGeom(ref geom.weights, 3, DM.GeometryChannelTypes.BLENDWEIGHT0, md.weights, MathUtil.ToNexusVector);
+                AddToGeom(ref geom.weight_groups, 7, DM.GeometryChannelTypes.BLENDINDICES0, md.weightGroups, x => x);
 
                 geom.vert_count = (uint)geom.verts.Count;
 
@@ -361,6 +376,8 @@ namespace PD2ModelParser.Importers
                 new List<Vector2>(),
                 new List<Vector2>(),
             };
+            public List<Vector3> weights = new List<Vector3>();
+            public List<DM.GeometryWeightGroups> weightGroups = new List<DM.GeometryWeightGroups>();
 
             public int AppendVertex(Vertex vtx)
             {
@@ -374,6 +391,8 @@ namespace PD2ModelParser.Importers
                 {
                     vtx.uv[i].WithValue(v => this.uvs[i].Add(v));
                 }
+                vtx.weight.WithValue(v => this.weights.Add(v));
+                if(vtx.weightGroups != null) { this.weightGroups.Add(vtx.weightGroups); }
                 return idx;
             }
 
@@ -563,6 +582,32 @@ namespace PD2ModelParser.Importers
                     }
                 }
 
+                prim.VertexAccessors.TryGetValue("JOINTS_0", out var joints);
+                prim.VertexAccessors.TryGetValue("WEIGHTS_0", out var weights);
+                if(joints != null && joints.Count > 0)
+                {
+                    var ja = joints.AsVector4Array();
+                    var wa = joints.AsVector4Array();
+                    result = result.Select((vtx, idx) =>
+                    {
+                        var gltfWeight = ja[idx];
+                        vtx.weight = new Vector3(gltfWeight.X, gltfWeight.Y, gltfWeight.Z);
+                        if(gltfWeight.W > 0)
+                        {
+                            Log.Default.Warn($"{prim.LogicalParent.Name} has a vertex with >3 weights at {vtx.pos}!");
+                        }
+                        vtx.weightGroups = new DM.GeometryWeightGroups()
+                        {
+                            Bones1 = (ushort)wa[idx].X,
+                            Bones2 = (ushort)wa[idx].Y,
+                            Bones3 = (ushort)wa[idx].Z,
+                            Bones4 = (ushort)wa[idx].W
+                        };
+
+                        return vtx;
+                    });
+                }
+
                 return result;
             }
         }
@@ -573,6 +618,8 @@ namespace PD2ModelParser.Importers
             public Vector3? normal, tangent, binormal;
             public Vector4? vtx_col;
             public Vector2?[] uv = new Vector2?[8];
+            public Vector3? weight;
+            public DM.GeometryWeightGroups weightGroups;
 
             public override bool Equals(object obj)
             {
@@ -587,7 +634,9 @@ namespace PD2ModelParser.Importers
                        EqualityComparer<Vector3?>.Default.Equals(tangent, other.tangent) &&
                        EqualityComparer<Vector3?>.Default.Equals(binormal, other.binormal) &&
                        EqualityComparer<Vector4?>.Default.Equals(vtx_col, other.vtx_col) &&
-                       EqualityComparer<Vector2?[]>.Default.Equals(uv, other.uv);
+                       EqualityComparer<Vector2?[]>.Default.Equals(uv, other.uv) &&
+                       EqualityComparer<Vector3?>.Default.Equals(weight, other.weight) &&
+                       EqualityComparer<DM.GeometryWeightGroups>.Default.Equals(weightGroups, other.weightGroups);
             }
 
             public override int GetHashCode()
@@ -602,6 +651,8 @@ namespace PD2ModelParser.Importers
                 {
                     uv[i].WithValue(v => hashCode = hashCode * -1521134295 + EqualityComparer<Vector2>.Default.GetHashCode(v));
                 }
+                hashCode = hashCode * -1521134295 + EqualityComparer<Vector3?>.Default.GetHashCode(weight);
+                hashCode = hashCode * -1521134295 + EqualityComparer<DM.GeometryWeightGroups>.Default.GetHashCode(weightGroups);
                 return hashCode;
             }
         }
