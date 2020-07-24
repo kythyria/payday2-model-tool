@@ -321,6 +321,7 @@ namespace PD2ModelParser.Importers
             if(skinBonesBySkin.TryGetValue(node.Skin, out skinBones))
             {
                 model.skinbones_ID = skinBones.SectionId;
+                model.SetParent(data.parsed_sections.Where(i => i.Value.SectionId == skinBones.probably_root_bone).FirstOrDefault().Value as DM.Object3D);
                 return;
             }
 
@@ -331,8 +332,12 @@ namespace PD2ModelParser.Importers
             skinBones = new DM.SkinBones(BitConverter.ToUInt32(randomBytes, 0));
 
             skinBones.global_skin_transform = Nexus.Matrix3D.Identity;
-            skinBones.probably_root_bone = data.SectionsOfType<DM.Object3D>()
-                .FirstOrDefault(i => i.Name == node.Skin.Skeleton.Name).SectionId;
+            var parent = data.SectionsOfType<DM.Object3D>()
+                .FirstOrDefault(i => i.Name == node.Skin.Skeleton.Name);
+            skinBones.probably_root_bone = parent.SectionId;
+            // I have no idea if this is universal. It looks like it might be.
+            // TODO: For skinned meshes, does mesh.Parent == mesh.SkinBones.probably_root_bone?
+            model.SetParent(parent);
 
             var bmi = new DM.BoneMappingItem();
             skinBones.bone_mappings.Add(bmi);
@@ -347,6 +352,7 @@ namespace PD2ModelParser.Importers
 
             skinBonesBySkin.Add(node.Skin, skinBones);
             data.AddSection(skinBones);
+            model.skinbones_ID = skinBones.SectionId;
         }
 
         public class MeshSections
