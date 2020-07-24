@@ -19,6 +19,7 @@ namespace PD2ModelParser
 
         public static bool TryParseName(string name, out FileTypeInfo result)
         {
+            if(name == null) { result = null;  return false; }
             var ident = name.ToLower().TrimStart('.');
             result = Types.FirstOrDefault(i => i.Extension == ident || i.Name == ident);
             return result != null;
