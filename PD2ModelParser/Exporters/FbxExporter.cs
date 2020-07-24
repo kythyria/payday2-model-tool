@@ -72,7 +72,7 @@ namespace PD2ModelParser.Exporters
 
                 ModelInfo mesh = AddModel(data, model);
 
-                if (model.skinbones_ID == 0)
+                if (model.SkinBones == null)
                 {
                     // If there's no corresponding skeleton, remove the 'Object' suffix
                     mesh.Node.SetName(model.Name);
@@ -81,7 +81,7 @@ namespace PD2ModelParser.Exporters
                     continue;
                 }
 
-                SkinBones sb = (SkinBones) data.parsed_sections[model.skinbones_ID];
+                SkinBones sb = model.SkinBones;
 
                 SkeletonInfo bones;
                 if (skeletons.ContainsKey(sb.probably_root_bone))

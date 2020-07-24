@@ -186,11 +186,11 @@ namespace PD2ModelParser.Importers
             // body skeleton which breaks everything. For this reason, ignore any bones
             // not in the previous SkinBones.
             // Ideally we'd fix this properly via mscript, but this will do for now.
-            SkinBones previous = (SkinBones) data.parsed_sections[model.skinbones_ID];
+            SkinBones previous = model.SkinBones;
 
             SkinBones sb = new SkinBones(0);
             data.AddSection(sb);
-            model.skinbones_ID = sb.SectionId;
+            model.SkinBones = sb;
 
             Recurse(rootNode, rootPoint, (node, parent) =>
             {
@@ -302,7 +302,7 @@ namespace PD2ModelParser.Importers
             if (skin == null)
                 throw new Exception("EFBX007 Could not get skin deformer ID=0");
 
-            SkinBones sb = (SkinBones) data.parsed_sections[model.skinbones_ID];
+            SkinBones sb = model.SkinBones;
 
             // Either 2 for low-LOD models or 3 for high-LOD models - afaik this
             // has something to do with which render template is used.

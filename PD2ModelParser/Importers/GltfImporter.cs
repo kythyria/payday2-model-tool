@@ -320,7 +320,7 @@ namespace PD2ModelParser.Importers
             DM.SkinBones skinBones;
             if(skinBonesBySkin.TryGetValue(node.Skin, out skinBones))
             {
-                model.skinbones_ID = skinBones.SectionId;
+                model.SkinBones = skinBones;
                 model.SetParent(data.parsed_sections.Where(i => i.Value.SectionId == skinBones.probably_root_bone).FirstOrDefault().Value as DM.Object3D);
                 return;
             }
@@ -352,7 +352,7 @@ namespace PD2ModelParser.Importers
 
             skinBonesBySkin.Add(node.Skin, skinBones);
             data.AddSection(skinBones);
-            model.skinbones_ID = skinBones.SectionId;
+            model.SkinBones = skinBones;
         }
 
         public class MeshSections

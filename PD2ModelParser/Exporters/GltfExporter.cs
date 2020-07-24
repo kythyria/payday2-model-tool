@@ -85,7 +85,7 @@ namespace PD2ModelParser.Exporters
 
         void CreateNodeFromObject3D(Object3D thing, GLTF.IVisualNodeContainer parent)
         {
-            var isSkinned = thing is Model m && m.skinbones_ID != 0;
+            var isSkinned = thing is Model m && m.SkinBones != null;
             if (isSkinned)
             {
                 parent = scene;
@@ -117,7 +117,7 @@ namespace PD2ModelParser.Exporters
                 if (mod.version == 3)
                 {
                     node.Mesh = GetMeshForModel(mod);
-                    if ((thing as Model).skinbones_ID != 0)
+                    if (mod.SkinBones != null)
                     {
                         toSkin.Add((mod, node));
                     }
@@ -167,12 +167,12 @@ namespace PD2ModelParser.Exporters
 
         void SkinModel(Model model, GLTF.Node node)
         {
-            if (!data.parsed_sections.ContainsKey(model.skinbones_ID))
+            if (!data.parsed_sections.ContainsKey(model.SkinBones.SectionId))
             {
                 return;
             }
 
-            var skinbones = data.parsed_sections[model.skinbones_ID] as SkinBones;
+            var skinbones = model.SkinBones;
             var skin = root.CreateSkin(model.Name + "_Skin");
             skin.Skeleton = nodesBySectionId[skinbones.probably_root_bone];
 

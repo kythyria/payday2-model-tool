@@ -94,10 +94,10 @@ namespace PD2ModelParser
 
                     nodes.Add(root_node);
 
-                    if (model_data.skinbones_ID == 0)
+                    if (model_data.SkinBones == null)
                         continue;
 
-                    SkinBones sb = (SkinBones) parsed_sections[model_data.skinbones_ID];
+                    SkinBones sb = model_data.SkinBones;
                     //Console.WriteLine(sb.bones);
                     //Console.WriteLine(sb);
 
