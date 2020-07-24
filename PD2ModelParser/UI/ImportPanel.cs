@@ -43,21 +43,21 @@ namespace PD2ModelParser.UI
 
             bool createNewObjects = createNewModel.Checked || createNewObjectsBox.Checked;
 
-            FullModelData model = new FullModelData();
-
+            var script = new List<Modelscript.IScriptItem>();
             if (!createNewModel.Checked)
             {
-                model = ModelReader.Open(baseModelFileBrowser.Selected);
+                script.Add(new Modelscript.LoadModel() { File = baseModelFileBrowser.Selected });
+            }
+            else
+            {
+                script.Add(new Modelscript.NewModel());
             }
 
             if (scriptFile.Selected != null)
             {
-                bool success = Modelscript.Script.ExecuteFileWithMsgBox(ref model, scriptFile.Selected);
-                if (!success)
-                    return;
+                script.Add(new Modelscript.RunScript() { File = scriptFile.Selected });
             }
 
-            var script = new List<Modelscript.IScriptItem>();
             if (objectFile.Selected != null)
             {
                 script.Add(new Modelscript.CreateNewObjects() { Create = createNewObjects });
@@ -81,7 +81,7 @@ namespace PD2ModelParser.UI
 
             try
             {
-                Modelscript.Script.ExecuteItems(script, System.IO.Directory.GetCurrentDirectory(), model);
+                Modelscript.Script.ExecuteItems(script, System.IO.Directory.GetCurrentDirectory(), null);
             }
             catch(Exception exc)
             {
