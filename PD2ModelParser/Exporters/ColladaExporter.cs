@@ -176,7 +176,7 @@ namespace PD2ModelParser
 
                         if (obj.Parent == null || !sb.objects.Contains(obj.parentID))
                         {
-                            Matrix3D fixed_obj_transform = obj.world_transform;
+                            Matrix3D fixed_obj_transform = obj.WorldTransform;
                             fixed_obj_transform.Decompose(out scale, out rotate, out translate);
 
                             // Fixes the head, but breaks the arms

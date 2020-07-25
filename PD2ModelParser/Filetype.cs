@@ -39,7 +39,7 @@ namespace PD2ModelParser
             public override bool CanImport => true;
             public override string Export(FullModelData data, string path) => Exporters.FbxExporter.ExportFile(data, path);
             public override void Import(FullModelData data, string path, bool createModels, Func<string, Sections.Object3D> parentFinder, IOptionReceiver options)
-                => FilmboxImporter.Import(data, path, createModels, parentFidner, options);
+                => FilmboxImporter.Import(data, path, createModels, parentFinder, options);
             public override IOptionReceiver CreateOptionReceiver() => new FilmboxImporter.FbxImportOptions();
 #else
             public override bool CanExport => false;

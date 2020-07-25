@@ -37,7 +37,10 @@ namespace PD2ModelParser.Sections
 
         // Non-written fields
         private bool has_post_loaded;
-        public Matrix3D world_transform;
+
+        [Category("Object3D")]
+        [TypeConverter(typeof(Inspector.NexusMatrixConverter))]
+        public Matrix3D WorldTransform { get; private set; }
 
         [Category("Object3D")]
         [DisplayName("Parent")]
@@ -210,11 +213,11 @@ namespace PD2ModelParser.Sections
         {
             if (Parent == null)
             {
-                world_transform = Transform;
+                WorldTransform = Transform;
                 return;
             }
 
-            world_transform = Transform.MultDiesel(Parent.world_transform);
+            WorldTransform = Transform.MultDiesel(Parent.WorldTransform);
         }
     }
 }

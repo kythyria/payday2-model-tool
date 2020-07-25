@@ -126,7 +126,7 @@ namespace PD2ModelParser.Exporters
             FbxMesh mesh = FbxMesh.Create(fm, name + "Mesh");
             mesh_node.SetNodeAttributeGeom(mesh);
 
-            CopyTransform(model.world_transform, mesh_node);
+            CopyTransform(model.WorldTransform, mesh_node);
 
             FbxLayerElementNormal normals = mesh.CreateElementNormal();
             normals.SetReferenceMode(FbxLayerElement.EReferenceMode.eIndexToDirect);
@@ -286,7 +286,7 @@ namespace PD2ModelParser.Exporters
 
                 // Break down the bone's transform and convert it to an FBX affine matrix
                 // Skip the scale for now though, we don't need it
-                obj.world_transform.Decompose(out Vector3D _, out Quaternion rotate, out Vector3D translate);
+                obj.WorldTransform.Decompose(out Vector3D _, out Quaternion rotate, out Vector3D translate);
                 FbxAMatrix mat = new FbxAMatrix();
                 mat.SetIdentity();
                 mat.SetT(new FbxVector4(translate.X, translate.Y, translate.Z));
