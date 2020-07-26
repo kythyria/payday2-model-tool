@@ -321,20 +321,20 @@ namespace PD2ModelParser.Importers
             if(skinBonesBySkin.TryGetValue(node.Skin, out skinBones))
             {
                 model.SkinBones = skinBones;
-                model.SetParent(data.parsed_sections.Where(i => i.Value.SectionId == skinBones.probably_root_bone).FirstOrDefault().Value as DM.Object3D);
+                model.SetParent(skinBones.ProbablyRootBone);
                 return;
             }
 
             var random = new Random();
             var randomBytes = new byte[4];
             random.NextBytes(randomBytes);
-            // TODO: Generate section IDs in a properly safe way, perhaps at write time.
-            skinBones = new DM.SkinBones(BitConverter.ToUInt32(randomBytes, 0));
+            // TODO: Get rid of the sectionids when making a new section.
+            skinBones = new DM.SkinBones(0);
 
             skinBones.global_skin_transform = Nexus.Matrix3D.Identity;
             var parent = data.SectionsOfType<DM.Object3D>()
                 .FirstOrDefault(i => i.Name == node.Skin.Skeleton.Name);
-            skinBones.probably_root_bone = parent.SectionId;
+            skinBones.ProbablyRootBone = parent;
             // I have no idea if this is universal. It looks like it might be.
             // TODO: For skinned meshes, does mesh.Parent == mesh.SkinBones.probably_root_bone?
             model.SetParent(parent);

@@ -9,7 +9,8 @@ namespace PD2ModelParser.Sections
     [SectionId(Tags.skinbones_tag)]
     class SkinBones : Bones, ISection, IPostLoadable
     {
-        public uint probably_root_bone { get; set; }
+        [TypeConverter(typeof(Inspector.Object3DReferenceConverter))]
+        public Object3D ProbablyRootBone { get; set; }
         public int count => objects.Count;
         public List<uint> objects { get; private set; } = new List<uint>(); // of Object3D by SectionID
         public List<Matrix3D> rotations { get; private set; } = new List<Matrix3D>();
@@ -29,7 +30,7 @@ namespace PD2ModelParser.Sections
             this.SectionId = section.id;
             this.size = section.size;
 
-            this.probably_root_bone = instream.ReadUInt32();
+            PostloadRef(instream.ReadUInt32(), this, i => ProbablyRootBone);
             uint count = instream.ReadUInt32();
             for (int x = 0; x < count; x++)
                 this.objects.Add(instream.ReadUInt32());
@@ -53,7 +54,7 @@ namespace PD2ModelParser.Sections
         public override void StreamWriteData(BinaryWriter outstream)
         {
             base.StreamWriteData(outstream);
-            outstream.Write(this.probably_root_bone);
+            outstream.Write(this.ProbablyRootBone.SectionId);
             outstream.Write(this.count);
 
             SectionUtils.CheckLength(count, objects);
@@ -89,7 +90,7 @@ namespace PD2ModelParser.Sections
             }
 
             return base.ToString() +
-                   " object3D_section_id: " + this.probably_root_bone +
+                   " object3D_section_id: " + this.ProbablyRootBone.SectionId +
                    " count: " + this.count + " objects" +
                    " count: " + this.objects.Count + " objects:[ " + objects_string + " ]" +
                    " rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ]" +
@@ -99,6 +100,7 @@ namespace PD2ModelParser.Sections
 
         public override void PostLoad(uint id, Dictionary<uint, ISection> parsed_sections)
         {
+            base.PostLoad(id, parsed_sections);
             SkinPositions = new List<Matrix3D>(count);
 
             for (int i = 0; i < objects.Count; i++)

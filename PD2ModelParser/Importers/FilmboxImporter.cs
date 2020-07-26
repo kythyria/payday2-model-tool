@@ -274,7 +274,7 @@ namespace PD2ModelParser.Importers
             if (root_bone == null)
                 throw new Exception("EFBX005 Rigged model " + rootNode.GetName() + " has no bones");
 
-            sb.probably_root_bone = root_bone.SectionId;
+            sb.ProbablyRootBone = root_bone;
             rootBone = root_bone;
 
             // TODO more research into how this works

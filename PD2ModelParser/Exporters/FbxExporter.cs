@@ -84,14 +84,14 @@ namespace PD2ModelParser.Exporters
                 SkinBones sb = model.SkinBones;
 
                 SkeletonInfo bones;
-                if (skeletons.ContainsKey(sb.probably_root_bone))
+                if (skeletons.ContainsKey(sb.ProbablyRootBone.SectionId))
                 {
-                    bones = skeletons[sb.probably_root_bone];
+                    bones = skeletons[sb.ProbablyRootBone.SectionId];
                 }
                 else
                 {
                     bones = AddSkeleton(data, sb, model_objects);
-                    skeletons[sb.probably_root_bone] = bones;
+                    skeletons[sb.ProbablyRootBone.SectionId] = bones;
 
                     // Make one root node to contain the skeleton, and all the models
                     FbxNode root = FbxNode.Create(fm, bones.Root.Game.Name + "_RigRoot");
@@ -202,7 +202,7 @@ namespace PD2ModelParser.Exporters
         {
             Dictionary<uint, ISection> parsed = data.parsed_sections;
             Dictionary<Object3D, BoneInfo> bone_maps = new Dictionary<Object3D, BoneInfo>();
-            Object3D root = (Object3D) parsed[bones.probably_root_bone];
+            Object3D root = bones.ProbablyRootBone;
             BoneInfo root_bone = AddBone(root, bone_maps, exclude, bones);
             return new SkeletonInfo
             {

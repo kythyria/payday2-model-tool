@@ -174,7 +174,7 @@ namespace PD2ModelParser.Exporters
 
             var skinbones = model.SkinBones;
             var skin = root.CreateSkin(model.Name + "_Skin");
-            skin.Skeleton = nodesBySectionId[skinbones.probably_root_bone];
+            skin.Skeleton = nodesBySectionId[skinbones.ProbablyRootBone.SectionId];
 
             var wt = node.WorldMatrix;
             node.LocalTransform = Matrix4x4.Identity;
