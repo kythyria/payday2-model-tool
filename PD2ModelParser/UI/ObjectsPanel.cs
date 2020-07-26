@@ -12,6 +12,7 @@ namespace PD2ModelParser.UI
         private readonly Dictionary<uint, TreeNode> nodes = new Dictionary<uint, TreeNode>();
         private readonly ContextMenu nodeRightclickMenu;
         private TreeNode menuTarget;
+        private FullModelData data;
 
         public ObjectsPanel()
         {
@@ -38,7 +39,7 @@ namespace PD2ModelParser.UI
         /// </remarks>
         private void Reload()
         {
-            FullModelData data = null;
+            data = null;
             var script = new List<Modelscript.IScriptItem>();
             if(modelFile.Selected != null)
             {
@@ -151,7 +152,7 @@ namespace PD2ModelParser.UI
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            var scr = new List<Modelscript.IScriptItem>()
+            var script = new List<Modelscript.IScriptItem>()
             {
                 new Modelscript.SaveModel() { File = modelFile.Selected }
             };
