@@ -37,6 +37,7 @@ namespace PD2ModelParser.UI
             this.scriptFile = new PD2ModelParser.UI.FileBrowserControl();
             this.modelFile = new PD2ModelParser.UI.FileBrowserControl();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnSave = new System.Windows.Forms.Button();
             lblModel = new System.Windows.Forms.Label();
             lblScript = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -149,10 +150,21 @@ namespace PD2ModelParser.UI
             this.splitContainer1.SplitterDistance = 383;
             this.splitContainer1.TabIndex = 8;
             // 
+            // btnSave
+            // 
+            this.btnSave.Location = new System.Drawing.Point(427, 61);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(75, 23);
+            this.btnSave.TabIndex = 9;
+            this.btnSave.Text = "Save";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
             // ObjectsPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.btnSave);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.btnReload);
             this.Controls.Add(this.showScriptChanges);
@@ -180,5 +192,6 @@ namespace PD2ModelParser.UI
         private System.Windows.Forms.TreeView treeView;
         private System.Windows.Forms.PropertyGrid propertyGrid1;
         private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.Button btnSave;
     }
 }

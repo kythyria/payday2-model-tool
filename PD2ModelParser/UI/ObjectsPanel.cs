@@ -1,3 +1,4 @@
+using PD2ModelParser.Sections;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -47,6 +48,7 @@ namespace PD2ModelParser.UI
             {
                 script.Add(new Modelscript.NewModel());
             }
+            btnSave.Enabled = !showScriptChanges.Checked;
 
             if(scriptFile.Selected != null && showScriptChanges.Checked)
             {
@@ -145,6 +147,18 @@ namespace PD2ModelParser.UI
                 ReconcileChildNodes(i, n.Nodes);
             }
             viewNodes.AddRange(toAdd.ToArray());
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            var scr = new List<Modelscript.IScriptItem>()
+            {
+                new Modelscript.SaveModel() { File = modelFile.Selected }
+            };
+            // TODO: There must be a better way to deal with errors.
+            bool success = Modelscript.Script.ExecuteWithMsgBox(script, ref data);
+            if (!success)
+                return;
         }
     }
 }
