@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -23,13 +24,24 @@ namespace PD2ModelParser
             }
         }
 
-        public static IEnumerable<(string, string, FullModelData)> EveryModel(string root)
+        public static IEnumerable<(string fullpath, string relativepath, FullModelData data)> EveryModel(string root)
         {
             foreach (var i in WalkDirectoryTreeDepth(new DirectoryInfo(root), "*.model"))
             {
-                var fmd = ModelReader.Open(i.FullName);
+                FullModelData fmd = null;
+                try
+                {
+                    fmd = ModelReader.Open(i.FullName);
+                }
+                catch(Exception e)
+                {
+                    Log.Default.Warn($"Unable to read {i.FullName}: {e}");
+                }
+                if (fmd != null)
+                {
                 yield return (i.FullName, i.FullName.Substring(root.Length), fmd);
             }
+        }
         }
 
         public static void WriteSimpleCsvLike<T>(TextWriter tw, IEnumerable<T> items)

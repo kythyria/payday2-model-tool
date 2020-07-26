@@ -1,6 +1,7 @@
 ﻿using Nexus;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 
 namespace PD2ModelParser.Sections
@@ -12,10 +13,11 @@ namespace PD2ModelParser.Sections
         public int count => objects.Count;
         public List<uint> objects { get; private set; } = new List<uint>(); // of Object3D by SectionID
         public List<Matrix3D> rotations { get; private set; } = new List<Matrix3D>();
+        [TypeConverter(typeof(Inspector.NexusMatrixConverter))]
         public Matrix3D global_skin_transform { get; set; }
 
         // Post-loaded
-        public List<Matrix3D> SkinPositions { get; set; }
+        public List<Matrix3D> SkinPositions { get; private set; }
 
         public SkinBones(uint secId) : base()
         {
