@@ -1,13 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.ComponentModel;
 
 namespace PD2ModelParser.Sections
 {
     [SectionId(Tags.passthroughGP_tag)]
+    [TypeConverter(typeof(ExpandableObjectConverter))]
     class PassthroughGP : AbstractSection, ISection, IPostLoadable
     {
         public UInt32 size;
+        [Category("PassthroughGP")]
         public Geometry Geometry { get; set; }
+        [Category("PassthroughGP")]
         public Topology Topology { get; set; }
         public byte[] remaining_data = null;
 

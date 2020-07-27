@@ -75,12 +75,17 @@ namespace PD2ModelParser.Sections
 
         delegate void PostLoadCallback(ISection self, Dictionary<uint, ISection> sections);
         List<PostLoadCallback> postloadCallbacks = new List<PostLoadCallback>();
+
+
         /// <summary>
         /// Record that a section ID was read, for assigning the actual section later when all sections exist.
         /// </summary>
         /// <param name="id">Section ID.</param>
         /// <param name="self">Object which has the reference property on it.</param>
         /// <param name="prop">Expression reading the property in question.</param>
+        /// 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter",
+            Justification = "Exists to force TSelf to the correct type")]
         protected void PostloadRef<TSelf, TRef>(uint id, TSelf self, Expression<Func<TSelf, TRef>> prop)
         {
             var body = prop.Body as MemberExpression;

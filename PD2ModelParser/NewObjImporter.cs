@@ -208,7 +208,7 @@ namespace PD2ModelParser
                 }
 
                 Model model_data_section = (Model)parsed_sections[modelSectionid];
-                PassthroughGP passthrough_section = (PassthroughGP)parsed_sections[model_data_section.passthroughGP_ID];
+                PassthroughGP passthrough_section = model_data_section.PassthroughGP;
                 Geometry geometry_section = passthrough_section.Geometry;
                 Topology topology_section = passthrough_section.Topology;
 
@@ -679,7 +679,7 @@ namespace PD2ModelParser
                         continue;
 
                     Model model_data_section = (Model)fm.parsed_sections[modelSectionid];
-                    PassthroughGP passthrough_section = (PassthroughGP)fm.parsed_sections[model_data_section.passthroughGP_ID];
+                    PassthroughGP passthrough_section = model_data_section.PassthroughGP;
                     Geometry geometry_section = passthrough_section.Geometry;
                     Topology topology_section = passthrough_section.Topology;
 

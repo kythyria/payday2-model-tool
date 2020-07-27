@@ -53,14 +53,16 @@ namespace PD2ModelParser.Sections
         [Category("Model")]
         [DisplayName("Version")]
         public UInt32 version { get; set; }
+
         //Version 6
         [Category("Model")]
         public float v6_unknown7 { get; set; }
         [Category("Model")]
         public UInt32 v6_unknown8 { get; set; }
-        //Other Versions
+
+        //Other versions
         [Category("Model")]
-        public UInt32 passthroughGP_ID { get; set; } //ID of associated PassthroughGP
+        public PassthroughGP PassthroughGP { get; set; }
         [Category("Model")]
         public UInt32 topologyIP_ID { get; set; } //ID of associated TopologyIP
 
@@ -99,7 +101,7 @@ namespace PD2ModelParser.Sections
             SectionId = (uint)object_name.GetHashCode();
 
             this.version = 3;
-            this.passthroughGP_ID = passGP.SectionId;
+            this.PassthroughGP = passGP;
             this.topologyIP_ID = topoIP.SectionId;
             this.RenderAtoms = new List<RenderAtom>();
             RenderAtom nmi = new RenderAtom
@@ -128,7 +130,7 @@ namespace PD2ModelParser.Sections
         {
             this.size = 0;
             // TODO: Get rid of all referring to things by section ID outside of read/write of model files so we don't have to do this.
-            SectionId = (uint) object_name.GetHashCode();
+            SectionId = (uint)object_name.GetHashCode();
 
             this.version = 6;
             this.BoundsMin = bounds_min.ToNexusVector();
@@ -154,13 +156,13 @@ namespace PD2ModelParser.Sections
             {
                 this.BoundsMin = instream.ReadNexusVector3D();
                 this.BoundsMax = instream.ReadNexusVector3D();
-                
+
                 this.v6_unknown7 = instream.ReadSingle();
                 this.v6_unknown8 = instream.ReadUInt32();
             }
             else
             {
-                this.passthroughGP_ID = instream.ReadUInt32();
+                PostloadRef(instream.ReadUInt32(), this, i => PassthroughGP);
                 this.topologyIP_ID = instream.ReadUInt32();
                 var renderAtomCount = instream.ReadUInt32();
 
@@ -211,7 +213,7 @@ namespace PD2ModelParser.Sections
             }
             else
             {
-                outstream.Write(this.passthroughGP_ID);
+                outstream.Write(this.PassthroughGP.SectionId);
                 outstream.Write(this.topologyIP_ID);
                 outstream.Write((uint)this.RenderAtoms.Count);
                 foreach (RenderAtom modelitem in this.RenderAtoms)
@@ -249,21 +251,21 @@ namespace PD2ModelParser.Sections
             else
             {
                 var atoms_string = string.Join(",", RenderAtoms.Select(i => i.ToString()));
-                return $"{base.ToString()} version: {this.version} passthroughGP_ID: {this.passthroughGP_ID} topologyIP_ID: {this.topologyIP_ID} RenderAtoms: {this.RenderAtoms.Count} items: [{atoms_string}] MaterialGroup: {this.MaterialGroup.SectionId} unknown10: {this.lightset_ID} bounds_min: {this.BoundsMin} bounds_max: {this.BoundsMax} unknown11: {this.properties_bitmap} BoundingRadius: {this.BoundingRadius} unknown13: {this.unknown13} skinbones_ID: {this.SkinBones.SectionId}{(this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "")}";
+                return $"{base.ToString()} version: {this.version} passthroughGP_ID: {this.PassthroughGP?.SectionId} topologyIP_ID: {this.topologyIP_ID} RenderAtoms: {this.RenderAtoms.Count} items: [{atoms_string}] MaterialGroup: {this.MaterialGroup.SectionId} unknown10: {this.lightset_ID} bounds_min: {this.BoundsMin} bounds_max: {this.BoundsMax} unknown11: {this.properties_bitmap} BoundingRadius: {this.BoundingRadius} unknown13: {this.unknown13} skinbones_ID: {this.SkinBones?.SectionId ?? 0}{(this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "")}";
             }
         }
 
-        public void UpdateBounds(FullModelData fmd)
+        public void UpdateBounds()
         {
             if (version != 3) { return; }
 
-            var gp = fmd.parsed_sections[passthroughGP_ID] as PassthroughGP;
+            var gp = this.PassthroughGP;
             if (gp == null) { return; }
 
             var geo = gp.Geometry;
             if (geo == null) { return; }
 
-            if(geo.verts.Count == 0) { return; }
+            if (geo.verts.Count == 0) { return; }
 
             Transform.Decompose(out Vector3D scale, out _, out _);
 

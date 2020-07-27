@@ -3,11 +3,8 @@ using Nexus;
 using PD2ModelParser.Sections;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using static PD2ModelParser.Tags;
 
 namespace PD2ModelParser
@@ -69,7 +66,7 @@ namespace PD2ModelParser
 
                     string model_id = model_i + "-" + model_data.HashName.String;
 
-                    PassthroughGP passthrough_section = (PassthroughGP) parsed_sections[model_data.passthroughGP_ID];
+                    PassthroughGP passthrough_section = model_data.PassthroughGP;
                     Geometry geometry_section = passthrough_section.Geometry;
                     Topology topology_section = passthrough_section.Topology;
                     geometry geom = SerializeModel(geometry_section, topology_section, model_data, model_id);

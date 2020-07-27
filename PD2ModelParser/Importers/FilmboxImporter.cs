@@ -142,7 +142,7 @@ namespace PD2ModelParser.Importers
             }
 
             Dictionary<uint, ISection> parsed = data.parsed_sections;
-            PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
+            PassthroughGP pgp = model.PassthroughGP;
             Geometry geom = pgp.Geometry;
             Topology topo = pgp.Topology;
 

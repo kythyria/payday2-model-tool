@@ -116,7 +116,7 @@ namespace PD2ModelParser.Exporters
         private static ModelInfo AddModel(FullModelData data, Model model)
         {
             Dictionary<uint, ISection> parsed = data.parsed_sections;
-            PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
+            PassthroughGP pgp = model.PassthroughGP;
             Geometry geom = pgp.Geometry;
             Topology topo = pgp.Topology;
 
@@ -258,7 +258,7 @@ namespace PD2ModelParser.Exporters
             FbxMesh mesh, IReadOnlyDictionary<Object3D, BoneInfo> bones)
         {
             Dictionary<uint, ISection> parsed = data.parsed_sections;
-            PassthroughGP pgp = (PassthroughGP) parsed[model.passthroughGP_ID];
+            PassthroughGP pgp = model.PassthroughGP;
             Geometry geom = pgp.Geometry;
 
             // Mainly for testing stuff with bone exports, keep things working if

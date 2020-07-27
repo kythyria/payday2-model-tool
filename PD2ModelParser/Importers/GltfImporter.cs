@@ -147,7 +147,7 @@ namespace PD2ModelParser.Importers
             lt.Translation *= scaleFactor;
             obj.Transform = lt.Matrix.ToNexusMatrix();
 
-            (obj as DM.Model)?.UpdateBounds(data);
+            (obj as DM.Model)?.UpdateBounds();
 
             foreach(var child in node.VisualChildren)
             {
@@ -177,7 +177,7 @@ namespace PD2ModelParser.Importers
             var ms = new MeshSections();
             ms.matg = matGroup;
             ms.topoip = data.parsed_sections[model.topologyIP_ID] as DM.TopologyIP;
-            ms.passgp = data.parsed_sections[model.passthroughGP_ID] as DM.PassthroughGP;
+            ms.passgp = data.parsed_sections[model.PassthroughGP.SectionId] as DM.PassthroughGP;
             ms.geom = data.parsed_sections[ms.passgp.SectionId] as DM.Geometry;
             ms.topo = data.parsed_sections[ms.topoip.SectionId] as DM.Topology;
             ms.atoms = md.renderAtoms;

@@ -192,14 +192,14 @@ namespace PD2ModelParser.Exporters
 
         GLTF.Mesh GetMeshForModel(Model model)
         {
-            if(!data.parsed_sections.ContainsKey(model.passthroughGP_ID))
+            if(!data.parsed_sections.ContainsKey(model.PassthroughGP.SectionId))
             {
                 return null;
             }
 
             var mesh = root.CreateMesh(model.Name);
 
-            var secPassthrough = (PassthroughGP)data.parsed_sections[model.passthroughGP_ID];
+            var secPassthrough = model.PassthroughGP;
             var geometry = secPassthrough.Geometry;
             var topology = secPassthrough.Topology;
             var materialGroup = model.MaterialGroup;
