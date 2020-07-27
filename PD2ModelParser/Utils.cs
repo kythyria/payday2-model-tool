@@ -186,6 +186,34 @@ namespace PD2ModelParser
 
         public static Boolean IsUnitLength(this System.Numerics.Vector3 vec) =>
             Math.Abs(vec.Length() - 1) <= UnitLengthThresholdVec3;
+
+        /// <summary>
+        /// Produce a matrix by executing an arbitrary function on its elements.
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        static Matrix3D Elementwise(this Matrix3D mat, Func<float, float> f)
+        {
+            return Elementwise(mat, new Matrix3D(), (m, o) => f(m));
+        }
+
+        /// <summary>
+        /// Produce a matrix by executing an arbtrary function on the elements of two matrices.
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <param name="oth"></param>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        static Matrix3D Elementwise(this Matrix3D mat, Matrix3D oth, Func<float, float, float> f)
+        {
+            return new Matrix3D(
+                f(mat.M11, oth.M11), f(mat.M12, oth.M12), f(mat.M13, oth.M13), f(mat.M14, oth.M14),
+                f(mat.M21, oth.M21), f(mat.M22, oth.M22), f(mat.M23, oth.M23), f(mat.M24, oth.M24),
+                f(mat.M31, oth.M31), f(mat.M32, oth.M32), f(mat.M33, oth.M33), f(mat.M34, oth.M34),
+                f(mat.M41, oth.M41), f(mat.M42, oth.M42), f(mat.M43, oth.M43), f(mat.M44, oth.M44)
+            );
+        }
     }
 
     public static class MatrixExtensions
