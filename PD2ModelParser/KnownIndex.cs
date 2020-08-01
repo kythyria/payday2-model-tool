@@ -81,7 +81,7 @@ namespace PD2Bundle
             var exedir = Path.GetDirectoryName(exepath);
             var cwd = Directory.GetCurrentDirectory();
 
-            var hashregex = new Regex(@"hash(list|es)(-\d+)?(\.txt)?");
+            var hashregex = new Regex(@"hash(list|es)(-\d+)?(\.txt)?", RegexOptions.IgnoreCase);
             var names = Directory.GetFiles(cwd).Where(i=>hashregex.IsMatch(i));
             if(exedir != cwd)
             {

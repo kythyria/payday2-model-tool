@@ -67,8 +67,8 @@ not in the list will be written as a number, while the GLTF importer will assume
 `unsigned long` is the result of that process.
 
 A copy of [Luffyyy's version of the hashlist](https://github.com/Luffyyy/PAYDAY-2-Hashlist) is included; the
-tool looks for files called `hashlist`, `hashes`, with or without a numeric suffix like `-3`, with or without
-a `.txt` extension, in the current directory and next to the executable. Any it finds are interpreted as lists
+tool looks for files whose names include, case insensitively, `hashlist` or `hashes`, in the current directory
+and next to the executable. Any it finds are interpreted as lists
 of unhashed names, one per line. If you change hashlists you will need to restart the tool in order to pick
 up the changes.
 
