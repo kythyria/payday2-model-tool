@@ -171,7 +171,7 @@ namespace PD2ModelParser.Importers
                 return mat;
             }).ToList();
 
-            var matGroup = new DM.Material_Group((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats.Select(i => i.SectionId));
+            var matGroup = new DM.MaterialGroup((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats);
             data.AddSection(matGroup);
 
             var ms = new MeshSections();
@@ -247,7 +247,7 @@ namespace PD2ModelParser.Importers
                 return mat;
             }).ToList();
 
-            var matGroup = new DM.Material_Group((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats.Select(i => i.SectionId));
+            var matGroup = new DM.MaterialGroup((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats);
             data.AddSection(matGroup);
 
             var ms = new MeshSections();
@@ -368,7 +368,7 @@ namespace PD2ModelParser.Importers
             public DM.Topology topo;
             public DM.TopologyIP topoip;
             public DM.PassthroughGP passgp;
-            public DM.Material_Group matg;
+            public DM.MaterialGroup matg;
             public List<DM.RenderAtom> atoms = new List<DM.RenderAtom>();
 
             public void PopulateFromMeshData(MeshData md)

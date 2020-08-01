@@ -183,7 +183,7 @@
     <Compile Include="Sections\Geometry.cs" />
     <Compile Include="Sections\LinearVector3Controller.cs" />
     <Compile Include="Sections\Material.cs" />
-    <Compile Include="Sections\Material_Group.cs" />
+    <Compile Include="Sections\MaterialGroup.cs" />
     <Compile Include="Sections\Model.cs" />
     <Compile Include="Sections\Object3D.cs" />
     <Compile Include="Sections\PassthroughGP.cs" />

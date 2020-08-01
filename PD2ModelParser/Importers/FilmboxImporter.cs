@@ -84,7 +84,7 @@ namespace PD2ModelParser.Importers
             // TODO material setup
             Material mat = new Material(0, "");
             data.AddSection(mat);
-            Material_Group mat_g = new Material_Group(0, mat.SectionId);
+            MaterialGroup mat_g = new MaterialGroup(0, mat);
             data.AddSection(mat_g);
 
             // Used for some internal model stuff

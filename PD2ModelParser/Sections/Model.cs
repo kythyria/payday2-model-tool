@@ -69,7 +69,7 @@ namespace PD2ModelParser.Sections
         [Category("Model")]
         public List<RenderAtom> RenderAtoms { get; set; }
         [Category("Model")]
-        public Material_Group MaterialGroup { get; set; }
+        public MaterialGroup MaterialGroup { get; set; }
         [Category("Model")]
         public UInt32 lightset_ID { get; set; }
 
@@ -93,7 +93,7 @@ namespace PD2ModelParser.Sections
         [Category("Model")]
         public SkinBones SkinBones { get; set; }
 
-        public Model(string object_name, uint triangleCount, uint vertexCount, PassthroughGP passGP, TopologyIP topoIP, Material_Group matg, Object3D parent)
+        public Model(string object_name, uint triangleCount, uint vertexCount, PassthroughGP passGP, TopologyIP topoIP, MaterialGroup matg, Object3D parent)
             : base(object_name, parent)
         {
             this.size = 0;
@@ -139,7 +139,7 @@ namespace PD2ModelParser.Sections
             this.v6_unknown8 = 0;
         }
 
-        public Model(obj_data obj, PassthroughGP passGP, TopologyIP topoIP, Material_Group matg, Object3D parent)
+        public Model(obj_data obj, PassthroughGP passGP, TopologyIP topoIP, MaterialGroup matg, Object3D parent)
             : this(obj.object_name, (uint)obj.verts.Count, (uint)obj.faces.Count, passGP, topoIP, matg, parent) { }
 
         public Model(BinaryReader instream, SectionHeader section)

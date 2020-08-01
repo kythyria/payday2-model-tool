@@ -225,7 +225,7 @@ namespace PD2ModelParser
                 {
                     //create new Model
                     Material newMat = new Material((uint)(obj.object_name + ".material").GetHashCode(), obj.material_name);
-                    Material_Group newMatG = new Material_Group((uint)(obj.object_name + ".materialGroup").GetHashCode(), newMat.SectionId);
+                    MaterialGroup newMatG = new MaterialGroup((uint)(obj.object_name + ".materialGroup").GetHashCode(), newMat);
                     Geometry newGeom = new Geometry((uint)(obj.object_name + ".geom").GetHashCode(), obj);
                     Topology newTopo = new Topology((uint)(obj.object_name + ".topo").GetHashCode(), obj);
 

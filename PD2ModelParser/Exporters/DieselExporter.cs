@@ -51,11 +51,12 @@ namespace PD2ModelParser
                 {
                     author_sections.Add(section as Author);
                 }
-                else if (section is Material_Group)
+                else if (section is MaterialGroup)
                 {
-                    foreach(var matid in (section as Material_Group).items)
+                    foreach(var matsec in (section as MaterialGroup).Items)
                     {
-                        var matsec = data.parsed_sections[matid];
+                        if (!data.parsed_sections.ContainsKey(matsec.SectionId))
+                            throw new Exception($"BUG: In MaterialGroup {section.SectionId}, Material {matsec.SectionId} isn't registered as part of the .model we're saving");
                         if(!material_sections.Contains(matsec))
                         {
                             material_sections.Add(matsec);

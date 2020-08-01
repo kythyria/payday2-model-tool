@@ -225,7 +225,7 @@ namespace PD2ModelParser.Exporters
             return mesh;
         }
 
-        IEnumerable<(GLTF.Accessor, GLTF.Material)> CreatePrimitiveIndices(Topology topo, IEnumerable<RenderAtom> atoms, Material_Group materialGroup)
+        IEnumerable<(GLTF.Accessor, GLTF.Material)> CreatePrimitiveIndices(Topology topo, IEnumerable<RenderAtom> atoms, MaterialGroup materialGroup)
         {
             var buf = new ArraySegment<byte>(new byte[topo.facelist.Count * 3 * 2]);
             var mai = new MemoryAccessInfo($"indices_{topo.hashname}", 0, topo.facelist.Count * 3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
@@ -246,7 +246,7 @@ namespace PD2ModelParser.Exporters
                 var atom_ma = new MemoryAccessor(buf, atom_mai);
                 var accessor = root.CreateAccessor();
                 accessor.SetIndexData(atom_ma);
-                var material = materialsBySectionId[materialGroup.items[(int)ra.MaterialId]];
+                var material = materialsBySectionId[materialGroup.Items[(int)ra.MaterialId].SectionId];
                 yield return (accessor, material);
             }
         }
