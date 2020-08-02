@@ -169,17 +169,16 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
-        public Geometry(uint id)
+        public Geometry()
         {
-            this.SectionId = id;
-
+            this.SectionId = 0;
             for (int i = 0; i < UVs.Length; i++)
             {
                 UVs[i] = new List<Vector2D>();
             }
         }
 
-        public Geometry(uint secId, obj_data newobject) : this(secId)
+        public Geometry(obj_data newobject) : this()
         {
             this.vert_count = (uint) newobject.verts.Count;
 
@@ -198,8 +197,9 @@ namespace PD2ModelParser.Sections
             this.hashname = Hash64.HashString(newobject.object_name + ".Geometry");
         }
 
-        public Geometry(BinaryReader instream, SectionHeader section) : this(section.id)
+        public Geometry(BinaryReader instream, SectionHeader section)
         {
+            this.SectionId = section.id;
             // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
             this.vert_count = instream.ReadUInt32();
             //Count of all headers for items in this section

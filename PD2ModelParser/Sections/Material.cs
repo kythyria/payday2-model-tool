@@ -27,9 +27,9 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
-        public Material(uint sec_id, string mat_name)
+        public Material(string mat_name)
         {
-            this.SectionId = sec_id;
+
             this.size = 0;
             this.hashname = new HashName(mat_name);
             this.skipped = new byte[48];

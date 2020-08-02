@@ -82,7 +82,7 @@ namespace PD2ModelParser.Importers
 
             // Material information
             // TODO material setup
-            Material mat = new Material(0, "");
+            Material mat = new Material("");
             data.AddSection(mat);
             MaterialGroup mat_g = new MaterialGroup(0, mat);
             data.AddSection(mat_g);
@@ -477,7 +477,7 @@ namespace PD2ModelParser.Importers
 
         private Geometry CreateGeometry()
         {
-            Geometry geom = new Geometry(0);
+            Geometry geom = new Geometry();
             data.AddSection(geom);
 
             // TODO cleanup
