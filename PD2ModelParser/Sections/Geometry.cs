@@ -197,7 +197,7 @@ namespace PD2ModelParser.Sections
             this.hashname = Hash64.HashString(newobject.object_name + ".Geometry");
         }
 
-        public Geometry(BinaryReader instream, SectionHeader section)
+        public Geometry(BinaryReader instream, SectionHeader section) : this()
         {
             this.SectionId = section.id;
             // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)

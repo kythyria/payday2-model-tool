@@ -6,12 +6,12 @@ using System.Linq;
 namespace PD2ModelParser.Sections
 {
     [SectionId(Tags.material_group_tag)]
-    class MaterialGroup : AbstractSection, ISection
+    class MaterialGroup : AbstractSection, ISection, IPostLoadable
     {
         private UInt32 size;
         private List<UInt32> itemIds = new List<UInt32>();
 
-        public UInt32 Count => (uint)itemIds.Count;
+        public UInt32 Count => (uint)Items.Count;
         public List<Material> Items { get; set; } = new List<Material>();
         public byte[] remaining_data = null;
 
