@@ -20,9 +20,12 @@ namespace PD2ModelParser
         /// <param name="obj">The section to add</param>
         public void AddSection(ISection obj)
         {
-            // Start custom objects at ID 10001, so they are easy to identify (there's no requirement
-            // we start at this point, however).
-            uint id = 10001;
+            // Shouldn't add twice
+            if(parsed_sections.ContainsValue(obj)) { return; }
+
+            // Objects with no ID already start at 10001. There's no real reason for this
+            // but we have to start somewhere and this is smaller than what overkill uses.
+            uint id = obj.SectionId != 0 ? obj.SectionId : 10001;
 
             // Find the first unused ID
             while (parsed_sections.ContainsKey(id))

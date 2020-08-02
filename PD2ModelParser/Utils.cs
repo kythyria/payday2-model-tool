@@ -458,7 +458,7 @@ namespace PD2ModelParser
         }
     }
 
-    static class NullableUtil
+    static class MiscUtil
     {
         public static R WithValue<T,R>(this T? self, Func<T,R> cb) where T : struct
         {
@@ -476,10 +476,7 @@ namespace PD2ModelParser
         {
             if (self.HasValue) { cb(self.Value); }
         }
-    }
 
-    static class EnumerableUtil
-    {
         public static IEnumerable<T> OrderedDistinct<T>(this IEnumerable<T> self)
         {
             var set = new HashSet<T>();
@@ -492,5 +489,14 @@ namespace PD2ModelParser
                 }
             }
         }
+
+        // This exists in later framework versions
+        public static void Deconstruct<T1, T2>(this KeyValuePair<T1, T2> tuple, out T1 key, out T2 value)
+        {
+            key = tuple.Key;
+            value = tuple.Value;
+        }
     }
+
+    
 }

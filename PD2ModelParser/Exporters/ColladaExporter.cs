@@ -119,7 +119,7 @@ namespace PD2ModelParser
                     };
                     root_node.node1 = new node[] {bone_root_node};
 
-                    Dictionary<UInt32, node> bones = new Dictionary<UInt32, node>();
+                    Dictionary<Object3D, node> bones = new Dictionary<Object3D, node>();
 
                     // In order to find locators, which aren't present in the SkinBones
                     // object, we check the child of each object we process.
@@ -175,7 +175,7 @@ namespace PD2ModelParser
                         bool locator = !sb.Objects.Contains(obj);
 
                         // Add the node
-                        bones[obj.SectionId] = new node
+                        bones[obj] = new node
                         {
                             id = "model-" + model_id + "-bone-" + bonename,
                             name = (locator ? "locator-" : "") + bonename,
@@ -197,15 +197,14 @@ namespace PD2ModelParser
                         i++;
                     }
 
-                    foreach (var nod in bones)
+                    foreach (var (obj, nod) in bones)
                     {
-                        Object3D obj = (Object3D) parsed_sections[nod.Key];
 
                         node parent = bone_root_node;
 
-                        if (bones.ContainsKey(obj.parentID))
+                        if (bones.ContainsKey(obj))
                         {
-                            parent = bones[obj.parentID];
+                            parent = bones[obj.Parent];
                         }
 
                         if (parent.node1 == null)
@@ -219,7 +218,7 @@ namespace PD2ModelParser
                             parent.node1 = children;
                         }
 
-                        parent.node1[parent.node1.Length - 1] = nod.Value;
+                        parent.node1[parent.node1.Length - 1] = nod;
                     }
                 }
             }

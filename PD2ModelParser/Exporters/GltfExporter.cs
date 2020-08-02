@@ -30,9 +30,8 @@ namespace PD2ModelParser.Exporters
         FullModelData data;
         GLTF.ModelRoot root;
         GLTF.Scene scene;
-        Dictionary<uint, List<(string, GLTF.Accessor)>> vertexAttributesByGeometryId;
-        Dictionary<uint, GLTF.Material> materialsBySectionId;
-        Dictionary<uint, GLTF.Node> nodesBySectionId;
+        Dictionary<ISection, GLTF.Material> materialsBySection;
+        Dictionary<ISection, GLTF.Node> nodesBySection;
         List<(Model, GLTF.Node)> toSkin;
 
         /// <summary>
@@ -46,9 +45,8 @@ namespace PD2ModelParser.Exporters
 
         GLTF.ModelRoot Convert(FullModelData data)
         {
-            vertexAttributesByGeometryId = new Dictionary<uint, List<(string, GLTF.Accessor)>>();
-            materialsBySectionId = new Dictionary<uint, GLTF.Material>();
-            nodesBySectionId = new Dictionary<uint, GLTF.Node>();
+            materialsBySection = new Dictionary<ISection, GLTF.Material>();
+            nodesBySection = new Dictionary<ISection, GLTF.Node>();
             toSkin = new List<(Model, GLTF.Node)>();
 
             this.data = data;
@@ -65,7 +63,7 @@ namespace PD2ModelParser.Exporters
 
             foreach (var ms in data.parsed_sections.Where(i => i.Value is Material).Select(i => i.Value as Material))
             {
-                materialsBySectionId[ms.SectionId] = root.CreateMaterial(ms.hashname.String);
+                materialsBySection[ms] = root.CreateMaterial(ms.hashname.String);
             }
 
             foreach(var i in data.SectionsOfType<Object3D>().Where(i => i.Parent == null))
@@ -93,7 +91,7 @@ namespace PD2ModelParser.Exporters
 
             var node = parent.CreateNode(thing.Name);
 
-            nodesBySectionId[thing.SectionId] = node;
+            nodesBySection[thing] = node;
             if (thing != null)
             {
                 var istrs = thing.Transform.Decompose(out var scale, out var rotation, out var translation);
@@ -167,20 +165,20 @@ namespace PD2ModelParser.Exporters
 
         void SkinModel(Model model, GLTF.Node node)
         {
-            if (!data.parsed_sections.ContainsKey(model.SkinBones.SectionId))
+            if (model.SkinBones == null)
             {
                 return;
             }
 
             var skinbones = model.SkinBones;
             var skin = root.CreateSkin(model.Name + "_Skin");
-            skin.Skeleton = nodesBySectionId[skinbones.ProbablyRootBone.SectionId];
+            skin.Skeleton = nodesBySection[skinbones.ProbablyRootBone];
 
             var wt = node.WorldMatrix;
             node.LocalTransform = Matrix4x4.Identity;
 
             var joints2 = skinbones.bone_mappings[0].bones.Select(b => {
-                var jointNode = nodesBySectionId[skinbones.Objects[(int)b].SectionId];
+                var jointNode = nodesBySection[skinbones.Objects[(int)b]];
                 var ibm = skinbones.rotations[(int)b].ToMatrix4x4();
                 ibm.Translation *= scaleFactor;
                 return (jointNode, ibm);
@@ -192,7 +190,7 @@ namespace PD2ModelParser.Exporters
 
         GLTF.Mesh GetMeshForModel(Model model)
         {
-            if(!data.parsed_sections.ContainsKey(model.PassthroughGP.SectionId))
+            if(model.PassthroughGP == null)
             {
                 return null;
             }
@@ -246,7 +244,7 @@ namespace PD2ModelParser.Exporters
                 var atom_ma = new MemoryAccessor(buf, atom_mai);
                 var accessor = root.CreateAccessor();
                 accessor.SetIndexData(atom_ma);
-                var material = materialsBySectionId[materialGroup.Items[(int)ra.MaterialId].SectionId];
+                var material = materialsBySection[materialGroup.Items[(int)ra.MaterialId]];
                 yield return (accessor, material);
             }
         }
@@ -254,10 +252,6 @@ namespace PD2ModelParser.Exporters
         List<(string, GLTF.Accessor)> GetGeometryAttributes(Geometry geometry)
         {
             List<(string, GLTF.Accessor)> result;
-            if(vertexAttributesByGeometryId.TryGetValue(geometry.SectionId, out result))
-            {
-                return result;
-            }
             result = new List<(string, GLTF.Accessor)>();
 
             var a_pos = MakeVertexAttributeAccessor("vpos", geometry.verts.Select(i=>i*scaleFactor).ToList(), 12, GLTF.DimensionType.VEC3, MathUtil.ToVector3, ma => ma.AsVector3Array());

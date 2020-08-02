@@ -59,7 +59,7 @@ namespace PD2ModelParser.Exporters
             // Find all the Object3Ds that are actually part of an object
             var model_objects = new HashSet<Object3D>(data.SectionsOfType<Model>());
 
-            Dictionary<uint, SkeletonInfo> skeletons = new Dictionary<uint, SkeletonInfo>();
+            Dictionary<Object3D, SkeletonInfo> skeletonsObj = new Dictionary<Object3D, SkeletonInfo>();
 
             foreach (SectionHeader section_header in data.sections)
             {
@@ -84,14 +84,14 @@ namespace PD2ModelParser.Exporters
                 SkinBones sb = model.SkinBones;
 
                 SkeletonInfo bones;
-                if (skeletons.ContainsKey(sb.ProbablyRootBone.SectionId))
+                if (skeletonsObj.ContainsKey(sb.ProbablyRootBone))
                 {
-                    bones = skeletons[sb.ProbablyRootBone.SectionId];
+                    bones = skeletonsObj[sb.ProbablyRootBone];
                 }
                 else
                 {
                     bones = AddSkeleton(data, sb, model_objects);
-                    skeletons[sb.ProbablyRootBone.SectionId] = bones;
+                    skeletonsObj[sb.ProbablyRootBone] = bones;
 
                     // Make one root node to contain the skeleton, and all the models
                     FbxNode root = FbxNode.Create(fm, bones.Root.Game.Name + "_RigRoot");

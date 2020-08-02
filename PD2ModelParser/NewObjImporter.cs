@@ -18,9 +18,6 @@ namespace PD2ModelParser
             List<obj_data> objects = new List<obj_data>();
             List<obj_data> toAddObjects = new List<obj_data>();
 
-            ref List<SectionHeader> sections = ref fmd.sections;
-            ref Dictionary<UInt32, ISection> parsed_sections = ref fmd.parsed_sections;
-
             using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
             {
                 using (StreamReader sr = new StreamReader(fs))
@@ -178,42 +175,25 @@ namespace PD2ModelParser
                 //One would fix Tatsuto's broken shading here.
 
                 //Locate the proper model
-                uint modelSectionid = 0;
-                foreach (KeyValuePair<uint, ISection> pair in parsed_sections)
-                {
-                    if (modelSectionid != 0)
-                        break;
-
-                    if (pair.Value is Model)
-                    {
-                        UInt64 tryp;
-                        if (UInt64.TryParse(obj.object_name, out tryp))
-                        {
-                            if (tryp == ((Model)pair.Value).HashName.Hash)
-                                modelSectionid = pair.Key;
-                        }
-                        else
-                        {
-                            if (Hash64.HashString(obj.object_name) == ((Model)pair.Value).HashName.Hash)
-                                modelSectionid = pair.Key;
-                        }
-                    }
-                }
+                var hashname = HashName.FromNumberOrString(obj.object_name);
+                Model modelSection = fmd.parsed_sections
+                    .Where(i => i.Value is Model mod && hashname.Hash == mod.HashName.Hash)
+                    .Select(i => i.Value as Model)
+                    .FirstOrDefault();
 
                 //Apply new changes
-                if (modelSectionid == 0)
+                if (modelSection == null)
                 {
                     toAddObjects.Add(obj);
                     continue;
                 }
 
-                Model model_data_section = (Model)parsed_sections[modelSectionid];
-                PassthroughGP passthrough_section = model_data_section.PassthroughGP;
+                PassthroughGP passthrough_section = modelSection.PassthroughGP;
                 Geometry geometry_section = passthrough_section.Geometry;
                 Topology topology_section = passthrough_section.Topology;
 
                 AddObject(false, obj,
-                    model_data_section, passthrough_section,
+                    modelSection, passthrough_section,
                     geometry_section, topology_section);
             }
 
@@ -224,9 +204,11 @@ namespace PD2ModelParser
                 foreach (obj_data obj in toAddObjects)
                 {
                     //create new Model
-                    Material newMat = new Material((uint)(obj.object_name + ".material").GetHashCode(), obj.material_name);
+                    Material newMat = new Material(obj.material_name);
+                    fmd.AddSection(newMat);
                     MaterialGroup newMatG = new MaterialGroup((uint)(obj.object_name + ".materialGroup").GetHashCode(), newMat);
-                    Geometry newGeom = new Geometry((uint)(obj.object_name + ".geom").GetHashCode(), obj);
+                    Geometry newGeom = new Geometry(obj);
+                    fmd.AddSection(newGeom);
                     Topology newTopo = new Topology((uint)(obj.object_name + ".topo").GetHashCode(), obj);
 
                     PassthroughGP newPassGP = new PassthroughGP((uint)(obj.object_name + ".passGP").GetHashCode(), newGeom, newTopo);
@@ -239,20 +221,11 @@ namespace PD2ModelParser
                         newModel, newPassGP, newGeom, newTopo);
 
                     //Add new sections
-                    parsed_sections.Add(newMat.SectionId, newMat);
-                    sections.Add(new SectionHeader(newMat.SectionId));
-                    parsed_sections.Add(newMatG.SectionId, newMatG);
-                    sections.Add(new SectionHeader(newMatG.SectionId));
-                    parsed_sections.Add(newGeom.SectionId, newGeom);
-                    sections.Add(new SectionHeader(newGeom.SectionId));
-                    parsed_sections.Add(newTopo.SectionId, newTopo);
-                    sections.Add(new SectionHeader(newTopo.SectionId));
-                    parsed_sections.Add(newPassGP.SectionId, newPassGP);
-                    sections.Add(new SectionHeader(newPassGP.SectionId));
-                    parsed_sections.Add(newTopoIP.SectionId, newTopoIP);
-                    sections.Add(new SectionHeader(newTopoIP.SectionId));
-                    parsed_sections.Add(newModel.SectionId, newModel);
-                    sections.Add(new SectionHeader(newModel.SectionId));
+                    fmd.AddSection(newMatG);
+                    fmd.AddSection(newTopo);
+                    fmd.AddSection(newPassGP);
+                    fmd.AddSection(newTopoIP);
+                    fmd.AddSection(newModel);
                 }
             }
         }
