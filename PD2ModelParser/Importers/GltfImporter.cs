@@ -176,10 +176,10 @@ namespace PD2ModelParser.Importers
 
             var ms = new MeshSections();
             ms.matg = matGroup;
-            ms.topoip = data.parsed_sections[model.TopologyIP.SectionId] as DM.TopologyIP;
-            ms.passgp = data.parsed_sections[model.PassthroughGP.SectionId] as DM.PassthroughGP;
-            ms.geom = data.parsed_sections[ms.passgp.SectionId] as DM.Geometry;
-            ms.topo = data.parsed_sections[ms.topoip.SectionId] as DM.Topology;
+            ms.topoip = model.TopologyIP;
+            ms.passgp = model.PassthroughGP;
+            ms.geom = ms.passgp.Geometry;
+            ms.topo = ms.passgp.Topology;
             ms.atoms = md.renderAtoms;
 
             ms.PopulateFromMeshData(md);
