@@ -241,7 +241,7 @@ namespace PD2ModelParser.Importers
                 //     return obj;
 
                 // See above, wrt the hack to get around extra bones
-                if (!previous.objects.Contains(obj.SectionId))
+                if (!previous.Objects.Contains(obj))
                     return obj;
 
                 // Bone transforms seem to get messed up really easily. Since changing bone
@@ -254,6 +254,7 @@ namespace PD2ModelParser.Importers
                 }
 
                 sb.objects.Add(obj.SectionId);
+                sb.Objects.Add(obj);
 
                 // TODO implement
                 // ZNix's 10/11/19 notes on how the rotation and global_skin_transform seem
@@ -326,7 +327,7 @@ namespace PD2ModelParser.Importers
             Dictionary<Object3D, int> bone_indices = new Dictionary<Object3D, int>();
             for (int i = 0; i < sb.count; i++)
             {
-                Object3D obj = (Object3D) data.parsed_sections[sb.objects[i]];
+                Object3D obj = sb.Objects[i];
                 bone_indices[obj] = i;
             }
 

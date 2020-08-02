@@ -219,7 +219,7 @@ namespace PD2ModelParser.Exporters
 
             // If it's not part of the SkinBones object list, then it's a locator that vertices can't bind to
             // This will be read later when importing
-            if (!sb.objects.Contains(obj.SectionId))
+            if (!sb.Objects.Contains(obj))
             {
                 name += FbxUtils.LocatorSuffix;
             }
@@ -271,7 +271,7 @@ namespace PD2ModelParser.Exporters
 
             for (int bone_idx = 0; bone_idx < sb.count; bone_idx++)
             {
-                Object3D obj = (Object3D) parsed[sb.objects[bone_idx]];
+                Object3D obj = sb.Objects[bone_idx];
 
                 FbxCluster cluster = FbxCluster.Create(fm, "");
                 cluster.SetLink(bones[obj].Node);

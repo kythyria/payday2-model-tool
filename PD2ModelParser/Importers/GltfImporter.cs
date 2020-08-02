@@ -346,7 +346,7 @@ namespace PD2ModelParser.Importers
                 var (jointNode, ibm) = node.Skin.GetJoint(i);
                 ibm.Translation *= scaleFactor;
                 skinBones.rotations.Add(ibm.ToNexusMatrix());
-                skinBones.objects.Add(objectsByNode[jointNode].SectionId);
+                skinBones.Objects.Add(objectsByNode[jointNode]);
                 bmi.bones.Add((uint) i);
             }
 

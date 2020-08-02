@@ -4,6 +4,7 @@ using PD2ModelParser.Sections;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using static PD2ModelParser.Tags;
 
@@ -131,35 +132,23 @@ namespace PD2ModelParser
                     //
                     // TODO rewrite this code to be based around children, removing the need for a seperate
                     // loop after this that arranges the heirachy of nodes.
-                    List<uint> parsed = new List<uint>(sb.objects);
-                    Queue<uint> to_parse = new Queue<uint>();
-
-                    foreach (UInt32 id in sb.objects)
-                    {
-                        to_parse.Enqueue(id);
-                    }
+                    List<Object3D> parsed = new List<Object3D>(sb.Objects);
+                    Queue<Object3D> to_parse = new Queue<Object3D>(sb.Objects);
 
                     int i = 0;
                     while (to_parse.Count != 0)
                     {
-                        uint id = to_parse.Dequeue();
-
-                        // This used to hard cast the section out - unfortunately I didn't
-                        // make a comment when I wrote this and it's been like six months, so
-                        // I can only guess that a model node found it's way in here?
-                        Object3D obj = parsed_sections[id] as Object3D;
-                        if (obj == null)
-                            continue;
+                        Object3D obj = to_parse.Dequeue();
 
                         string bonename = obj.HashName.String;
 
                         // Find the locators and such, and add them to the TODO list
                         foreach (Object3D child in obj.children)
                         {
-                            if (!parsed.Contains(child.SectionId)) // Don't process something twice
+                            if (!parsed.Contains(child)) // Don't process something twice
                             {
-                                parsed.Add(child.SectionId);
-                                to_parse.Enqueue(child.SectionId);
+                                parsed.Add(child);
+                                to_parse.Enqueue(child);
                             }
                         }
 
@@ -171,7 +160,7 @@ namespace PD2ModelParser
                         Matrix3D final_rot = Matrix3D.CreateFromQuaternion(rotate);
                         final_rot.Translation = translate;
 
-                        if (obj.Parent == null || !sb.objects.Contains(obj.parentID))
+                        if (obj.Parent == null || !sb.Objects.Contains(obj.Parent))
                         {
                             Matrix3D fixed_obj_transform = obj.WorldTransform;
                             fixed_obj_transform.Decompose(out scale, out rotate, out translate);
@@ -183,10 +172,10 @@ namespace PD2ModelParser
 
                         // If the object is not contained within the SkinBones
                         // object, it must be a locator.
-                        bool locator = !sb.objects.Contains(id);
+                        bool locator = !sb.Objects.Contains(obj);
 
                         // Add the node
-                        bones[id] = new node
+                        bones[obj.SectionId] = new node
                         {
                             id = "model-" + model_id + "-bone-" + bonename,
                             name = (locator ? "locator-" : "") + bonename,

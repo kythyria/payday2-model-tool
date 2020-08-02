@@ -180,7 +180,7 @@ namespace PD2ModelParser.Exporters
             node.LocalTransform = Matrix4x4.Identity;
 
             var joints2 = skinbones.bone_mappings[0].bones.Select(b => {
-                var jointNode = nodesBySectionId[skinbones.objects[(int)b]];
+                var jointNode = nodesBySectionId[skinbones.Objects[(int)b].SectionId];
                 var ibm = skinbones.rotations[(int)b].ToMatrix4x4();
                 ibm.Translation *= scaleFactor;
                 return (jointNode, ibm);

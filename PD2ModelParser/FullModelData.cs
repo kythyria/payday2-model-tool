@@ -18,7 +18,6 @@ namespace PD2ModelParser
         /// This sets the Section ID of the passed object.
         /// </remarks>
         /// <param name="obj">The section to add</param>
-        /// <param name="typecode">The ID of the section header - see <see cref="Tags"/> for these</param>
         public void AddSection(ISection obj)
         {
             // Start custom objects at ID 10001, so they are easy to identify (there's no requirement

@@ -3,16 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 
 namespace PD2ModelParser.Sections
 {
     [SectionId(Tags.skinbones_tag)]
     class SkinBones : Bones, ISection, IPostLoadable
     {
+        private List<uint> objects { get; set; } = new List<uint>(); // of Object3D by SectionID
+
         [TypeConverter(typeof(Inspector.Object3DReferenceConverter))]
         public Object3D ProbablyRootBone { get; set; }
-        public int count => objects.Count;
-        public List<uint> objects { get; private set; } = new List<uint>(); // of Object3D by SectionID
+        public int count => Objects.Count;
+        public List<Object3D> Objects { get; private set; } = new List<Object3D>();
         public List<Matrix3D> rotations { get; private set; } = new List<Matrix3D>();
         [TypeConverter(typeof(Inspector.NexusMatrixConverter))]
         public Matrix3D global_skin_transform { get; set; }
@@ -57,11 +60,11 @@ namespace PD2ModelParser.Sections
             outstream.Write(this.ProbablyRootBone.SectionId);
             outstream.Write(this.count);
 
-            SectionUtils.CheckLength(count, objects);
+            SectionUtils.CheckLength(count, Objects);
             SectionUtils.CheckLength(count, rotations);
 
-            foreach (UInt32 item in this.objects)
-                outstream.Write(item);
+            foreach (var item in this.Objects)
+                outstream.Write(item.SectionId);
             foreach (Matrix3D matrix in this.rotations)
             {
                 MathUtil.WriteMatrix(outstream, matrix);
@@ -75,12 +78,9 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            string objects_string = (this.objects.Count == 0 ? "none" : "");
+            string objects_string = (this.Objects.Count == 0 ? "none" : "");
 
-            foreach (UInt32 obj in this.objects)
-            {
-                objects_string += obj + ", ";
-            }
+            objects_string += string.Join(", ", this.Objects.Select(i => i.SectionId));
 
             string rotations_string = (this.rotations.Count == 0 ? "none" : "");
 
@@ -91,8 +91,7 @@ namespace PD2ModelParser.Sections
 
             return base.ToString() +
                    " object3D_section_id: " + this.ProbablyRootBone.SectionId +
-                   " count: " + this.count + " objects" +
-                   " count: " + this.objects.Count + " objects:[ " + objects_string + " ]" +
+                   " count: " + this.Objects.Count + " objects:[ " + objects_string + " ]" +
                    " rotations count: " + this.rotations.Count + " rotations:[ " + rotations_string + " ]" +
                    " global_skin_transform: " + this.global_skin_transform +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
@@ -106,12 +105,14 @@ namespace PD2ModelParser.Sections
             for (int i = 0; i < objects.Count; i++)
             {
                 Object3D obj = (Object3D) parsed_sections[objects[i]];
+                Objects.Add(obj);
 
                 Matrix3D inter = rotations[i].MultDiesel(obj.WorldTransform);
                 Matrix3D skin_node = inter.MultDiesel(global_skin_transform);
 
                 SkinPositions.Add(skin_node);
             }
+            objects = null;
         }
     }
 }
