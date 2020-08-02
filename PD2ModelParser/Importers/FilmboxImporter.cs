@@ -253,7 +253,6 @@ namespace PD2ModelParser.Importers
                     obj.Transform = node.GetNexusTransform();
                 }
 
-                sb.objects.Add(obj.SectionId);
                 sb.Objects.Add(obj);
 
                 // TODO implement
