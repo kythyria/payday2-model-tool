@@ -8,24 +8,20 @@ namespace PD2ModelParser.Sections
     [SectionId(Tags.material_group_tag)]
     class MaterialGroup : AbstractSection, ISection, IPostLoadable
     {
-        private UInt32 size;
+        private UInt32 size = 0;
         private List<UInt32> itemIds = new List<UInt32>();
 
         public UInt32 Count => (uint)Items.Count;
         public List<Material> Items { get; set; } = new List<Material>();
         public byte[] remaining_data = null;
 
-        public MaterialGroup(uint sec_id, Material mat)
+        public MaterialGroup(Material mat)
         {
-            this.SectionId = sec_id;
-            this.size = 0;
             this.Items.Add(mat);
         }
 
-        public MaterialGroup(uint sec_id, IEnumerable<Material> mats)
+        public MaterialGroup(IEnumerable<Material> mats)
         {
-            this.SectionId = sec_id;
-            this.size = 0;
             this.Items = mats.ToList();
         }
 

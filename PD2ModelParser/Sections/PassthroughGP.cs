@@ -8,17 +8,15 @@ namespace PD2ModelParser.Sections
     [TypeConverter(typeof(ExpandableObjectConverter))]
     class PassthroughGP : AbstractSection, ISection, IPostLoadable
     {
-        public UInt32 size;
+        public UInt32 size = 8;
         [Category("PassthroughGP")]
         public Geometry Geometry { get; set; }
         [Category("PassthroughGP")]
         public Topology Topology { get; set; }
         public byte[] remaining_data = null;
 
-        public PassthroughGP(uint sec_id, Geometry geom, Topology topo)
+        public PassthroughGP(Geometry geom, Topology topo)
         {
-            this.SectionId = sec_id;
-            this.size = 8;
             this.Geometry = geom;
             this.Topology = topo;
         }

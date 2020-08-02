@@ -23,10 +23,7 @@ namespace PD2ModelParser.Sections
         // Post-loaded
         public List<Matrix3D> SkinPositions { get; private set; }
 
-        public SkinBones(uint secId) : base()
-        {
-            SectionId = secId;
-        }
+        public SkinBones() : base() { }
 
         public SkinBones(BinaryReader instream, SectionHeader section) : base(instream)
         {

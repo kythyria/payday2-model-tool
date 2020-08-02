@@ -171,7 +171,7 @@ namespace PD2ModelParser.Importers
                 return mat;
             }).ToList();
 
-            var matGroup = new DM.MaterialGroup((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats);
+            var matGroup = new DM.MaterialGroup(mats);
             data.AddSection(matGroup);
 
             var ms = new MeshSections();
@@ -247,7 +247,7 @@ namespace PD2ModelParser.Importers
                 return mat;
             }).ToList();
 
-            var matGroup = new DM.MaterialGroup((uint)(gmesh.Name + ".matgroup").GetHashCode(), mats);
+            var matGroup = new DM.MaterialGroup(mats);
             data.AddSection(matGroup);
 
             var ms = new MeshSections();
@@ -257,13 +257,13 @@ namespace PD2ModelParser.Importers
             data.AddSection(ms.geom);
             ms.geom.hashname = Hash64.HashString(gmesh.Name + ".Geometry");
 
-            ms.topo = new DM.Topology((uint)(gmesh.Name + ".Topology").GetHashCode(), gmesh.Name);
+            ms.topo = new DM.Topology(gmesh.Name);
             data.AddSection(ms.topo);
 
-            ms.topoip = new DM.TopologyIP((uint)(gmesh.Name + ".topoIP").GetHashCode(), ms.topo);
+            ms.topoip = new DM.TopologyIP(ms.topo);
             data.AddSection(ms.topoip);
 
-            ms.passgp = new DM.PassthroughGP((uint)(gmesh.Name + ".passGP").GetHashCode(), ms.geom, ms.topo);
+            ms.passgp = new DM.PassthroughGP(ms.geom, ms.topo);
             data.AddSection(ms.passgp);
 
             ms.atoms = md.renderAtoms;
@@ -328,8 +328,7 @@ namespace PD2ModelParser.Importers
             var random = new Random();
             var randomBytes = new byte[4];
             random.NextBytes(randomBytes);
-            // TODO: Get rid of the sectionids when making a new section.
-            skinBones = new DM.SkinBones(0);
+            skinBones = new DM.SkinBones();
 
             skinBones.global_skin_transform = Nexus.Matrix3D.Identity;
             var parent = data.SectionsOfType<DM.Object3D>()

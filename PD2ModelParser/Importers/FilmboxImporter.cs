@@ -71,20 +71,20 @@ namespace PD2ModelParser.Importers
             Geometry geom = CreateGeometry();
 
             // Faces
-            Topology topo = new Topology(0, name);
+            Topology topo = new Topology(name);
             data.AddSection(topo);
 
             // Weird wrappers
-            TopologyIP tip = new TopologyIP(0, topo);
+            TopologyIP tip = new TopologyIP(topo);
             data.AddSection(tip);
-            PassthroughGP pgp = new PassthroughGP(0, geom, topo);
+            PassthroughGP pgp = new PassthroughGP(geom, topo);
             data.AddSection(pgp);
 
             // Material information
             // TODO material setup
             Material mat = new Material("");
             data.AddSection(mat);
-            MaterialGroup mat_g = new MaterialGroup(0, mat);
+            MaterialGroup mat_g = new MaterialGroup(mat);
             data.AddSection(mat_g);
 
             // Used for some internal model stuff
@@ -188,7 +188,7 @@ namespace PD2ModelParser.Importers
             // Ideally we'd fix this properly via mscript, but this will do for now.
             SkinBones previous = model.SkinBones;
 
-            SkinBones sb = new SkinBones(0);
+            SkinBones sb = new SkinBones();
             data.AddSection(sb);
             model.SkinBones = sb;
 

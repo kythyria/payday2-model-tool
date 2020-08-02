@@ -6,14 +6,16 @@ namespace PD2ModelParser.Sections
     [SectionId(Tags.topologyIP_tag)]
     class TopologyIP : AbstractSection, ISection, IPostLoadable
     {
-        public UInt32 size;
+        public UInt32 size = 0;
         public Topology Topology { get; set; }
         public byte[] remaining_data = null;
 
-        public TopologyIP(uint sec_id, Topology top)
+        public TopologyIP(uint sec_id, Topology top) : this(top)
         {
             this.SectionId = sec_id;
-            this.size = 0;
+        }
+        public TopologyIP(Topology top)
+        {
             this.Topology = top;
         }
 

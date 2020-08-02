@@ -206,26 +206,26 @@ namespace PD2ModelParser
                     //create new Model
                     Material newMat = new Material(obj.material_name);
                     fmd.AddSection(newMat);
-                    MaterialGroup newMatG = new MaterialGroup((uint)(obj.object_name + ".materialGroup").GetHashCode(), newMat);
+                    MaterialGroup newMatG = new MaterialGroup(newMat);
+                    fmd.AddSection(newMatG);
                     Geometry newGeom = new Geometry(obj);
                     fmd.AddSection(newGeom);
-                    Topology newTopo = new Topology((uint)(obj.object_name + ".topo").GetHashCode(), obj);
+                    Topology newTopo = new Topology(obj);
+                    fmd.AddSection(newTopo);
 
-                    PassthroughGP newPassGP = new PassthroughGP((uint)(obj.object_name + ".passGP").GetHashCode(), newGeom, newTopo);
-                    TopologyIP newTopoIP = new TopologyIP((uint)(obj.object_name + ".topoIP").GetHashCode(), newTopo);
+                    PassthroughGP newPassGP = new PassthroughGP(newGeom, newTopo);
+                    fmd.AddSection(newPassGP);
+                    TopologyIP newTopoIP = new TopologyIP(newTopo);
+                    fmd.AddSection(newTopoIP);
 
                     Object3D parent = root_point.Invoke(obj.object_name);
                     Model newModel = new Model(obj, newPassGP, newTopoIP, newMatG, parent);
+                    fmd.AddSection(newModel);
 
                     AddObject(true, obj,
                         newModel, newPassGP, newGeom, newTopo);
 
                     //Add new sections
-                    fmd.AddSection(newMatG);
-                    fmd.AddSection(newTopo);
-                    fmd.AddSection(newPassGP);
-                    fmd.AddSection(newTopoIP);
-                    fmd.AddSection(newModel);
                 }
             }
         }
