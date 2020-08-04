@@ -288,7 +288,12 @@ namespace PD2ModelParser.Exporters
 
                     var txn = Vector3.Cross(tangent, normal);
                     var dot = Vector3.Dot(txn, binorm);
-                    var sgn = Math.Sign(dot);
+                    if(float.IsNaN(dot))
+                    {
+                        Log.Default.Warn("Weird normals in vtx {3} of geom {4}|{5}, N={0}, T={1}, B={2}, (T cross N) dot B is NaN", normal, tangent, binorm, index, geometry.SectionId, geometry.hashname);
+                        return new Vector4(tangent, 1);
+                    }
+                    var sgn = float.IsNaN(dot) ? 1 : Math.Sign(dot);
 
                     // A few models have vertices where tangent==binorm, which is silly
                     // also breaks because SharpGLTF tries to do validation. So we return
