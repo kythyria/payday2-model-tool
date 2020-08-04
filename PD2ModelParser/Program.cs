@@ -16,6 +16,7 @@ namespace PD2ModelParser
         [STAThread]
         static void Main(string[] args)
         {
+            ModelReader.SayHello();
             Log.Default = new ConsoleLogger();
 
             bool gui = HandleCommandLine(args);

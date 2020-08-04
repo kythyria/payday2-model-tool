@@ -7,7 +7,7 @@ using PD2ModelParser.Sections;
 
 namespace PD2ModelParser
 {
-    static class ModelReader
+    static partial class ModelReader
     {
         public static FullModelData Open(string filepath)
         {
@@ -98,29 +98,12 @@ namespace PD2ModelParser
 
                     foreach (SectionHeader sh in sections)
                     {
-                        ISection section;
-
                         fs.Position = sh.Start;
-
-                        if(SectionMetaInfo.TryGetForTag(sh.type, out var mi))
-                        {
-                            section = mi.Deserialise(br, sh);
-                        }
-                        else
-                        {
-                            Log.Default.Warn("UNKNOWN Tag at {0} Size: {1}", sh.offset, sh.size);
-                            fs.Position = sh.offset;
-
-                            section = new Unknown(br, sh);
-                        }
-
-                        Log.Default.Debug("Section {0} at {1} length {2}",
-                            section.GetType().Name, sh.offset, sh.size);
-
+                        var section = ReadSection(br, sh);
                         parsed_sections.Add(sh.id, section);
                     }
 
-                    foreach(var i in parsed_sections)
+                    foreach (var i in parsed_sections)
                     {
                         if(i.Value is IPostLoadable pl)
                         {
