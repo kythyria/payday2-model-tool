@@ -31,6 +31,19 @@ namespace PD2ModelParser.Sections
     [SectionId(Tags.light_tag)]
     class Light : Object3D, ISection
     {
+        /* zdann says that
+         *   color - vector3
+         *   multiplier - float
+         *   far_range - float
+         *   spot_angle_end - float
+         *   enable - bool
+         *   falloff_exponent - float
+         *   properties - string
+         *   final_color - vector3
+         *   specular_multiplier - float
+         *   ambient_cube_side - vector3
+         * are pertinent properties to lights */
+
         public byte unknown_1 { get; set; } // 1 in all known lights
         public int LightType { get; set; } // it's 1 in light_omni and 2 in light_spot
         public LightColour Colour { get; set; }

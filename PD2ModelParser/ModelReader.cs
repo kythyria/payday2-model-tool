@@ -91,7 +91,13 @@ namespace PD2ModelParser
 
             using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
             {
-                using (BinaryReader br = new BinaryReader(fs))
+                var bytes = new byte[fs.Length];
+                int res = fs.Read(bytes, 0, (int)fs.Length);
+                if (res != fs.Length)
+                    throw new Exception($"Failed to read {filepath} all in one go!");
+
+                using (var ms = new MemoryStream(bytes, false))
+                using (var br = new BinaryReader(ms))
                 {
                     sections.Clear();
                     sections.AddRange(ReadHeaders(br));
@@ -100,16 +106,16 @@ namespace PD2ModelParser
                     {
                         ISection section;
 
-                        fs.Position = sh.Start;
+                        ms.Position = sh.Start;
 
-                        if(SectionMetaInfo.TryGetForTag(sh.type, out var mi))
+                        if (SectionMetaInfo.TryGetForTag(sh.type, out var mi))
                         {
                             section = mi.Deserialise(br, sh);
                         }
                         else
                         {
-                            Log.Default.Warn("UNKNOWN Tag at {0} Size: {1}", sh.offset, sh.size);
-                            fs.Position = sh.offset;
+                            Log.Default.Warn("UNKNOWN Tag {2} at {0} Size: {1}", sh.offset, sh.size, sh.type);
+                            ms.Position = sh.offset;
 
                             section = new Unknown(br, sh);
                         }
@@ -120,16 +126,16 @@ namespace PD2ModelParser
                         parsed_sections.Add(sh.id, section);
                     }
 
-                    foreach(var i in parsed_sections)
+                    foreach (var i in parsed_sections)
                     {
-                        if(i.Value is IPostLoadable pl)
+                        if (i.Value is IPostLoadable pl)
                         {
                             pl.PostLoad(i.Key, parsed_sections);
                         }
                     }
 
-                    if (fs.Position < fs.Length)
-                        data.leftover_data = br.ReadBytes((int)(fs.Length - fs.Position));
+                    if (ms.Position < ms.Length)
+                        data.leftover_data = br.ReadBytes((int)(ms.Length - ms.Position));
                 }
             }
         }
