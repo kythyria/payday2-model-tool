@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Reflection.Emit;
 
 namespace PD2ModelParser.Sections
 {
@@ -157,13 +158,15 @@ namespace PD2ModelParser.Sections
         public static SectionMetaInfo For(Type t) => byType[t];
 
         private System.Reflection.ConstructorInfo deserialiseConstructor;
+        private Func<BinaryReader, SectionHeader, ISection> deserialiseDelegate;
 
         public Type Type { get; private set; }
         public uint Tag { get; private set; }
 
         public ISection Deserialise(BinaryReader br, SectionHeader sh)
         {
-            return (ISection)deserialiseConstructor.Invoke(new object[] { br, sh });
+            //return (ISection)deserialiseConstructor.Invoke(new object[] { br, sh });
+            return deserialiseDelegate(br, sh);
         }
 
         SectionMetaInfo(Type t)
@@ -174,6 +177,14 @@ namespace PD2ModelParser.Sections
             this.Tag = idAttr.Tag;
 
             this.deserialiseConstructor = t.GetConstructor(new Type[] { typeof(BinaryReader), typeof(SectionHeader) });
+
+            var dm = new DynamicMethod("ConstructSection_" + t.Name, t, new Type[] { typeof(BinaryReader), typeof(SectionHeader) }, typeof(AbstractSection).Module);
+            var dmil = dm.GetILGenerator();
+            dmil.Emit(OpCodes.Ldarg_0);
+            dmil.Emit(OpCodes.Ldarg_1);
+            dmil.Emit(OpCodes.Newobj, deserialiseConstructor);
+            dmil.Emit(OpCodes.Ret);
+            deserialiseDelegate = (Func<BinaryReader, SectionHeader, ISection>)dm.CreateDelegate(typeof(Func<BinaryReader, SectionHeader, ISection>));
         }
     }
 
