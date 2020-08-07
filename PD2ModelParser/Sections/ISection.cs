@@ -5,6 +5,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 namespace PD2ModelParser.Sections
 {
@@ -76,21 +77,27 @@ namespace PD2ModelParser.Sections
         delegate void PostLoadCallback(ISection self, Dictionary<uint, ISection> sections);
         List<PostLoadCallback> postloadCallbacks = new List<PostLoadCallback>();
 
-
-        /// <summary>
-        /// Record that a section ID was read, for assigning the actual section later when all sections exist.
-        /// </summary>
-        /// <param name="id">Section ID.</param>
-        /// <param name="self">Object which has the reference property on it.</param>
-        /// <param name="prop">Expression reading the property in question.</param>
-        /// 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter",
-            Justification = "Exists to force TSelf to the correct type")]
-        protected void PostloadRef<TSelf, TRef>(uint id, TSelf self, Expression<Func<TSelf, TRef>> prop)
+        protected void PostLoadRef<TRef>(uint id, Action<TRef> setter, [CallerFilePath] string fp = "(unknown)", [CallerLineNumber] int linenum = 0) where TRef: class
         {
-            var body = prop.Body as MemberExpression;
-            var propinfo = body.Member as System.Reflection.PropertyInfo;
-            postloadCallbacks.Add((thisSection, secs) => DeferredRefAssignment(secs, propinfo, id));
+            postloadCallbacks.Add((thisid, sections) => {
+                ISection target;
+                if (id == 0)
+                {
+                    setter(null);
+                    return;
+                }
+                else if (sections.TryGetValue(id, out target)) { }
+                else throw new Exception($"Couldn't resolve section reference at {fp}:{linenum}: {SectionId} points to non-section {id}");
+
+                if (target is TRef typedTarget) // no need to worry about target==null, that only happens legit when id==0
+                {
+                    setter(typedTarget);
+                }
+                else
+                {
+                    throw new InvalidCastException($"Couldn't resolve section reference at {fp}:{linenum}: {SectionId} expects {id} to be a {typeof(TRef).Name} (got {target.GetType().Name})");
+                }
+            });
         }
 
         private void DeferredRefAssignment(Dictionary<uint, ISection> sections, System.Reflection.PropertyInfo pi, uint id)

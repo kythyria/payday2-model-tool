@@ -23,7 +23,7 @@ namespace PD2ModelParser.Sections
         {
             this.SectionId = sh.id;
             this.size = sh.size;
-            PostloadRef(br.ReadUInt32(), this, i => i.Topology);
+            PostLoadRef<Topology>(br.ReadUInt32(), i => Topology = i);
             this.remaining_data = null;
             if ((sh.offset + 12 + sh.size) > br.BaseStream.Position)
                 this.remaining_data = br.ReadBytes((int)((sh.offset + 12 + sh.size) - br.BaseStream.Position));

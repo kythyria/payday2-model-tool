@@ -162,8 +162,8 @@ namespace PD2ModelParser.Sections
             }
             else
             {
-                PostloadRef(instream.ReadUInt32(), this, i => PassthroughGP);
-                PostloadRef(instream.ReadUInt32(), this, i => TopologyIP);
+                PostLoadRef<PassthroughGP>(instream.ReadUInt32(), i => PassthroughGP = i);
+                PostLoadRef<TopologyIP>(instream.ReadUInt32(), i => TopologyIP = i);
                 var renderAtomCount = instream.ReadUInt32();
 
                 for (int x = 0; x < renderAtomCount; x++)
@@ -178,7 +178,7 @@ namespace PD2ModelParser.Sections
                 }
 
                 //this.unknown9 = instream.ReadUInt32();
-                PostloadRef(instream.ReadUInt32(), this, i => MaterialGroup);
+                PostLoadRef<MaterialGroup>(instream.ReadUInt32(), i => MaterialGroup = i);
                 this.lightset_ID = instream.ReadUInt32(); // this is a section id afaik
 
                 // Bitmap that stores properties about the model
@@ -192,7 +192,7 @@ namespace PD2ModelParser.Sections
 
                 this.BoundingRadius = instream.ReadSingle();
                 this.unknown13 = instream.ReadUInt32();
-                PostloadRef(instream.ReadUInt32(), this, i => SkinBones);
+                PostLoadRef<SkinBones>(instream.ReadUInt32(), i => SkinBones = i);
             }
             this.remaining_data = null;
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)

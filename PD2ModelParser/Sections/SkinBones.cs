@@ -30,7 +30,7 @@ namespace PD2ModelParser.Sections
             this.SectionId = section.id;
             this.size = section.size;
 
-            PostloadRef(instream.ReadUInt32(), this, i => ProbablyRootBone);
+            PostLoadRef<Object3D>(instream.ReadUInt32(), i => ProbablyRootBone = i);
             uint count = instream.ReadUInt32();
             for (int x = 0; x < count; x++)
                 this.objects.Add(instream.ReadUInt32());

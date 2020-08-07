@@ -129,7 +129,7 @@ namespace PD2ModelParser.Sections
 
             Transform = transform;
 
-            PostloadRef(instream.ReadUInt32(), this, i => i.Parent);
+            PostLoadRef<Object3D>(instream.ReadUInt32(), i => this.Parent = i);
 
             this.remaining_data = null;
         }
