@@ -138,9 +138,11 @@ namespace PD2ModelParser
         public static System.Numerics.Vector2 ToVector2(this Vector2D input) => new System.Numerics.Vector2(input.X, input.Y);
         public static System.Numerics.Vector3 ToVector3(this Vector3D input) => new System.Numerics.Vector3(input.X, input.Y, input.Z);
         public static System.Numerics.Vector4 ToVector4(this Sections.GeometryColor input) => new System.Numerics.Vector4(input.red/255.0f, input.green/255.0f, input.blue/255.0f, input.alpha/255.0f);
+        public static System.Numerics.Vector4 ToVector4(this Vector4D input) => new System.Numerics.Vector4(input.X, input.Y, input.Z, input.W);
 
         public static Vector2D ToNexusVector(this System.Numerics.Vector2 input) => new Vector2D(input.X, input.Y);
         public static Vector3D ToNexusVector(this System.Numerics.Vector3 input) => new Vector3D(input.X, input.Y, input.Z);
+        public static Vector4D ToNexusVector(this System.Numerics.Vector4 input) => new Vector4D(input.X, input.Y, input.Z, input.W);
         public static Sections.GeometryColor ToGeometryColor(this System.Numerics.Vector4 input) {
             return new Sections.GeometryColor(
                 ClampFloatToByte(input.X),

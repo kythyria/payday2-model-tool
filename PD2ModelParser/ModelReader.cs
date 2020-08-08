@@ -96,7 +96,7 @@ namespace PD2ModelParser
                 if (res != fs.Length)
                     throw new Exception($"Failed to read {filepath} all in one go!");
 
-                using (var ms = new MemoryStream(bytes, false))
+                using (var ms = new MemoryStream(bytes, 0, bytes.Length, false, true))
                 using (var br = new BinaryReader(ms))
                 {
                     sections.Clear();
