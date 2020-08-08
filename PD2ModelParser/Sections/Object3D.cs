@@ -15,7 +15,7 @@ namespace PD2ModelParser.Sections
         [Category("Object3D")]
         [DisplayName("Name")]
         public HashName HashName { get; set; } //Hashed object root point name (see hashlist.txt)
-        private List<uint> child_ids = new List<uint>(); // This is NOT a list of Object3Ds (or Models). Maybe animation related?
+        public List<uint> animation_ids = new List<uint>(); // This is NOT a list of Object3Ds (or Models). Maybe animation related?
         private Matrix3D _rotation = new Matrix3D(); // 4x4 transform matrix - for translation/scale too
 
         [Category("Object3D")]
@@ -72,7 +72,7 @@ namespace PD2ModelParser.Sections
             this.size = 0;
 
             this.HashName = HashName.FromNumberOrString(object_name);
-            this.child_ids = new List<uint>();
+            this.animation_ids = new List<uint>();
             this.Transform = Matrix3D.Identity;
 
             this.Parent = parent;
@@ -101,7 +101,7 @@ namespace PD2ModelParser.Sections
             {
                 uint item = instream.ReadUInt32(); // This is a reference thing, probably not important
                 instream.ReadUInt64(); // Skip eight bytes, as per PD2
-                this.child_ids.Add(item);
+                this.animation_ids.Add(item);
             }
 
             // In Object3D::load
@@ -137,8 +137,8 @@ namespace PD2ModelParser.Sections
         public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.HashName.Hash);
-            outstream.Write(child_ids.Count);
-            foreach (uint item in this.child_ids)
+            outstream.Write(animation_ids.Count);
+            foreach (uint item in this.animation_ids)
             {
                 outstream.Write(item);
                 outstream.Write((ulong) 0); // Bit to skip - the PD2 binary does the exact same thing
@@ -178,7 +178,7 @@ namespace PD2ModelParser.Sections
             return base.ToString() +
                    " size: " + this.size +
                    " HashName: " + this.HashName.String +
-                   " children: " + this.child_ids.Count +
+                   " animations: " + this.animation_ids.Count +
                    " mat.scale: " + scale +
                    " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "]" +
                    " Parent ID: " + this.parentID +
