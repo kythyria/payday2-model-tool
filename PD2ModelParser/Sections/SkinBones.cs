@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace PD2ModelParser.Sections
 {
-    [ModelFileSection(Tags.skinbones_tag)]
+    [ModelFileSection(Tags.skinbones_tag, ShowInInspectorRoot=false)]
     class SkinBones : Bones, ISection, IPostLoadable
     {
         private List<uint> objects { get; set; } = new List<uint>(); // of Object3D by SectionID

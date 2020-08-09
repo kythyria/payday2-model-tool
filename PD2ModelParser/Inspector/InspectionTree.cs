@@ -25,7 +25,7 @@ namespace PD2ModelParser.Inspector
         public string Label => "<root>";
         public object PropertyItem => data;
         public IEnumerable<IInspectorNode> GetChildren()
-            => Sections.SectionMetaInfo.All().Select(i => i.GetRootInspector(data));
+            => Sections.SectionMetaInfo.All().Where(i => i.ShowInInspectorRoot).Select(i => i.GetRootInspector(data));
     }
 
 
@@ -41,11 +41,11 @@ namespace PD2ModelParser.Inspector
             Label = $"<{typeof(TSection).Name}>";
             if(typeof(TSection).GetInterfaces().Contains(typeof(Sections.IHashNamed)))
             {
-                labeller = (sec) => $"{sec.SectionId} | {typeof(TSection).Name} ({(sec as Sections.IHashNamed).HashName.String})";
+                labeller = (sec) => $"{sec.SectionId} | {sec.GetType().Name} ({(sec as Sections.IHashNamed).HashName.String})";
             }
             else
             {
-                labeller = (sec) => $"{sec.SectionId} | {typeof(TSection).Name}";
+                labeller = (sec) => $"{sec.SectionId} | {sec.GetType().Name}";
             }
         }
 

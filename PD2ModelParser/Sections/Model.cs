@@ -47,7 +47,7 @@ namespace PD2ModelParser.Sections
         }
     }
 
-    [ModelFileSection(Tags.model_data_tag)]
+    [ModelFileSection(Tags.model_data_tag,ShowInInspectorRoot=false)]
     class Model : Object3D, ISection, IPostLoadable, IHashContainer
     {
         [Category("Model")]

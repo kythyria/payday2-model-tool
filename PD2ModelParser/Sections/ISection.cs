@@ -150,6 +150,7 @@ namespace PD2ModelParser.Sections
 
         private System.Reflection.ConstructorInfo deserialiseConstructor;
         private Func<BinaryReader, SectionHeader, ISection> deserialiseDelegate;
+        public bool ShowInInspectorRoot { get; private set; }
         public Type DeclaredRootInspectorType { get; private set; }
 
         public Type Type { get; private set; }
@@ -185,6 +186,7 @@ namespace PD2ModelParser.Sections
             var idAttr = t.GetCustomAttributes(typeof(ModelFileSectionAttribute), false)[0] as ModelFileSectionAttribute;
             this.Tag = idAttr.Tag;
             this.DeclaredRootInspectorType = idAttr.RootInspectorNode;
+            this.ShowInInspectorRoot = idAttr.ShowInInspectorRoot;
 
             this.deserialiseConstructor = t.GetConstructor(new Type[] { typeof(BinaryReader), typeof(SectionHeader) });
 
@@ -207,7 +209,7 @@ namespace PD2ModelParser.Sections
         }
 
         public uint Tag { get; private set; }
-
         public Type RootInspectorNode { get; set; }
+        public bool ShowInInspectorRoot { get; set; } = true;
     }
 }
