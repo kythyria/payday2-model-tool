@@ -5,11 +5,11 @@ using System.IO;
 namespace PD2ModelParser.Sections
 {
     [SectionId(Tags.animation_data_tag)]
-    public class Animation : AbstractSection, ISection
+    public class Animation : AbstractSection, ISection, IHashNamed
     {
         public UInt32 size;
 
-        public UInt64 hashname; //Hashed name for the animation (see hashlist.txt)
+        public HashName HashName { get; set; }
         public UInt32 unknown2;
         public float keyframe_length;
         public UInt32 count;
@@ -21,7 +21,7 @@ namespace PD2ModelParser.Sections
         {
             this.SectionId = section.id;
             this.size = section.size;
-            this.hashname = instream.ReadUInt64();
+            this.HashName = new HashName(instream.ReadUInt64());
             this.unknown2 = instream.ReadUInt32();
             this.keyframe_length = instream.ReadSingle();
             this.count = instream.ReadUInt32();
@@ -37,7 +37,7 @@ namespace PD2ModelParser.Sections
 
         public override void StreamWriteData(BinaryWriter outstream)
         {
-            outstream.Write(this.hashname);
+            outstream.Write(this.HashName.Hash);
             outstream.Write(this.unknown2);
             outstream.Write(this.keyframe_length);
             outstream.Write(this.count);
@@ -52,7 +52,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return base.ToString() + " size: " + this.size + " HashName: " + StaticStorage.hashindex.GetString(this.hashname) + " unknown2: " + this.unknown2 + " keyframe_length: " + this.keyframe_length + " count: " + this.count + " items: (count=" + this.items.Count + ")" + (remaining_data != null ? " REMAINING DATA! " + remaining_data.Length + " bytes" : "");
+            return $"{base.ToString()} size: {this.size} Name: {this.HashName.String} unknown2: {this.unknown2} keyframe_length: {this.keyframe_length} count: {this.count} items: (count={this.items.Count}){(remaining_data != null ? " REMAINING DATA! " + remaining_data.Length + " bytes" : "")}";
         }
     }
 }

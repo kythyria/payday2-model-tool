@@ -32,11 +32,11 @@ namespace PD2ModelParser.Sections
     }
 
     [SectionId(Tags.linearVector3Controller_tag)]
-    class LinearVector3Controller : AbstractSection, ISection
+    class LinearVector3Controller : AbstractSection, ISection, IHashNamed
     {
         public UInt32 size;
 
-        public UInt64 hashname; //Hashed material name (see hashlist.txt)
+        public HashName HashName { get; set; }
         public Byte flag0; // 2 = Loop?
         public Byte flag1;
         public Byte flag2;
@@ -54,7 +54,7 @@ namespace PD2ModelParser.Sections
             this.SectionId = section.id;
             this.size = section.size;
 
-            this.hashname = instream.ReadUInt64();
+            this.HashName = new HashName(instream.ReadUInt64());
             this.flag0 = instream.ReadByte();
             this.flag1 = instream.ReadByte();
             this.flag2 = instream.ReadByte();
@@ -75,7 +75,7 @@ namespace PD2ModelParser.Sections
 
         public override void StreamWriteData(BinaryWriter outstream)
         {
-            outstream.Write(this.hashname);
+            outstream.Write(this.HashName.Hash);
             outstream.Write(this.flag0);
             outstream.Write(this.flag1);
             outstream.Write(this.flag2);
@@ -107,7 +107,7 @@ namespace PD2ModelParser.Sections
 
             return base.ToString() +
                 " size: " + this.size +
-                " HashName: " + StaticStorage.hashindex.GetString(this.hashname) +
+                " HashName: " + this.HashName.String +
                 " flag0: " + this.flag0 +
                 " flag1: " + this.flag1 +
                 " flag2: " + this.flag2 +

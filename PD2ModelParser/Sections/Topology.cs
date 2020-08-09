@@ -38,13 +38,13 @@ namespace PD2ModelParser.Sections
     }
 
     [SectionId(Tags.topology_tag)]
-    class Topology : AbstractSection, ISection
+    class Topology : AbstractSection, ISection, IHashNamed
     {
         public UInt32 unknown1;
         public List<Face> facelist = new List<Face>();
         public UInt32 count2;
         public byte[] items2;
-        public UInt64 hashname; //Hashed name of this topology (see hashlist.txt)
+        public HashName HashName { get; set; }
 
         public byte[] remaining_data = null;
 
@@ -54,7 +54,7 @@ namespace PD2ModelParser.Sections
 
             this.count2 = 0;
             this.items2 = new byte[0];
-            this.hashname = Hash64.HashString(objectName + ".Topology");
+            this.HashName = new HashName(objectName + ".Topology");
         }
 
         public Topology(obj_data obj) : this(obj.object_name)
@@ -78,7 +78,7 @@ namespace PD2ModelParser.Sections
 
             this.count2 = instream.ReadUInt32();
             this.items2 = instream.ReadBytes((int) this.count2);
-            this.hashname = instream.ReadUInt64();
+            this.HashName = new HashName(instream.ReadUInt64());
 
             this.remaining_data = null;
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
@@ -98,7 +98,7 @@ namespace PD2ModelParser.Sections
 
             outstream.Write(this.count2);
             outstream.Write(this.items2);
-            outstream.Write(this.hashname);
+            outstream.Write(this.HashName.Hash);
 
             if (this.remaining_data != null)
                 outstream.Write(this.remaining_data);
@@ -111,7 +111,7 @@ namespace PD2ModelParser.Sections
                    " facelist: " + this.facelist.Count +
                    " count2: " + this.count2 +
                    " items2: " + this.items2.Length +
-                   " HashName: " + StaticStorage.hashindex.GetString(this.hashname) +
+                   " HashName: " + this.HashName.String +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
     }

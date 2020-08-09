@@ -63,7 +63,7 @@ namespace PD2ModelParser.Exporters
 
             foreach (var ms in data.parsed_sections.Where(i => i.Value is Material).Select(i => i.Value as Material))
             {
-                materialsBySection[ms] = root.CreateMaterial(ms.hashname.String);
+                materialsBySection[ms] = root.CreateMaterial(ms.HashName.String);
             }
 
             foreach(var i in data.SectionsOfType<Object3D>().Where(i => i.Parent == null))
@@ -226,7 +226,7 @@ namespace PD2ModelParser.Exporters
         IEnumerable<(GLTF.Accessor, GLTF.Material)> CreatePrimitiveIndices(Topology topo, IEnumerable<RenderAtom> atoms, MaterialGroup materialGroup)
         {
             var buf = new ArraySegment<byte>(new byte[topo.facelist.Count * 3 * 2]);
-            var mai = new MemoryAccessInfo($"indices_{topo.hashname}", 0, topo.facelist.Count * 3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
+            var mai = new MemoryAccessInfo($"indices_{topo.HashName.String}", 0, topo.facelist.Count * 3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
             var ma = new MemoryAccessor(buf, mai);
             var array = ma.AsIntegerArray();
             for (int i = 0; i < topo.facelist.Count; i++)
@@ -240,7 +240,7 @@ namespace PD2ModelParser.Exporters
 
             foreach (var ra in atoms)
             {
-                var atom_mai = new MemoryAccessInfo($"indices_{topo.hashname}_{atomcount++}", (int)ra.BaseIndex*2, (int)ra.TriangleCount*3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
+                var atom_mai = new MemoryAccessInfo($"indices_{topo.HashName}_{atomcount++}", (int)ra.BaseIndex*2, (int)ra.TriangleCount*3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
                 var atom_ma = new MemoryAccessor(buf, atom_mai);
                 var accessor = root.CreateAccessor();
                 accessor.SetIndexData(atom_ma);
@@ -264,12 +264,12 @@ namespace PD2ModelParser.Exporters
                     var normalized = Vector3.Normalize(norm.ToVector3());
                     if(!normalized.IsFinite())
                     {
-                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} is bogus ({3})", idx, geometry.SectionId, geometry.hashname, norm);
+                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} is bogus ({3})", idx, geometry.SectionId, geometry.HashName.String, norm);
                         return new Vector3(1, 0, 0);
                     }
                     if(!normalized.IsUnitLength())
                     {
-                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} is bogus length {4} ({3})", idx, geometry.SectionId, geometry.hashname, norm, norm.Length());
+                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} is bogus length {4} ({3})", idx, geometry.SectionId, geometry.HashName.String, norm, norm.Length());
                         return new Vector3(1, 0, 0);
                     }
                     return normalized;
@@ -290,7 +290,7 @@ namespace PD2ModelParser.Exporters
                     var dot = Vector3.Dot(txn, binorm);
                     if(float.IsNaN(dot))
                     {
-                        Log.Default.Warn("Weird normals in vtx {3} of geom {4}|{5}, N={0}, T={1}, B={2}, (T cross N) dot B is NaN", normal, tangent, binorm, index, geometry.SectionId, geometry.hashname);
+                        Log.Default.Warn("Weird normals in vtx {3} of geom {4}|{5}, N={0}, T={1}, B={2}, (T cross N) dot B is NaN", normal, tangent, binorm, index, geometry.SectionId, geometry.HashName.String);
                         return new Vector4(tangent, 1);
                     }
                     var sgn = float.IsNaN(dot) ? 1 : Math.Sign(dot);

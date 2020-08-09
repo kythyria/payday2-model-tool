@@ -16,11 +16,11 @@ namespace PD2ModelParser.Sections
     }
 
     [SectionId(Tags.material_tag)]
-    class Material : AbstractSection, ISection
+    class Material : AbstractSection, ISection, IHashNamed
     {
         public UInt32 size;
 
-        public HashName hashname; //Hashed material name (see hashlist.txt)
+        public HashName HashName { get; set; } //Hashed material name (see hashlist.txt)
         public byte[] skipped;
         public uint count;
         public List<MaterialItem> items = new List<MaterialItem>();
@@ -31,7 +31,7 @@ namespace PD2ModelParser.Sections
         {
 
             this.size = 0;
-            this.hashname = new HashName(mat_name);
+            this.HashName = new HashName(mat_name);
             this.skipped = new byte[48];
             this.count = 0;
         }
@@ -41,7 +41,7 @@ namespace PD2ModelParser.Sections
             this.SectionId = section.id;
             this.size = section.size;
 
-            this.hashname = new HashName(instream.ReadUInt64());
+            this.HashName = new HashName(instream.ReadUInt64());
             this.skipped = instream.ReadBytes(48);
             this.count = instream.ReadUInt32();
 
@@ -61,7 +61,7 @@ namespace PD2ModelParser.Sections
 
         public override void StreamWriteData(BinaryWriter outstream)
         {
-            outstream.Write(this.hashname.Hash);
+            outstream.Write(this.HashName.Hash);
             outstream.Write(this.skipped);
             outstream.Write(this.count);
             foreach (MaterialItem item in this.items)
@@ -85,7 +85,7 @@ namespace PD2ModelParser.Sections
 
             return base.ToString() +
                    " size: " + this.size +
-                   " HashName: " + this.hashname.String +
+                   " HashName: " + this.HashName.String +
                    " count: " + this.count +
                    " items: [ " + items_string + " ] " +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");

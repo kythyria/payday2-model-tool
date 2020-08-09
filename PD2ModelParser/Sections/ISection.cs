@@ -35,6 +35,11 @@ namespace PD2ModelParser.Sections
         void CollectHashes(CustomHashlist hashlist);
     }
 
+    public interface IHashNamed
+    {
+        HashName HashName { get; set; }
+    }
+
     public abstract class AbstractSection : ISection
     {
         // These attributes are here because the auto lookup doesn't see them on interfaces.

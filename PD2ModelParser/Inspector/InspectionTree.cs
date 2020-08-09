@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace PD2ModelParser.Inspector
 {
-    interface IInspectorNode
+    public interface IInspectorNode
     {
         string Key { get; }
         string IconName { get; }
@@ -27,9 +27,9 @@ namespace PD2ModelParser.Inspector
         public IEnumerable<IInspectorNode> GetChildren()
         {
             yield return new ObjectsRootNode(data);
-            yield return new AllSectionsNode<Sections.Geometry>(data, "<geometries>", "<Geometry>", g => $"{g.SectionId} | Geometry ({new HashName(g.hashname).String})");
-            yield return new AllSectionsNode<Sections.SkinBones>(data, "<skinbones>", "<SkinBones>", sb => $"{sb.SectionId} | SkinBones");
-            yield return new AllSectionsNode<Sections.PassthroughGP>(data, "<passthroughgp>", "<PassthroughGP>", pgp => $"{pgp.SectionId}");
+            yield return new AllSectionsNode<Sections.Geometry>(data);
+            yield return new AllSectionsNode<Sections.SkinBones>(data);
+            yield return new AllSectionsNode<Sections.PassthroughGP>(data);
         }
     }
 
@@ -39,12 +39,19 @@ namespace PD2ModelParser.Inspector
     {
         FullModelData data;
         Func<TSection, string> labeller;
-        public AllSectionsNode(FullModelData fmd, string key, string label, Func<TSection, string> childLabel)
+        public AllSectionsNode(FullModelData fmd, string key = null)
         {
             data = fmd;
-            Key = key;
-            Label = label;
-            labeller = childLabel;
+            Key = $"<AllSectionsNode<{typeof(TSection).Name}>>";
+            Label = $"<{typeof(TSection).Name}>";
+            if(typeof(TSection).GetInterfaces().Contains(typeof(Sections.IHashNamed)))
+            {
+                labeller = (sec) => $"{sec.SectionId} | {typeof(TSection).Name} ({(sec as Sections.IHashNamed).HashName.String})";
+            }
+            else
+            {
+                labeller = (sec) => $"{sec.SectionId} | {typeof(TSection).Name}";
+            }
         }
 
         public string Key { get; private set; }

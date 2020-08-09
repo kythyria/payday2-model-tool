@@ -4,11 +4,11 @@ using System.IO;
 namespace PD2ModelParser.Sections
 {
     [SectionId(Tags.author_tag)]
-    class Author : AbstractSection, ISection
+    class Author : AbstractSection, ISection, IHashNamed
     {
         public UInt32 size;
 
-        public UInt64 hashname; //Hashed name (see hashlist.txt)
+        public HashName HashName { get; set; }
         public String email; //Author's email address
         public String source_file; //Source model file
         public UInt32 unknown2;
@@ -19,7 +19,7 @@ namespace PD2ModelParser.Sections
         {
             this.SectionId = section.id;
             this.size = section.size;
-            this.hashname = instream.ReadUInt64();
+            this.HashName = new HashName(instream.ReadUInt64());
 
             this.email = instream.ReadCString();
             this.source_file = instream.ReadCString();
@@ -34,7 +34,7 @@ namespace PD2ModelParser.Sections
         public override void StreamWriteData(BinaryWriter outstream)
         {
             Byte zero = 0;
-            outstream.Write(this.hashname);
+            outstream.Write(this.HashName.Hash);
             outstream.Write(this.email.ToCharArray());
             outstream.Write(zero);
             outstream.Write(this.source_file.ToCharArray());
@@ -47,7 +47,7 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            return base.ToString() + " size: " + this.size + " HashName: " + StaticStorage.hashindex.GetString( this.hashname ) + " email: " + this.email + " Source file: " + this.source_file + " unknown2: " + this.unknown2 + (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
+            return $"{base.ToString()} size: {this.size} HashName: {this.HashName.String} email: {this.email} Source file: {this.source_file} unknown2: {this.unknown2}{(this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "")}";
         }
 
     }

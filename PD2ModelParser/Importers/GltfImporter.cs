@@ -162,7 +162,7 @@ namespace PD2ModelParser.Importers
             var mats = md.materials.Select(i =>
             {
                 var hn = HashName.FromNumberOrString(i);
-                var mat = data.SectionsOfType<DM.Material>().FirstOrDefault(j => j.hashname.Hash == hn.Hash);
+                var mat = data.SectionsOfType<DM.Material>().FirstOrDefault(j => j.HashName.Hash == hn.Hash);
                 if (mat == null)
                 {
                     mat = new DM.Material(i);
@@ -238,7 +238,7 @@ namespace PD2ModelParser.Importers
             var mats = md.materials.Select(i =>
             {
                 var hn = HashName.FromNumberOrString(i);
-                var mat = data.SectionsOfType<DM.Material>().FirstOrDefault(j => j.hashname.Hash == hn.Hash);
+                var mat = data.SectionsOfType<DM.Material>().FirstOrDefault(j => j.HashName.Hash == hn.Hash);
                 if (mat == null)
                 {
                     mat = new DM.Material(i);
@@ -255,7 +255,7 @@ namespace PD2ModelParser.Importers
 
             ms.geom = new DM.Geometry();
             data.AddSection(ms.geom);
-            ms.geom.hashname = Hash64.HashString(gmesh.Name + ".Geometry");
+            ms.geom.HashName = new HashName(gmesh.Name + ".Geometry");
 
             ms.topo = new DM.Topology(gmesh.Name);
             data.AddSection(ms.topo);

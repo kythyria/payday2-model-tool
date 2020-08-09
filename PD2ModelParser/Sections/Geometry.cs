@@ -143,7 +143,7 @@ namespace PD2ModelParser.Sections
     }
 
     [SectionId(Tags.geometry_tag)]
-    class Geometry : AbstractSection, ISection
+    class Geometry : AbstractSection, ISection, IHashNamed
     {
         // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
         public UInt32 vert_count;
@@ -165,7 +165,7 @@ namespace PD2ModelParser.Sections
         // Unknown items from this section. Includes colors and a few other items.
         public List<byte[]> unknown_item_data = new List<byte[]>();
 
-        public UInt64 hashname;
+        public HashName HashName { get; set; }
 
         public byte[] remaining_data = null;
 
@@ -194,7 +194,7 @@ namespace PD2ModelParser.Sections
             //this.binormals;
             //this.tangents;
 
-            this.hashname = Hash64.HashString(newobject.object_name + ".Geometry");
+            this.HashName = new HashName(newobject.object_name + ".Geometry");
         }
 
         public Geometry(BinaryReader instream, SectionHeader section) : this()
@@ -318,7 +318,7 @@ namespace PD2ModelParser.Sections
                 }
             }
 
-            this.hashname = instream.ReadUInt64();
+            this.HashName = new HashName(instream.ReadUInt64());
 
             this.remaining_data = null;
             long sect_end = section.offset + 12 + section.size;
@@ -480,7 +480,7 @@ namespace PD2ModelParser.Sections
                 }
             }
 
-            outstream.Write(this.hashname);
+            outstream.Write(this.HashName.Hash);
 
             if (this.remaining_data != null)
                 outstream.Write(this.remaining_data);
@@ -494,7 +494,7 @@ namespace PD2ModelParser.Sections
             if (this.weight_groups.Count > 0 && this.binormals.Count > 0 && this.tangents.Count > 0 &&
                 this.weights.Count > 0)
             {
-                outstream.WriteLine("Printing weights table for " + StaticStorage.hashindex.GetString(this.hashname));
+                outstream.WriteLine("Printing weights table for " + this.HashName.String);
                 outstream.WriteLine("====================================================");
                 outstream.WriteLine(
                     "unkn15_1\tunkn15_2\tunkn15_3\tunkn15_4\tunkn17_X\tunkn17_Y\tunk17_Z\ttotalsum\tunk_20_X\tunk_20_Y\tunk_20_Z\tunk21_X\tunk21_Y\tunk21_Z");
@@ -547,7 +547,7 @@ namespace PD2ModelParser.Sections
                    " binormals: " + this.binormals.Count +
                    " tangents: " + this.tangents.Count +
                    " Geometry_unknown_item_data: " + this.unknown_item_data.Count +
-                   " unknown_hash: " + StaticStorage.hashindex.GetString(this.hashname) +
+                   " unknown_hash: " + this.HashName.String +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
     }
