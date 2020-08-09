@@ -3,20 +3,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.ComponentModel;
 using Nexus;
+using System.Linq;
 
 namespace PD2ModelParser.Sections
 {
     //[System.ComponentModel.TypeConverter(typeof(Inspector.AbstractSectionConverter))]
-    [SectionId(Tags.object3D_tag)]
-    public class Object3D : AbstractSection, ISection, IPostLoadable, IHashContainer
+    [ModelFileSection(Tags.object3D_tag, RootInspectorNode=typeof(Inspector.ObjectsRootNode))]
+    public class Object3D : AbstractSection, ISection, IPostLoadable, IHashContainer, IHashNamed
     {
         public UInt32 size;
 
         [Category("Object3D")]
         [DisplayName("Name")]
         public HashName HashName { get; set; } //Hashed object root point name (see hashlist.txt)
-        public List<uint> animation_ids = new List<uint>(); // This is NOT a list of Object3Ds (or Models). Maybe animation related?
+        private List<uint> animation_ids = new List<uint>(); // This is NOT a list of Object3Ds (or Models). Maybe animation related?
         private Matrix3D _rotation = new Matrix3D(); // 4x4 transform matrix - for translation/scale too
+
+        [Category("Object3D")]
+        public List<ISection> Animations { get; private set; } = new List<ISection>();
 
         [Category("Object3D")]
         [TypeConverter(typeof(Inspector.NexusMatrixConverter))]
@@ -138,9 +142,9 @@ namespace PD2ModelParser.Sections
         {
             outstream.Write(this.HashName.Hash);
             outstream.Write(animation_ids.Count);
-            foreach (uint item in this.animation_ids)
+            foreach (var item in this.Animations)
             {
-                outstream.Write(item);
+                outstream.Write((item?.SectionId).GetValueOrDefault());
                 outstream.Write((ulong) 0); // Bit to skip - the PD2 binary does the exact same thing
             }
 
@@ -203,6 +207,8 @@ namespace PD2ModelParser.Sections
                     Parent.children.Add(this);
                 }
             }
+
+            Animations.AddRange(animation_ids.Select(i => parsed_sections.ContainsKey(i) ? parsed_sections[i] : null));
 
             UpdateTransforms();
 

@@ -37,7 +37,7 @@ namespace PD2ModelParser.Sections
         }
     }
 
-    [SectionId(Tags.topology_tag)]
+    [ModelFileSection(Tags.topology_tag)]
     class Topology : AbstractSection, ISection, IHashNamed
     {
         public UInt32 unknown1;

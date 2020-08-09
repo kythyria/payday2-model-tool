@@ -31,7 +31,7 @@ namespace PD2ModelParser.Sections
 
     }
 
-    [SectionId(Tags.linearVector3Controller_tag)]
+    [ModelFileSection(Tags.linearVector3Controller_tag)]
     class LinearVector3Controller : AbstractSection, ISection, IHashNamed
     {
         public UInt32 size;

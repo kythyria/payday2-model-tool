@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace PD2ModelParser.Sections
 {
-    [SectionId(Tags.material_group_tag)]
+    [ModelFileSection(Tags.material_group_tag)]
     class MaterialGroup : AbstractSection, ISection, IPostLoadable
     {
         private UInt32 size = 0;

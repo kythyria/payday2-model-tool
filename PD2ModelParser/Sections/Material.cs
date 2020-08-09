@@ -15,7 +15,7 @@ namespace PD2ModelParser.Sections
         }
     }
 
-    [SectionId(Tags.material_tag)]
+    [ModelFileSection(Tags.material_tag)]
     class Material : AbstractSection, ISection, IHashNamed
     {
         public UInt32 size;

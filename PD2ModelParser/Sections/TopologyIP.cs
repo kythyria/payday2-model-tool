@@ -3,7 +3,7 @@ using System.IO;
 
 namespace PD2ModelParser.Sections
 {
-    [SectionId(Tags.topologyIP_tag)]
+    [ModelFileSection(Tags.topologyIP_tag)]
     class TopologyIP : AbstractSection, ISection, IPostLoadable
     {
         public UInt32 size = 0;

@@ -32,7 +32,7 @@ namespace PD2ModelParser.Sections
 
     }
     
-    [SectionId(Tags.quatLinearRotationController_tag)]
+    [ModelFileSection(Tags.quatLinearRotationController_tag)]
     class QuatLinearRotationController : AbstractSection, ISection, IHashNamed
     {
         public UInt32 size;

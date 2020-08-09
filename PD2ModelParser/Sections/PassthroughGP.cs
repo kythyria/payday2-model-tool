@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace PD2ModelParser.Sections
 {
-    [SectionId(Tags.passthroughGP_tag)]
+    [ModelFileSection(Tags.passthroughGP_tag)]
     [TypeConverter(typeof(ExpandableObjectConverter))]
     class PassthroughGP : AbstractSection, ISection, IPostLoadable
     {

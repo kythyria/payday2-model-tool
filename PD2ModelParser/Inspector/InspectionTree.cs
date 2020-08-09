@@ -25,12 +25,7 @@ namespace PD2ModelParser.Inspector
         public string Label => "<root>";
         public object PropertyItem => data;
         public IEnumerable<IInspectorNode> GetChildren()
-        {
-            yield return new ObjectsRootNode(data);
-            yield return new AllSectionsNode<Sections.Geometry>(data);
-            yield return new AllSectionsNode<Sections.SkinBones>(data);
-            yield return new AllSectionsNode<Sections.PassthroughGP>(data);
-        }
+            => Sections.SectionMetaInfo.All().Select(i => i.GetRootInspector(data));
     }
 
 
@@ -39,7 +34,7 @@ namespace PD2ModelParser.Inspector
     {
         FullModelData data;
         Func<TSection, string> labeller;
-        public AllSectionsNode(FullModelData fmd, string key = null)
+        public AllSectionsNode(FullModelData fmd)
         {
             data = fmd;
             Key = $"<AllSectionsNode<{typeof(TSection).Name}>>";

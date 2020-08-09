@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PD2ModelParser.Sections
 {
-    [SectionId(Tags.custom_hashlist_tag)]
+    [ModelFileSection(Tags.custom_hashlist_tag)]
     public class CustomHashlist : AbstractSection, ISection
     {
         public HashSet<string> Strings { get; } = new HashSet<string>();

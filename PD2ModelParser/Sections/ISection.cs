@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Reflection.Emit;
 
@@ -106,20 +105,6 @@ namespace PD2ModelParser.Sections
             });
         }
 
-        private void DeferredRefAssignment(Dictionary<uint, ISection> sections, System.Reflection.PropertyInfo pi, uint id)
-        {
-            ISection target;
-            try
-            {
-                target = id != 0 ? sections[id] : null;
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Couldn't load {pi.DeclaringType.Name}.{pi.Name}: Section {SectionId} points to non-section {id}", e);
-            }
-            pi.SetValue(this, target);
-        }
-
         public virtual void PostLoad(uint id, Dictionary<uint, ISection> sections)
         {
             foreach (var cb in postloadCallbacks)
@@ -147,7 +132,7 @@ namespace PD2ModelParser.Sections
         {
             var types = System.Reflection.Assembly.GetCallingAssembly()
                 .GetTypes()
-                .Where(i => i.CustomAttributes.Any(j => j.AttributeType == typeof(SectionIdAttribute)))
+                .Where(i => i.CustomAttributes.Any(j => j.AttributeType == typeof(ModelFileSectionAttribute)))
                 .Select(i => new SectionMetaInfo(i))
                 .ToList();
             byTag = types.ToDictionary(i => i.Tag);
@@ -161,9 +146,11 @@ namespace PD2ModelParser.Sections
 
         public static SectionMetaInfo For<T>() => byType[typeof(T)];
         public static SectionMetaInfo For(Type t) => byType[t];
+        public static IEnumerable<SectionMetaInfo> All() => byTag.Values;
 
         private System.Reflection.ConstructorInfo deserialiseConstructor;
         private Func<BinaryReader, SectionHeader, ISection> deserialiseDelegate;
+        public Type DeclaredRootInspectorType { get; private set; }
 
         public Type Type { get; private set; }
         public uint Tag { get; private set; }
@@ -174,12 +161,30 @@ namespace PD2ModelParser.Sections
             return deserialiseDelegate(br, sh);
         }
 
+        public Inspector.IInspectorNode GetRootInspector(FullModelData data)
+        {
+            Type inspectortype;
+            System.Reflection.ConstructorInfo constructor;
+            if (DeclaredRootInspectorType != null)
+            {
+                inspectortype = DeclaredRootInspectorType;
+            }
+            else
+            {
+                inspectortype = typeof(Inspector.AllSectionsNode<>).MakeGenericType(new Type[] { this.Type });
+            }
+            constructor = inspectortype.GetConstructor(new Type[] { typeof(FullModelData) });
+            if (constructor == null) { throw new Exception($"The root inspector type {inspectortype.FullName} does not have a suitable constructor"); }
+            return (Inspector.IInspectorNode)constructor.Invoke(new object[] { data });
+        }
+
         SectionMetaInfo(Type t)
         {
             this.Type = t;
 
-            var idAttr = t.GetCustomAttributes(typeof(SectionIdAttribute), false)[0] as SectionIdAttribute;
+            var idAttr = t.GetCustomAttributes(typeof(ModelFileSectionAttribute), false)[0] as ModelFileSectionAttribute;
             this.Tag = idAttr.Tag;
+            this.DeclaredRootInspectorType = idAttr.RootInspectorNode;
 
             this.deserialiseConstructor = t.GetConstructor(new Type[] { typeof(BinaryReader), typeof(SectionHeader) });
 
@@ -194,13 +199,15 @@ namespace PD2ModelParser.Sections
     }
 
     [System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    sealed class SectionIdAttribute : Attribute
+    sealed class ModelFileSectionAttribute : Attribute
     {
-        public SectionIdAttribute(uint tag)
+        public ModelFileSectionAttribute(uint tag)
         {
             Tag = tag;
         }
 
         public uint Tag { get; private set; }
+
+        public Type RootInspectorNode { get; set; }
     }
 }

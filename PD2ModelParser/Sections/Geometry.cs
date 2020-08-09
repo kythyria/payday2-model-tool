@@ -142,7 +142,7 @@ namespace PD2ModelParser.Sections
         TANGENT0 = 21,
     }
 
-    [SectionId(Tags.geometry_tag)]
+    [ModelFileSection(Tags.geometry_tag)]
     class Geometry : AbstractSection, ISection, IHashNamed
     {
         // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)

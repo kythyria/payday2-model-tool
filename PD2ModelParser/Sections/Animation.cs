@@ -4,7 +4,7 @@ using System.IO;
 
 namespace PD2ModelParser.Sections
 {
-    [SectionId(Tags.animation_data_tag)]
+    [ModelFileSection(Tags.animation_data_tag)]
     public class Animation : AbstractSection, ISection, IHashNamed
     {
         public UInt32 size;

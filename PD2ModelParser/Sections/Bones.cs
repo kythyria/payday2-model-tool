@@ -53,7 +53,7 @@ namespace PD2ModelParser.Sections
     /// As an abstract class, it can never be found by itself, only embedded within
     /// SkinBones (it's only known - and likely only - subclass).
     /// </remarks>
-    [SectionId(Tags.bones_tag)]
+    [ModelFileSection(Tags.bones_tag)]
     class Bones : AbstractSection, ISection
     {
         public UInt32 size;

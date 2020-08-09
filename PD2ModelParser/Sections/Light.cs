@@ -28,7 +28,7 @@ namespace PD2ModelParser.Sections
         }
     }
 
-    [SectionId(Tags.light_tag)]
+    [ModelFileSection(Tags.light_tag)]
     class Light : Object3D, ISection
     {
         /* zdann says that

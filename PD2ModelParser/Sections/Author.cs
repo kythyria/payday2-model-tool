@@ -3,7 +3,7 @@ using System.IO;
 
 namespace PD2ModelParser.Sections
 {
-    [SectionId(Tags.author_tag)]
+    [ModelFileSection(Tags.author_tag)]
     class Author : AbstractSection, ISection, IHashNamed
     {
         public UInt32 size;
