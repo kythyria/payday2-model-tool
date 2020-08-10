@@ -7,7 +7,6 @@ using System.Linq;
 
 namespace PD2ModelParser.Sections
 {
-    //[System.ComponentModel.TypeConverter(typeof(Inspector.AbstractSectionConverter))]
     [ModelFileSection(Tags.object3D_tag, RootInspectorNode=typeof(Inspector.ObjectsRootNode))]
     public class Object3D : AbstractSection, ISection, IPostLoadable, IHashContainer, IHashNamed
     {

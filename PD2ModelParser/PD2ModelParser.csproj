@@ -116,7 +116,6 @@
     <Compile Include="Inspector\HashNameConverter.cs" />
     <Compile Include="Inspector\InspectionTree.cs" />
     <Compile Include="Inspector\NexusMatrixConverter.cs" />
-    <Compile Include="Inspector\Object3DConverter.cs" />
     <Compile Include="Inspector\Object3DReferenceConverter.cs" />
     <Compile Include="InternationalisationUtils.cs" />
     <Compile Include="Logging.cs" />
