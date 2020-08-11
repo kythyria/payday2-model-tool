@@ -229,8 +229,11 @@ namespace PD2ModelParser.Modelscript
         {
             state.Log.Status($"Running other modelscript {File}");
             string path = state.ResolvePath(File);
+            string oldBaseDir = state.WorkDir;
+            state.WorkDir = System.IO.Path.GetDirectoryName(path);
             var script = Script.ParseXml(path);
             state.ExecuteItems(script);
+            state.WorkDir = oldBaseDir;
             state.Log.Status($"Finished running {File}");
         }
     }
