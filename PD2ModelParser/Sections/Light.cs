@@ -72,7 +72,10 @@ namespace PD2ModelParser.Sections
             unknown_8 = instream.ReadSingle();
 
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
+            {
                 remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
+                Log.Default.Info("Light {0}|{1} has {2} bytes of extraneous(?) data", section.id, HashName.String, remaining_data.Length);
+            }
         }
 
         public override void StreamWriteData(BinaryWriter outstream)
@@ -86,7 +89,7 @@ namespace PD2ModelParser.Sections
             outstream.Write(unknown_6);
             outstream.Write(unknown_7);
             outstream.Write(unknown_8);
-            if(remaining_data.Length > 0)
+            if (remaining_data != null)
             {
                 outstream.Write(remaining_data, 0, remaining_data.Length);
             }
