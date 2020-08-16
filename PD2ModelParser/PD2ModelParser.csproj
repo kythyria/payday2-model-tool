@@ -137,6 +137,7 @@
     <Compile Include="Sections\CustomHashlist.cs" />
     <Compile Include="Sections\ISection.cs" />
     <Compile Include="Sections\Light.cs" />
+    <Compile Include="Sections\LinearFloatController.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Tests\MultiplicationTest.cs" />
     <Compile Include="UI\FileBrowserControl.cs">
