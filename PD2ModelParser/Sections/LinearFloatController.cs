@@ -17,8 +17,8 @@ namespace PD2ModelParser.Sections
                 Value = value;
             }
 
-            public float Timestamp { get; private set; }
-            public float Value { get; private set; }
+            public float Timestamp { get; set; }
+            public float Value { get; set; }
 
             public void StreamWriteData(BinaryWriter output)
             {

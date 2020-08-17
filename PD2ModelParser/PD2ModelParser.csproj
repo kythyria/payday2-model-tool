@@ -134,10 +134,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Sections\Camera.cs" />
     <Compile Include="Sections\CustomHashlist.cs" />
     <Compile Include="Sections\ISection.cs" />
     <Compile Include="Sections\Light.cs" />
     <Compile Include="Sections\LinearFloatController.cs" />
+    <Compile Include="Sections\LookAtConstrRotationController.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Tests\MultiplicationTest.cs" />
     <Compile Include="UI\FileBrowserControl.cs">
