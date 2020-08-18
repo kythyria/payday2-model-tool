@@ -37,15 +37,13 @@ namespace PD2ModelParser.Sections
         public UInt32 size;
 
         public HashName HashName { get; set; }
-        public Byte flag0; // 2 = Loop?
-        public Byte flag1;
-        public Byte flag2;
-        public Byte flag3;
-
-        public UInt32 unknown1;
-        public float keyframe_length;
-        public UInt32 keyframe_count;
-        public List<LinearVector3Controller_KeyFrame> keyframes = new List<LinearVector3Controller_KeyFrame>();
+        public byte Flag0 { get; set; }
+        public byte Flag1 { get; set; }
+        public byte Flag2 { get; set; }
+        public byte Flag3 { get; set; }
+        public uint Unknown1 { get; set; }
+        public float KeyframeLength { get; set; }
+        public List<LinearVector3Controller_KeyFrame> Keyframes { get; set; } = new List<LinearVector3Controller_KeyFrame>();
 
         public byte[] remaining_data = null;
 
@@ -55,17 +53,17 @@ namespace PD2ModelParser.Sections
             this.size = section.size;
 
             this.HashName = new HashName(instream.ReadUInt64());
-            this.flag0 = instream.ReadByte();
-            this.flag1 = instream.ReadByte();
-            this.flag2 = instream.ReadByte();
-            this.flag3 = instream.ReadByte();
-            this.unknown1 = instream.ReadUInt32();
-            this.keyframe_length = instream.ReadSingle();
-            this.keyframe_count = instream.ReadUInt32();
+            this.Flag0 = instream.ReadByte();
+            this.Flag1 = instream.ReadByte();
+            this.Flag2 = instream.ReadByte();
+            this.Flag3 = instream.ReadByte();
+            this.Unknown1 = instream.ReadUInt32();
+            this.KeyframeLength = instream.ReadSingle();
+            var keyframe_count = instream.ReadUInt32();
 
-            for (int x = 0; x < this.keyframe_count; x++)
+            for (int x = 0; x < keyframe_count; x++)
             {
-                this.keyframes.Add(new LinearVector3Controller_KeyFrame(instream));
+                this.Keyframes.Add(new LinearVector3Controller_KeyFrame(instream));
             }
 
             this.remaining_data = null;
@@ -76,15 +74,15 @@ namespace PD2ModelParser.Sections
         public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.HashName.Hash);
-            outstream.Write(this.flag0);
-            outstream.Write(this.flag1);
-            outstream.Write(this.flag2);
-            outstream.Write(this.flag3);
-            outstream.Write(this.unknown1);
-            outstream.Write(this.keyframe_length);
-            outstream.Write(this.keyframe_count);
+            outstream.Write(this.Flag0);
+            outstream.Write(this.Flag1);
+            outstream.Write(this.Flag2);
+            outstream.Write(this.Flag3);
+            outstream.Write(this.Unknown1);
+            outstream.Write(this.KeyframeLength);
+            outstream.Write(this.Keyframes.Count);
 
-            foreach (LinearVector3Controller_KeyFrame item in this.keyframes)
+            foreach (LinearVector3Controller_KeyFrame item in this.Keyframes)
             {
                 item.StreamWriteData(outstream);
             }
@@ -96,10 +94,10 @@ namespace PD2ModelParser.Sections
         public override string ToString()
         {
 
-            string keyframes_string = (this.keyframes.Count == 0 ? "none" : "");
+            string keyframes_string = (this.Keyframes.Count == 0 ? "none" : "");
 
             bool first = true;
-            foreach (LinearVector3Controller_KeyFrame item in this.keyframes)
+            foreach (LinearVector3Controller_KeyFrame item in this.Keyframes)
             {
                 keyframes_string += (first ? "" : ", ") + item;
                 first = false;
@@ -108,13 +106,13 @@ namespace PD2ModelParser.Sections
             return base.ToString() +
                 " size: " + this.size +
                 " HashName: " + this.HashName.String +
-                " flag0: " + this.flag0 +
-                " flag1: " + this.flag1 +
-                " flag2: " + this.flag2 +
-                " flag3: " + this.flag3 +
-                " unknown1: " + this.unknown1 +
-                " keyframe_length: " + this.keyframe_length +
-                " count: " + this.keyframe_count + " items: [ " + keyframes_string + " ] " +
+                " flag0: " + this.Flag0 +
+                " flag1: " + this.Flag1 +
+                " flag2: " + this.Flag2 +
+                " flag3: " + this.Flag3 +
+                " unknown1: " + this.Unknown1 +
+                " keyframe_length: " + this.KeyframeLength +
+                " count: " + this.Keyframes.Count + " items: [ " + keyframes_string + " ] " +
                 (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
