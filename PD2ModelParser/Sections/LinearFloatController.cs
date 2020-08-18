@@ -28,9 +28,9 @@ namespace PD2ModelParser.Sections
         }
 
         public HashName HashName { get; set; }
-        public uint Unknown1 { get; set; }
+        public uint Flags { get; set; }
         public uint Unknown2 { get; set; }
-        public uint Unknown3 { get; set; }
+        public float KeyframeLength { get; set; }
         public List<Keyframe> Keyframes { get; set; } = new List<Keyframe>();
 
         public LinearFloatController()
@@ -42,9 +42,9 @@ namespace PD2ModelParser.Sections
         {
             SectionId = section.id;
             HashName = new HashName(instream.ReadUInt64());
-            Unknown1 = instream.ReadUInt32();
+            Flags = instream.ReadUInt32();
             Unknown2 = instream.ReadUInt32();
-            Unknown3 = instream.ReadUInt32();
+            KeyframeLength = instream.ReadSingle();
             var count = instream.ReadUInt32();
             for (var i = 0; i < count; i++) {
                 Keyframes.Add(new Keyframe(instream.ReadSingle(), instream.ReadSingle()));
@@ -54,9 +54,9 @@ namespace PD2ModelParser.Sections
         public override void StreamWriteData(BinaryWriter output)
         {
             output.Write(HashName.Hash);
-            output.Write(Unknown1);
+            output.Write(Flags);
             output.Write(Unknown2);
-            output.Write(Unknown3);
+            output.Write(KeyframeLength);
             output.Write(Keyframes.Count);
             for(var i = 0; i < Keyframes.Count; i++)
             {
