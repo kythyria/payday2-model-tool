@@ -221,6 +221,7 @@ namespace PD2ModelParser.Sections
                 //Console.WriteLine("Header type: " + head.item_type + " Size: " + head.item_size);
                 if (head.item_type == GeometryChannelTypes.POSITION)
                 {
+                    verts.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
                         Vector3D vert = new Vector3D();
@@ -233,6 +234,7 @@ namespace PD2ModelParser.Sections
                 }
                 else if (head.item_type == GeometryChannelTypes.NORMAL)
                 {
+                    normals.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
                         Vector3D norm = new Vector3D();
@@ -244,6 +246,7 @@ namespace PD2ModelParser.Sections
                 }
                 else if (head.item_type == GeometryChannelTypes.COLOR0)
                 {
+                    vertex_colors.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
                         this.vertex_colors.Add(new GeometryColor(instream));
@@ -253,6 +256,7 @@ namespace PD2ModelParser.Sections
 
                 else if (head.item_type == GeometryChannelTypes.BINORMAL0)
                 {
+                    binormals.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
                         Vector3D binormal_entry = new Vector3D();
@@ -264,6 +268,7 @@ namespace PD2ModelParser.Sections
                 }
                 else if (head.item_type == GeometryChannelTypes.TANGENT0)
                 {
+                    tangents.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
                         Vector3D tangent_entry = new Vector3D();
@@ -277,6 +282,7 @@ namespace PD2ModelParser.Sections
                 //Weight Groups
                 else if (head.item_type == GeometryChannelTypes.BLENDINDICES0)
                 {
+                    weight_groups.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
                         GeometryWeightGroups unknown_15_entry = new GeometryWeightGroups(instream);
@@ -287,6 +293,7 @@ namespace PD2ModelParser.Sections
                 //Weights
                 else if (head.item_type == GeometryChannelTypes.BLENDWEIGHT0)
                 {
+                    weights.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
                         Vector3D unknown_17_entry = new Vector3D();
