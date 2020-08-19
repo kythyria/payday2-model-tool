@@ -29,6 +29,10 @@ namespace PD2ModelParser.Sections
 
         public HashName HashName { get; set; }
         public uint Flags { get; set; }
+        public byte Flag0 { get => (byte)((Flags & 0x000000FF) >> 0); set => Flags = Flags & (uint)((value << 0) | 0xFFFFFF00); }
+        public byte Flag1 { get => (byte)((Flags & 0x0000FF00) >> 8);  set => Flags = Flags & (uint)((value << 8) | 0xFFFF00FF); }
+        public byte Flag2 { get => (byte)((Flags & 0x00FF0000) >> 16); set => Flags = Flags & (uint)((value << 16) | 0xFF00FFFF); }
+        public byte Flag3 { get => (byte)((Flags & 0xFF000000) >> 24); set => Flags = Flags & (uint)((value << 24) | 0x00FFFFFF); }
         public uint Unknown2 { get; set; }
         public float KeyframeLength { get; set; }
         public List<Keyframe> Keyframes { get; set; } = new List<Keyframe>();
