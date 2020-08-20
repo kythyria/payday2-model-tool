@@ -15,7 +15,6 @@ namespace PD2ModelParser.Sections
         [Category("Object3D")]
         [DisplayName("Name")]
         public HashName HashName { get; set; } //Hashed object root point name (see hashlist.txt)
-        private List<uint> animation_ids = new List<uint>(); // This is NOT a list of Object3Ds (or Models). Maybe animation related?
         private Matrix3D _rotation = new Matrix3D(); // 4x4 transform matrix - for translation/scale too
 
         /// <summary>
@@ -24,7 +23,8 @@ namespace PD2ModelParser.Sections
         /// <remarks>
         /// The contents of this property with the actual type of self.
         /// 
-        /// For self is Light, it's [brightness, colour, null, position].
+        /// self is Light: [float brightness, vector3? colour, null, vector3 position?].
+        /// self is Light: [vector3 colour, null, null]
         /// </remarks>
         [Category("Object3D")]
         public List<ISection> Animations { get; private set; } = new List<ISection>();
@@ -83,7 +83,6 @@ namespace PD2ModelParser.Sections
             this.size = 0;
 
             this.HashName = HashName.FromNumberOrString(object_name);
-            this.animation_ids = new List<uint>();
             this.Transform = Matrix3D.Identity;
 
             this.Parent = parent;
@@ -107,13 +106,15 @@ namespace PD2ModelParser.Sections
 
             // in dsl::ParamBlock::load
             uint child_count = instream.ReadUInt32();
+            var animation_ids = new List<uint>();
 
             for (int x = 0; x < child_count; x++)
             {
                 uint item = instream.ReadUInt32(); // This is a reference thing, probably not important
                 instream.ReadUInt64(); // Skip eight bytes, as per PD2
-                this.animation_ids.Add(item);
+                animation_ids.Add(item);
             }
+            postloadCallbacks.Add((self, sections) => Animations.AddRange(animation_ids.Select(i => sections.ContainsKey(i) ? sections[i] : null)));
 
             // In Object3D::load
             Matrix3D transform = new Matrix3D();
@@ -148,7 +149,7 @@ namespace PD2ModelParser.Sections
         public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.HashName.Hash);
-            outstream.Write(animation_ids.Count);
+            outstream.Write(this.Animations.Count);
             foreach (var item in this.Animations)
             {
                 outstream.Write((item?.SectionId).GetValueOrDefault());
@@ -189,7 +190,7 @@ namespace PD2ModelParser.Sections
             return base.ToString() +
                    " size: " + this.size +
                    " HashName: " + this.HashName.String +
-                   " animations: " + this.animation_ids.Count +
+                   " animations: " + this.Animations.Count +
                    " mat.scale: " + scale +
                    " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "]" +
                    " Parent ID: " + this.parentID +
@@ -214,8 +215,6 @@ namespace PD2ModelParser.Sections
                     Parent.children.Add(this);
                 }
             }
-
-            Animations.AddRange(animation_ids.Select(i => parsed_sections.ContainsKey(i) ? parsed_sections[i] : null));
 
             UpdateTransforms();
 

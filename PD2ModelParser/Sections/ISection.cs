@@ -79,8 +79,8 @@ namespace PD2ModelParser.Sections
             return $"[{GetType().Name}] ID: {SectionId}";
         }
 
-        delegate void PostLoadCallback(ISection self, Dictionary<uint, ISection> sections);
-        List<PostLoadCallback> postloadCallbacks = new List<PostLoadCallback>();
+        protected delegate void PostLoadCallback(ISection self, Dictionary<uint, ISection> sections);
+        protected List<PostLoadCallback> postloadCallbacks = new List<PostLoadCallback>();
 
         protected void PostLoadRef<TRef>(uint id, Action<TRef> setter, [CallerFilePath] string fp = "(unknown)", [CallerLineNumber] int linenum = 0) where TRef: class
         {
