@@ -10,6 +10,12 @@ namespace PD2ModelParser.Sections
         public float timestamp;
         public Vector3D vector;
 
+        public LinearVector3Controller_KeyFrame(float timestamp, Vector3D vector)
+        {
+            this.timestamp = timestamp;
+            this.vector = vector;
+        }
+
         public LinearVector3Controller_KeyFrame(BinaryReader instream)
         {
             this.timestamp = instream.ReadSingle();

@@ -18,6 +18,14 @@ namespace PD2ModelParser.Sections
         private List<uint> animation_ids = new List<uint>(); // This is NOT a list of Object3Ds (or Models). Maybe animation related?
         private Matrix3D _rotation = new Matrix3D(); // 4x4 transform matrix - for translation/scale too
 
+        /// <summary>
+        /// Animation controllers affecting this object.
+        /// </summary>
+        /// <remarks>
+        /// The contents of this property with the actual type of self.
+        /// 
+        /// For self is Light, it's [brightness, colour, null, position].
+        /// </remarks>
         [Category("Object3D")]
         public List<ISection> Animations { get; private set; } = new List<ISection>();
 
