@@ -21,10 +21,23 @@ namespace PD2ModelParser.Sections
         /// Animation controllers affecting this object.
         /// </summary>
         /// <remarks>
-        /// The contents of this property with the actual type of self.
+        /// The meaning of this property varies with the actual type of self.
         /// 
-        /// self is Light: [float brightness, vector3? colour, null, vector3 position?].
-        /// self is Light: [vector3 colour, null, null]
+        /// <list type="bullet">
+        /// <item>
+        /// <term>self is Light</term>
+        /// <description>[float brightness, vector3 colour, null, vector3 position]</description>
+        /// </item>
+        /// 
+        /// <item>
+        /// <term>self is Light</term>
+        /// <description>[float brightness, null, null, null]</description>
+        /// </item>
+        /// 
+        /// <item><term>self is Light</term>
+        /// <description>[vector3 colour, null, null]</description>
+        /// </item>
+        /// </list>
         /// </remarks>
         [Category("Object3D")]
         public List<ISection> Animations { get; private set; } = new List<ISection>();
