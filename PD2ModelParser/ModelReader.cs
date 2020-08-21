@@ -89,54 +89,59 @@ namespace PD2ModelParser
             List<SectionHeader> sections = data.sections;
             Dictionary<UInt32, ISection> parsed_sections = data.parsed_sections;
 
+            byte[] bytes;
+
             using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
             {
-                var bytes = new byte[fs.Length];
+                bytes = new byte[fs.Length];
                 int res = fs.Read(bytes, 0, (int)fs.Length);
                 if (res != fs.Length)
                     throw new Exception($"Failed to read {filepath} all in one go!");
+            }
 
-                using (var ms = new MemoryStream(bytes, 0, bytes.Length, false, true))
-                using (var br = new BinaryReader(ms))
+            using (var ms = new MemoryStream(bytes, 0, bytes.Length, false, true))
+            using (var br = new BinaryReader(ms))
+            {
+                sections.Clear();
+                sections.AddRange(ReadHeaders(br));
+
+                foreach (SectionHeader sh in sections)
                 {
-                    sections.Clear();
-                    sections.AddRange(ReadHeaders(br));
+                    ISection section;
 
-                    foreach (SectionHeader sh in sections)
+                    ms.Position = sh.Start;
+
+                    if (SectionMetaInfo.TryGetForTag(sh.type, out var mi))
                     {
-                        ISection section;
+                        section = mi.Deserialise(br, sh);
+                    }
+                    else
+                    {
+                        Log.Default.Warn("UNKNOWN Tag {2} at {0} Size: {1}", sh.offset, sh.size, sh.type);
+                        ms.Position = sh.offset;
 
-                        ms.Position = sh.Start;
-
-                        if (SectionMetaInfo.TryGetForTag(sh.type, out var mi))
-                        {
-                            section = mi.Deserialise(br, sh);
-                        }
-                        else
-                        {
-                            Log.Default.Warn("UNKNOWN Tag {2} at {0} Size: {1}", sh.offset, sh.size, sh.type);
-                            ms.Position = sh.offset;
-
-                            section = new Unknown(br, sh);
-                        }
-
-                        Log.Default.Debug("Section {0} at {1} length {2}",
-                            section.GetType().Name, sh.offset, sh.size);
-
-                        parsed_sections.Add(sh.id, section);
+                        section = new Unknown(br, sh);
                     }
 
-                    foreach (var i in parsed_sections)
-                    {
-                        if (i.Value is IPostLoadable pl)
-                        {
-                            pl.PostLoad(i.Key, parsed_sections);
-                        }
-                    }
+                    if (ms.Position != sh.End)
+                        throw new Exception(string.Format("Section of type {2} {0} read more than its length of {1} ", sh.id, sh.size, sh.type));
 
-                    if (ms.Position < ms.Length)
-                        data.leftover_data = br.ReadBytes((int)(ms.Length - ms.Position));
+                    Log.Default.Debug("Section {0} at {1} length {2}",
+                        section.GetType().Name, sh.offset, sh.size);
+
+                    parsed_sections.Add(sh.id, section);
                 }
+
+                foreach (var i in parsed_sections)
+                {
+                    if (i.Value is IPostLoadable pl)
+                    {
+                        pl.PostLoad(i.Key, parsed_sections);
+                    }
+                }
+
+                if (ms.Position < ms.Length)
+                    data.leftover_data = br.ReadBytes((int)(ms.Length - ms.Position));
             }
         }
     }

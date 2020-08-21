@@ -293,6 +293,11 @@ namespace PD2ModelParser.Sections
                 //Weights
                 else if (head.item_type == GeometryChannelTypes.BLENDWEIGHT0)
                 {
+                    if(head.item_size == 4)
+                    {
+                        Log.Default.Warn("Section {0} has four weights", this.SectionId);
+                    }
+
                     weights.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
@@ -301,6 +306,13 @@ namespace PD2ModelParser.Sections
                         unknown_17_entry.Y = instream.ReadSingle();
                         if (head.item_size == 3)
                             unknown_17_entry.Z = instream.ReadSingle();
+                        else if(head.item_size == 4)
+                        {
+                            unknown_17_entry.Z = instream.ReadSingle();
+                            var tmp = instream.ReadSingle();
+                            if (tmp != 0)
+                                Log.Default.Warn("Nonzero fourth weight in {0} vtx {1} (is {2})", this.SectionId, x, tmp);
+                        }
                         else if (head.item_size != 2)
                             throw new Exception("Bad BLENDWEIGHT0 item size " + head.item_size);
                         this.weights.Add(unknown_17_entry);
@@ -457,6 +469,10 @@ namespace PD2ModelParser.Sections
                 }
                 else if (head.item_type == GeometryChannelTypes.BLENDWEIGHT)
                 {
+                    if (head.item_size == 4)
+                    {
+                        Log.Default.Warn("Section {0} has four weights", this.HashName.String);
+                    }
                     for (int x = 0; x < this.vert_count; x++)
                     {
                         Vector3D weight = this.weights.Count != this.vert_count ? Vector3D.UnitX : weights[x];
@@ -465,6 +481,11 @@ namespace PD2ModelParser.Sections
 
                         if (head.item_size == 3)
                             outstream.Write(weight.Z);
+                        if (head.item_size == 4)
+                        {
+                            outstream.Write(weight.Z);
+                            outstream.Write(0.0f);
+                        }
                         else if (head.item_size != 2)
                             throw new Exception("Cannot write bad header BLENDWEIGHT s=" + head.item_size);
                     }
