@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace PD2ModelParser.Sections
 {
-    interface IAnimationController : ISection, IHashNamed
+    public interface IAnimationController : ISection, IHashNamed
     {
         uint Flags { get; set; }
         float KeyframeLength { get; set; }
     }
 
-    interface IAnimationController<TValue> : IAnimationController
+    public interface IAnimationController<TValue> : IAnimationController
     {
         IList<Keyframe<TValue>> Keyframes { get; set; }
     }

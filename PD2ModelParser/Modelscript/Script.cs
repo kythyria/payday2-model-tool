@@ -98,8 +98,17 @@ namespace PD2ModelParser.Modelscript
                     case "exporttype": yield return ParseXmlExportType(element); break;
                     case "batchexport": yield return ParseXmlBatchExport(element); break;
                     case "object3d": yield return ParseXmlObject3d(element); break;
+                    case "dumpanims": yield return ParseXmlDumpAnims(element); break;
                 }
             }
+        }
+
+        private static IScriptItem ParseXmlDumpAnims(XElement element)
+        {
+            return new DumpAnims()
+            {
+                File = RequiredAttr(element, "file")
+            };
         }
 
         private static IScriptItem ParseXmlImport(XElement element)

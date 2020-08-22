@@ -278,6 +278,9 @@ given as one of a few elements:
 Which respectively set the position, rotation, or scale, clear the object's parent entirely, or set it
 to the object named "whatever".
 
-## `<runscript file="path"/>
+## `<runscript file="path"/>`
 Runs another mscript file with the same state. Entirely the same: `<createnew/>` and such will carry over
 between them.
+## `<dumpanims file="path">`
+Create a modelscript file containing `<animate/>` commands that will restore all
+of the animations in the current model file.

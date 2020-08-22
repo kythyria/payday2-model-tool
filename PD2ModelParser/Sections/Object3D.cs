@@ -50,7 +50,7 @@ namespace PD2ModelParser.Sections
         /// </list>
         /// </remarks>
         [Category("Object3D")]
-        public List<ISection> Animations { get; private set; } = new List<ISection>();
+        public List<IAnimationController> Animations { get; private set; } = new List<IAnimationController>();
 
         [Category("Object3D")]
         [TypeConverter(typeof(Inspector.NexusMatrixConverter))]
@@ -137,7 +137,7 @@ namespace PD2ModelParser.Sections
                 instream.ReadUInt64(); // Skip eight bytes, as per PD2
                 animation_ids.Add(item);
             }
-            postloadCallbacks.Add((self, sections) => Animations.AddRange(animation_ids.Select(i => sections.ContainsKey(i) ? sections[i] : null)));
+            postloadCallbacks.Add((self, sections) => Animations.AddRange(animation_ids.Select(i => sections.ContainsKey(i) ? (IAnimationController)sections[i] : null)));
 
             // In Object3D::load
             Matrix3D transform = new Matrix3D();
