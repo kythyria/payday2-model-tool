@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -32,6 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugNoFBX|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -42,6 +44,7 @@
     <DefineConstants>DEBUG;TRACE;NO_FBX</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <UseVSHostingProcess>false</UseVSHostingProcess>
@@ -58,6 +61,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FbxNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="!$(DefineConstants.Contains('NO_FBX'))">
@@ -122,6 +126,7 @@
     <Compile Include="Misc\BulkFunctions.cs" />
     <Compile Include="Misc\SerializeUtils.cs" />
     <Compile Include="Misc\Updates.cs" />
+    <Compile Include="Modelscript\AnimationCommands.cs" />
     <Compile Include="Modelscript\Script.cs" />
     <Compile Include="Modelscript\ScriptCommands.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
