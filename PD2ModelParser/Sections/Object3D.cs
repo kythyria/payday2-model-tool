@@ -37,6 +37,16 @@ namespace PD2ModelParser.Sections
         /// <item><term>self is Light</term>
         /// <description>[vector3 colour, null, null]</description>
         /// </item>
+        /// 
+        /// <item>
+        /// <term>self is exactly Object3D</term>
+        /// <description>[quaternion rotation, null]</description>
+        /// </item>
+        /// <item>
+        /// 
+        /// <term>self is Model</term>
+        /// <description>[quaternion rotation, null]</description>
+        /// </item>
         /// </list>
         /// </remarks>
         [Category("Object3D")]
