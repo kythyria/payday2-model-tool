@@ -2,38 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace PD2ModelParser.Sections
 {
-    public class  QuatLinearRotationController_KeyFrame
-    {
-        public float timestamp;
-        public Quaternion rotation;
-
-        public QuatLinearRotationController_KeyFrame(BinaryReader instream)
-        {
-            this.timestamp = instream.ReadSingle();
-            this.rotation = new Quaternion(instream.ReadSingle(), instream.ReadSingle(), instream.ReadSingle(), instream.ReadSingle()); //Might be wrong order
-        }
-
-        public void StreamWriteData(BinaryWriter outstream)
-        {
-            outstream.Write(this.timestamp);
-            outstream.Write(this.rotation.X);
-            outstream.Write(this.rotation.Y);
-            outstream.Write(this.rotation.Z);
-            outstream.Write(this.rotation.W);
-        }
-
-        public override string ToString()
-        {
-            return "Timestamp=" + this.timestamp + " Rotation=[X=" + this.rotation.X + ", Y=" + this.rotation.Y + ", Z=" + this.rotation.Z + ", W=" + this.rotation.W + "]";
-        }
-
-    }
-    
     [ModelFileSection(Tags.quatLinearRotationController_tag)]
-    class QuatLinearRotationController : AbstractSection, ISection, IHashNamed
+    class QuatLinearRotationController : AbstractSection, ISection, IHashNamed, IAnimationController<Quaternion>
     {
         public UInt32 size;
 
@@ -43,13 +17,28 @@ namespace PD2ModelParser.Sections
         public Byte flag2;
         public Byte flag3;
 
-        public UInt32 unknown1;
-        public float keyframe_length;
-        public UInt32 keyframe_count;
-        public List<QuatLinearRotationController_KeyFrame> keyframes = new List<QuatLinearRotationController_KeyFrame>();
+        public uint Flags
+        { 
+            get => flag0 | ((uint)flag1 << 8) | ((uint)flag2 << 16) | ((uint)flag3 << 24);
+            set
+            {
+                flag0 = (byte)(value & 0x000000FF);
+                flag1 = (byte)((value >> 8) & 0x0000FF00);
+                flag2 = (byte)((value >> 16) & 0x00FF0000);
+                flag3 = (byte)((value >> 24) & 0xFF000000);
+            }
+        }
 
+        public UInt32 unknown1;
+        public float KeyframeLength { get; set; }
+        public IList<Keyframe<Quaternion>> Keyframes { get; set; } = new List<Keyframe<Quaternion>>();
         
         public byte[] remaining_data = null;
+
+        public QuatLinearRotationController(string name = null)
+        {
+            HashName = new HashName(name ?? "");
+        }
 
         public QuatLinearRotationController(BinaryReader instream, SectionHeader section)
         {
@@ -62,12 +51,12 @@ namespace PD2ModelParser.Sections
             this.flag2 = instream.ReadByte();
             this.flag3 = instream.ReadByte();
             this.unknown1 = instream.ReadUInt32();
-            this.keyframe_length = instream.ReadSingle();
-            this.keyframe_count = instream.ReadUInt32();
+            this.KeyframeLength = instream.ReadSingle();
+            var keyframe_count = instream.ReadUInt32();
 
-            for(int x = 0; x < this.keyframe_count; x++)
+            for(int x = 0; x < keyframe_count; x++)
             {
-                this.keyframes.Add(new QuatLinearRotationController_KeyFrame(instream));
+                this.Keyframes.Add(new Keyframe<Quaternion>(instream.ReadSingle(), instream.ReadNexusQuaternion()));
             }
 
             this.remaining_data = null;
@@ -83,12 +72,16 @@ namespace PD2ModelParser.Sections
             outstream.Write(this.flag2);
             outstream.Write(this.flag3);
             outstream.Write(this.unknown1);
-            outstream.Write(this.keyframe_length);
-            outstream.Write(this.keyframe_count);
+            outstream.Write(this.KeyframeLength);
+            outstream.Write(this.Keyframes.Count);
 
-            foreach (QuatLinearRotationController_KeyFrame item in this.keyframes)
+            foreach (var item in this.Keyframes)
             {
-                item.StreamWriteData(outstream);
+                outstream.Write(item.Timestamp);
+                outstream.Write(item.Value.X);
+                outstream.Write(item.Value.Y);
+                outstream.Write(item.Value.Z);
+                outstream.Write(item.Value.W);
             }
 
             if (this.remaining_data != null)
@@ -98,14 +91,8 @@ namespace PD2ModelParser.Sections
         public override string ToString()
         {
 
-            string keyframes_string = (this.keyframes.Count == 0 ? "none" : "");
-
-            bool first = true;
-            foreach (QuatLinearRotationController_KeyFrame item in this.keyframes)
-            {
-                keyframes_string += (first ? "" : ", ") + item;
-                first = false;
-            }
+            string keyframes_string = (this.Keyframes.Count == 0 ? "none" : "");
+            keyframes_string += string.Join(", ", Keyframes.Select(i => i.ToString()));
 
             return base.ToString() + 
                 " size: " + this.size +
@@ -115,8 +102,8 @@ namespace PD2ModelParser.Sections
                 " flag2: " + this.flag2 +
                 " flag3: " + this.flag3 +
                 " unknown1: " + this.unknown1 +
-                " keyframe_length: " + this.keyframe_length +
-                " count: " + this.keyframe_count + " items: [ " + keyframes_string + " ] " + 
+                " keyframe_length: " + this.KeyframeLength +
+                " count: " + this.Keyframes.Count + " items: [ " + keyframes_string + " ] " + 
                 (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 

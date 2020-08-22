@@ -7,26 +7,8 @@ using System.Text;
 namespace PD2ModelParser.Sections
 {
     [ModelFileSection(Tags.linearFloatController_tag)]
-    class LinearFloatController : AbstractSection, ISection, IHashNamed
+    class LinearFloatController : AbstractSection, ISection, IHashNamed, IAnimationController<float>
     {
-        public class Keyframe
-        {
-            public Keyframe(float timestamp, float value)
-            {
-                Timestamp = timestamp;
-                Value = value;
-            }
-
-            public float Timestamp { get; set; }
-            public float Value { get; set; }
-
-            public void StreamWriteData(BinaryWriter output)
-            {
-                output.Write(Timestamp);
-                output.Write(Value);
-            }
-        }
-
         public HashName HashName { get; set; }
         public uint Flags { get; set; }
         public byte Flag0 { get => (byte)((Flags & 0x000000FF) >> 0); set => Flags = Flags & (uint)((value << 0) | 0xFFFFFF00); }
@@ -35,7 +17,7 @@ namespace PD2ModelParser.Sections
         public byte Flag3 { get => (byte)((Flags & 0xFF000000) >> 24); set => Flags = Flags & (uint)((value << 24) | 0x00FFFFFF); }
         public uint Unknown2 { get; set; }
         public float KeyframeLength { get; set; }
-        public List<Keyframe> Keyframes { get; set; } = new List<Keyframe>();
+        public IList<Keyframe<float>> Keyframes { get; set; } = new List<Keyframe<float>>();
 
         public LinearFloatController()
         {
@@ -51,7 +33,7 @@ namespace PD2ModelParser.Sections
             KeyframeLength = instream.ReadSingle();
             var count = instream.ReadUInt32();
             for (var i = 0; i < count; i++) {
-                Keyframes.Add(new Keyframe(instream.ReadSingle(), instream.ReadSingle()));
+                Keyframes.Add(new Keyframe<float>(instream.ReadSingle(), instream.ReadSingle()));
             }
         }
 
@@ -62,9 +44,10 @@ namespace PD2ModelParser.Sections
             output.Write(Unknown2);
             output.Write(KeyframeLength);
             output.Write(Keyframes.Count);
-            for(var i = 0; i < Keyframes.Count; i++)
+            foreach(var i in Keyframes)
             {
-                Keyframes[i].StreamWriteData(output);
+                output.Write(i.Timestamp);
+                output.Write(i.Value);
             }
         }
     }

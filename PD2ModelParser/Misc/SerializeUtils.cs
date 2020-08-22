@@ -3,13 +3,10 @@
     static class SerializeUtils
     {
         static public Nexus.Vector3D ReadNexusVector3D(this System.IO.BinaryReader self)
-        {
-            return new Nexus.Vector3D(
-                self.ReadSingle(),
-                self.ReadSingle(),
-                self.ReadSingle()
-            );
-        }
+            => new Nexus.Vector3D(self.ReadSingle(), self.ReadSingle(), self.ReadSingle());
+
+        static public Nexus.Quaternion ReadNexusQuaternion(this System.IO.BinaryReader self)
+            => new Nexus.Quaternion(self.ReadSingle(), self.ReadSingle(), self.ReadSingle(), self.ReadSingle());
 
         static public void Write(this System.IO.BinaryWriter self, Nexus.Vector3D vec)
         {

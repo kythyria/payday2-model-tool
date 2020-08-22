@@ -126,7 +126,6 @@
     <Compile Include="Misc\BulkFunctions.cs" />
     <Compile Include="Misc\SerializeUtils.cs" />
     <Compile Include="Misc\Updates.cs" />
-    <Compile Include="Modelscript\AnimationCommands.cs" />
     <Compile Include="Modelscript\Script.cs" />
     <Compile Include="Modelscript\ScriptCommands.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -141,6 +140,7 @@
     </Compile>
     <Compile Include="Sections\Camera.cs" />
     <Compile Include="Sections\CustomHashlist.cs" />
+    <Compile Include="Sections\IAnimationController.cs" />
     <Compile Include="Sections\ISection.cs" />
     <Compile Include="Sections\Light.cs" />
     <Compile Include="Sections\LinearFloatController.cs" />
