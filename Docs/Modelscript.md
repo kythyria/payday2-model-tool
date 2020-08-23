@@ -300,3 +300,14 @@ floats. This list is split into groups to make keyframes as follows:
 | `<float>`      | `timestamp value`   |
 | `<vector3>`    | `timestamp X Y Z`   |
 | `<quaternion>` | `timestamp X Y Z W` |
+
+The combinations observed in vanilla files include the following
+
+| Object type    | Types                             | Meanings                       |
+|----------------|-----------------------------------|--------------------------------|
+| Light          | `float      null    null null`    | `intensity -      - -`         |
+| Light          | `vector3    null    null`         | `colour    -      - -`         |
+| Light          | `float      vector3 null vector3` | `intensity colour - position`  |
+| Object3d/Model | `quaternion null    null`         | `rotation  -      -`           |
+| Object3d/Model | `vector3`                         | Probably position              |
+| Object3d/Model | `quaternion vector3`              | Probably rotation and position |
