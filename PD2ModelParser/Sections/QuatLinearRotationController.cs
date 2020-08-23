@@ -35,10 +35,7 @@ namespace PD2ModelParser.Sections
         
         public byte[] remaining_data = null;
 
-        public QuatLinearRotationController(string name = null)
-        {
-            HashName = new HashName(name ?? "");
-        }
+        public QuatLinearRotationController(string name = null) => HashName = new HashName(name ?? "");
 
         public QuatLinearRotationController(BinaryReader instream, SectionHeader section)
         {

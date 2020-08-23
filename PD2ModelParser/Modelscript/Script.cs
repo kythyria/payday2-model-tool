@@ -99,8 +99,43 @@ namespace PD2ModelParser.Modelscript
                     case "batchexport": yield return ParseXmlBatchExport(element); break;
                     case "object3d": yield return ParseXmlObject3d(element); break;
                     case "dumpanims": yield return ParseXmlDumpAnims(element); break;
+                    case "animate": yield return ParseXmlAnimate(element); break;
                 }
             }
+        }
+
+        private static readonly char[] AnimateValueSeparators = new char[] { ' ', '\t', '\r', '\n', ',' };
+
+        private static IScriptItem ParseXmlAnimate(XElement element)
+        {
+            var cmd = new Animate();
+            cmd.Object = RequiredAttr(element, "object");
+            foreach(var ec in element.Elements())
+            {
+                var item = new Animate.Item();
+                item.Type = ec.Name.LocalName.ToLower() switch
+                {
+                    "null" => Animate.ItemType.Null,
+                    "float" => Animate.ItemType.Float,
+                    "vector3" => Animate.ItemType.Vector3,
+                    "quaternion" => Animate.ItemType.Quaternion,
+                    _ => throw new Exception($"Invalid controller type {ec.Name}")
+                };
+                item.Name = ec.Attribute("name")?.Value;
+                if(uint.TryParse(ec.Attribute("flags")?.Value, System.Globalization.NumberStyles.HexNumber, null, out var flags))
+                {
+                    item.Flags = flags;
+                }
+                cmd.Controllers.Add(item);
+                if (item.Type == Animate.ItemType.Null) continue;
+
+                item.Values = ec.Value
+                    .Split(AnimateValueSeparators, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(i => float.Parse(i))
+                    .ToList();
+            }
+
+            return cmd;
         }
 
         private static IScriptItem ParseXmlDumpAnims(XElement element)

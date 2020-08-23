@@ -35,6 +35,8 @@ namespace PD2ModelParser.Sections
 
         public byte[] remaining_data = null;
 
+        public LinearVector3Controller(string name = null) => HashName = new HashName(name ?? "");
+
         public LinearVector3Controller(BinaryReader instream, SectionHeader section)
         {
             this.SectionId = section.id;

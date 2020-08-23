@@ -19,10 +19,7 @@ namespace PD2ModelParser.Sections
         public float KeyframeLength { get; set; }
         public IList<Keyframe<float>> Keyframes { get; set; } = new List<Keyframe<float>>();
 
-        public LinearFloatController()
-        {
-
-        }
+        public LinearFloatController(string name = null) => HashName = new HashName(name ?? "");
 
         public LinearFloatController(System.IO.BinaryReader instream, SectionHeader section)
         {

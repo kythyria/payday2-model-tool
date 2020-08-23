@@ -148,6 +148,10 @@ namespace PD2ModelParser
                     "batch-export=", "Recursively scans a directory for .model files and exports them all",
                     v => script.Add(new BatchExport { Directory = v })
                 },
+                {
+                    "dump-anims=", "Write out a modelscript with the current model's animations in",
+                    v => script.Add(new DumpAnims { File = v })
+                }
             };
 
             List<string> extra;

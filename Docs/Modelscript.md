@@ -281,6 +281,22 @@ to the object named "whatever".
 ## `<runscript file="path"/>`
 Runs another mscript file with the same state. Entirely the same: `<createnew/>` and such will carry over
 between them.
+
 ## `<dumpanims file="path">`
 Create a modelscript file containing `<animate/>` commands that will restore all
 of the animations in the current model file.
+
+## `<animate object="obj_name">`
+Replace the `Animations` property of `obj_name`. This lets you create animations
+that live in the .model, as is used for doors and such. Each child element becomes
+a controller, `<null/>` represents a null in the list of controllers.
+
+All the others understand a base-16 `flags` attribute, which is always 0 or 2 in the
+vanilla files. The contents of the element is a whitespace/newline separated list of
+floats. This list is split into groups to make keyframes as follows:
+
+| Element        | Items               |
+|----------------|---------------------|
+| `<float>`      | `timestamp value`   |
+| `<vector3>`    | `timestamp X Y Z`   |
+| `<quaternion>` | `timestamp X Y Z W` |
