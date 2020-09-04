@@ -312,17 +312,17 @@ namespace PD2ModelParser.Modelscript
                 extant.SetParent(null);
             }
 
-            var tf = extant.Transform;
+            var tf = extant.Transform.ToMatrix4x4();
             if (Rotation.HasValue || Scale.HasValue)
             {
-                tf.Decompose(out var scale, out var rotation, out var translation);
-                Rotation.WithValue(r => rotation = r.ToNexusQuaternion());
-                Scale.WithValue(s => scale = s.ToNexusVector());
-                tf = Nexus.Matrix3D.CreateScale(scale) * Nexus.Matrix3D.CreateFromQuaternion(rotation);
+                Matrix4x4.Decompose(tf, out var scale, out var rotation, out var translation);
+                Rotation.WithValue(r => rotation = r);
+                Scale.WithValue(s => scale = s);
+                tf = Matrix4x4.CreateScale(scale) * Matrix4x4.CreateFromQuaternion(rotation);
             }
-            Position.WithValue(p => tf.Translation = p.ToNexusVector());
+            Position.WithValue(p => tf.Translation = p);
 
-            extant.Transform = tf;
+            extant.Transform = tf.ToNexusMatrix();
         }
     }
 }

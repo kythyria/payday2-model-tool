@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using SN = System.Numerics;
 using static PD2ModelParser.Tags;
 
 namespace PD2ModelParser
@@ -152,18 +153,18 @@ namespace PD2ModelParser
                             }
                         }
 
-                        Vector3D translate;
-                        Quaternion rotate;
-                        Vector3D scale;
-                        obj.Transform.Decompose(out scale, out rotate, out translate);
+                        SN.Vector3 translate;
+                        SN.Quaternion rotate;
+                        SN.Vector3 scale;
+                        SN.Matrix4x4.Decompose(obj.Transform.ToMatrix4x4(), out scale, out rotate, out translate);
 
-                        Matrix3D final_rot = Matrix3D.CreateFromQuaternion(rotate);
+                        SN.Matrix4x4 final_rot = SN.Matrix4x4.CreateFromQuaternion(rotate);
                         final_rot.Translation = translate;
 
                         if (obj.Parent == null || !sb.Objects.Contains(obj.Parent))
                         {
-                            Matrix3D fixed_obj_transform = obj.WorldTransform;
-                            fixed_obj_transform.Decompose(out scale, out rotate, out translate);
+                            SN.Matrix4x4 fixed_obj_transform = obj.WorldTransform.ToMatrix4x4();
+                            SN.Matrix4x4.Decompose(fixed_obj_transform, out scale, out rotate, out translate);
 
                             // Fixes the head, but breaks the arms
                             // For now, leave it like this

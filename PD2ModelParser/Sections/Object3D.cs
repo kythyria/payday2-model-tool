@@ -206,10 +206,10 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            Vector3D scale = new Vector3D();
-            Quaternion rot = new Quaternion();
-            Vector3D translation = new Vector3D();
-            this.Transform.Decompose(out scale, out rot, out translation);
+            var scale = new System.Numerics.Vector3();
+            var rot = new System.Numerics.Quaternion();
+            var translation = new System.Numerics.Vector3();
+            System.Numerics.Matrix4x4.Decompose(this.Transform.ToMatrix4x4(), out scale, out rot, out translation);
             return base.ToString() +
                    " size: " + this.size +
                    " HashName: " + this.HashName.String +

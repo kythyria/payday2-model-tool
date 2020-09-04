@@ -1,8 +1,8 @@
-﻿using Nexus;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 
 namespace PD2ModelParser.Sections
 {
@@ -53,7 +53,7 @@ namespace PD2ModelParser.Sections
 
             for(int x = 0; x < keyframe_count; x++)
             {
-                this.Keyframes.Add(new Keyframe<Quaternion>(instream.ReadSingle(), instream.ReadNexusQuaternion()));
+                this.Keyframes.Add(new Keyframe<Quaternion>(instream.ReadSingle(), instream.ReadQuaternion()));
             }
 
             this.remaining_data = null;

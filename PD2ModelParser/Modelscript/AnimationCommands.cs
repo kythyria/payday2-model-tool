@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Numerics;
 using System.Xml;
-using Nexus;
 using PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Modelscript
@@ -135,7 +133,7 @@ namespace PD2ModelParser.Modelscript
                         var vc = new LinearVector3Controller(item.Name);
                         for (var i = 0; i < item.Values.Count; i += 4)
                         {
-                            vc.Keyframes.Add(new Keyframe<Vector3D>(item.Values[i], new Vector3D(item.Values[i + 1], item.Values[i + 2], item.Values[i + 3])));
+                            vc.Keyframes.Add(new Keyframe<Vector3>(item.Values[i], new Vector3(item.Values[i + 1], item.Values[i + 2], item.Values[i + 3])));
                         }
                         SetLength(vc);
                         c = vc;

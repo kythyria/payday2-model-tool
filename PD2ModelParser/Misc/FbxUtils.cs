@@ -1,4 +1,6 @@
 using System;
+using SN = System.Numerics;
+using System.Numerics;
 using FbxNet;
 using Nexus;
 using PD2ModelParser.Sections;
@@ -47,42 +49,42 @@ namespace PD2ModelParser.Misc
         public static void Set(this FbxVector4 v, Vector3D other) => v.Set(other.X, other.Y, other.Z, 0);
 
         // ReSharper disable once InconsistentNaming
-        public static Vector3D ToEulerZYX(this Quaternion q)
+        public static Vector3 ToEulerZYX(this SN.Quaternion q)
         {
-            Vector3D angles;
+            Vector3 angles;
 
             // roll (x-axis rotation)
             double sinr_cosp = +2.0 * (q.W * q.X + q.Y * q.Z);
             double cosr_cosp = +1.0 - 2.0 * (q.X * q.X + q.Y * q.Y);
-            angles.X = (float) Math.Atan2(sinr_cosp, cosr_cosp);
+            angles.X = (float)Math.Atan2(sinr_cosp, cosr_cosp);
 
             // pitch (y-axis rotation)
             double sinp = +2.0 * (q.W * q.Y - q.Z * q.X);
             if (Math.Abs(sinp) >= 1)
-                angles.Y = (float) Math.PI / 2 * (sinp > 0 ? 1 : -1); // use 90 degrees if out of range
+                angles.Y = (float)Math.PI / 2 * (sinp > 0 ? 1 : -1); // use 90 degrees if out of range
             else
-                angles.Y = (float) Math.Asin(sinp);
+                angles.Y = (float)Math.Asin(sinp);
 
             // yaw (z-axis rotation)
             double siny_cosp = +2.0 * (q.W * q.Z + q.X * q.Y);
             double cosy_cosp = +1.0 - 2.0 * (q.Y * q.Y + q.Z * q.Z);
-            angles.Z = (float) Math.Atan2(siny_cosp, cosy_cosp);
+            angles.Z = (float)Math.Atan2(siny_cosp, cosy_cosp);
 
             return angles;
         }
 
         // ReSharper disable once InconsistentNaming
         // ReSharper disable once MemberCanBePrivate.Global
-        public static Quaternion EulerToQuaternionXYZ(this Vector3D v)
+        public static SN.Quaternion EulerToQuaternionXYZ(this SN.Vector3 v)
         {
-            Quaternion roll = Quaternion.CreateFromAxisAngle(Vector3D.UnitX, v.X);
-            Quaternion pitch = Quaternion.CreateFromAxisAngle(Vector3D.UnitY, v.Y);
-            Quaternion yaw = Quaternion.CreateFromAxisAngle(Vector3D.UnitZ, v.Z);
+            SN.Quaternion roll = SN.Quaternion.CreateFromAxisAngle(SN.Vector3.UnitX, v.X);
+            SN.Quaternion pitch = SN.Quaternion.CreateFromAxisAngle(SN.Vector3.UnitY, v.Y);
+            SN.Quaternion yaw = SN.Quaternion.CreateFromAxisAngle(SN.Vector3.UnitZ, v.Z);
 
             return yaw * pitch * roll;
         }
 
-        public static FbxDouble3 ToFbxD3(this Vector3D v) => new FbxDouble3(v.X, v.Y, v.Z);
+        public static FbxDouble3 ToFbxD3(this Vector3 v) => new FbxDouble3(v.X, v.Y, v.Z);
 
         public static FbxVector2 ToFbxV2(this Vector2D v) => new FbxVector2(v.X, v.Y);
 
@@ -103,12 +105,13 @@ namespace PD2ModelParser.Misc
             if (node.RotationOrder.Get() != FbxEuler.EOrder.eOrderXYZ)
                 throw new Exception("Currently only the XYZ rotation order is supported");
 
-            Vector3D radians_euler = node.LclRotation.Get().V3() / 180 * (float) Math.PI;
-            Quaternion rotation = radians_euler.EulerToQuaternionXYZ();
+            Vector3 radians_euler = node.LclRotation.Get().V3().ToVector3() / 180 * (float) Math.PI;
+            SN.Quaternion rotation = radians_euler.EulerToQuaternionXYZ();
 
-            Matrix3D transform = Matrix3D.CreateFromQuaternion(rotation);
-            transform.Translation = node.LclTranslation.Get().V3();
-            return transform;
+            //Matrix3D transform = Matrix3D.CreateFromQuaternion(rotation.ToNexusQuaternion());
+            Matrix4x4 transform = Matrix4x4.CreateFromQuaternion(rotation);
+            transform.Translation = node.LclTranslation.Get().V3().ToVector3();
+            return transform.ToNexusMatrix();
         }
     }
 }

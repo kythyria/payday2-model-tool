@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SN = System.Numerics;
 using FbxNet;
 using Nexus;
 using PD2ModelParser.Misc;
@@ -286,7 +287,7 @@ namespace PD2ModelParser.Exporters
 
                 // Break down the bone's transform and convert it to an FBX affine matrix
                 // Skip the scale for now though, we don't need it
-                obj.WorldTransform.Decompose(out Vector3D _, out Quaternion rotate, out Vector3D translate);
+                SN.Matrix4x4.Decompose(obj.WorldTransform.ToMatrix4x4(), out SN.Vector3 _, out SN.Quaternion rotate, out SN.Vector3 translate);
                 FbxAMatrix mat = new FbxAMatrix();
                 mat.SetIdentity();
                 mat.SetT(new FbxVector4(translate.X, translate.Y, translate.Z));
@@ -327,10 +328,10 @@ namespace PD2ModelParser.Exporters
 
         private static void CopyTransform(Matrix3D transform, FbxNode node)
         {
-            Vector3D translate;
-            Quaternion rotate;
-            Vector3D scale;
-            transform.Decompose(out scale, out rotate, out translate);
+            SN.Vector3 translate;
+            SN.Quaternion rotate;
+            SN.Vector3 scale;
+            SN.Matrix4x4.Decompose(transform.ToMatrix4x4(), out scale, out rotate, out translate);
 
             node.LclTranslation.Set(new FbxDouble3(translate.X, translate.Y, translate.Z));
 
@@ -338,7 +339,7 @@ namespace PD2ModelParser.Exporters
             // node.LclRotation.Set(fq.DecomposeSphericalXYZ().D3());
 
             node.RotationOrder.Set(FbxEuler.EOrder.eOrderZYX);
-            Vector3D euler = rotate.ToEulerZYX() * (180 / (float) Math.PI);
+            SN.Vector3 euler = rotate.ToEulerZYX() * (180 / (float) Math.PI);
             node.LclRotation.Set(euler.ToFbxD3());
         }
 

@@ -35,7 +35,7 @@ namespace PD2ModelParser
 
     static class MathUtil
     {
-        public static double[] Serialize(Matrix3D matrix)
+        public static double[] Serialize(System.Numerics.Matrix4x4 matrix)
         {
             return new double[]
             {
