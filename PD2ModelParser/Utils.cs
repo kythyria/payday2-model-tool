@@ -226,13 +226,7 @@ namespace PD2ModelParser
          */
         public static Vector4D MultEach(this Vector4D a, Vector4D b)
         {
-            return new Vector4D
-            {
-                X = a.X * b.X,
-                Y = a.Y * b.Y,
-                Z = a.Z * b.Z,
-                W = a.W * b.W
-            };
+            return (a.ToVector4() * b.ToVector4()).ToNexusVector();
         }
 
         /**

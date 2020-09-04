@@ -29,13 +29,13 @@ namespace PD2ModelParser.Misc
             return new Vector3D((float) x, (float) y, (float) z);
         }
 
-        public static Vector3D V3(this FbxDouble3 vec)
+        public static Vector3 V3(this FbxDouble3 vec)
         {
             SWIGTYPE_p_double data = vec.mData;
             double x = FbxNet.FbxNet.doubleArray_getitem(data, 0);
             double y = FbxNet.FbxNet.doubleArray_getitem(data, 1);
             double z = FbxNet.FbxNet.doubleArray_getitem(data, 2);
-            return new Vector3D((float) x, (float) y, (float) z);
+            return new Vector3((float) x, (float) y, (float) z);
         }
 
         public static Vector2D V2(this FbxDouble2 vec)
@@ -75,11 +75,11 @@ namespace PD2ModelParser.Misc
 
         // ReSharper disable once InconsistentNaming
         // ReSharper disable once MemberCanBePrivate.Global
-        public static SN.Quaternion EulerToQuaternionXYZ(this SN.Vector3 v)
+        public static SN.Quaternion EulerToQuaternionXYZ(this Vector3 v)
         {
-            SN.Quaternion roll = SN.Quaternion.CreateFromAxisAngle(SN.Vector3.UnitX, v.X);
-            SN.Quaternion pitch = SN.Quaternion.CreateFromAxisAngle(SN.Vector3.UnitY, v.Y);
-            SN.Quaternion yaw = SN.Quaternion.CreateFromAxisAngle(SN.Vector3.UnitZ, v.Z);
+            SN.Quaternion roll = SN.Quaternion.CreateFromAxisAngle(Vector3.UnitX, v.X);
+            SN.Quaternion pitch = SN.Quaternion.CreateFromAxisAngle(Vector3.UnitY, v.Y);
+            SN.Quaternion yaw = SN.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, v.Z);
 
             return yaw * pitch * roll;
         }
@@ -99,19 +99,18 @@ namespace PD2ModelParser.Misc
             };
         }
 
-        public static Matrix3D GetNexusTransform(this FbxNode node)
+        public static Matrix4x4 GetTransform(this FbxNode node)
         {
             // TODO do we need to support other rotation orders? They all seem to come out as XYZ
             if (node.RotationOrder.Get() != FbxEuler.EOrder.eOrderXYZ)
                 throw new Exception("Currently only the XYZ rotation order is supported");
 
-            Vector3 radians_euler = node.LclRotation.Get().V3().ToVector3() / 180 * (float) Math.PI;
+            Vector3 radians_euler = node.LclRotation.Get().V3() / 180 * (float)Math.PI;
             SN.Quaternion rotation = radians_euler.EulerToQuaternionXYZ();
 
-            //Matrix3D transform = Matrix3D.CreateFromQuaternion(rotation.ToNexusQuaternion());
             Matrix4x4 transform = Matrix4x4.CreateFromQuaternion(rotation);
-            transform.Translation = node.LclTranslation.Get().V3().ToVector3();
-            return transform.ToNexusMatrix();
+            transform.Translation = node.LclTranslation.Get().V3();
+            return transform;
         }
     }
 }
