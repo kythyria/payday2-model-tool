@@ -397,8 +397,8 @@ namespace PD2ModelParser
 
             if (model_data_section.version != 6)
             {
-                model_data_section.BoundsMin = new_Model_data_bounds_min;
-                model_data_section.BoundsMax = new_Model_data_bounds_max;
+                model_data_section.BoundsMin = new_Model_data_bounds_min.ToVector3();
+                model_data_section.BoundsMax = new_Model_data_bounds_max.ToVector3();
                 model_data_section.BoundingRadius = obj.verts.Select(i => i.Length()).Max();
             }
 

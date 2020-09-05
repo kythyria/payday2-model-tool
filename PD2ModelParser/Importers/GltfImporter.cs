@@ -330,7 +330,7 @@ namespace PD2ModelParser.Importers
             random.NextBytes(randomBytes);
             skinBones = new DM.SkinBones();
 
-            skinBones.global_skin_transform = Nexus.Matrix3D.Identity;
+            skinBones.global_skin_transform = Matrix4x4.Identity.ToNexusMatrix();
             var parent = data.SectionsOfType<DM.Object3D>()
                 .FirstOrDefault(i => i.Name == node.Skin.Skeleton.Name);
             skinBones.ProbablyRootBone = parent;

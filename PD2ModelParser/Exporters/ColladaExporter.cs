@@ -163,7 +163,7 @@ namespace PD2ModelParser
 
                         if (obj.Parent == null || !sb.Objects.Contains(obj.Parent))
                         {
-                            SN.Matrix4x4 fixed_obj_transform = obj.WorldTransform.ToMatrix4x4();
+                            SN.Matrix4x4 fixed_obj_transform = obj.WorldTransform;
                             SN.Matrix4x4.Decompose(fixed_obj_transform, out scale, out rotate, out translate);
 
                             // Fixes the head, but breaks the arms

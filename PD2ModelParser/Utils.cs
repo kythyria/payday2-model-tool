@@ -63,9 +63,9 @@ namespace PD2ModelParser
         }
 
 
-        public static Matrix3D ReadMatrix(BinaryReader instream)
+        public static Matrix4x4 ReadMatrix(BinaryReader instream)
         {
-            Matrix3D m;
+            Matrix4x4 m;
 
             // Yes, the matricies appear to be written top-down in colums, this isn't the field names being wrong
             // This is how a multidimensional array is layed out in memory.
@@ -137,15 +137,13 @@ namespace PD2ModelParser
             );
         }
 
-        public static System.Numerics.Vector2 ToVector2(this Vector2D input) => new System.Numerics.Vector2(input.X, input.Y);
-        public static System.Numerics.Vector3 ToVector3(this Vector3D input) => new System.Numerics.Vector3(input.X, input.Y, input.Z);
-        public static System.Numerics.Vector4 ToVector4(this Sections.GeometryColor input) => new System.Numerics.Vector4(input.red/255.0f, input.green/255.0f, input.blue/255.0f, input.alpha/255.0f);
-        public static System.Numerics.Vector4 ToVector4(this Vector4D input) => new System.Numerics.Vector4(input.X, input.Y, input.Z, input.W);
+        public static Vector2 ToVector2(this Vector2D input) => new Vector2(input.X, input.Y);
+        public static Vector3 ToVector3(this Vector3D input) => new Vector3(input.X, input.Y, input.Z);
+        public static Vector4 ToVector4(this Sections.GeometryColor input) => new Vector4(input.red/255.0f, input.green/255.0f, input.blue/255.0f, input.alpha/255.0f);
 
-        public static Vector2D ToNexusVector(this System.Numerics.Vector2 input) => new Vector2D(input.X, input.Y);
-        public static Vector3D ToNexusVector(this System.Numerics.Vector3 input) => new Vector3D(input.X, input.Y, input.Z);
-        public static Vector4D ToNexusVector(this System.Numerics.Vector4 input) => new Vector4D(input.X, input.Y, input.Z, input.W);
-        public static Sections.GeometryColor ToGeometryColor(this System.Numerics.Vector4 input) {
+        public static Vector2D ToNexusVector(this Vector2 input) => new Vector2D(input.X, input.Y);
+        public static Vector3D ToNexusVector(this Vector3 input) => new Vector3D(input.X, input.Y, input.Z);
+        public static Sections.GeometryColor ToGeometryColor(this Vector4 input) {
             return new Sections.GeometryColor(
                 ClampFloatToByte(input.X),
                 ClampFloatToByte(input.Y),
@@ -155,8 +153,8 @@ namespace PD2ModelParser
         public static Nexus.Quaternion ToNexusQuaternion(this SN.Quaternion input) => new Nexus.Quaternion(input.X, input.Y, input.Z, input.W);
         public static SN.Quaternion ToQuaternion(this Nexus.Quaternion input) => new SN.Quaternion(input.X, input.Y, input.Z, input.W);
 
-        public static Vector3D Max(Vector3D left, Vector3D right) => new Vector3D(Math.Max(left.X, right.X), Math.Max(left.Y, right.Y), Math.Max(left.Z, right.Z));
-        public static Vector3D Min(Vector3D left, Vector3D right) => new Vector3D(Math.Min(left.X, right.X), Math.Min(left.Y, right.Y), Math.Min(left.Z, right.Z));
+        public static Vector3 Max(Vector3 left, Vector3 right) => new Vector3(Math.Max(left.X, right.X), Math.Max(left.Y, right.Y), Math.Max(left.Z, right.Z));
+        public static Vector3 Min(Vector3 left, Vector3 right) => new Vector3(Math.Min(left.X, right.X), Math.Min(left.Y, right.Y), Math.Min(left.Z, right.Z));
 
         /// <summary>
         /// Clamp a float to 0..1 and rescale it to 0..255
@@ -222,29 +220,31 @@ namespace PD2ModelParser
 
     public static class MatrixExtensions
     {
-        public static float Get(this Matrix4x4 @this, int idx)
-            => idx switch
+        public static ref float Index(ref this Matrix4x4 @this, int idx)
+        {
+            switch(idx)
             {
-                0 => @this.M11,
-                1 => @this.M12,
-                2 => @this.M13,
-                3 => @this.M14,
-                4 => @this.M21,
-                5 => @this.M22,
-                6 => @this.M23,
-                7 => @this.M24,
-                8 => @this.M31,
-                9 => @this.M32,
-                10 => @this.M33,
-                11 => @this.M34,
-                12 => @this.M41,
-                13 => @this.M42,
-                14 => @this.M43,
-                15 => @this.M44,
-                _ => throw new IndexOutOfRangeException("Invalid matrix index!")
-            };
+                case 0 : return ref @this.M11;
+                case 1 : return ref @this.M12;
+                case 2 : return ref @this.M13;
+                case 3 : return ref @this.M14;
+                case 4 : return ref @this.M21;
+                case 5 : return ref @this.M22;
+                case 6 : return ref @this.M23;
+                case 7 : return ref @this.M24;
+                case 8 : return ref @this.M31;
+                case 9 : return ref @this.M32;
+                case 10: return ref @this.M33;
+                case 11: return ref @this.M34;
+                case 12: return ref @this.M41;
+                case 13: return ref @this.M42;
+                case 14: return ref @this.M43;
+                case 15: return ref @this.M44;
+                default: throw new IndexOutOfRangeException("Invalid matrix index!");
+            }
+        }
 
-        public static float Get(this Matrix4x4 @this, int c, int r) => @this.Get(r * 4 + c);
+        public static ref float Index(ref this Matrix4x4 @this, int c, int r) => ref @this.Index(r * 4 + c);
 
         /**
          * Get a single column from this matrix, expressed as a vector.
@@ -254,34 +254,19 @@ namespace PD2ModelParser
          */
         public static Vector4 GetColumn(this Matrix4x4 self, int column)
         {
+            self.Index(15) = 1;
             if (column < 0 || column >= 4)
             {
                 throw new ArgumentOutOfRangeException(
                     "Column must be between 0-3 inclusive (real value " + column + ")");
             }
-            return new Vector4(self.Get(0, column), self.Get(1, column), self.Get(2, column), self.Get(3, column));
+            return new Vector4(self.Index(0, column), self.Index(1, column), self.Index(2, column), self.Index(3, column));
         }
 
         /**
          * Return a copy of this matrix with the specified column set
          * to a value. See GetColumn for more information.
          */
-        public static Matrix3D WithColumn(this Matrix3D this_, int column, Vector4D value)
-        {
-            if (column < 0 || column >= 4)
-            {
-                throw new ArgumentOutOfRangeException(
-                    "Column must be between 0-3 inclusive (real value " + column + ")");
-            }
-
-            this_[0, column] = value.X;
-            this_[1, column] = value.Y;
-            this_[2, column] = value.Z;
-            this_[3, column] = value.W;
-
-            return this_;
-        }
-
         public static Matrix4x4 WithColumn(this Matrix4x4 @this, int column, Vector4 value)
         {
             if (column < 0 || column >= 4)
@@ -290,33 +275,10 @@ namespace PD2ModelParser
                     "Column must be between 0-3 inclusive (real value " + column + ")");
             }
 
-            switch (column)
-            {
-                case 0:
-                    @this.M11 = value.X;
-                    @this.M12 = value.Y;
-                    @this.M13 = value.Z;
-                    @this.M14 = value.W;
-                    break;
-                case 1:
-                    @this.M21 = value.X;
-                    @this.M22 = value.Y;
-                    @this.M23 = value.Z;
-                    @this.M24 = value.W;
-                    break;
-                case 2:
-                    @this.M31 = value.X;
-                    @this.M32 = value.Y;
-                    @this.M33 = value.Z;
-                    @this.M34 = value.W;
-                    break;
-                case 3:
-                    @this.M41 = value.X;
-                    @this.M42 = value.Y;
-                    @this.M43 = value.Z;
-                    @this.M44 = value.W;
-                    break;
-            }
+            @this.Index(0, column) = value.X;
+            @this.Index(1, column) = value.Y;
+            @this.Index(2, column) = value.Z;
+            @this.Index(3, column) = value.W;
 
             return @this;
         }

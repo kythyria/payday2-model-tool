@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 
 namespace PD2ModelParser.Sections
 {
@@ -36,10 +37,10 @@ namespace PD2ModelParser.Sections
                 this.objects.Add(instream.ReadUInt32());
             for (int x = 0; x < count; x++)
             {
-                this.rotations.Add(MathUtil.ReadMatrix(instream));
+                this.rotations.Add(MathUtil.ReadMatrix(instream).ToNexusMatrix());
             }
 
-            this.global_skin_transform = MathUtil.ReadMatrix(instream);
+            this.global_skin_transform = MathUtil.ReadMatrix(instream).ToNexusMatrix();
 
             this.remaining_data = null;
 
@@ -104,10 +105,10 @@ namespace PD2ModelParser.Sections
                 Object3D obj = (Object3D) parsed_sections[objects[i]];
                 Objects.Add(obj);
 
-                System.Numerics.Matrix4x4 inter = rotations[i].ToMatrix4x4().MultDiesel(obj.WorldTransform.ToMatrix4x4());
-                Matrix3D skin_node = inter.MultDiesel(global_skin_transform.ToMatrix4x4()).ToNexusMatrix();
+                Matrix4x4 inter = rotations[i].ToMatrix4x4().MultDiesel(obj.WorldTransform);
+                Matrix4x4 skin_node = inter.MultDiesel(global_skin_transform.ToMatrix4x4());
 
-                SkinPositions.Add(skin_node);
+                SkinPositions.Add(skin_node.ToNexusMatrix());
             }
             objects = null;
         }

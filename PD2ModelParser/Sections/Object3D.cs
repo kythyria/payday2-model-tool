@@ -4,6 +4,7 @@ using System.IO;
 using System.ComponentModel;
 using Nexus;
 using System.Linq;
+using System.Numerics;
 
 namespace PD2ModelParser.Sections
 {
@@ -15,7 +16,7 @@ namespace PD2ModelParser.Sections
         [Category("Object3D")]
         [DisplayName("Name")]
         public HashName HashName { get; set; } //Hashed object root point name (see hashlist.txt)
-        private Matrix3D _rotation = new Matrix3D(); // 4x4 transform matrix - for translation/scale too
+        private Matrix4x4 _rotation = new Matrix4x4(); // 4x4 transform matrix - for translation/scale too
 
         /// <summary>
         /// Animation controllers affecting this object.
@@ -56,10 +57,10 @@ namespace PD2ModelParser.Sections
         [TypeConverter(typeof(Inspector.NexusMatrixConverter))]
         public Matrix3D Transform
         {
-            get => _rotation;
+            get => _rotation.ToNexusMatrix();
             set
             {
-                _rotation = value;
+                _rotation = value.ToMatrix4x4();
                 UpdateTransforms();
             }
         }
@@ -73,8 +74,7 @@ namespace PD2ModelParser.Sections
         private bool has_post_loaded;
 
         [Category("Object3D")]
-        [TypeConverter(typeof(Inspector.NexusMatrixConverter))]
-        public Matrix3D WorldTransform { get; private set; }
+        public Matrix4x4 WorldTransform { get; private set; }
 
         [Category("Object3D")]
         [DisplayName("Parent")]
@@ -206,10 +206,10 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            var scale = new System.Numerics.Vector3();
+            var scale = new Vector3();
             var rot = new System.Numerics.Quaternion();
-            var translation = new System.Numerics.Vector3();
-            System.Numerics.Matrix4x4.Decompose(this.Transform.ToMatrix4x4(), out scale, out rot, out translation);
+            var translation = new Vector3();
+            Matrix4x4.Decompose(this.Transform.ToMatrix4x4(), out scale, out rot, out translation);
             return base.ToString() +
                    " size: " + this.size +
                    " HashName: " + this.HashName.String +
@@ -248,11 +248,11 @@ namespace PD2ModelParser.Sections
         {
             if (Parent == null)
             {
-                WorldTransform = Transform;
+                WorldTransform = Transform.ToMatrix4x4();
                 return;
             }
 
-            WorldTransform = Transform.ToMatrix4x4().MultDiesel(Parent.WorldTransform.ToMatrix4x4()).ToNexusMatrix();
+            WorldTransform = Transform.ToMatrix4x4().MultDiesel(Parent.WorldTransform);
         }
     }
 }

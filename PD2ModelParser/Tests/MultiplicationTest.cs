@@ -3,7 +3,6 @@ using System.IO;
 using System.Numerics;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Nexus;
 using NUnit.Framework;
 
 namespace PD2ModelParser.Tests
@@ -17,7 +16,7 @@ namespace PD2ModelParser.Tests
             // a float is four bytes, so that's 64 bytes. With 2 characters per byte, that's 128 chars.
             Assert.AreEqual((4 * 4) * 4 * 2, str.Length);
 
-            Matrix3D mat = new Matrix3D();
+            Matrix4x4 mat = new Matrix4x4();
 
             byte[] data = new byte[64];
             for (int i = 0; i < data.Length; i++)
@@ -27,19 +26,19 @@ namespace PD2ModelParser.Tests
 
             for (int i = 0; i < 16; i++)
             {
-                mat[i] = BitConverter.ToSingle(data, i * 4);
+                mat.Index(i) = BitConverter.ToSingle(data, i * 4);
             }
 
-            return mat.ToMatrix4x4();
+            return mat;
         }
 
         private static void TestRoundedEquals(Matrix4x4 expect, Matrix4x4 test, float err)
         {
             for (int i = 0; i < 16; i++)
             {
-                float diff = Math.Abs(expect.Get(i) - test.Get(i));
+                float diff = Math.Abs(expect.Index(i) - test.Index(i));
                 if (diff > err)
-                    Assert.Fail("Matrix value mismatch: {0} vs {1}", expect.Get(i), test.Get(i));
+                    Assert.Fail("Matrix value mismatch: {0} vs {1}", expect.Index(i), test.Index(i));
             }
         }
 

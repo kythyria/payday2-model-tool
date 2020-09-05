@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.ComponentModel;
+using System.Numerics;
 
 namespace PD2ModelParser.Sections
 {
@@ -74,12 +75,10 @@ namespace PD2ModelParser.Sections
         public UInt32 lightset_ID { get; set; }
 
         [Category("Model"), DisplayName("Bounds Min"), Description("Minimum corner of the bounding box.")]
-        [TypeConverter(typeof(Inspector.NexusVector3DConverter))]
-        public Vector3D BoundsMin { get; set; } = new Vector3D(0, 0, 0);
+        public Vector3 BoundsMin { get; set; } = new Vector3(0, 0, 0);
 
         [Category("Model"), DisplayName("Bounds Max"), Description("Maximum corner of the bounding box.")]
-        [TypeConverter(typeof(Inspector.NexusVector3DConverter))]
-        public Vector3D BoundsMax { get; set; } = new Vector3D(0, 0, 0);
+        public Vector3 BoundsMax { get; set; } = new Vector3(0, 0, 0);
 
         [Category("Model")]
         public UInt32 properties_bitmap { get; set; }
@@ -133,8 +132,8 @@ namespace PD2ModelParser.Sections
             SectionId = (uint)object_name.GetHashCode();
 
             this.version = 6;
-            this.BoundsMin = bounds_min.ToNexusVector();
-            this.BoundsMax = bounds_max.ToNexusVector();
+            this.BoundsMin = bounds_min;
+            this.BoundsMax = bounds_max;
             this.v6_unknown7 = v6_unknown7;
             this.v6_unknown8 = 0;
         }
@@ -154,8 +153,8 @@ namespace PD2ModelParser.Sections
 
             if (this.version == 6)
             {
-                this.BoundsMin = instream.ReadNexusVector3D();
-                this.BoundsMax = instream.ReadNexusVector3D();
+                this.BoundsMin = instream.ReadVector3();
+                this.BoundsMax = instream.ReadVector3();
 
                 this.v6_unknown7 = instream.ReadSingle();
                 this.v6_unknown8 = instream.ReadUInt32();
@@ -187,8 +186,8 @@ namespace PD2ModelParser.Sections
                 // 3: has_opacity
                 this.properties_bitmap = instream.ReadUInt32();
 
-                this.BoundsMin = instream.ReadNexusVector3D();
-                this.BoundsMax = instream.ReadNexusVector3D();
+                this.BoundsMin = instream.ReadVector3();
+                this.BoundsMax = instream.ReadVector3();
 
                 this.BoundingRadius = instream.ReadSingle();
                 this.unknown13 = instream.ReadUInt32();
@@ -267,12 +266,12 @@ namespace PD2ModelParser.Sections
 
             if (geo.verts.Count == 0) { return; }
 
-            Transform.Decompose(out Vector3D scale, out _, out _);
+            Matrix4x4.Decompose(Transform.ToMatrix4x4(), out Vector3 scale, out _, out _);
 
-            var scaled = geo.verts.Select(i => new Vector3D(i.X * scale.X, i.Y * scale.Y, i.Z * scale.Z)).ToList();
+            var scaled = geo.verts.Select(i => new Vector3(i.X * scale.X, i.Y * scale.Y, i.Z * scale.Z)).ToList();
 
-            BoundsMax = geo.verts.Aggregate(MathUtil.Max);
-            BoundsMin = geo.verts.Aggregate(MathUtil.Min);
+            BoundsMax = geo.verts.Select(MathUtil.ToVector3).Aggregate(MathUtil.Max);
+            BoundsMin = geo.verts.Select(MathUtil.ToVector3).Aggregate(MathUtil.Min);
             BoundingRadius = scaled.Select(i => i.Length()).Max();
         }
     }
