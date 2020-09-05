@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using SN = System.Numerics;
+using System.Numerics;
 
 namespace PD2ModelParser
 {
@@ -151,8 +152,8 @@ namespace PD2ModelParser
                 ClampFloatToByte(input.Z),
                 ClampFloatToByte(input.W));
         }
-        public static Quaternion ToNexusQuaternion(this System.Numerics.Quaternion input) => new Quaternion(input.X, input.Y, input.Z, input.W);
-        public static System.Numerics.Quaternion ToQuaternion(this Quaternion input) => new System.Numerics.Quaternion(input.X, input.Y, input.Z, input.W);
+        public static Nexus.Quaternion ToNexusQuaternion(this SN.Quaternion input) => new Nexus.Quaternion(input.X, input.Y, input.Z, input.W);
+        public static SN.Quaternion ToQuaternion(this Nexus.Quaternion input) => new SN.Quaternion(input.X, input.Y, input.Z, input.W);
 
         public static Vector3D Max(Vector3D left, Vector3D right) => new Vector3D(Math.Max(left.X, right.X), Math.Max(left.Y, right.Y), Math.Max(left.Z, right.Z));
         public static Vector3D Min(Vector3D left, Vector3D right) => new Vector3D(Math.Min(left.X, right.X), Math.Min(left.Y, right.Y), Math.Min(left.Z, right.Z));
@@ -221,29 +222,29 @@ namespace PD2ModelParser
 
     public static class MatrixExtensions
     {
-        /**
-         * Return a vector with all four variables set to a single variable from this vector.
-         *
-         * For example, Vector4D(9, 8, 7, 6).DupedField(2) would return Vector4D(7, 7, 7, 7)
-         *
-         * This is very similar to SSE's _mm_shuffle_epi32
-         */
-        // it's also very similar to __m128_shuffle_ps aka Sse.Shuffle()
-        // even more specifically to
-        // => Sse.Shuffle(a,a, (field & 0b11) | ((field & 0b11) << 2) | ((field & 0b11) << 4) | ((field & 0b11) << 6) );
-        public static System.Numerics.Vector4 DupedField(this Vector4D a, int field)
-        {
-            float v = field switch
+        public static float Get(this Matrix4x4 @this, int idx)
+            => idx switch
             {
-                0 => a.X,
-                1 => a.Y,
-                2 => a.Z,
-                3 => a.W,
-                _ => throw new ArgumentException("Illegal field " + field + " - must be 0-3 inclusive")
+                0 => @this.M11,
+                1 => @this.M12,
+                2 => @this.M13,
+                3 => @this.M14,
+                4 => @this.M21,
+                5 => @this.M22,
+                6 => @this.M23,
+                7 => @this.M24,
+                8 => @this.M31,
+                9 => @this.M32,
+                10 => @this.M33,
+                11 => @this.M34,
+                12 => @this.M41,
+                13 => @this.M42,
+                14 => @this.M43,
+                15 => @this.M44,
+                _ => throw new IndexOutOfRangeException("Invalid matrix index!")
             };
 
-            return new SN.Vector4(v);
-        }
+        public static float Get(this Matrix4x4 @this, int c, int r) => @this.Get(r * 4 + c);
 
         /**
          * Get a single column from this matrix, expressed as a vector.
@@ -251,35 +252,15 @@ namespace PD2ModelParser
          * Note: the order of the column placement is 0-1-2-3 into X-Y-Z-W (so
          * 'W' is the last not first value).
          */
-        public static Vector4D GetColumn(this Matrix3D this_, int column)
+        public static Vector4 GetColumn(this Matrix4x4 self, int column)
         {
             if (column < 0 || column >= 4)
             {
                 throw new ArgumentOutOfRangeException(
                     "Column must be between 0-3 inclusive (real value " + column + ")");
             }
-
-            return new Vector4D
-            {
-                // this[(p2 * 4) + p1]
-                X = this_[0, column], // this_[column*4 + 0]
-                Y = this_[1, column], // this_[column*4 + 1]
-                Z = this_[2, column], // this_[column*4 + 2]
-                W = this_[3, column]  // this_[column*4 + 4]
-            };
+            return new Vector4(self.Get(0, column), self.Get(1, column), self.Get(2, column), self.Get(3, column));
         }
-
-        
-        public static SN.Vector4 GetColumn(this SN.Matrix4x4 self, int column)
-            => column switch
-            {
-                0 => new SN.Vector4(self.M11, self.M12, self.M13, self.M14),
-                1 => new SN.Vector4(self.M21, self.M22, self.M23, self.M24),
-                2 => new SN.Vector4(self.M31, self.M32, self.M33, self.M34),
-                3 => new SN.Vector4(self.M41, self.M42, self.M43, self.M44),
-                _ => throw new ArgumentOutOfRangeException(
-                    "Column must be between 0-3 inclusive (real value " + column + ")")
-            };
 
         /**
          * Return a copy of this matrix with the specified column set
@@ -301,7 +282,7 @@ namespace PD2ModelParser
             return this_;
         }
 
-        public static SN.Matrix4x4 WithColumn(this SN.Matrix4x4 @this, int column, SN.Vector4 value)
+        public static Matrix4x4 WithColumn(this Matrix4x4 @this, int column, Vector4 value)
         {
             if (column < 0 || column >= 4)
             {
@@ -309,7 +290,7 @@ namespace PD2ModelParser
                     "Column must be between 0-3 inclusive (real value " + column + ")");
             }
 
-            switch(column)
+            switch (column)
             {
                 case 0:
                     @this.M11 = value.X;
@@ -357,15 +338,14 @@ namespace PD2ModelParser
          *
          * See https://github.com/blt4linux/research for the relevant headers.
          */
-        public static Matrix3D MultDiesel(this Matrix3D a, Matrix3D b)
+        public static Matrix4x4 MultDiesel(this Matrix4x4 a, Matrix4x4 b)
         {
-            var bm = b.ToMatrix4x4();
             // TODO cleanup
-            SN.Matrix4x4 result = SN.Matrix4x4.Identity;
+            Matrix4x4 result = Matrix4x4.Identity;
 
             for (int i = 0; i < 4; i++)
             {
-                SN.Vector4 bas = a.ToMatrix4x4().GetColumn(i);
+                Vector4 bas = a.GetColumn(i);
                 /*Vector4D outcol = new Vector4D {
                     X = bas[0] * b.GetColumn(0)[0] + bas[1] * b.GetColumn(1)[0] + bas[2] * b.GetColumn(2)[0],
                     Y = bas[0] * b.GetColumn(0)[1] + bas[1] * b.GetColumn(1)[1] + bas[2] * b.GetColumn(2)[1],
@@ -373,24 +353,24 @@ namespace PD2ModelParser
                     W = 0
                 };*/
 
-                SN.Vector4 outcol;
+                Vector4 outcol;
 
                 if (i == 3)
                 {
                     outcol = 
-                        (new SN.Vector4(bas.Z) * bm.GetColumn(2)) +
-                        (new SN.Vector4(bas.Y) * bm.GetColumn(1)) +
-                        (new SN.Vector4(bas.X) * bm.GetColumn(0)) +
-                        bm.GetColumn(3);
+                        (new Vector4(bas.Z) * b.GetColumn(2)) +
+                        (new Vector4(bas.Y) * b.GetColumn(1)) +
+                        (new Vector4(bas.X) * b.GetColumn(0)) +
+                        b.GetColumn(3);
 
                     outcol.W = 1;
                 }
                 else
                 {
                     outcol = 
-                        new SN.Vector4(bas.Z) * bm.GetColumn(2) +
-                        new SN.Vector4(bas.Y) * bm.GetColumn(1) +
-                        new SN.Vector4(bas.X) * bm.GetColumn(0)
+                        new Vector4(bas.Z) * b.GetColumn(2) +
+                        new Vector4(bas.Y) * b.GetColumn(1) +
+                        new Vector4(bas.X) * b.GetColumn(0)
                         ;
 
                     outcol.W = 0;
@@ -399,7 +379,7 @@ namespace PD2ModelParser
                 result = result.WithColumn(i, outcol);
             }
 
-            return result.ToNexusMatrix();
+            return result;
 
             // Old system:
             /*Matrix3D result = Matrix3D.Identity;

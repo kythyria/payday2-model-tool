@@ -104,8 +104,8 @@ namespace PD2ModelParser.Sections
                 Object3D obj = (Object3D) parsed_sections[objects[i]];
                 Objects.Add(obj);
 
-                Matrix3D inter = rotations[i].MultDiesel(obj.WorldTransform);
-                Matrix3D skin_node = inter.MultDiesel(global_skin_transform);
+                System.Numerics.Matrix4x4 inter = rotations[i].ToMatrix4x4().MultDiesel(obj.WorldTransform.ToMatrix4x4());
+                Matrix3D skin_node = inter.MultDiesel(global_skin_transform.ToMatrix4x4()).ToNexusMatrix();
 
                 SkinPositions.Add(skin_node);
             }

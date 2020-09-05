@@ -252,7 +252,7 @@ namespace PD2ModelParser.Sections
                 return;
             }
 
-            WorldTransform = Transform.MultDiesel(Parent.WorldTransform);
+            WorldTransform = Transform.ToMatrix4x4().MultDiesel(Parent.WorldTransform.ToMatrix4x4()).ToNexusMatrix();
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Numerics;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Nexus;
@@ -10,7 +11,7 @@ namespace PD2ModelParser.Tests
     [TestFixture]
     public class MultiplicationTest
     {
-        private static Matrix3D MatrixDecode(string str)
+        private static Matrix4x4 MatrixDecode(string str)
         {
             // str is a byte-for-byte dump of the Matrix3D structure, a C float[4][4] struct
             // a float is four bytes, so that's 64 bytes. With 2 characters per byte, that's 128 chars.
@@ -29,30 +30,30 @@ namespace PD2ModelParser.Tests
                 mat[i] = BitConverter.ToSingle(data, i * 4);
             }
 
-            return mat;
+            return mat.ToMatrix4x4();
         }
 
-        private static void TestRoundedEquals(Matrix3D expect, Matrix3D test, float err)
+        private static void TestRoundedEquals(Matrix4x4 expect, Matrix4x4 test, float err)
         {
             for (int i = 0; i < 16; i++)
             {
-                float diff = Math.Abs(expect[i] - test[i]);
+                float diff = Math.Abs(expect.Get(i) - test.Get(i));
                 if (diff > err)
-                    Assert.Fail("Matrix value mismatch: {0} vs {1}", expect[i], test[i]);
+                    Assert.Fail("Matrix value mismatch: {0} vs {1}", expect.Get(i), test.Get(i));
             }
         }
 
         [Test]
         public void TestIdentityMultiplication()
         {
-            Matrix3D base_ = new Matrix3D(
+            Matrix4x4 base_ = new Matrix4x4(
                 -1, 1.22465e-16f, 0, 0,
                 -6.16298e-32f, -4.44089e-16f, 1, 0,
                 1.22465e-16f, 1, 4.44089e-16f, 0,
                 1.31163e-14f, 5.32948f, 101.777f, 1
             );
 
-            Matrix3D result = base_.MultDiesel(Matrix3D.Identity);
+            Matrix4x4 result = base_.MultDiesel(Matrix4x4.Identity);
 
             Assert.AreEqual(base_, result);
         }
@@ -61,28 +62,28 @@ namespace PD2ModelParser.Tests
         public void TestSimpleMultiplication()
         {
             // vec11
-            Matrix3D base_ = new Matrix3D(
+            Matrix4x4 base_ = new Matrix4x4(
                 0.644716f, -0.205625f, 0.736247f, 0,
                 0.135465f, 0.978631f, 0.154697f, 0,
                 -0.752323f, 4.72831e-09f, 0.658794f, 0,
                 4.06338f, -1.85149f, 2.32434f, 1
             );
 
-            Matrix3D arg = new Matrix3D(
+            Matrix4x4 arg = new Matrix4x4(
                 0.602691f, 0.747197f, -0.280109f, 0,
                 -0.538034f, 0.639738f, 0.548867f, 0,
                 0.589308f, -0.180089f, 0.787581f, 0,
                 -21.0668f, 36.5858f, 120.295f, 1
             );
 
-            Matrix3D target = new Matrix3D(
+            Matrix4x4 target = new Matrix4x4(
                 0.933074f, 0.217594f, 0.286403f, 0,
                 -0.353729f, 0.699427f, 0.621029f, 0,
                 -0.0651858f, -0.680775f, 0.729586f, 0,
                 -16.2519f, 38.0189f, 119.972f, 1
             );
 
-            Matrix3D result = base_.MultDiesel(arg);
+            Matrix4x4 result = base_.MultDiesel(arg);
 
             // Check if the values are within reason. Note we need to be quite sloppy (1mm), as copy+pasted
             // values from C printf don't have all the digits, and the errors add up.
@@ -93,7 +94,7 @@ namespace PD2ModelParser.Tests
         public void TestDecoder()
         {
             // vec11 in1
-            Matrix3D base_ = new Matrix3D(
+            Matrix4x4 base_ = new Matrix4x4(
                 0.644716f, -0.205625f, 0.736247f, 0,
                 0.135465f, 0.978631f, 0.154697f, 0,
                 -0.752323f, 4.72831e-09f, 0.658794f, 0,
@@ -131,9 +132,9 @@ namespace PD2ModelParser.Tests
                     Assert.AreEqual(match1.Groups[1].Value, match2.Groups[1].Value);
                     Assert.AreEqual(match1.Groups[1].Value, matchout.Groups[1].Value);
 
-                    Matrix3D in1 = MatrixDecode(match1.Groups[2].Value);
-                    Matrix3D in2 = MatrixDecode(match2.Groups[2].Value);
-                    Matrix3D outm = MatrixDecode(matchout.Groups[2].Value);
+                    Matrix4x4 in1 = MatrixDecode(match1.Groups[2].Value);
+                    Matrix4x4 in2 = MatrixDecode(match2.Groups[2].Value);
+                    Matrix4x4 outm = MatrixDecode(matchout.Groups[2].Value);
                     
                     // Values aren't going to come out exactly the same unfortunately, since we're in C# the
                     // float calculations will be ever so slightly off, but not nearly enough to be a problem.
