@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using SN = System.Numerics;
 
 namespace PD2ModelParser
 {
@@ -221,50 +222,27 @@ namespace PD2ModelParser
     public static class MatrixExtensions
     {
         /**
-         * Multiply each field of two vectors together, same as
-         * the SSE function _mm_mul_ps.
-         */
-        public static Vector4D MultEach(this Vector4D a, Vector4D b)
-        {
-            return (a.ToVector4() * b.ToVector4()).ToNexusVector();
-        }
-
-        /**
          * Return a vector with all four variables set to a single variable from this vector.
          *
          * For example, Vector4D(9, 8, 7, 6).DupedField(2) would return Vector4D(7, 7, 7, 7)
          *
          * This is very similar to SSE's _mm_shuffle_epi32
          */
-        public static Vector4D DupedField(this Vector4D a, int field)
+        // it's also very similar to __m128_shuffle_ps aka Sse.Shuffle()
+        // even more specifically to
+        // => Sse.Shuffle(a,a, (field & 0b11) | ((field & 0b11) << 2) | ((field & 0b11) << 4) | ((field & 0b11) << 6) );
+        public static System.Numerics.Vector4 DupedField(this Vector4D a, int field)
         {
-            float v;
-
-            switch (field)
+            float v = field switch
             {
-                case 0:
-                    v = a.X;
-                    break;
-                case 1:
-                    v = a.Y;
-                    break;
-                case 2:
-                    v = a.Z;
-                    break;
-                case 3:
-                    v = a.W;
-                    break;
-                default:
-                    throw new ArgumentException("Illegal field " + field + " - must be 0-3 inclusive");
-            }
-
-            return new Vector4D
-            {
-                X = v,
-                Y = v,
-                Z = v,
-                W = v
+                0 => a.X,
+                1 => a.Y,
+                2 => a.Z,
+                3 => a.W,
+                _ => throw new ArgumentException("Illegal field " + field + " - must be 0-3 inclusive")
             };
+
+            return new SN.Vector4(v);
         }
 
         /**
@@ -283,12 +261,25 @@ namespace PD2ModelParser
 
             return new Vector4D
             {
-                X = this_[0, column],
-                Y = this_[1, column],
-                Z = this_[2, column],
-                W = this_[3, column]
+                // this[(p2 * 4) + p1]
+                X = this_[0, column], // this_[column*4 + 0]
+                Y = this_[1, column], // this_[column*4 + 1]
+                Z = this_[2, column], // this_[column*4 + 2]
+                W = this_[3, column]  // this_[column*4 + 4]
             };
         }
+
+        
+        public static SN.Vector4 GetColumn(this SN.Matrix4x4 self, int column)
+            => column switch
+            {
+                0 => new SN.Vector4(self.M11, self.M12, self.M13, self.M14),
+                1 => new SN.Vector4(self.M21, self.M22, self.M23, self.M24),
+                2 => new SN.Vector4(self.M31, self.M32, self.M33, self.M34),
+                3 => new SN.Vector4(self.M41, self.M42, self.M43, self.M44),
+                _ => throw new ArgumentOutOfRangeException(
+                    "Column must be between 0-3 inclusive (real value " + column + ")")
+            };
 
         /**
          * Return a copy of this matrix with the specified column set
@@ -310,6 +301,45 @@ namespace PD2ModelParser
             return this_;
         }
 
+        public static SN.Matrix4x4 WithColumn(this SN.Matrix4x4 @this, int column, SN.Vector4 value)
+        {
+            if (column < 0 || column >= 4)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "Column must be between 0-3 inclusive (real value " + column + ")");
+            }
+
+            switch(column)
+            {
+                case 0:
+                    @this.M11 = value.X;
+                    @this.M12 = value.Y;
+                    @this.M13 = value.Z;
+                    @this.M14 = value.W;
+                    break;
+                case 1:
+                    @this.M21 = value.X;
+                    @this.M22 = value.Y;
+                    @this.M23 = value.Z;
+                    @this.M24 = value.W;
+                    break;
+                case 2:
+                    @this.M31 = value.X;
+                    @this.M32 = value.Y;
+                    @this.M33 = value.Z;
+                    @this.M34 = value.W;
+                    break;
+                case 3:
+                    @this.M41 = value.X;
+                    @this.M42 = value.Y;
+                    @this.M43 = value.Z;
+                    @this.M44 = value.W;
+                    break;
+            }
+
+            return @this;
+        }
+
         /**
          * Multiply two vectors the same way Diesel does. This is a bit confusing, see the decompiled
          * code in 'decompiled matrix parsing' and 'decompiled matrix parsing 2' (in the
@@ -329,12 +359,13 @@ namespace PD2ModelParser
          */
         public static Matrix3D MultDiesel(this Matrix3D a, Matrix3D b)
         {
+            var bm = b.ToMatrix4x4();
             // TODO cleanup
-            Matrix3D result = Matrix3D.Identity;
+            SN.Matrix4x4 result = SN.Matrix4x4.Identity;
 
             for (int i = 0; i < 4; i++)
             {
-                Vector4D bas = a.GetColumn(i);
+                SN.Vector4 bas = a.ToMatrix4x4().GetColumn(i);
                 /*Vector4D outcol = new Vector4D {
                     X = bas[0] * b.GetColumn(0)[0] + bas[1] * b.GetColumn(1)[0] + bas[2] * b.GetColumn(2)[0],
                     Y = bas[0] * b.GetColumn(0)[1] + bas[1] * b.GetColumn(1)[1] + bas[2] * b.GetColumn(2)[1],
@@ -342,29 +373,24 @@ namespace PD2ModelParser
                     W = 0
                 };*/
 
-                Vector4D outcol;
+                SN.Vector4 outcol;
 
                 if (i == 3)
                 {
-                    outcol =
-                        bas.DupedField(2).MultEach(b.GetColumn(2)) +
-                        bas.DupedField(1).MultEach(b.GetColumn(1)) +
-                        bas.DupedField(0).MultEach(b.GetColumn(0)) +
-                        b.GetColumn(3);
+                    outcol = 
+                        (new SN.Vector4(bas.Z) * bm.GetColumn(2)) +
+                        (new SN.Vector4(bas.Y) * bm.GetColumn(1)) +
+                        (new SN.Vector4(bas.X) * bm.GetColumn(0)) +
+                        bm.GetColumn(3);
 
                     outcol.W = 1;
                 }
                 else
                 {
-                    /*outcol =
-                        new Vector4D(bas[2], bas[2], bas[2], bas[2]).MultEach(b.GetColumn(2)) +
-                        new Vector4D(bas[1], bas[1], bas[1], bas[1]).MultEach(b.GetColumn(1)) +
-                        new Vector4D(bas[0], bas[0], bas[0], bas[0]).MultEach(b.GetColumn(0))
-                        ;*/
-                    outcol =
-                        bas.DupedField(2).MultEach(b.GetColumn(2)) +
-                        bas.DupedField(1).MultEach(b.GetColumn(1)) +
-                        bas.DupedField(0).MultEach(b.GetColumn(0))
+                    outcol = 
+                        new SN.Vector4(bas.Z) * bm.GetColumn(2) +
+                        new SN.Vector4(bas.Y) * bm.GetColumn(1) +
+                        new SN.Vector4(bas.X) * bm.GetColumn(0)
                         ;
 
                     outcol.W = 0;
@@ -373,7 +399,7 @@ namespace PD2ModelParser
                 result = result.WithColumn(i, outcol);
             }
 
-            return result;
+            return result.ToNexusMatrix();
 
             // Old system:
             /*Matrix3D result = Matrix3D.Identity;
