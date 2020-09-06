@@ -266,7 +266,7 @@ namespace PD2ModelParser.Sections
 
             if (geo.verts.Count == 0) { return; }
 
-            Matrix4x4.Decompose(Transform.ToMatrix4x4(), out Vector3 scale, out _, out _);
+            Matrix4x4.Decompose(Transform, out Vector3 scale, out _, out _);
 
             var scaled = geo.verts.Select(i => new Vector3(i.X * scale.X, i.Y * scale.Y, i.Z * scale.Z)).ToList();
 

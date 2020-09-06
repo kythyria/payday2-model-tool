@@ -17,12 +17,11 @@ namespace PD2ModelParser.Sections
         public Object3D ProbablyRootBone { get; set; }
         public int count => Objects.Count;
         public List<Object3D> Objects { get; private set; } = new List<Object3D>();
-        public List<Matrix3D> rotations { get; private set; } = new List<Matrix3D>();
-        [TypeConverter(typeof(Inspector.NexusMatrixConverter))]
-        public Matrix3D global_skin_transform { get; set; }
+        public List<Matrix4x4> rotations { get; private set; } = new List<Matrix4x4>();
+        public Matrix4x4 global_skin_transform { get; set; }
 
         // Post-loaded
-        public List<Matrix3D> SkinPositions { get; private set; }
+        public List<Matrix4x4> SkinPositions { get; private set; }
 
         public SkinBones() : base() { }
 
@@ -37,10 +36,10 @@ namespace PD2ModelParser.Sections
                 this.objects.Add(instream.ReadUInt32());
             for (int x = 0; x < count; x++)
             {
-                this.rotations.Add(MathUtil.ReadMatrix(instream).ToNexusMatrix());
+                this.rotations.Add(instream.ReadMatrix());
             }
 
-            this.global_skin_transform = MathUtil.ReadMatrix(instream).ToNexusMatrix();
+            this.global_skin_transform = instream.ReadMatrix();
 
             this.remaining_data = null;
 
@@ -63,12 +62,12 @@ namespace PD2ModelParser.Sections
 
             foreach (var item in this.Objects)
                 outstream.Write(item.SectionId);
-            foreach (Matrix3D matrix in this.rotations)
+            foreach (Matrix4x4 matrix in this.rotations)
             {
-                MathUtil.WriteMatrix(outstream, matrix);
+                outstream.Write(matrix);
             }
 
-            MathUtil.WriteMatrix(outstream, global_skin_transform);
+            outstream.Write(global_skin_transform);
 
             if (this.remaining_data != null)
                 outstream.Write(this.remaining_data);
@@ -82,7 +81,7 @@ namespace PD2ModelParser.Sections
 
             string rotations_string = (this.rotations.Count == 0 ? "none" : "");
 
-            foreach (Matrix3D rotation in this.rotations)
+            foreach (Matrix4x4 rotation in this.rotations)
             {
                 rotations_string += rotation + ", ";
             }
@@ -98,17 +97,17 @@ namespace PD2ModelParser.Sections
         public override void PostLoad(uint id, Dictionary<uint, ISection> parsed_sections)
         {
             base.PostLoad(id, parsed_sections);
-            SkinPositions = new List<Matrix3D>(count);
+            SkinPositions = new List<Matrix4x4>(count);
 
             for (int i = 0; i < objects.Count; i++)
             {
                 Object3D obj = (Object3D) parsed_sections[objects[i]];
                 Objects.Add(obj);
 
-                Matrix4x4 inter = rotations[i].ToMatrix4x4().MultDiesel(obj.WorldTransform);
-                Matrix4x4 skin_node = inter.MultDiesel(global_skin_transform.ToMatrix4x4());
+                Matrix4x4 inter = rotations[i].MultDiesel(obj.WorldTransform);
+                Matrix4x4 skin_node = inter.MultDiesel(global_skin_transform);
 
-                SkinPositions.Add(skin_node.ToNexusMatrix());
+                SkinPositions.Add(skin_node);
             }
             objects = null;
         }

@@ -272,7 +272,7 @@ namespace PD2ModelParser.Modelscript
             var obj = new S.Object3D(Name, parent);
             var tf = Matrix4x4.CreateScale(Scale) * Matrix4x4.CreateFromQuaternion(Rotation);
             tf.Translation = Position;
-            obj.Transform = tf.ToNexusMatrix();
+            obj.Transform = tf;
         }
     }
 
@@ -312,7 +312,7 @@ namespace PD2ModelParser.Modelscript
                 extant.SetParent(null);
             }
 
-            var tf = extant.Transform.ToMatrix4x4();
+            var tf = extant.Transform;
             if (Rotation.HasValue || Scale.HasValue)
             {
                 Matrix4x4.Decompose(tf, out var scale, out var rotation, out var translation);
@@ -322,7 +322,7 @@ namespace PD2ModelParser.Modelscript
             }
             Position.WithValue(p => tf.Translation = p);
 
-            extant.Transform = tf.ToNexusMatrix();
+            extant.Transform = tf;
         }
     }
 }

@@ -54,13 +54,12 @@ namespace PD2ModelParser.Sections
         public List<IAnimationController> Animations { get; private set; } = new List<IAnimationController>();
 
         [Category("Object3D")]
-        [TypeConverter(typeof(Inspector.NexusMatrixConverter))]
-        public Matrix3D Transform
+        public Matrix4x4 Transform
         {
-            get => _rotation.ToNexusMatrix();
+            get => _rotation;
             set
             {
-                _rotation = value.ToMatrix4x4();
+                _rotation = value;
                 UpdateTransforms();
             }
         }
@@ -106,7 +105,7 @@ namespace PD2ModelParser.Sections
             this.size = 0;
 
             this.HashName = HashName.FromNumberOrString(object_name);
-            this.Transform = Matrix3D.Identity;
+            this.Transform = Matrix4x4.Identity;
 
             this.Parent = parent;
 
@@ -140,23 +139,7 @@ namespace PD2ModelParser.Sections
             postloadCallbacks.Add((self, sections) => Animations.AddRange(animation_ids.Select(i => sections.ContainsKey(i) ? (IAnimationController)sections[i] : null)));
 
             // In Object3D::load
-            Matrix3D transform = new Matrix3D();
-            transform.M11 = instream.ReadSingle();
-            transform.M12 = instream.ReadSingle();
-            transform.M13 = instream.ReadSingle();
-            transform.M14 = instream.ReadSingle();
-            transform.M21 = instream.ReadSingle();
-            transform.M22 = instream.ReadSingle();
-            transform.M23 = instream.ReadSingle();
-            transform.M24 = instream.ReadSingle();
-            transform.M31 = instream.ReadSingle();
-            transform.M32 = instream.ReadSingle();
-            transform.M33 = instream.ReadSingle();
-            transform.M34 = instream.ReadSingle();
-            transform.M41 = instream.ReadSingle();
-            transform.M42 = instream.ReadSingle();
-            transform.M43 = instream.ReadSingle();
-            transform.M44 = instream.ReadSingle();
+            Matrix4x4 transform = instream.ReadMatrix();
 
             transform.M41 = instream.ReadSingle();
             transform.M42 = instream.ReadSingle();
@@ -179,22 +162,7 @@ namespace PD2ModelParser.Sections
                 outstream.Write((ulong) 0); // Bit to skip - the PD2 binary does the exact same thing
             }
 
-            outstream.Write(this.Transform.M11);
-            outstream.Write(this.Transform.M12);
-            outstream.Write(this.Transform.M13);
-            outstream.Write(this.Transform.M14);
-            outstream.Write(this.Transform.M21);
-            outstream.Write(this.Transform.M22);
-            outstream.Write(this.Transform.M23);
-            outstream.Write(this.Transform.M24);
-            outstream.Write(this.Transform.M31);
-            outstream.Write(this.Transform.M32);
-            outstream.Write(this.Transform.M33);
-            outstream.Write(this.Transform.M34);
-            outstream.Write(this.Transform.M41);
-            outstream.Write(this.Transform.M42);
-            outstream.Write(this.Transform.M43);
-            outstream.Write(this.Transform.M44);
+            outstream.Write(this.Transform);
             outstream.Write(this.Transform.M41); // Write the position out again, as for some reason
             outstream.Write(this.Transform.M42); // it's not stored in the main matrix
             outstream.Write(this.Transform.M43);
@@ -209,7 +177,7 @@ namespace PD2ModelParser.Sections
             var scale = new Vector3();
             var rot = new System.Numerics.Quaternion();
             var translation = new Vector3();
-            Matrix4x4.Decompose(this.Transform.ToMatrix4x4(), out scale, out rot, out translation);
+            Matrix4x4.Decompose(this.Transform, out scale, out rot, out translation);
             return base.ToString() +
                    " size: " + this.size +
                    " HashName: " + this.HashName.String +
@@ -248,11 +216,11 @@ namespace PD2ModelParser.Sections
         {
             if (Parent == null)
             {
-                WorldTransform = Transform.ToMatrix4x4();
+                WorldTransform = Transform;
                 return;
             }
 
-            WorldTransform = Transform.ToMatrix4x4().MultDiesel(Parent.WorldTransform);
+            WorldTransform = Transform.MultDiesel(Parent.WorldTransform);
         }
     }
 }

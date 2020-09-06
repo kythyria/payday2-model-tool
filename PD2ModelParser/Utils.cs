@@ -62,64 +62,9 @@ namespace PD2ModelParser
             );
         }
 
-
-        public static Matrix4x4 ReadMatrix(BinaryReader instream)
+        public static Matrix4x4 ToMatrix4x4(this Matrix3D input)
         {
-            Matrix4x4 m;
-
-            // Yes, the matricies appear to be written top-down in colums, this isn't the field names being wrong
-            // This is how a multidimensional array is layed out in memory.
-
-            // First column
-            m.M11 = instream.ReadSingle();
-            m.M12 = instream.ReadSingle();
-            m.M13 = instream.ReadSingle();
-            m.M14 = instream.ReadSingle();
-
-            // Second column
-            m.M21 = instream.ReadSingle();
-            m.M22 = instream.ReadSingle();
-            m.M23 = instream.ReadSingle();
-            m.M24 = instream.ReadSingle();
-
-            // Third column
-            m.M31 = instream.ReadSingle();
-            m.M32 = instream.ReadSingle();
-            m.M33 = instream.ReadSingle();
-            m.M34 = instream.ReadSingle();
-
-            // Fourth column
-            m.M41 = instream.ReadSingle();
-            m.M42 = instream.ReadSingle();
-            m.M43 = instream.ReadSingle();
-            m.M44 = instream.ReadSingle();
-
-            return m;
-        }
-
-        public static void WriteMatrix(BinaryWriter outstream, Matrix3D matrix)
-        {
-            outstream.Write(matrix.M11);
-            outstream.Write(matrix.M12);
-            outstream.Write(matrix.M13);
-            outstream.Write(matrix.M14);
-            outstream.Write(matrix.M21);
-            outstream.Write(matrix.M22);
-            outstream.Write(matrix.M23);
-            outstream.Write(matrix.M24);
-            outstream.Write(matrix.M31);
-            outstream.Write(matrix.M32);
-            outstream.Write(matrix.M33);
-            outstream.Write(matrix.M34);
-            outstream.Write(matrix.M41);
-            outstream.Write(matrix.M42);
-            outstream.Write(matrix.M43);
-            outstream.Write(matrix.M44);
-        }
-
-        public static System.Numerics.Matrix4x4 ToMatrix4x4(this Matrix3D input)
-        {
-            return new System.Numerics.Matrix4x4(
+            return new Matrix4x4(
                 input.M11, input.M12, input.M13, input.M14,
                 input.M21, input.M22, input.M23, input.M24,
                 input.M31, input.M32, input.M33, input.M34,
@@ -127,7 +72,7 @@ namespace PD2ModelParser
             );
         }
 
-        public static Matrix3D ToNexusMatrix(this System.Numerics.Matrix4x4 input)
+        public static Matrix3D ToNexusMatrix(this Matrix4x4 input)
         {
             return new Matrix3D(
                 input.M11, input.M12, input.M13, input.M14,
@@ -188,34 +133,6 @@ namespace PD2ModelParser
 
         public static Boolean IsUnitLength(this System.Numerics.Vector3 vec) =>
             Math.Abs(vec.Length() - 1) <= UnitLengthThresholdVec3;
-
-        /// <summary>
-        /// Produce a matrix by executing an arbitrary function on its elements.
-        /// </summary>
-        /// <param name="mat"></param>
-        /// <param name="f"></param>
-        /// <returns></returns>
-        static Matrix3D Elementwise(this Matrix3D mat, Func<float, float> f)
-        {
-            return Elementwise(mat, new Matrix3D(), (m, o) => f(m));
-        }
-
-        /// <summary>
-        /// Produce a matrix by executing an arbtrary function on the elements of two matrices.
-        /// </summary>
-        /// <param name="mat"></param>
-        /// <param name="oth"></param>
-        /// <param name="f"></param>
-        /// <returns></returns>
-        static Matrix3D Elementwise(this Matrix3D mat, Matrix3D oth, Func<float, float, float> f)
-        {
-            return new Matrix3D(
-                f(mat.M11, oth.M11), f(mat.M12, oth.M12), f(mat.M13, oth.M13), f(mat.M14, oth.M14),
-                f(mat.M21, oth.M21), f(mat.M22, oth.M22), f(mat.M23, oth.M23), f(mat.M24, oth.M24),
-                f(mat.M31, oth.M31), f(mat.M32, oth.M32), f(mat.M33, oth.M33), f(mat.M34, oth.M34),
-                f(mat.M41, oth.M41), f(mat.M42, oth.M42), f(mat.M43, oth.M43), f(mat.M44, oth.M44)
-            );
-        }
     }
 
     public static class MatrixExtensions

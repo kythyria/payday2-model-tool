@@ -94,7 +94,7 @@ namespace PD2ModelParser.Exporters
             nodesBySection[thing] = node;
             if (thing != null)
             {
-                var istrs = thing.Transform.Decompose(out var scale, out var rotation, out var translation);
+                var istrs = Matrix4x4.Decompose(thing.Transform, out var scale, out var rotation, out var translation);
                 if(!istrs)
                 {
                     throw new Exception($"In object \"{thing.Name}\" ({thing.SectionId}), non-TRS matrix");
@@ -104,7 +104,7 @@ namespace PD2ModelParser.Exporters
                 // want to affect the translation, less stability problems exist by directly changing
                 // just the cells that are the translation part.
 
-                var mat = thing.Transform.ToMatrix4x4();
+                var mat = thing.Transform;
                 mat.Translation = mat.Translation * scaleFactor;
 
                 node.LocalMatrix = isSkinned ? Matrix4x4.Identity : mat;
@@ -179,7 +179,7 @@ namespace PD2ModelParser.Exporters
 
             var joints2 = skinbones.bone_mappings[0].bones.Select(b => {
                 var jointNode = nodesBySection[skinbones.Objects[(int)b]];
-                var ibm = skinbones.rotations[(int)b].ToMatrix4x4();
+                var ibm = skinbones.rotations[(int)b];
                 ibm.Translation *= scaleFactor;
                 return (jointNode, ibm);
             }).ToArray();

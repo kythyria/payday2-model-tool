@@ -250,7 +250,7 @@ namespace PD2ModelParser.Importers
                 // they want to move bones.
                 if (_options.ImportBoneTransforms)
                 {
-                    obj.Transform = node.GetTransform().ToNexusMatrix();
+                    obj.Transform = node.GetTransform();
                 }
 
                 sb.Objects.Add(obj);
@@ -260,9 +260,9 @@ namespace PD2ModelParser.Importers
                 // to work (on ene_security_3): Archived in Git history, check out an older version
                 // to see the old and incorrect nodes.
                 // As it turns out, this just has to be the inverse of the object's world transform matrix
-                Matrix3D rotation = obj.WorldTransform.ToNexusMatrix();
-                rotation.Invert();
-                sb.rotations.Add(rotation);
+                Matrix4x4 rotation = obj.WorldTransform;
+                Matrix4x4.Invert(rotation, out Matrix4x4 invertedRotation);
+                sb.rotations.Add(invertedRotation);
 
                 return obj;
             });

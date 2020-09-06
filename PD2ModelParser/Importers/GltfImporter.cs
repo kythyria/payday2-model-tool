@@ -145,7 +145,7 @@ namespace PD2ModelParser.Importers
 
             var lt = node.LocalTransform;
             lt.Translation *= scaleFactor;
-            obj.Transform = lt.Matrix.ToNexusMatrix();
+            obj.Transform = lt.Matrix;
 
             (obj as DM.Model)?.UpdateBounds();
 
@@ -330,7 +330,7 @@ namespace PD2ModelParser.Importers
             random.NextBytes(randomBytes);
             skinBones = new DM.SkinBones();
 
-            skinBones.global_skin_transform = Matrix4x4.Identity.ToNexusMatrix();
+            skinBones.global_skin_transform = Matrix4x4.Identity;
             var parent = data.SectionsOfType<DM.Object3D>()
                 .FirstOrDefault(i => i.Name == node.Skin.Skeleton.Name);
             skinBones.ProbablyRootBone = parent;
@@ -344,7 +344,7 @@ namespace PD2ModelParser.Importers
             {
                 var (jointNode, ibm) = node.Skin.GetJoint(i);
                 ibm.Translation *= scaleFactor;
-                skinBones.rotations.Add(ibm.ToNexusMatrix());
+                skinBones.rotations.Add(ibm);
                 skinBones.Objects.Add(objectsByNode[jointNode]);
                 bmi.bones.Add((uint) i);
             }

@@ -156,7 +156,7 @@ namespace PD2ModelParser
                         SN.Vector3 translate;
                         SN.Quaternion rotate;
                         SN.Vector3 scale;
-                        SN.Matrix4x4.Decompose(obj.Transform.ToMatrix4x4(), out scale, out rotate, out translate);
+                        SN.Matrix4x4.Decompose(obj.Transform, out scale, out rotate, out translate);
 
                         SN.Matrix4x4 final_rot = SN.Matrix4x4.CreateFromQuaternion(rotate);
                         final_rot.Translation = translate;
