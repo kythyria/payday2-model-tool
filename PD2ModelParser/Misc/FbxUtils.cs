@@ -87,6 +87,7 @@ namespace PD2ModelParser.Misc
         public static FbxDouble3 ToFbxD3(this Vector3 v) => new FbxDouble3(v.X, v.Y, v.Z);
 
         public static FbxVector2 ToFbxV2(this Vector2D v) => new FbxVector2(v.X, v.Y);
+        public static FbxVector2 ToFbxV2(this Vector2 v) => new FbxVector2(v.X, v.Y);
 
         public static GeometryColor ToGeomColour(this FbxColor c)
         {

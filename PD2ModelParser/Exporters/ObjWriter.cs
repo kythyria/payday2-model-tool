@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 
 using static PD2ModelParser.Tags;
 
@@ -46,12 +47,12 @@ namespace PD2ModelParser
                             Topology topology_section = passthrough_section.Topology;
                             sw.WriteLine("Object ID: " + sectionheader.id);
                             sw.WriteLine("Verts (x, z, y)");
-                            foreach (Vector3D vert in geometry_section.verts)
+                            foreach (Vector3 vert in geometry_section.verts.Select(MathUtil.ToVector3))
                             {
                                 sw.WriteLine(vert.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + vert.Z.ToString("0.000000", CultureInfo.InvariantCulture) + " " + (-vert.Y).ToString("0.000000", CultureInfo.InvariantCulture));
                             }
                             sw.WriteLine("UV (u, -v)");
-                            foreach (Vector2D uv in geometry_section.uvs)
+                            foreach (Vector2 uv in geometry_section.uvs)
                             {
                                 sw.WriteLine(uv.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + uv.Y.ToString("0.000000", CultureInfo.InvariantCulture));
                             }
@@ -111,7 +112,7 @@ namespace PD2ModelParser
                             }
 
                             sw.WriteLine("Pattern UVs (u, v)");
-                            foreach (Vector2D pattern_uv_entry in geometry_section.pattern_uvs)
+                            foreach (Vector2 pattern_uv_entry in geometry_section.pattern_uvs)
                             {
                                 sw.WriteLine(pattern_uv_entry.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + pattern_uv_entry.Y.ToString("0.000000", CultureInfo.InvariantCulture));
                             }
@@ -257,7 +258,7 @@ namespace PD2ModelParser
                             sw.WriteLine("# " + geometry_section.verts.Count + " vertices");
                             sw.WriteLine();
 
-                            foreach (Vector2D uv in geometry_section.uvs)
+                            foreach (Vector2 uv in geometry_section.uvs)
                             {
                                 sw.WriteLine("vt " + uv.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + uv.Y.ToString("0.000000", CultureInfo.InvariantCulture));
                             }
@@ -359,7 +360,7 @@ namespace PD2ModelParser
                             sw.WriteLine("# " + geometry_section.verts.Count + " vertices");
                             sw.WriteLine();
 
-                            foreach (Vector2D uv in geometry_section.pattern_uvs)
+                            foreach (Vector2 uv in geometry_section.pattern_uvs)
                             {
                                 sw.WriteLine("vt " + uv.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + (-uv.Y).ToString("0.000000", CultureInfo.InvariantCulture));
                             }

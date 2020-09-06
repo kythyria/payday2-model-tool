@@ -5,6 +5,7 @@ using FbxNet;
 using Nexus;
 using PD2ModelParser.Misc;
 using PD2ModelParser.Sections;
+using System.Linq;
 
 namespace PD2ModelParser.Exporters
 {
@@ -185,7 +186,7 @@ namespace PD2ModelParser.Exporters
             };
         }
 
-        private static void AddUVs(FbxMesh mesh, string name, List<Vector2D> uvs)
+        private static void AddUVs(FbxMesh mesh, string name, List<SN.Vector2> uvs)
         {
             if (uvs.Count == 0)
                 return;
@@ -326,7 +327,7 @@ namespace PD2ModelParser.Exporters
             }
         }
 
-        private static void CopyTransform(Matrix4x4 transform, FbxNode node)
+        private static void CopyTransform(SN.Matrix4x4 transform, FbxNode node)
         {
             SN.Vector3 translate;
             SN.Quaternion rotate;

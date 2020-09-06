@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 
 namespace PD2ModelParser
 {
@@ -98,7 +99,7 @@ namespace PD2ModelParser
                             }
 
                             String[] uvs = line.Split(' ');
-                            Vector2D uv = new Vector2D();
+                            Vector2 uv = new Vector2();
                             uv.X = Convert.ToSingle(uvs[1], CultureInfo.InvariantCulture);
                             uv.Y = Convert.ToSingle(uvs[2], CultureInfo.InvariantCulture);
 
@@ -321,17 +322,16 @@ namespace PD2ModelParser
             }
 
             //Arrange UV and Normals
-            List<Vector2D> new_arranged_Geometry_UVs = new List<Vector2D>();
             List<Vector3D> new_arranged_Geometry_normals = new List<Vector3D>();
             List<Vector3D> new_arranged_Geometry_unknown20 = new List<Vector3D>();
             List<Vector3D> new_arranged_Geometry_unknown21 = new List<Vector3D>();
             List<int> added_uvs = new List<int>();
             List<int> added_normals = new List<int>();
 
-            Vector2D[] new_arranged_UV = new Vector2D[obj.verts.Count];
+            Vector2[] new_arranged_UV = new Vector2[obj.verts.Count];
             for (int x = 0; x < new_arranged_UV.Length; x++)
-                new_arranged_UV[x] = new Vector2D(100f, 100f);
-            Vector2D sentinel = new Vector2D(100f, 100f);
+                new_arranged_UV[x] = new Vector2(100f, 100f);
+            Vector2 sentinel = new Vector2(100f, 100f);
             Vector3D[] new_arranged_Normals = new Vector3D[obj.verts.Count];
             for (int x = 0; x < new_arranged_Normals.Length; x++)
                 new_arranged_Normals[x] = new Vector3D(0f, 0f, 0f);
@@ -412,7 +412,7 @@ namespace PD2ModelParser
             topology_section.facelist = new_faces;
         }
 
-        private static void ComputeTangentBasis(ref List<Face> faces, ref List<Vector3D> verts, ref Vector2D[] uvs, ref Vector3D[] normals, ref Vector3D[] tangents, ref Vector3D[] binormals)
+        private static void ComputeTangentBasis(ref List<Face> faces, ref List<Vector3D> verts, ref Vector2[] uvs, ref Vector3D[] normals, ref Vector3D[] tangents, ref Vector3D[] binormals)
         {
             //Taken from various sources online. Search up Normal Vector Tangent calculation.
 
@@ -420,15 +420,6 @@ namespace PD2ModelParser
 
             foreach (Face f in faces)
             {
-                Vector3D P0 = verts[f.a];
-                Vector3D P1 = verts[f.b];
-                Vector3D P2 = verts[f.c];
-
-                Vector2D UV0 = uvs[f.a];
-                Vector2D UV1 = uvs[f.b];
-                Vector2D UV2 = uvs[f.c];
-
-
                 float u02 = (uvs[f.c].X - uvs[f.a].X);
                 float v02 = (uvs[f.c].Y - uvs[f.a].Y);
                 float u01 = (uvs[f.b].X - uvs[f.a].X);
@@ -563,7 +554,7 @@ namespace PD2ModelParser
                                 }
 
                                 String[] uvs = line.Split(' ');
-                                Vector2D uv = new Vector2D();
+                                Vector2 uv = new Vector2();
                                 uv.X = Convert.ToSingle(uvs[1], CultureInfo.InvariantCulture);
                                 uv.Y = Convert.ToSingle(uvs[2], CultureInfo.InvariantCulture);
 
@@ -657,10 +648,10 @@ namespace PD2ModelParser
                     Topology topology_section = passthrough_section.Topology;
 
                     //Arrange UV and Normals
-                    Vector2D[] new_arranged_UV = new Vector2D[geometry_section.verts.Count];
+                    Vector2[] new_arranged_UV = new Vector2[geometry_section.verts.Count];
                     for (int x = 0; x < new_arranged_UV.Length; x++)
-                        new_arranged_UV[x] = new Vector2D(100f, 100f);
-                    Vector2D sentinel = new Vector2D(100f, 100f);
+                        new_arranged_UV[x] = new Vector2(100f, 100f);
+                    Vector2 sentinel = new Vector2(100f, 100f);
 
                     if (topology_section.facelist.Count != obj.faces.Count / 3)
                         return false;

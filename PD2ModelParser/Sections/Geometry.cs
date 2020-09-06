@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 
 namespace PD2ModelParser.Sections
 {
@@ -148,13 +149,13 @@ namespace PD2ModelParser.Sections
         // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
         public UInt32 vert_count;
 
-        public List<Vector2D>[] UVs = new List<Vector2D>[8];
+        public List<Vector2>[] UVs = new List<Vector2>[8];
 
         public UInt32 geometry_size;
         public List<GeometryHeader> headers = new List<GeometryHeader>();
         public List<Vector3D> verts = new List<Vector3D>();
-        public List<Vector2D> uvs => UVs[0];
-        public List<Vector2D> pattern_uvs => UVs[1];
+        public List<Vector2> uvs => UVs[0];
+        public List<Vector2> pattern_uvs => UVs[1];
         public List<Vector3D> normals = new List<Vector3D>();
         public List<GeometryColor> vertex_colors = new List<GeometryColor>();
         public List<GeometryWeightGroups> weight_groups = new List<GeometryWeightGroups>(); //4 - Weight Groups
@@ -174,7 +175,7 @@ namespace PD2ModelParser.Sections
             this.SectionId = 0;
             for (int i = 0; i < UVs.Length; i++)
             {
-                UVs[i] = new List<Vector2D>();
+                UVs[i] = new List<Vector2>();
             }
         }
 
@@ -326,7 +327,7 @@ namespace PD2ModelParser.Sections
                     {
                         // Previously, the Y was only inverted on the TEXCOORD0 channel, and
                         // not on the TEXCOORD1 channel. I assume that was incorrect, TODO check?
-                        Vector2D uv = new Vector2D {X = instream.ReadSingle(), Y = -instream.ReadSingle()};
+                        Vector2 uv = new Vector2 {X = instream.ReadSingle(), Y = -instream.ReadSingle()};
                         UVs[idx].Add(uv);
                     }
                 }
@@ -496,7 +497,7 @@ namespace PD2ModelParser.Sections
                     int idx = head.item_type - GeometryChannelTypes.TEXCOORD0;
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        Vector2D uv = UVs[idx][x];
+                        Vector2 uv = UVs[idx][x];
                         outstream.Write(uv.X);
                         outstream.Write(-uv.Y);
                     }

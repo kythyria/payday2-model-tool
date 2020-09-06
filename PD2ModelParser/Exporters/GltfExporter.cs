@@ -343,7 +343,7 @@ namespace PD2ModelParser.Exporters
             return result;
         }
 
-        Vector2 FixupUV(Nexus.Vector2D input) => new Vector2(input.X, 1-input.Y);
+        Vector2 FixupUV(Vector2 input) => new Vector2(input.X, 1-input.Y);
 
         GLTF.Accessor MakeVertexAttributeAccessor<TSource, TResult>(string maiName, IList<TSource> source, int stride, GLTF.DimensionType dimtype, Func<TSource, TResult> conv, Func<MemoryAccessor, IList<TResult>> getcontainer, GLTF.EncodingType enc = GLTF.EncodingType.FLOAT, bool normalized = false)
         {

@@ -497,7 +497,7 @@ namespace PD2ModelParser.Importers
             geom.verts.Clear();
             geom.normals.Clear();
             geom.vertex_colors.Clear();
-            foreach (List<Vector2D> uvs in geom.UVs) uvs.Clear();
+            foreach (var uvs in geom.UVs) uvs.Clear();
 
             FbxLayerElementNormal normals = mesh.GetElementNormal();
             List<int>[] cp_to_entries = FindPerVertEntries(mesh, normals, normals.GetIndexArray());
@@ -625,17 +625,17 @@ namespace PD2ModelParser.Importers
                 List<int>[] cp_to_entries = FindPerVertEntries(mesh, layer, layer.GetIndexArray());
 
                 FbxLayerElementArrayTemplateVector2 direct = layer.GetDirectArray();
-                List<Vector2D> uv = geom.UVs[gi];
+                List<Vector2> uv = geom.UVs[gi];
 
                 for (int j = 0; j < geom.vert_count; j++)
                 {
                     List<int> entries = cp_to_entries[j];
 
-                    Vector2D v = Vector2D.Zero;
+                    Vector2 v = Vector2.Zero;
 
                     foreach (int idx in entries)
                     {
-                        Vector2D vv = direct.GetAt(idx).V2();
+                        Vector2 vv = direct.GetAt(idx).V2();
                         v.X += vv.X;
                         v.Y += vv.Y;
                     }

@@ -392,7 +392,7 @@ namespace PD2ModelParser.Importers
                 for(var i = 0; i < md.uvs.Length; i++)
                 {
                     var ct = (DM.GeometryChannelTypes)((int)DM.GeometryChannelTypes.TEXCOORD0 + i);
-                    AddToGeom(ref geom.UVs[i], 2, ct, md.uvs[i], MathUtil.ToNexusVector);
+                    AddToGeom(ref geom.UVs[i], 2, ct, md.uvs[i], i => i);
                 }
                 AddToGeom(ref geom.weights, 3, DM.GeometryChannelTypes.BLENDWEIGHT0, md.weights, MathUtil.ToNexusVector);
                 AddToGeom(ref geom.weight_groups, 7, DM.GeometryChannelTypes.BLENDINDICES0, md.weightGroups, x => x);
