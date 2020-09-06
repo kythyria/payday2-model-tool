@@ -48,40 +48,6 @@ namespace PD2ModelParser
             };
         }
 
-        public static string SerializeToString(Matrix3D m)
-        {
-            return string.Format(
-                "{0} {1} {2} {3}\n" +
-                "{4} {5} {6} {7}\n" +
-                "{8} {9} {10} {11}\n" +
-                "{12} {13} {14} {15}",
-                m.M11, m.M21, m.M31, m.M41,
-                m.M12, m.M22, m.M32, m.M42,
-                m.M13, m.M23, m.M33, m.M43,
-                m.M14, m.M24, m.M34, m.M44
-            );
-        }
-
-        public static Matrix4x4 ToMatrix4x4(this Matrix3D input)
-        {
-            return new Matrix4x4(
-                input.M11, input.M12, input.M13, input.M14,
-                input.M21, input.M22, input.M23, input.M24,
-                input.M31, input.M32, input.M33, input.M34,
-                input.M41, input.M42, input.M43, input.M44
-            );
-        }
-
-        public static Matrix3D ToNexusMatrix(this Matrix4x4 input)
-        {
-            return new Matrix3D(
-                input.M11, input.M12, input.M13, input.M14,
-                input.M21, input.M22, input.M23, input.M24,
-                input.M31, input.M32, input.M33, input.M34,
-                input.M41, input.M42, input.M43, input.M44
-            );
-        }
-
         public static Vector2 ToVector2(this Vector2D input) => new Vector2(input.X, input.Y);
         public static Vector3 ToVector3(this Vector3D input) => new Vector3(input.X, input.Y, input.Z);
         public static Vector4 ToVector4(this Sections.GeometryColor input) => new Vector4(input.red/255.0f, input.green/255.0f, input.blue/255.0f, input.alpha/255.0f);
@@ -95,9 +61,7 @@ namespace PD2ModelParser
                 ClampFloatToByte(input.Z),
                 ClampFloatToByte(input.W));
         }
-        public static Nexus.Quaternion ToNexusQuaternion(this SN.Quaternion input) => new Nexus.Quaternion(input.X, input.Y, input.Z, input.W);
-        public static SN.Quaternion ToQuaternion(this Nexus.Quaternion input) => new SN.Quaternion(input.X, input.Y, input.Z, input.W);
-
+        
         public static Vector3 Max(Vector3 left, Vector3 right) => new Vector3(Math.Max(left.X, right.X), Math.Max(left.Y, right.Y), Math.Max(left.Z, right.Z));
         public static Vector3 Min(Vector3 left, Vector3 right) => new Vector3(Math.Min(left.X, right.X), Math.Min(left.Y, right.Y), Math.Min(left.Z, right.Z));
 
