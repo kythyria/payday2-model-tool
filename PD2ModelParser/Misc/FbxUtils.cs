@@ -20,7 +20,7 @@ namespace PD2ModelParser.Misc
             return new FbxDouble3(x, y, z);
         }
 
-        public static Vector3D V3(this FbxDouble4 vec)
+        public static Vector3 V3(this FbxDouble4 vec)
         {
             SWIGTYPE_p_double data = vec.mData;
             double x = FbxNet.FbxNet.doubleArray_getitem(data, 0);
@@ -38,12 +38,12 @@ namespace PD2ModelParser.Misc
             return new Vector3((float) x, (float) y, (float) z);
         }
 
-        public static Vector2D V2(this FbxDouble2 vec)
+        public static Vector2 V2(this FbxDouble2 vec)
         {
             SWIGTYPE_p_double data = vec.mData;
             double x = FbxNet.FbxNet.doubleArray_getitem(data, 0);
             double y = FbxNet.FbxNet.doubleArray_getitem(data, 1);
-            return new Vector2D((float) x, (float) y);
+            return new Vector2((float) x, (float) y);
         }
 
         public static void Set(this FbxVector4 v, Vector3D other) => v.Set(other.X, other.Y, other.Z, 0);
@@ -86,7 +86,6 @@ namespace PD2ModelParser.Misc
 
         public static FbxDouble3 ToFbxD3(this Vector3 v) => new FbxDouble3(v.X, v.Y, v.Z);
 
-        public static FbxVector2 ToFbxV2(this Vector2D v) => new FbxVector2(v.X, v.Y);
         public static FbxVector2 ToFbxV2(this Vector2 v) => new FbxVector2(v.X, v.Y);
 
         public static GeometryColor ToGeomColour(this FbxColor c)
