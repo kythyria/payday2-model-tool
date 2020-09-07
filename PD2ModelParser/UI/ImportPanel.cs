@@ -1,17 +1,108 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
-
+using System.Windows.Forms.Layout;
 using PD2ModelParser.Sections;
+
+using Size = System.Drawing.Size;
 
 namespace PD2ModelParser.UI
 {
     public partial class ImportPanel : UserControl
     {
+        class ImportPanelLayoutEngine : LayoutEngine
+        {
+            Label[] labels;
+
+            public ImportPanelLayoutEngine(ImportPanel panel)
+            {
+                
+            }
+
+            public override bool Layout(object container, LayoutEventArgs layoutEventArgs)
+            {
+                //return base.Layout(container, layoutEventArgs);
+                var panel = (ImportPanel)container;
+
+                //Console.WriteLine("Layout");
+
+                this.labels = new Label[] {
+                    panel.labelSelBaseModel,
+                    null,
+                    panel.lblScript,
+                    panel.labelObj,
+                    panel.labelPatternUV,
+                    null,
+                    panel.labelRootPoint,
+                    null,
+                    panel.labelSaveTo
+                };
+
+                var fields = new Control[]
+                {
+                    panel.baseModelFileBrowser,
+                    panel.createNewModel,
+                    panel.scriptFile,
+                    panel.objectFile,
+                    panel.patternUVFile,
+                    panel.createNewObjectsBox,
+                    panel.rootPoints,
+                    panel.labelRootPointHint,
+                    panel.outputBox
+                };
+
+                var maxLabelWidth = this.labels
+                    .Where(i => i != null)
+                    .Select(i => i.PreferredSize.Width + i.Margin.Horizontal ).Max();
+                var currY = 0;
+
+                for (var i = 0; i < fields.Length; i++)
+                {
+                    var label = labels[i];
+                    var labelSize = label?.GetPreferredSize(new Size(1,1)) ?? new Size(0,0);
+                    var field = fields[i];
+                    var fieldSize = field.GetPreferredSize(new Size(1,1));
+
+                    var rowHeight = Math.Max(labelSize.Height + (label?.Margin.Vertical ?? 0), fieldSize.Height + field.Margin.Vertical);
+                    
+                    if (label != null)
+                    {
+                        var labelOffsY = (rowHeight - labelSize.Height) / 2;
+                        label.SetBounds(maxLabelWidth - (labelSize.Width + label.Margin.Right), currY + labelOffsY, labelSize.Width, labelSize.Height);
+                    }
+
+                    var fieldX = maxLabelWidth + field.Margin.Left;
+                    var fieldOffsY = currY + (rowHeight - fieldSize.Height) / 2;
+                    var fieldWidth = panel.Width - (maxLabelWidth + field.Margin.Horizontal);
+                    field.SetBounds(fieldX, fieldOffsY, fieldWidth, fieldSize.Height);
+                    currY += rowHeight;
+                }
+
+                var buttonSize = panel.convert.GetPreferredSize(new Size(1, 1));
+                panel.convert.SetBounds(panel.convert.Margin.Left, currY + panel.convert.Margin.Top, panel.Width - panel.convert.Margin.Horizontal, buttonSize.Height);
+                currY += panel.convert.Bounds.Bottom + panel.convert.Margin.Bottom;
+
+                //Console.WriteLine("End Layout");
+
+                panel.MinimumSize = new Size(panel.MinimumSize.Width, currY);
+
+                return true;
+            }
+
+            public Size GetMinimumSize()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         private List<RootPointItem> root_point_items = new List<RootPointItem>();
+        private ImportPanelLayoutEngine layout;
+        public override LayoutEngine LayoutEngine => layout;
 
         public ImportPanel()
         {
+            layout = new ImportPanelLayoutEngine(this);
             InitializeComponent();
         }
 
@@ -187,6 +278,11 @@ namespace PD2ModelParser.UI
         private void scriptFile_FileSelected(object sender, EventArgs e)
         {
             UpdateRootPointBox();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
