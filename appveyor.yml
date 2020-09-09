@@ -1,6 +1,6 @@
 version: '{branch}.{build}'
 image: Visual Studio 2019
-configuration: DebugNoFBX
+configuration: Debug
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'

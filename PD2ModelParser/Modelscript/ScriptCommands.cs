@@ -96,10 +96,7 @@ namespace PD2ModelParser.Modelscript
 
             if (!effectiveType.CanImport)
             {
-                if (effectiveType == FileTypeInfo.Fbx)
-                    throw new Exception("FBX support was not enabled at compile time");
-                else
-                    throw new Exception($"No import support for {effectiveType}");
+                throw new Exception($"No import support for {effectiveType}");
             }
 
             var parentObjects = new Dictionary<string, S.Object3D>();
@@ -140,8 +137,6 @@ namespace PD2ModelParser.Modelscript
             }
 
             bool createObjects = CreateNewObjects ?? state.CreateNewObjects;
-            if(effectiveType == FileTypeInfo.Fbx && createObjects)
-                throw new Exception("Creating objects is not yet supported for FBX");
 
             effectiveType.Import(state.Data, filepath, createObjects, ParentFinder, opts);
         }
@@ -184,8 +179,8 @@ namespace PD2ModelParser.Modelscript
                 }
             }
 
-            if (fti == FileTypeInfo.Fbx && !fti.CanExport)
-                throw new Exception("FBX support was not enabled at compile time");
+            if (!fti.CanExport)
+                throw new Exception($"Cannot export {fti.FormatName}");
 
             fti.Export(state.Data, path);
         }

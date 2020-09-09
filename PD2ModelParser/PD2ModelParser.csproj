@@ -35,38 +35,11 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugNoFBX|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\DebugNoFBX\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;NO_FBX</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
   <PropertyGroup>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseNoFBX|AnyCPU'">
-    <OutputPath>bin\ReleaseNoFBX\</OutputPath>
-    <DefineConstants>TRACE;NO_FBX</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FbxNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="!$(DefineConstants.Contains('NO_FBX'))">
-      <HintPath>../Libs/FbxNet.dll</HintPath>
-    </Reference>
     <Reference Include="Mono.Options, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Mono.Options.5.3.0.1\lib\net4-client\Mono.Options.dll</HintPath>
       <Private>True</Private>
@@ -210,12 +183,6 @@
       <DependentUpon>ExportPanel.cs</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup Condition="!$(DefineConstants.Contains('NO_FBX'))">
-    <!-- FBX-specific files that are excluded entirely when FBX support is disabled -->
-    <Compile Include="Exporters\FbxExporter.cs" />
-    <Compile Include="Misc\FbxUtils.cs" />
-    <Compile Include="Importers\FilmboxImporter.cs" />
-  </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <ContentWithTargetPath Include="hashlist\hashlist">
@@ -263,14 +230,6 @@
     <PreBuildEvent Condition="'$(OS)' == 'Windows_NT' And '$(APPVEYOR)' != 'True'">CD /D $(SolutionDir) &amp; C:\Windows\Sysnative\bash.exe "gen-version.sh" "$(ConfigurationName)"</PreBuildEvent>
     <PreBuildEvent Condition="'$(OS)' != 'Windows_NT' ">"$(SolutionDir)gen-version.sh" "$(ConfigurationName)"</PreBuildEvent>
   </PropertyGroup>
-  <Target Name="AfterBuild" Condition="!$(DefineConstants.Contains('NO_FBX'))">
-    <!-- Copy in the FbxNet natives -->
-    <Copy SourceFiles="../Libs/FbxNetNative.dll" DestinationFolder="$(OutputPath)" />
-    <Copy SourceFiles="../Libs/libFbxNetNative.so" DestinationFolder="$(OutputPath)" />
-    <!-- Copy in the FBX SDK itself-->
-    <Copy SourceFiles="../Libs/libfbxsdk.dll" DestinationFolder="$(OutputPath)" />
-    <Copy SourceFiles="../Libs/libfbxsdk.so" DestinationFolder="$(OutputPath)" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

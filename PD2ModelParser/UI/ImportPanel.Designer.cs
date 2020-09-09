@@ -191,9 +191,8 @@ namespace PD2ModelParser.UI
             this.objectFile.AllowDrop = true;
             this.objectFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.objectFile.Filter = "Model files (*.gltf, *.glb, *.obj, *.fbx)|*.gltf;*.glb;*.obj;*.fbx|glTF files (*." +
-    "gltf, *.glb)|*.gltf;*.glb|Wavefront OBJ files (*.obj)|*.obj|Filmbox files (*.fbx" +
-    ")|*.fbx";
+            this.objectFile.Filter = "Model files (*.gltf, *.glb, *.obj)|*.gltf;*.glb;*.obj;|glTF files (*." +
+    "gltf, *.glb)|*.gltf;*.glb|Wavefront OBJ files (*.obj)|*.obj";
             this.objectFile.Location = new System.Drawing.Point(108, 84);
             this.objectFile.MinimumSize = new System.Drawing.Size(0, 23);
             this.objectFile.Name = "objectFile";

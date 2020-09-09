@@ -30,28 +30,6 @@ namespace PD2ModelParser
             return TryParseName(System.IO.Path.GetExtension(path), out result);
         }
 
-        class FbxType : FileTypeInfo
-        {
-            public override string Extension => "fbx";
-            public override string Name => "Filmbox";
-#if !NO_FBX
-            public override bool CanExport => true;
-            public override bool CanImport => true;
-            public override string Export(FullModelData data, string path) => Exporters.FbxExporter.ExportFile(data, path);
-            public override void Import(FullModelData data, string path, bool createModels, Func<string, Sections.Object3D> parentFinder, IOptionReceiver options)
-                => FilmboxImporter.Import(data, path, createModels, parentFinder, options);
-            public override IOptionReceiver CreateOptionReceiver() => new FilmboxImporter.FbxImportOptions();
-#else
-            public override bool CanExport => false;
-            public override bool CanImport => false;
-            public override void Import(FullModelData data, string path, bool createModels, Func<string, Sections.Object3D> parentFinder, IOptionReceiver options)
-                => throw new NotSupportedException("Model tool was built without FBX support");
-            public override string Export(FullModelData data, string path) => throw new NotSupportedException("Model tool was built without FBX support");
-            public override IOptionReceiver CreateOptionReceiver() => throw new NotSupportedException("Model tool was built without FBX support");
-#endif
-        }
-        public static readonly FileTypeInfo Fbx = new FbxType();
-
         class ObjType : FileTypeInfo
         {
             public override string Extension => "obj";
@@ -99,7 +77,6 @@ namespace PD2ModelParser
         public static readonly FileTypeInfo Glb = new GlbType();
 
         public static IReadOnlyList<FileTypeInfo> Types { get; } = new List<FileTypeInfo>() {
-            FileTypeInfo.Fbx,
             FileTypeInfo.Dae,
             FileTypeInfo.Obj,
             FileTypeInfo.Gltf,
