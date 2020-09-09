@@ -1,12 +1,10 @@
 ﻿using Collada141;
-using Nexus;
 using PD2ModelParser.Sections;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using SN = System.Numerics;
+using System.Numerics;
 using static PD2ModelParser.Tags;
 
 namespace PD2ModelParser
@@ -153,18 +151,18 @@ namespace PD2ModelParser
                             }
                         }
 
-                        SN.Vector3 translate;
-                        SN.Quaternion rotate;
-                        SN.Vector3 scale;
-                        SN.Matrix4x4.Decompose(obj.Transform, out scale, out rotate, out translate);
+                        Vector3 translate;
+                        Quaternion rotate;
+                        Vector3 scale;
+                        Matrix4x4.Decompose(obj.Transform, out scale, out rotate, out translate);
 
-                        SN.Matrix4x4 final_rot = SN.Matrix4x4.CreateFromQuaternion(rotate);
+                        Matrix4x4 final_rot = Matrix4x4.CreateFromQuaternion(rotate);
                         final_rot.Translation = translate;
 
                         if (obj.Parent == null || !sb.Objects.Contains(obj.Parent))
                         {
-                            SN.Matrix4x4 fixed_obj_transform = obj.WorldTransform;
-                            SN.Matrix4x4.Decompose(fixed_obj_transform, out scale, out rotate, out translate);
+                            Matrix4x4 fixed_obj_transform = obj.WorldTransform;
+                            Matrix4x4.Decompose(fixed_obj_transform, out scale, out rotate, out translate);
 
                             // Fixes the head, but breaks the arms
                             // For now, leave it like this
@@ -362,22 +360,22 @@ namespace PD2ModelParser
             };
         }
 
-        private static source GenerateSource(string name, List<SN.Vector3> vecs)
+        private static source GenerateSource(string name, List<Vector3> vecs)
         {
             return GenerateSource(name, new string[] {"X", "Y", "Z"}, vecs, VecToFloats);
         }
 
-        private static source GenerateSourceTex(string name, List<SN.Vector2> vecs)
+        private static source GenerateSourceTex(string name, List<Vector2> vecs)
         {
             return GenerateSource(name, new string[] {"S", "T"}, vecs, VecToFloats);
         }
 
-        private static double[] VecToFloats(SN.Vector3 vec)
+        private static double[] VecToFloats(Vector3 vec)
         {
             return new double[] {vec.X, vec.Y, vec.Z};
         }
 
-        private static double[] VecToFloats(SN.Vector2 vec)
+        private static double[] VecToFloats(Vector2 vec)
         {
             return new double[] {vec.X, vec.Y};
         }

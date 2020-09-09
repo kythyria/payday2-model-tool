@@ -1,5 +1,4 @@
-﻿using Nexus;
-using PD2ModelParser.Sections;
+﻿using PD2ModelParser.Sections;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

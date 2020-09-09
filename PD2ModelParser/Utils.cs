@@ -1,8 +1,5 @@
-﻿using Nexus;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using SN = System.Numerics;
 using System.Numerics;
 
 namespace PD2ModelParser
