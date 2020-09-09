@@ -181,7 +181,7 @@ namespace PD2ModelParser.UI
 
         protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified)
         {
-            base.SetBoundsCore(x, y, width, Math.Max(inputFileBox.Height, browseBttn.Height), specified);
+            base.SetBoundsCore(x, y, width, Math.Max(inputFileBox.PreferredHeight, browseBttn.PreferredSize.Height), specified);
         }
 
         class FileBrowserDesigner : ControlDesigner
