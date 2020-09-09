@@ -153,10 +153,10 @@ namespace PD2ModelParser.Sections
 
         public UInt32 geometry_size;
         public List<GeometryHeader> headers = new List<GeometryHeader>();
-        public List<Vector3D> verts = new List<Vector3D>();
+        public List<Vector3> verts = new List<Vector3>();
         public List<Vector2> uvs => UVs[0];
         public List<Vector2> pattern_uvs => UVs[1];
-        public List<Vector3D> normals = new List<Vector3D>();
+        public List<Vector3> normals = new List<Vector3>();
         public List<GeometryColor> vertex_colors = new List<GeometryColor>();
         public List<GeometryWeightGroups> weight_groups = new List<GeometryWeightGroups>(); //4 - Weight Groups
         public List<Vector3D> weights = new List<Vector3D>(); //3 - Weights
@@ -189,9 +189,9 @@ namespace PD2ModelParser.Sections
             this.headers.Add(new GeometryHeader(3, GeometryChannelTypes.BINORMAL0)); // unk20
             this.headers.Add(new GeometryHeader(3, GeometryChannelTypes.TANGENT0)); // unk21
 
-            this.verts = newobject.verts;
+            this.verts = newobject.verts.Select(MathUtil.ToVector3).ToList();
             this.UVs[0] = newobject.uv;
-            this.normals = newobject.normals;
+            this.normals = newobject.normals.Select(MathUtil.ToVector3).ToList();
             //this.binormals;
             //this.tangents;
 
@@ -225,7 +225,7 @@ namespace PD2ModelParser.Sections
                     verts.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        Vector3D vert = new Vector3D();
+                        Vector3 vert = new Vector3();
                         vert.X = instream.ReadSingle();
                         vert.Y = instream.ReadSingle();
                         vert.Z = instream.ReadSingle();
@@ -238,7 +238,7 @@ namespace PD2ModelParser.Sections
                     normals.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        Vector3D norm = new Vector3D();
+                        Vector3 norm = new Vector3();
                         norm.X = instream.ReadSingle();
                         norm.Y = instream.ReadSingle();
                         norm.Z = instream.ReadSingle();
@@ -364,9 +364,9 @@ namespace PD2ModelParser.Sections
                 outstream.Write((uint) head.item_type);
             }
 
-            List<Vector3D> verts = this.verts;
+            List<Vector3> verts = this.verts;
             int vert_pos = 0;
-            List<Vector3D> normals = this.normals;
+            List<Vector3> normals = this.normals.ToList();
             int norm_pos = 0;
 
             List<GeometryWeightGroups> unknown_15s = this.weight_groups;
@@ -385,7 +385,7 @@ namespace PD2ModelParser.Sections
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        Vector3D vert = verts[vert_pos];
+                        Vector3 vert = verts[vert_pos];
                         outstream.Write(vert.X);
                         outstream.Write(vert.Y);
                         outstream.Write(vert.Z);
@@ -396,7 +396,7 @@ namespace PD2ModelParser.Sections
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        Vector3D norm = normals[norm_pos];
+                        Vector3 norm = normals[norm_pos];
                         outstream.Write(norm.X);
                         outstream.Write(norm.Y);
                         outstream.Write(norm.Z);

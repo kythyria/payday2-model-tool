@@ -47,7 +47,7 @@ namespace PD2ModelParser
                             Topology topology_section = passthrough_section.Topology;
                             sw.WriteLine("Object ID: " + sectionheader.id);
                             sw.WriteLine("Verts (x, z, y)");
-                            foreach (Vector3 vert in geometry_section.verts.Select(MathUtil.ToVector3))
+                            foreach (Vector3 vert in geometry_section.verts)
                             {
                                 sw.WriteLine(vert.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + vert.Z.ToString("0.000000", CultureInfo.InvariantCulture) + " " + (-vert.Y).ToString("0.000000", CultureInfo.InvariantCulture));
                             }
@@ -59,38 +59,37 @@ namespace PD2ModelParser
                             sw.WriteLine("Normals (i, j, k)");
 
                             //Testing
-                            List<Vector3D> norm_tangents = new List<Vector3D>();
-                            List<Vector3D> norm_binorms = new List<Vector3D>();
+                            List<Vector3> norm_tangents = new List<Vector3>();
+                            List<Vector3> norm_binorms = new List<Vector3>();
 
-                            foreach (Vector3D norm in geometry_section.normals)
+                            foreach (Vector3 norm in geometry_section.normals)
                             {
                                 sw.WriteLine(norm.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + norm.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + norm.Z.ToString("0.000000", CultureInfo.InvariantCulture));
 
 
-                                Vector3D norm_t;
-                                Vector3D binorm;
+                                Vector3 norm_t;
+                                Vector3 binorm;
 
-                                Vector3D t1 = Vector3D.Cross(norm, Vector3D.Right);
-                                Vector3D t2 = Vector3D.Cross(norm, Vector3D.Forward);
+                                Vector3 t1 = Vector3.Cross(norm, Vector3.UnitX);
+                                Vector3 t2 = Vector3.Cross(norm, new Vector3(0, 0, -1));
 
                                 if (t1.Length() > t2.Length())
                                     norm_t = t1;
                                 else
                                     norm_t = t2;
-                                norm_t.Normalize();
+                                norm_t = Vector3.Normalize(norm_t);
                                 norm_tangents.Add(norm_t);
 
-                                binorm = Vector3D.Cross(norm, norm_t);
-                                binorm = new Vector3D(binorm.X * -1.0f, binorm.Y * -1.0f, binorm.Z * -1.0f);
-                                binorm.Normalize();
+                                binorm = Vector3.Cross(norm, norm_t);
+                                binorm = Vector3.Normalize(binorm * -1.0f);
                                 norm_binorms.Add(binorm);
 
                             }
 
                             if (norm_binorms.Count > 0 && norm_tangents.Count > 0)
                             {
-                                Vector3D[] arranged_unknown20 = norm_binorms.ToArray();
-                                Vector3D[] arranged_unknown21 = norm_tangents.ToArray();
+                                Vector3[] arranged_unknown20 = norm_binorms.ToArray();
+                                Vector3[] arranged_unknown21 = norm_tangents.ToArray();
 
                                 for (int fcount = 0; fcount < topology_section.facelist.Count; fcount++)
                                 {
@@ -120,18 +119,18 @@ namespace PD2ModelParser
                             int unk20tangcount = 0;
                             int unk21tangcount = 0;
                             sw.WriteLine("Unknown 20 (float, float, float) - Normal tangents???");
-                            foreach (Vector3D unknown_20_entry in geometry_section.binormals)
+                            foreach (Vector3 unknown_20_entry in geometry_section.binormals.Select(MathUtil.ToVector3))
                             {
                                 sw.WriteLine(unknown_20_entry.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_20_entry.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_20_entry.Z.ToString("0.000000", CultureInfo.InvariantCulture));
-                                Vector3D normt = norm_tangents[unk20tangcount];
+                                Vector3 normt = norm_tangents[unk20tangcount];
                                 sw.WriteLine("* " + normt.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + normt.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + normt.Z.ToString("0.000000", CultureInfo.InvariantCulture));
                                 unk20tangcount++;
                             }
                             sw.WriteLine("Unknown 21 (float, float, float) - Normal tangents???");
-                            foreach (Vector3D unknown_21_entry in geometry_section.tangents)
+                            foreach (Vector3 unknown_21_entry in geometry_section.tangents.Select(MathUtil.ToVector3))
                             {
                                 sw.WriteLine(unknown_21_entry.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_21_entry.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_21_entry.Z.ToString("0.000000", CultureInfo.InvariantCulture));
-                                Vector3D normt = norm_binorms[unk21tangcount];
+                                Vector3 normt = norm_binorms[unk21tangcount];
                                 sw.WriteLine("* " + normt.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + normt.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + normt.Z.ToString("0.000000", CultureInfo.InvariantCulture));
                                 unk21tangcount++;
                             }
@@ -251,7 +250,7 @@ namespace PD2ModelParser
                             sw.WriteLine("#");
                             sw.WriteLine();
                             sw.WriteLine("o " + model_data.Name);
-                            foreach (Vector3D vert in geometry_section.verts)
+                            foreach (Vector3 vert in geometry_section.verts)
                             {
                                 sw.WriteLine("v " + vert.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + vert.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + vert.Z.ToString("0.000000", CultureInfo.InvariantCulture));
                             }
@@ -265,7 +264,7 @@ namespace PD2ModelParser
                             sw.WriteLine("# " + geometry_section.uvs.Count + " UVs");
                             sw.WriteLine();
 
-                            foreach (Vector3D norm in geometry_section.normals)
+                            foreach (Vector3 norm in geometry_section.normals)
                             {
                                 sw.WriteLine("vn " + norm.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + norm.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + norm.Z.ToString("0.000000", CultureInfo.InvariantCulture));
                             }
@@ -353,7 +352,7 @@ namespace PD2ModelParser
                             sw.WriteLine("#");
                             sw.WriteLine();
                             sw.WriteLine("o " + model_data.Name);
-                            foreach (Vector3D vert in geometry_section.verts)
+                            foreach (Vector3 vert in geometry_section.verts)
                             {
                                 sw.WriteLine("v " + vert.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + vert.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + vert.Z.ToString("0.000000", CultureInfo.InvariantCulture));
                             }
@@ -367,7 +366,7 @@ namespace PD2ModelParser
                             sw.WriteLine("# " + geometry_section.pattern_uvs.Count + " UVs");
                             sw.WriteLine();
 
-                            foreach (Vector3D norm in geometry_section.normals)
+                            foreach (Vector3 norm in geometry_section.normals)
                             {
                                 sw.WriteLine("vn " + norm.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + norm.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + norm.Z.ToString("0.000000", CultureInfo.InvariantCulture));
                             }

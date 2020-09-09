@@ -362,7 +362,7 @@ namespace PD2ModelParser
             };
         }
 
-        private static source GenerateSource(string name, List<Vector3D> vecs)
+        private static source GenerateSource(string name, List<SN.Vector3> vecs)
         {
             return GenerateSource(name, new string[] {"X", "Y", "Z"}, vecs, VecToFloats);
         }
@@ -372,7 +372,7 @@ namespace PD2ModelParser
             return GenerateSource(name, new string[] {"S", "T"}, vecs, VecToFloats);
         }
 
-        private static double[] VecToFloats(Vector3D vec)
+        private static double[] VecToFloats(SN.Vector3 vec)
         {
             return new double[] {vec.X, vec.Y, vec.Z};
         }

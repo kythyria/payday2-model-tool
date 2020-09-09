@@ -254,14 +254,14 @@ namespace PD2ModelParser.Exporters
             List<(string, GLTF.Accessor)> result;
             result = new List<(string, GLTF.Accessor)>();
 
-            var a_pos = MakeVertexAttributeAccessor("vpos", geometry.verts.Select(i=>i*scaleFactor).ToList(), 12, GLTF.DimensionType.VEC3, MathUtil.ToVector3, ma => ma.AsVector3Array());
+            var a_pos = MakeVertexAttributeAccessor("vpos", geometry.verts.Select(i=>i*scaleFactor).ToList(), 12, GLTF.DimensionType.VEC3, i=>i, ma => ma.AsVector3Array());
             result.Add(("POSITION", a_pos));
 
             if (geometry.normals.Count > 0)
             {
-                Vector3 MakeNormal(Nexus.Vector3D norm, int idx)
+                Vector3 MakeNormal(Vector3 norm, int idx)
                 {
-                    var normalized = Vector3.Normalize(norm.ToVector3());
+                    var normalized = Vector3.Normalize(norm);
                     if(!normalized.IsFinite())
                     {
                         Log.Default.Warn("Vertex {0} of geometry {1}|{2} is bogus ({3})", idx, geometry.SectionId, geometry.HashName.String, norm);
@@ -284,7 +284,7 @@ namespace PD2ModelParser.Exporters
                 {
                     var tangent = input.ToVector3();
                     var binorm = geometry.binormals[index].ToVector3();
-                    var normal = geometry.normals[index].ToVector3();
+                    var normal = geometry.normals[index];
 
                     var txn = Vector3.Cross(tangent, normal);
                     var dot = Vector3.Dot(txn, binorm);

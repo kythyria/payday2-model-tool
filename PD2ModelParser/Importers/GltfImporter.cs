@@ -384,8 +384,8 @@ namespace PD2ModelParser.Importers
                     }
                 }
 
-                AddToGeom(ref geom.verts, 3, DM.GeometryChannelTypes.POSITION, md.verts, MathUtil.ToNexusVector);
-                AddToGeom(ref geom.normals, 3, DM.GeometryChannelTypes.NORMAL0, md.normals, MathUtil.ToNexusVector);
+                AddToGeom(ref geom.verts, 3, DM.GeometryChannelTypes.POSITION, md.verts, i => i);
+                AddToGeom(ref geom.normals, 3, DM.GeometryChannelTypes.NORMAL0, md.normals, i => i);
                 AddToGeom(ref geom.binormals, 3, DM.GeometryChannelTypes.BINORMAL0, md.binormals, MathUtil.ToNexusVector);
                 AddToGeom(ref geom.tangents, 3, DM.GeometryChannelTypes.TANGENT0, md.tangents, MathUtil.ToNexusVector);
                 AddToGeom(ref geom.vertex_colors, 5, DM.GeometryChannelTypes.COLOR0, md.vertex_colors, i => i);
