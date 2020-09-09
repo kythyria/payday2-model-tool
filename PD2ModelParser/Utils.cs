@@ -48,10 +48,8 @@ namespace PD2ModelParser
             };
         }
 
-        public static Vector3 ToVector3(this Vector3D input) => new Vector3(input.X, input.Y, input.Z);
         public static Vector4 ToVector4(this Sections.GeometryColor input) => new Vector4(input.red/255.0f, input.green/255.0f, input.blue/255.0f, input.alpha/255.0f);
 
-        public static Vector3D ToNexusVector(this Vector3 input) => new Vector3D(input.X, input.Y, input.Z);
         public static Sections.GeometryColor ToGeometryColor(this Vector4 input) {
             return new Sections.GeometryColor(
                 ClampFloatToByte(input.X),
