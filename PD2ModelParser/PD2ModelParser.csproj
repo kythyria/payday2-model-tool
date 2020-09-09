@@ -143,8 +143,8 @@
     </Compile>
     <Compile Include="Utils.cs" />
     <Compile Include="FullModelData.cs" />
-    <Compile Include="NewObjImporter.cs" />
-    <Compile Include="ModelReader.cs" />
+    <Compile Include="Importers\NewObjImporter.cs" />
+    <Compile Include="Importers\ModelReader.cs" />
     <Compile Include="StaticStorage.cs" />
     <Compile Include="Exporters\ObjWriter.cs" />
     <Compile Include="UI\Form1.cs">

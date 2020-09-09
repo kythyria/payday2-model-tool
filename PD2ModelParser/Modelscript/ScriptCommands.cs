@@ -63,7 +63,7 @@ namespace PD2ModelParser.Modelscript
         public void Execute(ScriptState state)
         {
             state.Log.Status($"Saving model to {File}");
-            DieselExporter.ExportFile(state.Data, state.ResolvePath(File));
+            Exporters.DieselExporter.ExportFile(state.Data, state.ResolvePath(File));
         }
     }
 
@@ -153,7 +153,7 @@ namespace PD2ModelParser.Modelscript
             {
                 throw new Exception($"Using \"{0}\" for pattern UV import requires it be OBJ format");
             }
-            bool result = NewObjImporter.ImportNewObjPatternUV(state.Data, path);
+            bool result = Importers.NewObjImporter.ImportNewObjPatternUV(state.Data, path);
             if (!result)
             {
                 throw new Exception("There was an error importing Pattern UV OBJ - see console");

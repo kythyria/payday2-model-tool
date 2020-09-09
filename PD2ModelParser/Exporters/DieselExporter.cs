@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace PD2ModelParser
+namespace PD2ModelParser.Exporters
 {
     static class DieselExporter
     {

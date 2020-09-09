@@ -38,7 +38,7 @@ namespace PD2ModelParser
             public override bool CanImport => true;
             public override void Import(FullModelData data, string path, bool createModels, Func<string, Sections.Object3D> parentFinder, IOptionReceiver options)
                 => NewObjImporter.ImportNewObj(data, path, createModels, parentFinder, options);
-            public override string Export(FullModelData data, string path) => ObjWriter.ExportFile(data, path);
+            public override string Export(FullModelData data, string path) => Exporters.ObjWriter.ExportFile(data, path);
         }
         public static readonly FileTypeInfo Obj = new ObjType();
 

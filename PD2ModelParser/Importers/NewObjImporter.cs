@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 
-namespace PD2ModelParser
+namespace PD2ModelParser.Importers
 {
     static class NewObjImporter
     {

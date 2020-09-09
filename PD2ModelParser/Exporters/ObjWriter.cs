@@ -8,7 +8,7 @@ using System.Numerics;
 
 using static PD2ModelParser.Tags;
 
-namespace PD2ModelParser
+namespace PD2ModelParser.Exporters
 {
     class ObjWriter
     {
