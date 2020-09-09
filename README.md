@@ -5,12 +5,10 @@ This is a copy of IAmNotASpy and PoueT's model tool, with a bunch of new feature
 * Greatly improved UI, with different functions cleanly separated
 * The ability to use an XML-based script to modify the object/bone structure of models, and create entirely
 new models without deriving them from an existing model, and set rootpoints for different objects
-* Experimental Collada (DAE) and Filmbox (FBX) export support, for bones and (in the latter case) full
-rigging, vertex colours, and eight UV channel support.
+* Experimental Collada (DAE) export support, with bones.
 * glTF export support, with vertex colours, all eight UV channels, and material slots (multiUV).
   There's also preliminary support for exporting rigged models.
 * glTF import support, also with vertex colours, all eight UV channels, and material slots.
-* An importer for Filmbox (Coming Soon™)
 * And a bunch of miscellaneous features and bugfixes
 
 # glTF export/import
@@ -42,19 +40,18 @@ the downside that if you're importing into Blender bones and empties are drawn m
 |--------|--------|--------|
 | OBJ    | ✓      | ✓      |
 | DAE    |        | ✓      | 
-| FBX    | ✓      | ✓      |
 | GLTF   | ✓      | ✓      |
 
-| Data             | FBX Out | FBX In | DAE | GLTF In | GLTF Out |
-|------------------|---------|--------|-----|---------|----------|
-| Triangles        | ✓       | ✓      | ✓   | ✓       | ✓        |
-| UV channels      | ✓       | ✓      | One | ✓       | ✓        |
-| Vertex colours   | ✓       | ?     | ✗   | ✓       | ✓        |
-| Vertex weights   | ✓       | ✓     | ✗   | ✓       | ✓        |
-| Material slots   | ✓       | ✗     | ✗   | ✓       | ✓        |
-| Object hierarchy | ✓       | ✓     | ✓   | ✓       | ✓        |
-| Bones            | ✓       | ✓     | As objects | As objects | Partial |
-| Skinning         | ✓       | ✓     | ✗   | Ignored | Partial    |
+| Data             | DAE | GLTF In | GLTF Out |
+|------------------|-----|---------|----------|
+| Triangles        | ✓   | ✓       | ✓        |
+| UV channels      | One | ✓       | ✓        |
+| Vertex colours   | ✗   | ✓       | ✓        |
+| Vertex weights   | ✗   | ✓       | ✓        |
+| Material slots   | ✗   | ✓       | ✓        |
+| Object hierarchy | ✓   | ✓       | ✓        |
+| Bones            | As objects | As objects | Partial |
+| Skinning         | ✗   | Ignored | Partial    |
 
 Partial bone/skinning support refers to the result not being read sensibly in all implementations.
 
@@ -85,8 +82,3 @@ you must provide the entire rest of the program under the GPLv3 with this except
 
 If you wish, you may also delete this exception from modified versions of the software and use the plain
 GPLv3.
-
-# Error Codes
-
-Error codes, descriptions and solutions in the format of 'EFBX123' can be found on
-the [FBX Importer page](Docs/FBXImporter.md) page.
