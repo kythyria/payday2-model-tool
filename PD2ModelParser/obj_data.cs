@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Nexus;
 
 using PD2ModelParser.Sections;
 
@@ -9,11 +8,11 @@ namespace PD2ModelParser
 {
     class obj_data
     {
-        public List<Vector3D> verts { get; set; }
+        public List<Vector3> verts { get; set; }
 
         public List<Vector2> uv { get; set; }
 
-        public List<Vector3D> normals { get; set; }
+        public List<Vector3> normals { get; set; }
 
         public string object_name { get; set; }
 
@@ -25,9 +24,9 @@ namespace PD2ModelParser
         
         public obj_data()
         {
-            this.verts = new List<Vector3D>();
+            this.verts = new List<Vector3>();
             this.uv = new List<Vector2>();
-            this.normals = new List<Vector3D>();
+            this.normals = new List<Vector3>();
             this.object_name = "";
             this.faces = new List<Face>();
             this.material_name = "";

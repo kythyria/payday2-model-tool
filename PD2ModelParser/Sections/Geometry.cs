@@ -1,5 +1,4 @@
-﻿using Nexus;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -159,9 +158,9 @@ namespace PD2ModelParser.Sections
         public List<Vector3> normals = new List<Vector3>();
         public List<GeometryColor> vertex_colors = new List<GeometryColor>();
         public List<GeometryWeightGroups> weight_groups = new List<GeometryWeightGroups>(); //4 - Weight Groups
-        public List<Vector3D> weights = new List<Vector3D>(); //3 - Weights
-        public List<Vector3D> binormals = new List<Vector3D>(); //3 - Tangent/Binormal
-        public List<Vector3D> tangents = new List<Vector3D>(); //3 - Tangent/Binormal
+        public List<Vector3> weights = new List<Vector3>(); //3 - Weights
+        public List<Vector3> binormals = new List<Vector3>(); //3 - Tangent/Binormal
+        public List<Vector3> tangents = new List<Vector3>(); //3 - Tangent/Binormal
 
         // Unknown items from this section. Includes colors and a few other items.
         public List<byte[]> unknown_item_data = new List<byte[]>();
@@ -189,9 +188,9 @@ namespace PD2ModelParser.Sections
             this.headers.Add(new GeometryHeader(3, GeometryChannelTypes.BINORMAL0)); // unk20
             this.headers.Add(new GeometryHeader(3, GeometryChannelTypes.TANGENT0)); // unk21
 
-            this.verts = newobject.verts.Select(MathUtil.ToVector3).ToList();
+            this.verts = newobject.verts;
             this.UVs[0] = newobject.uv;
-            this.normals = newobject.normals.Select(MathUtil.ToVector3).ToList();
+            this.normals = newobject.normals;
             //this.binormals;
             //this.tangents;
 
@@ -260,7 +259,7 @@ namespace PD2ModelParser.Sections
                     binormals.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        Vector3D binormal_entry = new Vector3D();
+                        Vector3 binormal_entry = new Vector3();
                         binormal_entry.X = instream.ReadSingle();
                         binormal_entry.Y = instream.ReadSingle();
                         binormal_entry.Z = instream.ReadSingle();
@@ -272,7 +271,7 @@ namespace PD2ModelParser.Sections
                     tangents.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        Vector3D tangent_entry = new Vector3D();
+                        Vector3 tangent_entry = new Vector3();
                         tangent_entry.X = instream.ReadSingle();
                         tangent_entry.Y = instream.ReadSingle();
                         tangent_entry.Z = instream.ReadSingle();
@@ -302,7 +301,7 @@ namespace PD2ModelParser.Sections
                     weights.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        Vector3D unknown_17_entry = new Vector3D();
+                        Vector3 unknown_17_entry = new Vector3();
                         unknown_17_entry.X = instream.ReadSingle();
                         unknown_17_entry.Y = instream.ReadSingle();
                         if (head.item_size == 3)
@@ -371,9 +370,9 @@ namespace PD2ModelParser.Sections
 
             List<GeometryWeightGroups> unknown_15s = this.weight_groups;
             int unknown_15s_pos = 0;
-            List<Vector3D> binormals = this.binormals;
+            List<Vector3> binormals = this.binormals;
             int binormals_pos = 0;
-            List<Vector3D> tangents = this.tangents;
+            List<Vector3> tangents = this.tangents;
             int tangents_pos = 0;
 
             List<byte[]> unknown_data = this.unknown_item_data;
@@ -423,7 +422,7 @@ namespace PD2ModelParser.Sections
                         }
                         else
                         {
-                            Vector3D binormal_entry = binormals[x];
+                            Vector3 binormal_entry = binormals[x];
                             outstream.Write(binormal_entry.X);
                             outstream.Write(binormal_entry.Y);
                             outstream.Write(binormal_entry.Z);
@@ -443,7 +442,7 @@ namespace PD2ModelParser.Sections
                         }
                         else
                         {
-                            Vector3D tangent_entry = tangents[x];
+                            Vector3 tangent_entry = tangents[x];
                             outstream.Write(tangent_entry.X);
                             outstream.Write(tangent_entry.Y);
                             outstream.Write(tangent_entry.Z);
@@ -476,7 +475,7 @@ namespace PD2ModelParser.Sections
                     }
                     for (int x = 0; x < this.vert_count; x++)
                     {
-                        Vector3D weight = this.weights.Count != this.vert_count ? Vector3D.UnitX : weights[x];
+                        Vector3 weight = this.weights.Count != this.vert_count ? Vector3.UnitX : weights[x];
                         outstream.Write(weight.X);
                         outstream.Write(weight.Y);
 

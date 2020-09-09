@@ -77,7 +77,7 @@ namespace PD2ModelParser
                             }
 
                             String[] verts = line.Replace("  ", " ").Split(' ');
-                            Vector3D vert = new Vector3D();
+                            Vector3 vert = new Vector3();
                             vert.X = Convert.ToSingle(verts[1], CultureInfo.InvariantCulture);
                             vert.Y = Convert.ToSingle(verts[2], CultureInfo.InvariantCulture);
                             vert.Z = Convert.ToSingle(verts[3], CultureInfo.InvariantCulture);
@@ -120,7 +120,7 @@ namespace PD2ModelParser
                             }
 
                             String[] norms = line.Split(' ');
-                            Vector3D norm = new Vector3D();
+                            Vector3 norm = new Vector3();
                             norm.X = Convert.ToSingle(norms[1], CultureInfo.InvariantCulture);
                             norm.Y = Convert.ToSingle(norms[2], CultureInfo.InvariantCulture);
                             norm.Z = Convert.ToSingle(norms[3], CultureInfo.InvariantCulture);
@@ -297,7 +297,7 @@ namespace PD2ModelParser
             Vector3D new_Model_data_bounds_min = new Vector3D();// Z (max), X (low), Y (low)
             Vector3D new_Model_data_bounds_max = new Vector3D();// Z (low), X (max), Y (max)
 
-            foreach (Vector3D vert in obj.verts)
+            foreach (Vector3 vert in obj.verts)
             {
                 //Z
                 // Note these were previously broken
@@ -332,9 +332,9 @@ namespace PD2ModelParser
             for (int x = 0; x < new_arranged_UV.Length; x++)
                 new_arranged_UV[x] = new Vector2(100f, 100f);
             Vector2 sentinel = new Vector2(100f, 100f);
-            Vector3D[] new_arranged_Normals = new Vector3D[obj.verts.Count];
+            Vector3[] new_arranged_Normals = new Vector3[obj.verts.Count];
             for (int x = 0; x < new_arranged_Normals.Length; x++)
-                new_arranged_Normals[x] = new Vector3D(0f, 0f, 0f);
+                new_arranged_Normals[x] = new Vector3(0f, 0f, 0f);
             Vector3D[] new_arranged_unknown20 = new Vector3D[obj.verts.Count];
             Vector3D[] new_arranged_unknown21 = new Vector3D[obj.verts.Count];
 
@@ -374,9 +374,9 @@ namespace PD2ModelParser
             }
 
             for (int x = 0; x < new_arranged_Normals.Length; x++)
-                new_arranged_Normals[x].Normalize();
+                new_arranged_Normals[x] = Vector3.Normalize(new_arranged_Normals[x]);
 
-            List<Vector3D> obj_verts = obj.verts;
+            List<Vector3> obj_verts = obj.verts;
             ComputeTangentBasis(ref new_faces, ref obj_verts, ref new_arranged_UV, ref new_arranged_Normals, ref new_arranged_unknown20, ref new_arranged_unknown21);
 
             List<RenderAtom> new_Model_items2 = new List<RenderAtom>();
@@ -403,16 +403,16 @@ namespace PD2ModelParser
             }
 
             geometry_section.vert_count = (uint)obj.verts.Count;
-            geometry_section.verts = obj.verts.Select(MathUtil.ToVector3).ToList();
-            geometry_section.normals = new_arranged_Normals.Select(MathUtil.ToVector3).ToList();
+            geometry_section.verts = obj.verts;
+            geometry_section.normals = new_arranged_Normals.ToList();
             geometry_section.UVs[0] = new_arranged_UV.ToList();
-            geometry_section.binormals = new_arranged_unknown20.ToList();
-            geometry_section.tangents = new_arranged_unknown21.ToList();
+            geometry_section.binormals = new_arranged_unknown20.Select(MathUtil.ToVector3).ToList();
+            geometry_section.tangents = new_arranged_unknown21.Select(MathUtil.ToVector3).ToList();
 
             topology_section.facelist = new_faces;
         }
 
-        private static void ComputeTangentBasis(ref List<Face> faces, ref List<Vector3D> verts, ref Vector2[] uvs, ref Vector3D[] normals, ref Vector3D[] tangents, ref Vector3D[] binormals)
+        private static void ComputeTangentBasis(ref List<Face> faces, ref List<Vector3> verts, ref Vector2[] uvs, ref Vector3[] normals, ref Vector3D[] tangents, ref Vector3D[] binormals)
         {
             //Taken from various sources online. Search up Normal Vector Tangent calculation.
 
@@ -436,34 +436,28 @@ namespace PD2ModelParser
                     v = (dot00 * u01 - dot01 * u02) / d;
                 }
 
-                Vector3D tangent = verts[f.c] * u + verts[f.b] * v - verts[f.a] * (u + v);
+                Vector3 tangent = verts[f.c] * u + verts[f.b] * v - verts[f.a] * (u + v);
 
                 //vert1
                 if (!parsed.Contains(f.a))
                 {
-                    binormals[f.a] = Vector3D.Cross(tangent, normals[f.a]);
-                    binormals[f.a].Normalize();
-                    tangents[f.a] = Vector3D.Cross(binormals[f.a], normals[f.a]);
-                    tangents[f.a].Normalize();
+                    binormals[f.a] = Vector3.Normalize(Vector3.Cross(tangent, normals[f.a])).ToNexusVector();
+                    tangents[f.a] = Vector3.Normalize(Vector3.Cross(binormals[f.a].ToVector3(), normals[f.a])).ToNexusVector();
                     parsed.Add(f.a);
                 }
 
                 //vert2
                 if (!parsed.Contains(f.b))
                 {
-                    binormals[f.b] = Vector3D.Cross(tangent, normals[f.b]);
-                    binormals[f.b].Normalize();
-                    tangents[f.b] = Vector3D.Cross(binormals[f.b], normals[f.b]);
-                    tangents[f.b].Normalize();
+                    binormals[f.b] = Vector3.Normalize(Vector3.Cross(tangent, normals[f.b])).ToNexusVector();
+                    tangents[f.b] = Vector3.Normalize(Vector3.Cross(binormals[f.b].ToVector3(), normals[f.b])).ToNexusVector();
                     parsed.Add(f.b);
                 }
                 //vert3
                 if (!parsed.Contains(f.c))
                 {
-                    binormals[f.c] = Vector3D.Cross(tangent, normals[f.c]);
-                    binormals[f.c].Normalize();
-                    tangents[f.c] = Vector3D.Cross(binormals[f.c], normals[f.c]);
-                    tangents[f.c].Normalize();
+                    binormals[f.c] = Vector3.Normalize(Vector3.Cross(tangent, normals[f.c])).ToNexusVector();
+                    tangents[f.c] = Vector3.Normalize(Vector3.Cross(binormals[f.c].ToVector3(), normals[f.c])).ToNexusVector();
                     parsed.Add(f.c);
                 }
 
@@ -532,7 +526,7 @@ namespace PD2ModelParser
                                 }
 
                                 String[] verts = line.Replace("  ", " ").Split(' ');
-                                Vector3D vert = new Vector3D();
+                                Vector3 vert = new Vector3();
                                 vert.X = Convert.ToSingle(verts[1], CultureInfo.InvariantCulture);
                                 vert.Y = Convert.ToSingle(verts[2], CultureInfo.InvariantCulture);
                                 vert.Z = Convert.ToSingle(verts[3], CultureInfo.InvariantCulture);
@@ -575,7 +569,7 @@ namespace PD2ModelParser
                                 }
 
                                 String[] norms = line.Split(' ');
-                                Vector3D norm = new Vector3D();
+                                Vector3 norm = new Vector3();
                                 norm.X = Convert.ToSingle(norms[1], CultureInfo.InvariantCulture);
                                 norm.Y = Convert.ToSingle(norms[2], CultureInfo.InvariantCulture);
                                 norm.Z = Convert.ToSingle(norms[3], CultureInfo.InvariantCulture);

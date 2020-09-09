@@ -119,7 +119,7 @@ namespace PD2ModelParser
                             int unk20tangcount = 0;
                             int unk21tangcount = 0;
                             sw.WriteLine("Unknown 20 (float, float, float) - Normal tangents???");
-                            foreach (Vector3 unknown_20_entry in geometry_section.binormals.Select(MathUtil.ToVector3))
+                            foreach (Vector3 unknown_20_entry in geometry_section.binormals)
                             {
                                 sw.WriteLine(unknown_20_entry.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_20_entry.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_20_entry.Z.ToString("0.000000", CultureInfo.InvariantCulture));
                                 Vector3 normt = norm_tangents[unk20tangcount];
@@ -127,7 +127,7 @@ namespace PD2ModelParser
                                 unk20tangcount++;
                             }
                             sw.WriteLine("Unknown 21 (float, float, float) - Normal tangents???");
-                            foreach (Vector3 unknown_21_entry in geometry_section.tangents.Select(MathUtil.ToVector3))
+                            foreach (Vector3 unknown_21_entry in geometry_section.tangents)
                             {
                                 sw.WriteLine(unknown_21_entry.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_21_entry.Y.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_21_entry.Z.ToString("0.000000", CultureInfo.InvariantCulture));
                                 Vector3 normt = norm_binorms[unk21tangcount];
@@ -144,7 +144,7 @@ namespace PD2ModelParser
                             }
 
                             sw.WriteLine("Unknown 17 (float, float, float) - Weights???");
-                            foreach (Vector3D unknown_17_entry in geometry_section.weights)
+                            foreach (Vector3 unknown_17_entry in geometry_section.weights)
                             {
                                 sw.WriteLine(unknown_17_entry.X.ToString("0.000000", CultureInfo.InvariantCulture) + " " + unknown_17_entry.Y.ToString("0.000000", CultureInfo.InvariantCulture));
                             }

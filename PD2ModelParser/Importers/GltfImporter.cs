@@ -375,27 +375,27 @@ namespace PD2ModelParser.Importers
                 geom.headers.Clear();
 
                 // Have to specify conv, as the type inference isn't smart enough to figure that out.
-                void AddToGeom<TS,TD>(ref List<TD> dest, uint size, DM.GeometryChannelTypes ct, IList<TS> src, Func<TS,TD> conv)
+                void AddToGeom<TD>(ref List<TD> dest, uint size, DM.GeometryChannelTypes ct, IList<TD> src)
                 {
                     if(src.Count > 0)
                     {
                         geom.headers.Add(new DM.GeometryHeader(size, ct));
-                        dest = src.Select(conv).ToList();
+                        dest = src.ToList();
                     }
                 }
 
-                AddToGeom(ref geom.verts, 3, DM.GeometryChannelTypes.POSITION, md.verts, i => i);
-                AddToGeom(ref geom.normals, 3, DM.GeometryChannelTypes.NORMAL0, md.normals, i => i);
-                AddToGeom(ref geom.binormals, 3, DM.GeometryChannelTypes.BINORMAL0, md.binormals, MathUtil.ToNexusVector);
-                AddToGeom(ref geom.tangents, 3, DM.GeometryChannelTypes.TANGENT0, md.tangents, MathUtil.ToNexusVector);
-                AddToGeom(ref geom.vertex_colors, 5, DM.GeometryChannelTypes.COLOR0, md.vertex_colors, i => i);
+                AddToGeom(ref geom.verts, 3, DM.GeometryChannelTypes.POSITION, md.verts);
+                AddToGeom(ref geom.normals, 3, DM.GeometryChannelTypes.NORMAL0, md.normals);
+                AddToGeom(ref geom.binormals, 3, DM.GeometryChannelTypes.BINORMAL0, md.binormals);
+                AddToGeom(ref geom.tangents, 3, DM.GeometryChannelTypes.TANGENT0, md.tangents);
+                AddToGeom(ref geom.vertex_colors, 5, DM.GeometryChannelTypes.COLOR0, md.vertex_colors);
                 for(var i = 0; i < md.uvs.Length; i++)
                 {
                     var ct = (DM.GeometryChannelTypes)((int)DM.GeometryChannelTypes.TEXCOORD0 + i);
-                    AddToGeom(ref geom.UVs[i], 2, ct, md.uvs[i], i => i);
+                    AddToGeom(ref geom.UVs[i], 2, ct, md.uvs[i]);
                 }
-                AddToGeom(ref geom.weights, 3, DM.GeometryChannelTypes.BLENDWEIGHT0, md.weights, MathUtil.ToNexusVector);
-                AddToGeom(ref geom.weight_groups, 7, DM.GeometryChannelTypes.BLENDINDICES0, md.weightGroups, x => x);
+                AddToGeom(ref geom.weights, 3, DM.GeometryChannelTypes.BLENDWEIGHT0, md.weights);
+                AddToGeom(ref geom.weight_groups, 7, DM.GeometryChannelTypes.BLENDINDICES0, md.weightGroups);
 
                 geom.vert_count = (uint)geom.verts.Count;
 
