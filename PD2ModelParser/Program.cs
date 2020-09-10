@@ -151,6 +151,10 @@ namespace PD2ModelParser
                 {
                     "dump-anims=", "Write out a modelscript with the current model's animations in",
                     v => script.Add(new DumpAnims { File = v })
+                },
+                {
+                    "dump-skins=", "Write out a modelscript with the current model's skin data in",
+                    v => script.Add(new DumpSkin() { File = v })
                 }
             };
 
