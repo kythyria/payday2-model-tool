@@ -9,7 +9,7 @@ namespace PD2ModelParser.Modelscript
 {
     class DumpAnims : IScriptItem
     {
-        public string File { get; set; }
+        [Required] public string File { get; set; }
 
         public void Execute(ScriptState state)
         {

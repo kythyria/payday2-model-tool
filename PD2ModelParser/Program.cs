@@ -132,7 +132,7 @@ namespace PD2ModelParser
                     v => {
                         if(FileTypeInfo.TryParseName(v, out var type))
                         {
-                            script.Add(new SetDefaultType() {FileType = type});
+                            script.Add(new SetDefaultExportType() {FileType = type});
                         }
                         else
                         {
@@ -154,7 +154,7 @@ namespace PD2ModelParser
                 },
                 {
                     "dump-skins=", "Write out a modelscript with the current model's skin data in",
-                    v => script.Add(new DumpSkin() { File = v })
+                    v => script.Add(new DumpSkins() { File = v })
                 }
             };
 

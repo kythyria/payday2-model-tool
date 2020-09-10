@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Xml.Serialization;
 using S = PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Modelscript
 {
     public class CreateNewObjects : IScriptItem
     {
-        public bool Create { get; set; }
+        [Required] public bool Create { get; set; }
         public void Execute(ScriptState state)
         {
             state.Log.Status(Create ? "New objects will be created" : "New objects will NOT be created");
@@ -18,7 +19,7 @@ namespace PD2ModelParser.Modelscript
 
     public class SetRootPoint : IScriptItem
     {
-        public string Name { get; set; }
+        [Required] public string Name { get; set; }
         public void Execute(ScriptState state)
         {
             if(Name == null)
@@ -46,9 +47,9 @@ namespace PD2ModelParser.Modelscript
 
     }
 
-    public class LoadModel : IScriptItem, IReadsFile
+    public class LoadModel : IScriptItem
     {
-        public string File { get; set; }
+        [Required] public string File { get; set; }
         public void Execute(ScriptState state)
         {
             state.Log.Status($"Loading model from {File}");
@@ -58,8 +59,7 @@ namespace PD2ModelParser.Modelscript
 
     public class SaveModel : IScriptItem
     {
-        public string StatusMessage => $"Save model to {0}";
-        public string File { get; set; }
+        [Required] public string File { get; set; }
         public void Execute(ScriptState state)
         {
             state.Log.Status($"Saving model to {File}");
@@ -67,7 +67,7 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public class Import : IScriptItem, IReadsFile
+    public class Import : IScriptItem
     {
         public string File { get; set; }
         public FileTypeInfo ForceType { get; set; }
@@ -142,9 +142,10 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public class PatternUV : IScriptItem, IReadsFile
+    public class PatternUV : IScriptItem
     {
-        public string File { get; set; }
+        [Required] public string File { get; set; }
+
         public void Execute(ScriptState state)
         {
             state.Log.Status($"Reading pattern UVs from {File}");
@@ -163,8 +164,8 @@ namespace PD2ModelParser.Modelscript
 
     public class Export : IScriptItem
     {
-        public string File { get; set; }
-        public FileTypeInfo ForceType { get; set; }
+        [Required] public string File { get; set; }
+        [XmlAttribute("type")] public FileTypeInfo ForceType { get; set; }
         public void Execute(ScriptState state)
         {
             state.Log.Status($"Exporting to {File}");
@@ -188,8 +189,8 @@ namespace PD2ModelParser.Modelscript
 
     public class BatchExport : IScriptItem
     {
-        public FileTypeInfo FileType { get; set; }
-        public string Directory { get; set; }
+        [XmlAttribute("type")] public FileTypeInfo FileType { get; set; }
+        [Required,XmlAttribute("sourcedir")] public string Directory { get; set; }
 
         public void Execute(ScriptState state)
         {
@@ -207,9 +208,9 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public class SetDefaultType : IScriptItem
+    public class SetDefaultExportType : IScriptItem
     {
-        public FileTypeInfo FileType { get; set; }
+        [Required,XmlAttribute("type")] public FileTypeInfo FileType { get; set; }
         public void Execute(ScriptState state)
         {
             state.Log.Status($"Default batch export type is {FileType}");
@@ -217,7 +218,7 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public class RunScript : IScriptItem, IReadsFile
+    public class RunScript : IScriptItem
     {
         public string File { get; set; }
         public void Execute(ScriptState state)

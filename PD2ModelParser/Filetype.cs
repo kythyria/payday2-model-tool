@@ -25,6 +25,12 @@ namespace PD2ModelParser
             return result != null;
         }
 
+        public static FileTypeInfo ParseName(string name)
+        {
+            if (TryParseName(name, out var result)) { return result; }
+            else throw new Exception($"'{name}' is not a recognised filetype");
+        }
+
         public static bool TryParseFromExtension(string path, out FileTypeInfo result)
         {
             return TryParseName(System.IO.Path.GetExtension(path), out result);

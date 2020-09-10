@@ -10,9 +10,9 @@ using PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Modelscript
 {
-    class DumpSkin : IScriptItem
+    class DumpSkins : IScriptItem
     {
-        public string File { get; set; }
+        [Required] public string File { get; set; }
 
         public void Execute(ScriptState state)
         {

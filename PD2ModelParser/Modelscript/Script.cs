@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace PD2ModelParser.Modelscript
 {
@@ -59,11 +61,6 @@ namespace PD2ModelParser.Modelscript
             return ExecuteItems(items, workDir, new FullModelData());
         }
 
-        public static IEnumerable<string> GetSourceFilenames(IEnumerable<IScriptItem> items)
-        {
-            return items.Where(i => i is IReadsFile).Select(i => (i as IReadsFile).File);
-        }
-
         public static IEnumerable<IScriptItem> ParseXml(string path)
         {
             using (var tr = new StreamReader(path))
@@ -87,21 +84,73 @@ namespace PD2ModelParser.Modelscript
             {
                 switch (element.Name.ToString())
                 {
-                    case "createnew": yield return ParseXmlCreatenew(element); break;
-                    case "rootpoint": yield return ParseXmlRootpoint(element); break;
-                    case "new": yield return new NewModel(); break;
-                    case "load": yield return ParseXmlLoadModel(element); break;
-                    case "save": yield return ParseXmlSaveModel(element); break;
+                    case "createnew": yield return ParseSimpleItem<CreateNewObjects>(element); break;
+                    case "rootpoint": yield return ParseSimpleItem<SetRootPoint>(element); break;
+                    case "new": yield return ParseSimpleItem<NewModel>(element); break;
+                    case "load": yield return ParseSimpleItem<LoadModel>(element); break;
+                    case "save": yield return ParseSimpleItem<SaveModel>(element); break;
                     case "import": yield return ParseXmlImport(element); break;
-                    case "patternuv": yield return ParseXmlPatternuv(element); break;
-                    case "export": yield return ParseXmlExport(element); break;
-                    case "exporttype": yield return ParseXmlExportType(element); break;
-                    case "batchexport": yield return ParseXmlBatchExport(element); break;
+                    case "patternuv": yield return ParseSimpleItem<PatternUV>(element); break;
+                    case "export": yield return ParseSimpleItem<Export>(element); break;
+                    case "exporttype": yield return ParseSimpleItem<SetDefaultExportType>(element); break;
+                    case "batchexport": yield return ParseSimpleItem<BatchExport>(element); break;
                     case "object3d": yield return ParseXmlObject3d(element); break;
-                    case "dumpanims": yield return ParseXmlDumpAnims(element); break;
+                    case "dumpanims": yield return ParseSimpleItem<DumpAnims>(element); break;
                     case "animate": yield return ParseXmlAnimate(element); break;
+                    case "dumpskins": yield return ParseSimpleItem<DumpSkins>(element); break;
                 }
             }
+        }
+
+        private static IScriptItem ParseSimpleItem<T>(XElement element) where T : IScriptItem, new()
+            => ParseSimpleItem(typeof(T), element);
+
+        private static IScriptItem ParseSimpleItem(Type T, XElement element)
+        {
+            var item = (IScriptItem)Activator.CreateInstance(T);
+
+            foreach(var prop in T.GetProperties())
+            {
+                var requiredattr = (RequiredAttribute)(prop.GetCustomAttributes(typeof(RequiredAttribute), true).FirstOrDefault());
+                var nameoverride = (XmlAttributeAttribute)(prop.GetCustomAttributes(typeof(XmlAttributeAttribute), true).FirstOrDefault());
+                var attrname = nameoverride?.AttributeName ?? prop.Name.ToLower();
+
+                string attrvalue = element.Attribute(attrname)?.Value;
+                if(requiredattr != null && attrvalue == null)
+                    throw new Exception($"Missing \"{attrname}\" attribute for <{element.Name}> element");
+
+                if (!prop.CanWrite)
+                    continue;
+
+                SetItemProperty(item, prop, attrname, attrvalue);
+            }
+
+            return item;
+        }
+
+        private static Dictionary<Type, (Func<string,object>, string)> parsers = new Dictionary<Type, (Func<string, object>, string)>()
+        {
+            { typeof(string), (i => i, "") },
+            { typeof(bool), (s => (object)(bool.Parse(s)), "must be either true or false") },
+            { typeof(float), (s => (object)(float.Parse(s)), "must be a valid float according to System.Single.Parse") },
+            { typeof(FileTypeInfo), (FileTypeInfo.ParseName, "must be a supported filetype") }
+        };
+
+        private static void SetItemProperty(IScriptItem item, PropertyInfo prop, string attrName, string attrval)
+        {
+            var pt = prop.PropertyType;
+            var (typ, (parser, errmsg)) = parsers.First(i => pt.IsAssignableFrom(i.Key));
+
+            object val;
+            try
+            {
+                val = parser(attrval);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Invalid value '{attrval}' for {attrName}: {errmsg}", e);
+            }
+            prop.SetValue(item, val);
         }
 
         private static readonly char[] AnimateValueSeparators = new char[] { ' ', '\t', '\r', '\n', ',' };
@@ -136,14 +185,6 @@ namespace PD2ModelParser.Modelscript
             }
 
             return cmd;
-        }
-
-        private static IScriptItem ParseXmlDumpAnims(XElement element)
-        {
-            return new DumpAnims()
-            {
-                File = RequiredAttr(element, "file")
-            };
         }
 
         private static IScriptItem ParseXmlImport(XElement element)
@@ -201,73 +242,6 @@ namespace PD2ModelParser.Modelscript
                 }
             }
             return item;
-        }
-
-        private static IScriptItem ParseXmlSaveModel(XElement elem)
-        {
-            var file = RequiredAttr(elem, "file");
-            return new SaveModel() { File = file };
-        }
-
-        private static IScriptItem ParseXmlLoadModel(XElement elem)
-        {
-            var file = RequiredAttr(elem, "file");
-            return new LoadModel() { File = file };
-        }
-
-        private static IScriptItem ParseXmlCreatenew(XElement elem)
-        {
-            var create = RequiredBool(elem, "create");
-            return new CreateNewObjects { Create = create };
-        }
-
-        private static IScriptItem ParseXmlRootpoint(XElement elem)
-        {
-            var name = elem.Attribute("name")?.Value;
-            return new SetRootPoint() { Name = name };
-        }
-
-        private static IScriptItem ParseXmlPatternuv(XElement elem)
-        {
-            var file = RequiredAttr(elem, "file");
-            return new PatternUV() { File = file };
-        }
-
-        private static IScriptItem ParseXmlExport(XElement elem)
-        {
-            var file = RequiredAttr(elem, "file");
-            var ext = elem.Attribute("type")?.Value;
-            var item = new Export() { File = file };
-            if(FileTypeInfo.TryParseName(ext, out var type))
-            {
-                item.ForceType = type;
-            }
-            else if(ext != null)
-            {
-                throw new Exception($"Invalid value {type} for type: Unrecognised format.");
-            }
-            return item;
-        }
-
-        private static IScriptItem ParseXmlExportType(XElement elem)
-        {
-            var type = RequiredAttr(elem, "type");
-            if (FileTypeInfo.TryParseName(type, out var fti))
-            {
-                return new SetDefaultType() { FileType = fti };
-            }
-            throw new Exception($"Invalid value {type} for type: Unrecognised format.");
-        }
-
-        private static IScriptItem ParseXmlBatchExport(XElement elem)
-        {
-            var dir = RequiredAttr(elem, "sourcedir");
-            var res = new BatchExport() { Directory = dir };
-            var typeish = elem.Attribute("type")?.Value;
-            if (typeish != null && FileTypeInfo.TryParseName(typeish, out var fti)) {
-                res.FileType = fti;
-            }
-            return res;
         }
 
         private static IScriptItem ParseXmlObject3d(XElement elem)
@@ -347,20 +321,6 @@ namespace PD2ModelParser.Modelscript
                    throw new Exception($"Missing \"{attr}\" attribute for {elem.Name} element");
         }
 
-        private static bool RequiredBool(XElement elem, string attrName)
-        {
-            var str = RequiredAttr(elem, attrName);
-            if(!bool.TryParse(str, out var result))
-            {
-                throw new Exception($"Invalid value '{str}' for {attrName}: "
-                                    + "must either be true or false");
-            }
-            else
-            {
-                return result;
-            }
-        }
-
         private static float RequiredFloat(XElement elem, string attr)
         {
             var str = RequiredAttr(elem, attr);
@@ -416,8 +376,6 @@ namespace PD2ModelParser.Modelscript
         void Execute(ScriptState state);
     }
 
-    public interface IReadsFile
-    {
-        string File { get; }
-    }
+    [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
+    sealed class RequiredAttribute : Attribute { }
 }
