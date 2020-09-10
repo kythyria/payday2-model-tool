@@ -10,11 +10,11 @@ using PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Modelscript
 {
-    class DumpSkins : IScriptItem
+    class DumpSkins : ScriptItem
     {
         [Required] public string File { get; set; }
 
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             var filepath = state.ResolvePath(File);
 

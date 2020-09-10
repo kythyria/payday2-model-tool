@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Xml;
+using System.Xml.Linq;
 using PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Modelscript
 {
-    class DumpAnims : IScriptItem
+    class DumpAnims : ScriptItem
     {
         [Required] public string File { get; set; }
 
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             var filepath = state.ResolvePath(File);
 
@@ -100,6 +101,36 @@ namespace PD2ModelParser.Modelscript
 
         public string Object { get; set; }
         public List<Item> Controllers { get; set; } = new List<Item>();
+
+        private static readonly char[] AnimateValueSeparators = new char[] { ' ', '\t', '\r', '\n', ',' };
+        public void ParseXml(XElement element)
+        {
+            this.Object = ScriptXml.RequiredAttr(element, "object");
+            foreach (var ec in element.Elements())
+            {
+                var item = new Animate.Item();
+                item.Type = ec.Name.LocalName.ToLower() switch
+                {
+                    "null" => Animate.ItemType.Null,
+                    "float" => Animate.ItemType.Float,
+                    "vector3" => Animate.ItemType.Vector3,
+                    "quaternion" => Animate.ItemType.Quaternion,
+                    _ => throw new Exception($"Invalid controller type {ec.Name}")
+                };
+                item.Name = ec.Attribute("name")?.Value;
+                if (uint.TryParse(ec.Attribute("flags")?.Value, System.Globalization.NumberStyles.HexNumber, null, out var flags))
+                {
+                    item.Flags = flags;
+                }
+                this.Controllers.Add(item);
+                if (item.Type == Animate.ItemType.Null) continue;
+
+                item.Values = ec.Value
+                    .Split(AnimateValueSeparators, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(i => float.Parse(i))
+                    .ToList();
+            }
+        }
 
         public void Execute(ScriptState state)
         {

@@ -2,25 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 using S = PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Modelscript
 {
-    public class CreateNewObjects : IScriptItem
+    public class CreateNewObjects : ScriptItem
     {
         [Required] public bool Create { get; set; }
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             state.Log.Status(Create ? "New objects will be created" : "New objects will NOT be created");
             state.CreateNewObjects = Create;
         }
     }
 
-    public class SetRootPoint : IScriptItem
+    public class SetRootPoint : ScriptItem
     {
         [Required] public string Name { get; set; }
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             if(Name == null)
             {
@@ -37,9 +38,9 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public class NewModel : IScriptItem
+    public class NewModel : ScriptItem
     {
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             state.Log.Status("Creating new model");
             state.Data = new FullModelData();
@@ -47,27 +48,27 @@ namespace PD2ModelParser.Modelscript
 
     }
 
-    public class LoadModel : IScriptItem
+    public class LoadModel : ScriptItem
     {
         [Required] public string File { get; set; }
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             state.Log.Status($"Loading model from {File}");
             state.Data = ModelReader.Open(state.ResolvePath(File));
         }
     }
 
-    public class SaveModel : IScriptItem
+    public class SaveModel : ScriptItem
     {
         [Required] public string File { get; set; }
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             state.Log.Status($"Saving model to {File}");
             Exporters.DieselExporter.ExportFile(state.Data, state.ResolvePath(File));
         }
     }
 
-    public class Import : IScriptItem
+    public class Import : ScriptItem
     {
         public string File { get; set; }
         public FileTypeInfo ForceType { get; set; }
@@ -76,7 +77,62 @@ namespace PD2ModelParser.Modelscript
         public Dictionary<string, string> ImporterOptions { get; set; } = new Dictionary<string, string>();
         public bool? CreateNewObjects { get; set; }
 
-        public void Execute(ScriptState state)
+        public override void ParseXml(XElement element)
+        {
+            this.File = ScriptXml.RequiredAttr(element, "file");
+
+            var strType = element.Attribute("type")?.Value;
+            if (FileTypeInfo.TryParseName(strType, out var type))
+            {
+                this.ForceType = type;
+            }
+            else { this.ForceType = null; }
+
+            var strCreateObjects = element.Attribute("create_objects")?.Value;
+            if (strCreateObjects != null && bool.TryParse(strCreateObjects, out var createObjects))
+            {
+                this.CreateNewObjects = createObjects;
+            }
+            else if (strCreateObjects != null)
+            {
+                throw new Exception($"create_objects must be boolean, \"{bool.TrueString}\" or \"{bool.FalseString}\"");
+            }
+
+            foreach (var child in element.Elements())
+            {
+                switch (child.Name.ToString())
+                {
+                    case "rootpoint":
+                        var targetname = ScriptXml.RequiredAttr(child, "name");
+                        foreach (var rpitem in child.Elements())
+                        {
+                            switch (rpitem.Name.ToString())
+                            {
+                                case "object":
+                                    var childName = ScriptXml.RequiredAttr(rpitem, "name");
+                                    if (this.Parents.ContainsKey(childName))
+                                        throw new Exception($"Cannot redefine rootpoint for object {childName}");
+                                    this.Parents.Add(childName, targetname);
+                                    break;
+                                case "default":
+                                    if (this.DefaultRootPoint == null)
+                                        this.DefaultRootPoint = targetname;
+                                    else
+                                        throw new Exception($"Cannot redefine default rootpoint to {targetname}");
+                                    break;
+                                default:
+                                    throw new Exception($"Invalid <rootpoint> child: {rpitem.Name}");
+                            }
+                        }
+                        break;
+                    case "option":
+                        this.ImporterOptions.Add(ScriptXml.RequiredAttr(child, "name"), child.Value.Trim());
+                        break;
+                }
+            }
+        }
+
+        public override void Execute(ScriptState state)
         {
             state.Log.Status($"Importing from {File}");
             var filepath = state.ResolvePath(File);
@@ -142,11 +198,11 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public class PatternUV : IScriptItem
+    public class PatternUV : ScriptItem
     {
         [Required] public string File { get; set; }
 
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             state.Log.Status($"Reading pattern UVs from {File}");
             string path = state.ResolvePath(File);
@@ -162,11 +218,11 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public class Export : IScriptItem
+    public class Export : ScriptItem
     {
         [Required] public string File { get; set; }
         [XmlAttribute("type")] public FileTypeInfo ForceType { get; set; }
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             state.Log.Status($"Exporting to {File}");
             string path = state.ResolvePath(File);
@@ -187,12 +243,12 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public class BatchExport : IScriptItem
+    public class BatchExport : ScriptItem
     {
         [XmlAttribute("type")] public FileTypeInfo FileType { get; set; }
         [Required,XmlAttribute("sourcedir")] public string Directory { get; set; }
 
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             state.Log.Status($"Batch exporting in {Directory}");
             var actualType = FileType ?? state.DefaultExportType;
@@ -208,20 +264,20 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public class SetDefaultExportType : IScriptItem
+    public class SetDefaultExportType : ScriptItem
     {
         [Required,XmlAttribute("type")] public FileTypeInfo FileType { get; set; }
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             state.Log.Status($"Default batch export type is {FileType}");
             state.DefaultExportType = FileType;
         }
     }
 
-    public class RunScript : IScriptItem
+    public class RunScript : ScriptItem
     {
         public string File { get; set; }
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             state.Log.Status($"Running other modelscript {File}");
             string path = state.ResolvePath(File);
@@ -234,7 +290,7 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public class CreateObject3d : IScriptItem
+    public class CreateObject3d : ScriptItem
     {
         public string Name { get; set; }
         public string Parent { get; set; }
@@ -242,7 +298,7 @@ namespace PD2ModelParser.Modelscript
         public Quaternion Rotation { get; set; } = new Quaternion(0, 0, 0, 1);
         public Vector3 Scale { get; set; } = new Vector3(1, 1, 1);
 
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             state.Log.Status($"Creating object {Name}");
             var extant = state.Data.SectionsOfType<S.Object3D>()
@@ -272,7 +328,7 @@ namespace PD2ModelParser.Modelscript
         }
     }
 
-    public class ModifyObject3d : IScriptItem
+    public class ModifyObject3d : ScriptItem
     {
         public string Name { get; set; }
         public bool SetParent { get; set; }
@@ -281,7 +337,7 @@ namespace PD2ModelParser.Modelscript
         public Quaternion? Rotation { get; set; }
         public Vector3? Scale { get; set; }
 
-        public void Execute(ScriptState state)
+        public override void Execute(ScriptState state)
         {
             state.Log.Status($"Modifying object {Name}");
             var extant = state.Data.SectionsOfType<S.Object3D>()
