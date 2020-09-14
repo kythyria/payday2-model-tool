@@ -192,14 +192,10 @@ namespace PD2ModelParser.Importers
         {
             var extras = gl.TryUseExtrasAsDictionary(false) ?? new SharpGLTF.IO.JsonDictionary();
             float? maybeNearRange = extras["diesel.nearRange"] as float?;
-            float nearRange = 0.0f;
+            float nearRange = maybeNearRange ?? 0.0f;
             if(!maybeNearRange.HasValue)
             {
-                Log.Default.Warn($"Light {name} has no near range specified. Defaulting to 0");
-            }
-            else
-            {
-                nearRange = maybeNearRange.Value;
+                Log.Default.Warn($"Light {name} has no diesel.nearRange specified. Defaulting to 0");
             }
 
             var dl = new DM.Light(name, null)
@@ -207,26 +203,24 @@ namespace PD2ModelParser.Importers
                 unknown_1 = 1,
                 Colour = new DM.LightColour() { A = 1.0f, R = gl.Color.X, G = gl.Color.Y, B = gl.Color.Z },
                 FarRange = gl.Range * scaleFactor,
-                unknown_8 = BitConverter.ToSingle(new byte[4] { 4, 0, 0, 0 }, 0)
+                unknown_8 = BitConverter.ToSingle(new byte[4] { 4, 0, 0, 0 }, 0),
+                NearRange = nearRange * scaleFactor
             };
-            switch(gl.LightType)
+
+            dl.LightType = gl.LightType switch
             {
-                case GLTF.PunctualLightType.Point:
-                    dl.LightType = 1;
-                    break;
-                case GLTF.PunctualLightType.Spot:
-                    dl.LightType = 2;
-                    break;
-                default:
-                    throw new Exception($"Light {name} is neither point nor spot.");
-            }
-            if(extras.TryGetValue("diesel.unknown_6", out object ov))
+                GLTF.PunctualLightType.Point => 1,
+                GLTF.PunctualLightType.Spot => 2,
+                _ => throw new Exception($"Light {name} is neither point nor spot."),
+            };
+
+            if (extras.TryGetValue("diesel.unknown_6", out object ov))
             {
-                if(ov != null && ov is float) { dl.unknown_6 = (float)ov; }
+                if(ov is float ovf) { dl.unknown_6 = ovf; }
             }
             if (extras.TryGetValue("diesel.unknown_7", out object ou7))
             {
-                if (ou7 != null && ou7 is float) { dl.unknown_6 = (float)ou7; }
+                if (ou7 is float ou7f) { dl.unknown_6 = ou7f; }
             }
             return dl;
         }
