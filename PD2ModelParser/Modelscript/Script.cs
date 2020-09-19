@@ -218,6 +218,22 @@ namespace PD2ModelParser.Modelscript
             var W = RequiredFloat(elem, "w");
             return new Quaternion(vec, W);
         }
+
+        public static readonly char[] ValueSeparators = new char[] { ' ', '\t', '\r', '\n', ',' };
+        public static List<float> FloatsFromText(XElement elem)
+            => elem.Value.Trim(ValueSeparators)
+                .Split(ValueSeparators, StringSplitOptions.RemoveEmptyEntries)
+                .Select(i => float.Parse(i))
+                .ToList();
+
+        public static Matrix4x4 MatrixFromText(XElement elem)
+        {
+            var floats = FloatsFromText(elem);
+            Matrix4x4 m = new Matrix4x4();
+            for (var i = 0; i < 16; i++)
+                m.Index(i) = floats[i];
+            return m;
+        }
     }
 
     public class ScriptState

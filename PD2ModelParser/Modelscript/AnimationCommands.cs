@@ -102,7 +102,6 @@ namespace PD2ModelParser.Modelscript
         public string Object { get; set; }
         public List<Item> Controllers { get; set; } = new List<Item>();
 
-        private static readonly char[] AnimateValueSeparators = new char[] { ' ', '\t', '\r', '\n', ',' };
         public void ParseXml(XElement element)
         {
             this.Object = ScriptXml.RequiredAttr(element, "object");
@@ -125,10 +124,7 @@ namespace PD2ModelParser.Modelscript
                 this.Controllers.Add(item);
                 if (item.Type == Animate.ItemType.Null) continue;
 
-                item.Values = ec.Value
-                    .Split(AnimateValueSeparators, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(i => float.Parse(i))
-                    .ToList();
+                item.Values = ScriptXml.FloatsFromText(ec);
             }
         }
 

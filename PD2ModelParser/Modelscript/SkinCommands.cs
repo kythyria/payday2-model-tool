@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 
 using PD2ModelParser.Sections;
 
@@ -69,15 +69,111 @@ namespace PD2ModelParser.Modelscript
         string GetMatrixString(Matrix4x4 ma)
         {
             var sb = new StringBuilder(4 * (4 * 17 + 2));
-            for (var i = 0; i < 4; i++)
-            {
-                for (var j = 0; j < 4; j++)
-                {
-                    sb.AppendFormat("  {0,14:g9}", ma.Index(i, j));
-                }
-                sb.AppendLine();
-            }
+            for (var i = 0; i < 16; i++)
+                sb.AppendFormat("  {0,14:g9}{1}", ma.Index(i), i % 4 == 3 ? Environment.NewLine : "");
             return sb.ToString();
+        }
+    }
+
+    class Skin : IScriptItem
+    {
+        public List<string> Objects { get; set; } = new List<string>();
+        public string ProbablyRootBone { get; set; }
+        public List<List<int>> BoneMappings { get; set; } = new List<List<int>>();
+        public Matrix4x4 GlobalSkinTransform { get; set; }
+        public List<(string, Matrix4x4)> Joints { get; set; } = new List<(string, Matrix4x4)>();
+
+        public void ParseXml(XElement element)
+        {
+            Objects.Add(ScriptXml.RequiredAttr(element, "object"));
+            ProbablyRootBone = ScriptXml.RequiredAttr(element, "root");
+
+            foreach (var child in element.Elements())
+            {
+                switch(child.Name.ToString())
+                {
+                    case "global_skin_transform":
+                        GlobalSkinTransform = ScriptXml.MatrixFromText(child);
+                        break;
+                    case "bone_mapping":
+                        BoneMappings.Add(child.Value
+                            .Split(ScriptXml.ValueSeparators, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(i => int.Parse(i))
+                            .ToList());
+                        break;
+                    case "joint":
+                        var bone = ScriptXml.RequiredAttr(child, "object");
+                        var mat = ScriptXml.MatrixFromText(child);
+                        Joints.Add((bone, mat));
+                        break;
+                }
+            }
+        }
+
+        public void Execute(ScriptState state)
+        {
+            if (Objects.Count == 0) throw new ArgumentNullException("Must supply an object name to use <animate>.", "Objects");
+            var models = new List<Model>();
+            var modelnames = new HashSet<string>(Objects);
+            foreach (var m in state.Data.SectionsOfType<Model>())
+            {
+                if (modelnames.Contains(m.Name))
+                {
+                    models.Add(m);
+                    modelnames.Remove(m.Name);
+                }
+            }
+            if(modelnames.Count > 0)
+                throw new Exception($"One or more models not found: {string.Join(", ", modelnames)}");
+
+            var rootbone = state.Data.SectionsOfType<Model>().FirstOrDefault(i => i.Name == ProbablyRootBone);
+            if (rootbone == null)
+                throw new Exception($"Could not find root bone '{ProbablyRootBone}'");
+
+            var resolvedJoints = new List<(Object3D bone, Matrix4x4 transform)>();
+            var objectsByName = state.Data.SectionsOfType<Object3D>().ToDictionary(i => i.Name, i => i);
+            var notfound = new List<string>();
+            foreach(var (bn, tf) in Joints)
+            {
+                if(objectsByName.TryGetValue(bn, out var o))
+                {
+                    resolvedJoints.Add((o, tf));
+                }
+                else
+                {
+                    notfound.Add(bn);
+                }
+            }
+            if (notfound.Count > 0)
+                throw new Exception($"One or more joints not found: {string.Join(", ", notfound.Select(i => "\"" + i + "\""))}");
+
+            state.Log.Status("Add skinning to {0}", string.Join(", ", Objects.Select(i => "\"" + i + "\"")));
+
+            var sb = new SkinBones();
+            sb.ProbablyRootBone = rootbone;
+            foreach(var bl in BoneMappings)
+            {
+                var bmi = new BoneMappingItem();
+                bmi.bones.AddRange(bl.Select(i => (uint)i));
+                sb.bone_mappings.Add(bmi);
+            }
+
+
+        }
+    }
+
+    class RemoveSkin : ScriptItem
+    {
+        [Required] string Model { get; set; }
+
+        public override void Execute(ScriptState state)
+        {
+            var obj = state.Data.SectionsOfType<Model>().FirstOrDefault(i => i.Name.ToLowerInvariant() == Model.ToLowerInvariant());
+            if (obj == null) throw new Exception($"Model {Model} not found");
+
+            state.Log.Status("Clear skinning of \"{0}\"", Model);
+
+            obj.SkinBones = null;
         }
     }
 }
