@@ -481,7 +481,7 @@ namespace PD2ModelParser.Sections
 
                         if (head.item_size == 3)
                             outstream.Write(weight.Z);
-                        if (head.item_size == 4)
+                        else if (head.item_size == 4)
                         {
                             outstream.Write(weight.Z);
                             outstream.Write(0.0f);
