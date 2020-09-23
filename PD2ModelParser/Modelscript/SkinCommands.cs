@@ -112,7 +112,7 @@ namespace PD2ModelParser.Modelscript
 
         public void Execute(ScriptState state)
         {
-            if (Objects.Count == 0) throw new ArgumentNullException("Must supply an object name to use <animate>.", "Objects");
+            if (Objects.Count == 0) throw new ArgumentNullException("Must supply an object name to use <skin>.", "Objects");
             var models = new List<Model>();
             var modelnames = new HashSet<string>(Objects);
             foreach (var m in state.Data.SectionsOfType<Model>())
@@ -150,6 +150,7 @@ namespace PD2ModelParser.Modelscript
             state.Log.Status("Add skinning to {0}", string.Join(", ", Objects.Select(i => "\"" + i + "\"")));
 
             var sb = new SkinBones();
+            state.Data.AddSection(sb);
             sb.ProbablyRootBone = rootbone;
             foreach(var bl in BoneMappings)
             {
@@ -157,8 +158,14 @@ namespace PD2ModelParser.Modelscript
                 bmi.bones.AddRange(bl.Select(i => (uint)i));
                 sb.bone_mappings.Add(bmi);
             }
+            sb.global_skin_transform = this.GlobalSkinTransform;
+            sb.Objects.AddRange(resolvedJoints.Select(i => i.bone));
+            sb.rotations.AddRange(resolvedJoints.Select(i => i.transform));
 
-
+            foreach(var m in models)
+            {
+                m.SkinBones = sb;
+            }
         }
     }
 
