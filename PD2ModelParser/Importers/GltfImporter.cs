@@ -366,14 +366,14 @@ namespace PD2ModelParser.Importers
 
             public void PopulateFromMeshData(MeshData md)
             {
-                geom.headers.Clear();
+                geom.Headers.Clear();
 
                 // Have to specify conv, as the type inference isn't smart enough to figure that out.
                 void AddToGeom<TD>(ref List<TD> dest, uint size, DM.GeometryChannelTypes ct, IList<TD> src)
                 {
                     if(src.Count > 0)
                     {
-                        geom.headers.Add(new DM.GeometryHeader(size, ct));
+                        geom.Headers.Add(new DM.GeometryHeader(size, ct));
                         dest = src.ToList();
                     }
                 }

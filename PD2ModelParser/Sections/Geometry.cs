@@ -92,8 +92,8 @@ namespace PD2ModelParser.Sections
         /// <summary>
         /// Index into <see cref="ItemSizes"/>
         /// </summary>
-        public UInt32 item_size;
-        public GeometryChannelTypes item_type;
+        public UInt32 ItemSize { get; set; }
+        public GeometryChannelTypes ItemType { get; set; }
 
         public GeometryHeader()
         {
@@ -101,11 +101,11 @@ namespace PD2ModelParser.Sections
 
         public GeometryHeader(UInt32 size, GeometryChannelTypes type)
         {
-            item_size = size;
-            item_type = type;
+            ItemSize = size;
+            ItemType = type;
         }
 
-        public uint ItemSizeBytes { get { return ItemSizes[(int)item_size]; } }
+        public uint ItemSizeBytes { get { return ItemSizes[(int)ItemSize]; } }
     }
 
     // Extracted from dsl::wd3d::D3DShaderProgram::compile
@@ -151,7 +151,7 @@ namespace PD2ModelParser.Sections
         public List<Vector2>[] UVs = new List<Vector2>[8];
 
         public UInt32 geometry_size;
-        public List<GeometryHeader> headers = new List<GeometryHeader>();
+        public List<GeometryHeader> Headers { get; private set; } = new List<GeometryHeader>();
         public List<Vector3> verts = new List<Vector3>();
         public List<Vector2> uvs => UVs[0];
         public List<Vector2> pattern_uvs => UVs[1];
@@ -182,11 +182,11 @@ namespace PD2ModelParser.Sections
         {
             this.vert_count = (uint) newobject.verts.Count;
 
-            this.headers.Add(new GeometryHeader(3, GeometryChannelTypes.POSITION)); // vert
-            this.headers.Add(new GeometryHeader(2, GeometryChannelTypes.TEXCOORD0)); // uv
-            this.headers.Add(new GeometryHeader(3, GeometryChannelTypes.NORMAL0)); // norm
-            this.headers.Add(new GeometryHeader(3, GeometryChannelTypes.BINORMAL0)); // unk20
-            this.headers.Add(new GeometryHeader(3, GeometryChannelTypes.TANGENT0)); // unk21
+            this.Headers.Add(new GeometryHeader(3, GeometryChannelTypes.POSITION)); // vert
+            this.Headers.Add(new GeometryHeader(2, GeometryChannelTypes.TEXCOORD0)); // uv
+            this.Headers.Add(new GeometryHeader(3, GeometryChannelTypes.NORMAL0)); // norm
+            this.Headers.Add(new GeometryHeader(3, GeometryChannelTypes.BINORMAL0)); // unk20
+            this.Headers.Add(new GeometryHeader(3, GeometryChannelTypes.TANGENT0)); // unk21
 
             this.verts = newobject.verts;
             this.UVs[0] = newobject.uv;
@@ -208,18 +208,18 @@ namespace PD2ModelParser.Sections
             for (int x = 0; x < header_count; x++)
             {
                 GeometryHeader header = new GeometryHeader();
-                header.item_size = instream.ReadUInt32();
-                header.item_type = (GeometryChannelTypes) instream.ReadUInt32();
+                header.ItemSize = instream.ReadUInt32();
+                header.ItemType = (GeometryChannelTypes) instream.ReadUInt32();
                 calc_size += header.ItemSizeBytes;
-                this.headers.Add(header);
+                this.Headers.Add(header);
             }
 
             this.geometry_size = this.vert_count * calc_size;
 
-            foreach (GeometryHeader head in this.headers)
+            foreach (GeometryHeader head in this.Headers)
             {
                 //Console.WriteLine("Header type: " + head.item_type + " Size: " + head.item_size);
-                if (head.item_type == GeometryChannelTypes.POSITION)
+                if (head.ItemType == GeometryChannelTypes.POSITION)
                 {
                     verts.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
@@ -232,7 +232,7 @@ namespace PD2ModelParser.Sections
                         this.verts.Add(vert);
                     }
                 }
-                else if (head.item_type == GeometryChannelTypes.NORMAL)
+                else if (head.ItemType == GeometryChannelTypes.NORMAL)
                 {
                     normals.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
@@ -244,7 +244,7 @@ namespace PD2ModelParser.Sections
                         this.normals.Add(norm);
                     }
                 }
-                else if (head.item_type == GeometryChannelTypes.COLOR0)
+                else if (head.ItemType == GeometryChannelTypes.COLOR0)
                 {
                     vertex_colors.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
@@ -254,7 +254,7 @@ namespace PD2ModelParser.Sections
                 }
                 //Below is unknown data
 
-                else if (head.item_type == GeometryChannelTypes.BINORMAL0)
+                else if (head.ItemType == GeometryChannelTypes.BINORMAL0)
                 {
                     binormals.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
@@ -266,7 +266,7 @@ namespace PD2ModelParser.Sections
                         this.binormals.Add(binormal_entry);
                     }
                 }
-                else if (head.item_type == GeometryChannelTypes.TANGENT0)
+                else if (head.ItemType == GeometryChannelTypes.TANGENT0)
                 {
                     tangents.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
@@ -280,7 +280,7 @@ namespace PD2ModelParser.Sections
                 }
 
                 //Weight Groups
-                else if (head.item_type == GeometryChannelTypes.BLENDINDICES0)
+                else if (head.ItemType == GeometryChannelTypes.BLENDINDICES0)
                 {
                     weight_groups.Capacity = (int)vert_count + 1;
                     for (int x = 0; x < this.vert_count; x++)
@@ -291,9 +291,9 @@ namespace PD2ModelParser.Sections
                 }
 
                 //Weights
-                else if (head.item_type == GeometryChannelTypes.BLENDWEIGHT0)
+                else if (head.ItemType == GeometryChannelTypes.BLENDWEIGHT0)
                 {
-                    if(head.item_size == 4)
+                    if(head.ItemSize == 4)
                     {
                         Log.Default.Warn("Section {0} has four weights", this.SectionId);
                     }
@@ -304,24 +304,24 @@ namespace PD2ModelParser.Sections
                         Vector3 unknown_17_entry = new Vector3();
                         unknown_17_entry.X = instream.ReadSingle();
                         unknown_17_entry.Y = instream.ReadSingle();
-                        if (head.item_size == 3)
+                        if (head.ItemSize == 3)
                             unknown_17_entry.Z = instream.ReadSingle();
-                        else if(head.item_size == 4)
+                        else if(head.ItemSize == 4)
                         {
                             unknown_17_entry.Z = instream.ReadSingle();
                             var tmp = instream.ReadSingle();
                             if (tmp != 0)
                                 Log.Default.Warn("Nonzero fourth weight in {0} vtx {1} (is {2})", this.SectionId, x, tmp);
                         }
-                        else if (head.item_size != 2)
-                            throw new Exception("Bad BLENDWEIGHT0 item size " + head.item_size);
+                        else if (head.ItemSize != 2)
+                            throw new Exception("Bad BLENDWEIGHT0 item size " + head.ItemSize);
                         this.weights.Add(unknown_17_entry);
                     }
                 }
-                else if (head.item_type >= GeometryChannelTypes.TEXCOORD0 &&
-                         head.item_type <= GeometryChannelTypes.TEXCOORD7)
+                else if (head.ItemType >= GeometryChannelTypes.TEXCOORD0 &&
+                         head.ItemType <= GeometryChannelTypes.TEXCOORD7)
                 {
-                    int idx = head.item_type - GeometryChannelTypes.TEXCOORD0;
+                    int idx = head.ItemType - GeometryChannelTypes.TEXCOORD0;
                     for (int x = 0; x < vert_count; x++)
                     {
                         // Previously, the Y was only inverted on the TEXCOORD0 channel, and
@@ -350,17 +350,17 @@ namespace PD2ModelParser.Sections
 
         public bool HasHeader(GeometryChannelTypes type)
         {
-            return headers.Any(h => h.item_type == type);
+            return Headers.Any(h => h.ItemType == type);
         }
 
         public override void StreamWriteData(BinaryWriter outstream)
         {
             outstream.Write(this.vert_count);
-            outstream.Write(headers.Count);
-            foreach (GeometryHeader head in this.headers)
+            outstream.Write(Headers.Count);
+            foreach (GeometryHeader head in this.Headers)
             {
-                outstream.Write(head.item_size);
-                outstream.Write((uint) head.item_type);
+                outstream.Write(head.ItemSize);
+                outstream.Write((uint) head.ItemType);
             }
 
             List<Vector3> verts = this.verts;
@@ -378,9 +378,9 @@ namespace PD2ModelParser.Sections
             List<byte[]> unknown_data = this.unknown_item_data;
             int unknown_data_pos = 0;
 
-            foreach (GeometryHeader head in this.headers)
+            foreach (GeometryHeader head in this.Headers)
             {
-                if (head.item_type == GeometryChannelTypes.POSITION)
+                if (head.ItemType == GeometryChannelTypes.POSITION)
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
@@ -391,7 +391,7 @@ namespace PD2ModelParser.Sections
                         vert_pos++;
                     }
                 }
-                else if (head.item_type == GeometryChannelTypes.NORMAL)
+                else if (head.ItemType == GeometryChannelTypes.NORMAL)
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
@@ -403,14 +403,14 @@ namespace PD2ModelParser.Sections
                     }
                 }
 
-                else if (head.item_type == GeometryChannelTypes.COLOR)
+                else if (head.ItemType == GeometryChannelTypes.COLOR)
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
                         this.vertex_colors[x].StreamWrite(outstream);
                     }
                 }
-                else if (head.item_type == GeometryChannelTypes.BINORMAL)
+                else if (head.ItemType == GeometryChannelTypes.BINORMAL)
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
@@ -430,7 +430,7 @@ namespace PD2ModelParser.Sections
                         }
                     }
                 }
-                else if (head.item_type == GeometryChannelTypes.TANGENT)
+                else if (head.ItemType == GeometryChannelTypes.TANGENT)
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
@@ -450,7 +450,7 @@ namespace PD2ModelParser.Sections
                         }
                     }
                 }
-                else if (head.item_type == GeometryChannelTypes.BLENDINDICES)
+                else if (head.ItemType == GeometryChannelTypes.BLENDINDICES)
                 {
                     for (int x = 0; x < this.vert_count; x++)
                     {
@@ -467,9 +467,9 @@ namespace PD2ModelParser.Sections
                         }
                     }
                 }
-                else if (head.item_type == GeometryChannelTypes.BLENDWEIGHT)
+                else if (head.ItemType == GeometryChannelTypes.BLENDWEIGHT)
                 {
-                    if (head.item_size == 4)
+                    if (head.ItemSize == 4)
                     {
                         Log.Default.Warn("Section {0} has four weights", this.HashName.String);
                     }
@@ -479,21 +479,21 @@ namespace PD2ModelParser.Sections
                         outstream.Write(weight.X);
                         outstream.Write(weight.Y);
 
-                        if (head.item_size == 3)
+                        if (head.ItemSize == 3)
                             outstream.Write(weight.Z);
-                        else if (head.item_size == 4)
+                        else if (head.ItemSize == 4)
                         {
                             outstream.Write(weight.Z);
                             outstream.Write(0.0f);
                         }
-                        else if (head.item_size != 2)
-                            throw new Exception("Cannot write bad header BLENDWEIGHT s=" + head.item_size);
+                        else if (head.ItemSize != 2)
+                            throw new Exception("Cannot write bad header BLENDWEIGHT s=" + head.ItemSize);
                     }
                 }
-                else if (head.item_type >= GeometryChannelTypes.TEXCOORD0 &&
-                         head.item_type <= GeometryChannelTypes.TEXCOORD7)
+                else if (head.ItemType >= GeometryChannelTypes.TEXCOORD0 &&
+                         head.ItemType <= GeometryChannelTypes.TEXCOORD7)
                 {
-                    int idx = head.item_type - GeometryChannelTypes.TEXCOORD0;
+                    int idx = head.ItemType - GeometryChannelTypes.TEXCOORD0;
                     for (int x = 0; x < this.vert_count; x++)
                     {
                         Vector2 uv = UVs[idx][x];
@@ -564,7 +564,7 @@ namespace PD2ModelParser.Sections
         {
             return base.ToString() +
                    " Count: " + this.vert_count +
-                   " Headers: " + this.headers.Count +
+                   " Headers: " + this.Headers.Count +
                    " Size: " + this.geometry_size +
                    " Verts: " + this.verts.Count +
                    " UVs: " + this.uvs.Count +
