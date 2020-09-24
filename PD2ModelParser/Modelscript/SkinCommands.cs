@@ -126,7 +126,7 @@ namespace PD2ModelParser.Modelscript
             if(modelnames.Count > 0)
                 throw new Exception($"One or more models not found: {string.Join(", ", modelnames)}");
 
-            var rootbone = state.Data.SectionsOfType<Model>().FirstOrDefault(i => i.Name == ProbablyRootBone);
+            var rootbone = state.Data.SectionsOfType<Object3D>().FirstOrDefault(i => i.Name == ProbablyRootBone);
             if (rootbone == null)
                 throw new Exception($"Could not find root bone '{ProbablyRootBone}'");
 

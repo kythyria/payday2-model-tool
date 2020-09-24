@@ -103,6 +103,7 @@ namespace PD2ModelParser.Modelscript
                     "dumpskins" => new DumpSkins(),
                     "import" => new Import(),
                     "animate" => new Animate(),
+                    "skin" => new Skin(),
                     _ => throw new Exception($"Unknown command {element.Name}"),
                 };
                 si.ParseXml(element);
