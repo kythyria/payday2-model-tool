@@ -171,16 +171,24 @@ namespace PD2ModelParser.Modelscript
 
     class RemoveSkin : ScriptItem
     {
-        [Required] string Model { get; set; }
+        string Model { get; set; }
 
         public override void Execute(ScriptState state)
         {
-            var obj = state.Data.SectionsOfType<Model>().FirstOrDefault(i => i.Name.ToLowerInvariant() == Model.ToLowerInvariant());
-            if (obj == null) throw new Exception($"Model {Model} not found");
-
-            state.Log.Status("Clear skinning of \"{0}\"", Model);
-
-            obj.SkinBones = null;
+            if (Model == null)
+            {
+                state.Log.Status("Removing all skinning data");
+                foreach (var model in state.Data.SectionsOfType<Model>())
+                {
+                    model.SkinBones = null;
+                }
+            }
+            else
+            {
+                var obj = state.Data.SectionsOfType<Model>().FirstOrDefault(i => i.Name.ToLowerInvariant() == Model.ToLowerInvariant());
+                state.Log.Status("Clear skinning of \"{0}\"", Model);
+                obj.SkinBones = null;
+            }
         }
     }
 }

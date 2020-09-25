@@ -276,7 +276,7 @@ namespace PD2ModelParser.Modelscript
 
     public class RunScript : ScriptItem
     {
-        public string File { get; set; }
+        [Required] public string File { get; set; }
         public override void Execute(ScriptState state)
         {
             state.Log.Status($"Running other modelscript {File}");

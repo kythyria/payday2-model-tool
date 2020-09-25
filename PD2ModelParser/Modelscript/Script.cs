@@ -80,11 +80,13 @@ namespace PD2ModelParser.Modelscript
             if (root.Name != "modelscript")
                 throw new Exception("Script root node is not named \"modelscript\"");
 
+            var script = new List<IScriptItem>();
+
             foreach (var element in root.Elements())
             {
                 if(element.Name.ToString() == "object3d")
                 {
-                    yield return ParseXmlObject3d(element);
+                    script.Add(ParseXmlObject3d(element));
                     continue;
                 }
 
@@ -104,11 +106,15 @@ namespace PD2ModelParser.Modelscript
                     "import" => new Import(),
                     "animate" => new Animate(),
                     "skin" => new Skin(),
+                    "removeskin" => new RemoveSkin(),
+                    "runscript" => new RunScript(),
                     _ => throw new Exception($"Unknown command {element.Name}"),
                 };
                 si.ParseXml(element);
-                yield return si;
+                script.Add(si);
             }
+
+            return script;
         }
 
         private static IScriptItem ParseXmlObject3d(XElement elem)
@@ -281,6 +287,8 @@ namespace PD2ModelParser.Modelscript
                 string attrvalue = elem.Attribute(attrname)?.Value;
                 if (requiredattr != null && attrvalue == null)
                     throw new Exception($"Missing \"{attrname}\" attribute for <{elem.Name}> element");
+                else if (requiredattr == null && attrvalue == null)
+                    continue;
 
                 if (!prop.CanWrite)
                     continue;
