@@ -45,7 +45,7 @@ namespace PD2ModelParser.Importers
         /// all we need to do is 1) scale every mesh on import, and 2) twiddle the translation
         /// component of every node on import.
         /// </remarks>
-        float scaleFactor = 100;
+        float scaleFactor = 1;
 
         public GltfImporter(FullModelData data)
         {
@@ -517,58 +517,6 @@ namespace PD2ModelParser.Importers
 
                     currentBaseIndex += ra.TriangleCount * 3;
                     currentBaseVertex += ra.GeometrySliceLength;
-                }
-                return ms;
-            }
-
-            public static MeshData FromGltfMesh0(GLTF.Mesh mesh)
-            {
-                var attribsUsed = mesh.Primitives.First().VertexAccessors.Select(i => i.Key).OrderBy(i => i);
-                var ok = mesh.Primitives.Select(i => i.VertexAccessors.Keys.OrderBy(j => j)).Aggregate(true, (acc, curr) => acc && curr.SequenceEqual(attribsUsed));
-                if (!ok)
-                {
-                    throw new Exception("Vertex attributes not consistent between Primitives. Diesel cannot represent this.");
-                }
-
-                var ms = new MeshData();
-                ms.materials = mesh.Primitives.Select(i => i.Material?.Name ?? "Material: Default Material").Distinct().ToList();
-
-                if (ms.materials.Contains(null))
-                {
-                    throw new Exception($"Missing material in mesh {mesh.Name}");
-                }
-
-                var atomoids = new List<(List<Vertex> verts, List<DM.Face> faces, string matName)>();
-                foreach (var prim in mesh.Primitives)
-                {
-                    var vertices = GetVerticesFromPrimitive(prim).ToList();
-                    var faces = prim.GetTriangleIndices().Select(i => new DM.Face { a = (ushort)i.A, b = (ushort)i.B, c = (ushort)i.C }).ToList();
-                    var matname = prim.Material?.Name ?? "Material: Default Material";
-                    atomoids.Add((vertices, faces, matname));
-                }
-
-                var md = new MeshData();
-
-                uint currentBaseVertex = 0;
-                uint currentBaseIndex = 0;
-                foreach (var i in atomoids)
-                {
-                    var ra = new DM.RenderAtom()
-                    {
-                        BaseIndex = currentBaseIndex,
-                        BaseVertex = currentBaseVertex,
-                        MaterialId = (uint)ms.materials.IndexOf(i.matName)
-                    };
-
-                    ms.AppendVertices(i.verts);
-                    ra.GeometrySliceLength = (uint)i.verts.Count;
-                    currentBaseVertex += (uint)i.verts.Count;
-
-                    ms.faces.AddRange(i.faces);
-                    ra.TriangleCount = (uint)i.faces.Count;
-                    currentBaseIndex += (uint)i.faces.Count * 3;
-
-                    ms.renderAtoms.Add(ra);
                 }
                 return ms;
             }

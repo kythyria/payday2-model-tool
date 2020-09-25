@@ -41,7 +41,7 @@ namespace PD2ModelParser.Exporters
         /// See the remarks of <see cref="PD2ModelParser.Importers.GltfImporter.scaleFactor"/> 
         /// for why the implementation here works.
         /// </remarks>
-        float scaleFactor = 0.01f;
+        float scaleFactor = 1;
 
         GLTF.ModelRoot Convert(FullModelData data)
         {

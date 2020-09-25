@@ -10,12 +10,12 @@ namespace PD2ModelParser.Sections
         public UInt32 size;
 
         public HashName HashName { get; set; }
-        public UInt32 unknown2;
-        public float keyframe_length;
-        public UInt32 count;
-        public List<float> items = new List<float>();
+        public UInt32 unknown2 { get; set; }
+        public float keyframe_length { get; set; }
+        public UInt32 count { get; set; }
+        public List<float> items { get; set; } = new List<float>();
 
-        public byte[] remaining_data = null;
+        public byte[] remaining_data { get; set; } = null;
 
         public Animation(BinaryReader instream, SectionHeader section)
         {
