@@ -17,3 +17,6 @@
 # VS options file
 # https://docs.microsoft.com/en-us/visualstudio/extensibility/internals/solution-user-options-dot-suo-file
 *.suo
+
+# VS per-user project settings
+*.csproj.user
