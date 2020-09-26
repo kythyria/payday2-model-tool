@@ -53,8 +53,9 @@ namespace PD2ModelParser.Modelscript
         [Required] public string File { get; set; }
         public override void Execute(ScriptState state)
         {
-            state.Log.Status($"Loading model from {File}");
-            state.Data = ModelReader.Open(state.ResolvePath(File));
+            string resolvedPath = state.ResolvePath(File);
+            state.Log.Status($"Loading model from {resolvedPath}");
+            state.Data = ModelReader.Open(resolvedPath);
         }
     }
 
@@ -63,8 +64,9 @@ namespace PD2ModelParser.Modelscript
         [Required] public string File { get; set; }
         public override void Execute(ScriptState state)
         {
-            state.Log.Status($"Saving model to {File}");
-            Exporters.DieselExporter.ExportFile(state.Data, state.ResolvePath(File));
+            var resolvedPath = state.ResolvePath(File);
+            state.Log.Status($"Saving model to {resolvedPath}");
+            Exporters.DieselExporter.ExportFile(state.Data, resolvedPath);
         }
     }
 
@@ -134,8 +136,8 @@ namespace PD2ModelParser.Modelscript
 
         public override void Execute(ScriptState state)
         {
-            state.Log.Status($"Importing from {File}");
             var filepath = state.ResolvePath(File);
+            state.Log.Status($"Importing from {filepath}");
             FileTypeInfo effectiveType = null;
             if(ForceType != null)
             {
@@ -204,8 +206,8 @@ namespace PD2ModelParser.Modelscript
 
         public override void Execute(ScriptState state)
         {
-            state.Log.Status($"Reading pattern UVs from {File}");
             string path = state.ResolvePath(File);
+            state.Log.Status($"Reading pattern UVs from {path}");
             if(!path.EndsWith(".obj"))
             {
                 throw new Exception($"Using \"{0}\" for pattern UV import requires it be OBJ format");
@@ -224,8 +226,8 @@ namespace PD2ModelParser.Modelscript
         [XmlAttribute("type")] public FileTypeInfo ForceType { get; set; }
         public override void Execute(ScriptState state)
         {
-            state.Log.Status($"Exporting to {File}");
             string path = state.ResolvePath(File);
+            state.Log.Status($"Exporting to {path}");
             FileTypeInfo fti = ForceType;
             if(ForceType == null)
             {
@@ -250,9 +252,10 @@ namespace PD2ModelParser.Modelscript
 
         public override void Execute(ScriptState state)
         {
-            state.Log.Status($"Batch exporting in {Directory}");
+            var dir = state.ResolvePath(Directory);
+            state.Log.Status($"Batch exporting in {dir}");
             var actualType = FileType ?? state.DefaultExportType;
-            foreach(var (path, relpath, fmd) in BulkFunctions.EveryModel(state.ResolvePath(Directory))) {
+            foreach(var (path, _, fmd) in BulkFunctions.EveryModel(dir)) {
                 state.Data = fmd;
                 new Export
                 {
@@ -279,8 +282,8 @@ namespace PD2ModelParser.Modelscript
         [Required] public string File { get; set; }
         public override void Execute(ScriptState state)
         {
-            state.Log.Status($"Running other modelscript {File}");
             string path = state.ResolvePath(File);
+            state.Log.Status($"Running other modelscript {path}");
             string oldBaseDir = state.WorkDir;
             state.WorkDir = System.IO.Path.GetDirectoryName(path);
             var script = Script.ParseXml(path);

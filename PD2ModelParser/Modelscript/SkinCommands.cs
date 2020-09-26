@@ -18,6 +18,8 @@ namespace PD2ModelParser.Modelscript
         {
             var filepath = state.ResolvePath(File);
 
+            state.Log.Status("Writing skinning script to {0}", filepath);
+
             var xws = new XmlWriterSettings()
             {
                 Indent = true
