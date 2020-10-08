@@ -40,7 +40,7 @@ namespace PD2ModelParser.Sections
     [ModelFileSection(Tags.topology_tag)]
     class Topology : AbstractSection, ISection, IHashNamed
     {
-        public UInt32 unknown1;
+        public UInt32 unknown1 { get; set; }
         public List<Face> facelist = new List<Face>();
         public UInt32 count2;
         public byte[] items2;

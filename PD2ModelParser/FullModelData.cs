@@ -42,7 +42,7 @@ namespace PD2ModelParser
             sections.Add(header);
         }
 
-        public void RemoveById(uint id)
+        public void RemoveSection(uint id)
         {
             SectionHeader header = sections.Find(s => s.id == id);
             if (header == null)
@@ -54,6 +54,8 @@ namespace PD2ModelParser
             parsed_sections.Remove(id);
             sections.Remove(header);
         }
+
+        public void RemoveSection(ISection section) => RemoveSection(section.SectionId);
 
         public IEnumerable<T> SectionsOfType<T>() where T : class
         {

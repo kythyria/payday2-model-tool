@@ -191,6 +191,13 @@ namespace PD2ModelParser.Modelscript
                 state.Log.Status("Clear skinning of \"{0}\"", Model);
                 obj.SkinBones = null;
             }
+
+            var skins = state.Data.SectionsOfType<SkinBones>().ToArray();
+            foreach(var i in skins)
+            {
+                state.Data.RemoveSection(i);
+            }
+            
         }
     }
 }

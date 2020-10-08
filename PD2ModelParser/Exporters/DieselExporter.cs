@@ -25,7 +25,7 @@ namespace PD2ModelParser.Exporters
             // Note that we use ToArray, which allows us to mutate the list without breaking anything
             foreach (SectionHeader header in data.sections.ToArray())
                 if (header.type == Tags.custom_hashlist_tag)
-                    data.RemoveById(header.id);
+                    data.RemoveSection(header.id);
 
             CustomHashlist hashlist = new CustomHashlist();
             data.AddSection(hashlist);
