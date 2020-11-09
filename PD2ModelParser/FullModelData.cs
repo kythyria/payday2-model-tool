@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace PD2ModelParser
 {
@@ -60,6 +61,54 @@ namespace PD2ModelParser
         public IEnumerable<T> SectionsOfType<T>() where T : class
         {
             return parsed_sections.Where(i => i.Value is T).Select(i => i.Value as T);
+        }
+
+        /// <summary>
+        /// Enforces that sections with a <see cref="IHashNamed.HashName"/> have unique names.
+        /// </summary>
+        public void UniquifyNames()
+        {
+            // The trick we use here is that since AbstractSection is abstract, we can group objects
+            // by their highest non-abstract base class and be pretty much right. The worst that can
+            // happen is a too-wide namespace anyway, and that won't hurt much.
+
+            var seenNamesOverall = new Dictionary<Type, HashSet<ulong>>();
+
+            foreach(var sec in SectionsOfType<IHashNamed>())
+            {
+                var st = sec.GetType();
+                while (!st.BaseType.IsAbstract) { st = st.BaseType; }
+
+                if(!seenNamesOverall.TryGetValue(st, out var seenNames))
+                {
+                    seenNames = seenNamesOverall[st] = new HashSet<ulong>();
+                }
+
+                var candidateName = sec.HashName;
+
+                while (seenNames.Contains(candidateName.Hash))
+                {
+                    if(!candidateName.Known)
+                    {
+                        candidateName = new HashName(candidateName.Hash++);
+                    }
+                    else
+                    {
+                        var m = Regex.Match(candidateName.String, @"\.(\d+)$");
+                        if(m == null)
+                        {
+                            candidateName = new HashName(candidateName.String + ".001");
+                        }
+                        else
+                        {
+                            var count = int.Parse(m.Groups[1].Value);
+                            count++;
+                            var baseName = candidateName.String.Substring(0, candidateName.String.Length - m.Length);
+                            candidateName = new HashName(string.Format("{0}.{1:D3}", baseName, count));
+                        }
+                    }
+                }
+            }
         }
     }
 }
