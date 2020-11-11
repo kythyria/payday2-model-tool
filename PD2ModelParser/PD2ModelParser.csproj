@@ -96,6 +96,7 @@
     <Compile Include="Misc\SerializeUtils.cs" />
     <Compile Include="Misc\Updates.cs" />
     <Compile Include="Modelscript\AnimationCommands.cs" />
+    <Compile Include="Modelscript\MergeCommand.cs" />
     <Compile Include="Modelscript\Script.cs" />
     <Compile Include="Modelscript\ScriptCommands.cs" />
     <Compile Include="Modelscript\SkinCommands.cs" />

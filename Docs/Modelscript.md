@@ -311,3 +311,42 @@ The combinations observed in vanilla files include the following
 | Object3d/Model | `quaternion null    null`         | `rotation  -      -`           |
 | Object3d/Model | `vector3`                         | Probably position              |
 | Object3d/Model | `quaternion vector3`              | Probably rotation and position |
+
+## `<merge>`
+**NOT YET IMPLEMENTED. This is just a spec.**
+
+Combine another model with the current one. Must have one child element, a `<modelscript>`
+which obtains the model to be merged (eg, by `<import>`ing it).
+
+The `property-merge` attribute specifies a lot of what's carried over, as a comma-separated
+list of:
+| Flag         | Effect                                             |
+|--------------|----------------------------------------------------|
+| `newobjects` | Objects in the incoming model which have no counterpart in the current model are copied wholesale. |
+| `parents`    | Objects which have parents in the incoming model are reparented to the corresponding (by name) object in the current model |
+| `position`   | Copy object positions from the incoming model.     |
+| `rotation`   | Copy object rotations from the incoming model.     |
+| `scale`      | Copy object scale factors from the incoming model. |
+| `transform`  | Equivalent to `position,rotation,scale`.           |
+
+The `model-merge` attribute says what to do with mesh data:
+
+| Value        | Effect                                                     |
+|--------------|------------------------------------------------------------|
+| `none`       | Don't do anything.                                         |
+| `recreate`   | Delete Geometry and Topology sections and create new ones. |
+| `overwrite`  | Overwrite mesh data in-place.                              |
+
+The `model-attributes` attribute specifies which data is copied across (comma-separated list):
+| Flag           | Effect                                                                   |
+|----------------|--------------------------------------------------------------------------|
+| `none`         | Nothing                                                                  |
+| `indices`      | Index buffer (the list of which vertices make up each face)              |
+| `positions`    | Vertex positions                                                         |
+| `normals`      | Normals, binormals, and tangents (if present)                            |
+| `colors`       | Vertex colours                                                           |
+| `colours`      | Vertex colors                                                            |
+| `weights`      | Joint IDs and weights                                                    |
+| `uv0` to `uv7` | UV layers 0 through 7                                                    |
+| `uvs`          | All the UV layers                                                        |
+| `vertices`     | Everything except `indices`                                              |

@@ -294,7 +294,26 @@ namespace PD2ModelParser.Modelscript
                     continue;
 
                 var pt = prop.PropertyType;
-                var (typ, (parser, errmsg)) = parsers.First(i => pt.IsAssignableFrom(i.Key));
+
+                Type typ; Func<string, object> parser; string errmsg;
+                if (pt.BaseType == typeof(Enum))
+                {
+                    typ = pt;
+                    parser = (s) => Enum.Parse(pt, s, true);
+                    if(pt.GetCustomAttribute(typeof(FlagsAttribute)) != null)
+                    {
+                        errmsg = "must be comma-separated list of at least one of ";
+                    }
+                    else
+                    {
+                        errmsg = "must be one of ";
+                    }
+                    errmsg += string.Join(", ", Enum.GetNames(pt)));
+                }
+                else
+                { 
+                    (typ, (parser, errmsg)) = parsers.First(i => pt.IsAssignableFrom(i.Key));
+                }
 
                 object val;
                 try
