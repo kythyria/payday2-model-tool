@@ -335,13 +335,13 @@ The `model-merge` attribute says what to do with mesh data:
 |--------------|------------------------------------------------------------|
 | `none`       | Don't do anything.                                         |
 | `recreate`   | Delete Geometry and Topology sections and create new ones. |
-| `overwrite`  | Overwrite mesh data in-place.                              |
+| `vertexedit` | Copy data over existing vertices.                          |
+| `overwrite`  | Wipe and recreate vertices, triangles, and material slots. |
 
-The `model-attributes` attribute specifies which data is copied across (comma-separated list):
+The `vertex-attributes` attribute specifies which data is copied across (comma-separated list):
 | Flag           | Effect                                                                   |
 |----------------|--------------------------------------------------------------------------|
 | `none`         | Nothing                                                                  |
-| `indices`      | Index buffer (the list of which vertices make up each face)              |
 | `positions`    | Vertex positions                                                         |
 | `normals`      | Normals, binormals, and tangents (if present)                            |
 | `colors`       | Vertex colours                                                           |
@@ -350,3 +350,8 @@ The `model-attributes` attribute specifies which data is copied across (comma-se
 | `uv0` to `uv7` | UV layers 0 through 7                                                    |
 | `uvs`          | All the UV layers                                                        |
 | `vertices`     | Everything except `indices`                                              |
+
+If you want to copy a UV layer from one to another, `remap-uvs` takes a comma-separated list of
+integers, indicating which UV layer in the incoming model corresponds to which in the current
+model, for instance `remap-uvs="0,0" vertex-attributes="uv1"` copies UV0 in the incoming model
+to UV1 in the current model.
