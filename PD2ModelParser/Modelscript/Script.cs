@@ -308,7 +308,7 @@ namespace PD2ModelParser.Modelscript
                     {
                         errmsg = "must be one of ";
                     }
-                    errmsg += string.Join(", ", Enum.GetNames(pt)));
+                    errmsg += string.Join(", ", Enum.GetNames(pt));
                 }
                 else
                 { 

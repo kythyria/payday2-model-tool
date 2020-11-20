@@ -328,6 +328,7 @@ namespace PD2ModelParser.Modelscript
             var tf = Matrix4x4.CreateScale(Scale) * Matrix4x4.CreateFromQuaternion(Rotation);
             tf.Translation = Position;
             obj.Transform = tf;
+            state.Data.AddSection(obj);
         }
     }
 
