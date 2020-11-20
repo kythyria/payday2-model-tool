@@ -45,7 +45,7 @@ namespace PD2ModelParser.Importers
         /// all we need to do is 1) scale every mesh on import, and 2) twiddle the translation
         /// component of every node on import.
         /// </remarks>
-        float scaleFactor = 1;
+        float scaleFactor = 100;
 
         public GltfImporter(FullModelData data)
         {
