@@ -82,11 +82,24 @@ namespace PD2ModelParser
         }
         public static readonly FileTypeInfo Glb = new GlbType();
 
+        class AnimationType : FileTypeInfo
+        {
+            public override string Extension => "animation";
+            public override string Name => "Animation";
+            public override bool CanExport => true;
+            public override bool CanImport => false;
+            public override void Import(FullModelData data, string path, bool createModels, Func<string, Sections.Object3D> parentFinder, IOptionReceiver options)
+                => throw new Exception("Please import animation files in the animation section.");
+            public override string Export(FullModelData data, string path) => Exporters.AnimationExporter.ExportFile(data, path);
+        }
+        public static readonly FileTypeInfo Animation = new AnimationType();
+
         public static IReadOnlyList<FileTypeInfo> Types { get; } = new List<FileTypeInfo>() {
             FileTypeInfo.Dae,
             FileTypeInfo.Obj,
             FileTypeInfo.Gltf,
-            FileTypeInfo.Glb
+            FileTypeInfo.Glb,
+            FileTypeInfo.Animation
         };
     }
 }

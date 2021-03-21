@@ -58,6 +58,16 @@ namespace PD2ModelParser
 
         public void RemoveSection(ISection section) => RemoveSection(section.SectionId);
 
+        public Object3D GetObject3DByHash(HashName hashName) {
+            foreach (Object3D object3D in SectionsOfType<Object3D>()) {
+                if (hashName.Hash == object3D.HashName.Hash) {
+                    return object3D;
+                }
+            }
+
+            return null;
+        }
+
         public IEnumerable<T> SectionsOfType<T>() where T : class
         {
             return parsed_sections.Where(i => i.Value is T).Select(i => i.Value as T);

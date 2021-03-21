@@ -190,4 +190,12 @@ namespace PD2ModelParser.Modelscript
         private void SetLength<T>(IAnimationController<T> c)
             => c.KeyframeLength = c.Keyframes.Max(kf => kf.Timestamp);
     }
+
+    class LoadAnimation : ScriptItem {
+        [Required] public string File { get; set; }
+        public override void Execute(ScriptState state) {
+            string path = state.ResolvePath(File);
+            Importers.AnimationImporter.Import(state.Data, path);
+        }
+    }
 }

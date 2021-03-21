@@ -33,6 +33,7 @@ namespace PD2ModelParser.UI
                     panel.lblScript,
                     panel.labelObj,
                     panel.labelPatternUV,
+                    panel.labelAnimations,
                     null,
                     panel.labelRootPoint,
                     null,
@@ -46,6 +47,7 @@ namespace PD2ModelParser.UI
                     panel.scriptFile,
                     panel.objectFile,
                     panel.patternUVFile,
+                    panel.animationFiles,
                     panel.createNewObjectsBox,
                     panel.rootPoints,
                     panel.labelRootPointHint,
@@ -167,6 +169,13 @@ namespace PD2ModelParser.UI
             {
                 script.Add(new Modelscript.PatternUV() { File = patternUVFile.Selected });
             }
+
+            if (animationFiles.AllSelected.Count > 0) {
+                foreach (string filepath in animationFiles.AllSelected) {
+                    script.Add(new Modelscript.LoadAnimation() { File = filepath });
+                }
+            }
+
 
             script.Add(new Modelscript.SaveModel() { File = outputBox.Selected });
 
