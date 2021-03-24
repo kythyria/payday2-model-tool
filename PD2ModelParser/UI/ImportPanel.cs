@@ -288,10 +288,5 @@ namespace PD2ModelParser.UI
         {
             UpdateRootPointBox();
         }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }

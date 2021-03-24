@@ -334,6 +334,12 @@ namespace PD2ModelParser
             key = tuple.Key;
             value = tuple.Value;
         }
+
+        public static void CopyTo<T>(this List<T> src, List<T> dst)
+        {
+            dst.Capacity = src.Count;
+            dst.AddRange(src);
+        }
     }
 
     

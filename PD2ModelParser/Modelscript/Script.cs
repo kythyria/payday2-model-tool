@@ -108,6 +108,7 @@ namespace PD2ModelParser.Modelscript
                     "skin" => new Skin(),
                     "removeskin" => new RemoveSkin(),
                     "runscript" => new RunScript(),
+                    "duplicate" => new Duplicate(),
                     _ => throw new Exception($"Unknown command {element.Name}"),
                 };
                 si.ParseXml(element);

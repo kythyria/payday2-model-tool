@@ -45,6 +45,19 @@ namespace PD2ModelParser.Sections
         {
             return "{BaseVertex=" + this.BaseVertex + " TriangleCount=" + this.TriangleCount + " BaseIndex=" + this.BaseIndex + " GeometrySliceLength=" + this.GeometrySliceLength + " MaterialId=" + this.MaterialId + "}";
         }
+
+        public RenderAtom Clone()
+        {
+            return new RenderAtom
+            {
+                BaseIndex = this.BaseIndex,
+                BaseVertex = this.BaseVertex,
+                TriangleCount = this.TriangleCount,
+                GeometrySliceLength = this.GeometrySliceLength,
+                MaterialId = this.MaterialId
+
+            };
+        }
     }
 
     [ModelFileSection(Tags.model_data_tag,ShowInInspectorRoot=false)]

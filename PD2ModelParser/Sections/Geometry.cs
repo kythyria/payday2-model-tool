@@ -146,11 +146,10 @@ namespace PD2ModelParser.Sections
     class Geometry : AbstractSection, ISection, IHashNamed
     {
         // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
-        public UInt32 vert_count;
+        public uint vert_count;
 
         public List<Vector2>[] UVs = new List<Vector2>[8];
 
-        public UInt32 geometry_size;
         public List<GeometryHeader> Headers { get; private set; } = new List<GeometryHeader>();
         public List<Vector3> verts = new List<Vector3>();
         public List<Vector2> uvs => UVs[0];
@@ -168,6 +167,31 @@ namespace PD2ModelParser.Sections
         public HashName HashName { get; set; }
 
         public byte[] remaining_data = null;
+
+        public Geometry Clone()
+        {
+            var src = this;
+            var dst = new Geometry();
+            dst.vert_count = this.vert_count;
+            for (int i = 0; i < UVs.Length; i++)
+            {
+                src.UVs[i].CopyTo(dst.UVs[i]);
+            }
+            dst.Headers.AddRange(src.Headers.Select(i => new GeometryHeader(i.ItemSize, i.ItemType)));
+            src.verts.CopyTo(dst.verts);
+            src.normals.CopyTo(dst.normals);
+            src.vertex_colors.CopyTo(dst.vertex_colors);
+            src.weight_groups.CopyTo(dst.weight_groups);
+            src.weights.CopyTo(dst.weights);
+            src.binormals.CopyTo(dst.binormals);
+            src.tangents.CopyTo(dst.tangents);
+            foreach(var ud in src.unknown_item_data)
+            {
+                dst.unknown_item_data.Add((byte[])(ud.Clone()));
+            }
+            dst.HashName = src.HashName;
+            return dst;
+        }
 
         public Geometry()
         {
@@ -213,8 +237,6 @@ namespace PD2ModelParser.Sections
                 calc_size += header.ItemSizeBytes;
                 this.Headers.Add(header);
             }
-
-            this.geometry_size = this.vert_count * calc_size;
 
             foreach (GeometryHeader head in this.Headers)
             {
@@ -565,7 +587,6 @@ namespace PD2ModelParser.Sections
             return base.ToString() +
                    " Count: " + this.vert_count +
                    " Headers: " + this.Headers.Count +
-                   " Size: " + this.geometry_size +
                    " Verts: " + this.verts.Count +
                    " UVs: " + this.uvs.Count +
                    " Pattern UVs: " + this.pattern_uvs.Count +

@@ -23,7 +23,7 @@ namespace PD2ModelParser.Modelscript
         [Required] public string Name { get; set; }
         public override void Execute(ScriptState state)
         {
-            if(Name == null)
+            if (Name == null)
             {
                 state.Log.Status("Clearing default root point");
                 state.DefaultRootPoint = null;
@@ -33,7 +33,7 @@ namespace PD2ModelParser.Modelscript
                 state.Log.Status($"Setting default root point to {Name}");
                 var point = state.Data.SectionsOfType<S.Object3D>()
                     .FirstOrDefault(o => o.Name == Name);
-                state.DefaultRootPoint =  point ?? throw new Exception($"Root point {Name} not found!");
+                state.DefaultRootPoint = point ?? throw new Exception($"Root point {Name} not found!");
             }
         }
     }
@@ -139,14 +139,14 @@ namespace PD2ModelParser.Modelscript
             var filepath = state.ResolvePath(File);
             state.Log.Status($"Importing from {filepath}");
             FileTypeInfo effectiveType = null;
-            if(ForceType != null)
+            if (ForceType != null)
             {
                 effectiveType = ForceType;
             }
             else
             {
                 var ext = System.IO.Path.GetExtension(filepath);
-                if(!FileTypeInfo.TryParseName(ext, out effectiveType))
+                if (!FileTypeInfo.TryParseName(ext, out effectiveType))
                 {
                     throw new Exception($"Unrecognised file extension \"{ext}\". Use a conventional extension or specify the type explicitly.");
                 }
@@ -158,7 +158,7 @@ namespace PD2ModelParser.Modelscript
             }
 
             var parentObjects = new Dictionary<string, S.Object3D>();
-            foreach(var kv in Parents)
+            foreach (var kv in Parents)
             {
                 var parent = state.Data.SectionsOfType<S.Object3D>().FirstOrDefault(i => i.Name == kv.Value);
                 if (parent == null)
@@ -181,7 +181,7 @@ namespace PD2ModelParser.Modelscript
             {
                 if (parentObjects.ContainsKey(name)) return parentObjects[name];
 
-                if(defaultRootObject == null && throwOnNoParent)
+                if (defaultRootObject == null && throwOnNoParent)
                     throw new Exception($"No default- nor object-rootpoint set for {name}");
 
                 return defaultRootObject;
@@ -189,7 +189,7 @@ namespace PD2ModelParser.Modelscript
 
             Importers.IOptionReceiver opts = effectiveType.CreateOptionReceiver();
 
-            foreach(var kv in ImporterOptions)
+            foreach (var kv in ImporterOptions)
             {
                 opts.AddOption(kv.Key, kv.Value);
             }
@@ -208,7 +208,7 @@ namespace PD2ModelParser.Modelscript
         {
             string path = state.ResolvePath(File);
             state.Log.Status($"Reading pattern UVs from {path}");
-            if(!path.EndsWith(".obj"))
+            if (!path.EndsWith(".obj"))
             {
                 throw new Exception($"Using \"{0}\" for pattern UV import requires it be OBJ format");
             }
@@ -229,10 +229,10 @@ namespace PD2ModelParser.Modelscript
             string path = state.ResolvePath(File);
             state.Log.Status($"Exporting to {path}");
             FileTypeInfo fti = ForceType;
-            if(ForceType == null)
+            if (ForceType == null)
             {
                 var ext = System.IO.Path.GetExtension(path);
-                if(!FileTypeInfo.TryParseName(ext, out fti))
+                if (!FileTypeInfo.TryParseName(ext, out fti))
                 {
                     throw new Exception($"Unrecognised file extension \"{ext}\". Use a conventional extension or specify the type explicitly.");
                 }
@@ -248,7 +248,7 @@ namespace PD2ModelParser.Modelscript
     public class BatchExport : ScriptItem
     {
         [XmlAttribute("type")] public FileTypeInfo FileType { get; set; }
-        [Required,XmlAttribute("sourcedir")] public string Directory { get; set; }
+        [Required, XmlAttribute("sourcedir")] public string Directory { get; set; }
 
         public override void Execute(ScriptState state)
         {
@@ -269,7 +269,7 @@ namespace PD2ModelParser.Modelscript
 
     public class SetDefaultExportType : ScriptItem
     {
-        [Required,XmlAttribute("type")] public FileTypeInfo FileType { get; set; }
+        [Required, XmlAttribute("type")] public FileTypeInfo FileType { get; set; }
         public override void Execute(ScriptState state)
         {
             state.Log.Status($"Default batch export type is {FileType}");
@@ -307,7 +307,7 @@ namespace PD2ModelParser.Modelscript
             var extant = state.Data.SectionsOfType<S.Object3D>()
                 .Where(i => i.Name == Name)
                 .FirstOrDefault();
-            if(extant != null)
+            if (extant != null)
             {
                 throw new Exception($"Cannot create object {Name}: Already exists.");
             }
@@ -379,6 +379,86 @@ namespace PD2ModelParser.Modelscript
             Position.WithValue(p => tf.Translation = p);
 
             extant.Transform = tf;
+        }
+    }
+
+    public class Duplicate : ScriptItem
+    {
+        [Required] public string Source { get; set; }
+        [Required] public string Destination { get; set; }
+        public bool Instance { get; set; } = false;
+        [XmlAttribute("new-materials")] public string[] NewMaterials { get; set; }
+
+        public override void Execute(ScriptState state)
+        {
+            var source = state.Data.SectionsOfType<S.Model>()
+                    .Where(i => i.Name == Source)
+                    .FirstOrDefault();
+            if(source == null)
+            {
+                throw new Exception($"Source model {Source} not found");
+            }
+            if(source.version != 3)
+            {
+                throw new Exception($"Can't duplicate non-v3 model {Source}");
+            }
+
+            var destinationExists = state.Data.SectionsOfType<S.Model>()
+                    .Any(i => i.Name == Destination);
+            if (destinationExists)
+            {
+                throw new Exception($"Destination model {Destination} not found");
+            }
+
+            S.TopologyIP newTopoIp;
+            S.PassthroughGP newPgp;
+            if(Instance)
+            {
+                newPgp = source.PassthroughGP;
+                newTopoIp = source.TopologyIP;
+            }
+            else
+            {
+                var newGeom = source.PassthroughGP.Geometry.Clone();
+                newGeom.HashName = new HashName($"{Destination}.Geometry");
+
+                var newTopology = source.TopologyIP.Topology.Clone(Destination);
+
+                newPgp = new S.PassthroughGP(newGeom, newTopology);
+                newTopoIp = new S.TopologyIP(newTopology);
+
+                state.Data.AddSection(newGeom);
+                state.Data.AddSection(newTopology);
+                state.Data.AddSection(newPgp);
+                state.Data.AddSection(newTopoIp);
+            }
+
+            S.MaterialGroup newMatGroup = source.MaterialGroup;
+            if(NewMaterials != null)
+            {
+                newMatGroup = new S.MaterialGroup(NewMaterials.Select(i =>
+                {
+                    var nm = new S.Material(i);
+                    state.Data.AddSection(nm);
+                    return nm;
+                }));
+            }
+
+            var newModel = new S.Model(Destination,
+                (uint)newTopoIp.Topology.facelist.Count,
+                newPgp.Geometry.vert_count,
+                newPgp, newTopoIp, newMatGroup, source.Parent);
+
+            newModel.version = source.version;
+            newModel.RenderAtoms.AddRange(source.RenderAtoms.Select(i => i.Clone()));
+            newModel.lightset_ID = source.lightset_ID;
+            newModel.properties_bitmap = source.properties_bitmap;
+            newModel.unknown13 = source.unknown13;
+            newModel.SkinBones = source.SkinBones;
+
+            newModel.UpdateBounds();
+
+            state.Data.AddSection(newModel);
         }
     }
 }

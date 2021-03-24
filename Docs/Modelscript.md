@@ -312,6 +312,13 @@ The combinations observed in vanilla files include the following
 | Object3d/Model | `vector3`                         | Probably position              |
 | Object3d/Model | `quaternion vector3`              | Probably rotation and position |
 
+## `<duplicate source="obj_name" destination="obj_name" instance="bool?" newmaterials="mat1,mat2,mat3...">
+Make a copy of `source` with the name `destination`. If `instance` is true, reuse the vertex and index
+buffers, otherwise copy them.
+
+If `newmaterials` is a comma-separated list of material names, set the list of materials to this, else
+reuse the source's material list. It is unknown what happens if the wrong number of materials is given.
+
 ## `<merge>`
 **NOT YET IMPLEMENTED. This is just a spec.**
 

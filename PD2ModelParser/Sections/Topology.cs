@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace PD2ModelParser.Sections
 {
@@ -47,6 +48,17 @@ namespace PD2ModelParser.Sections
         public HashName HashName { get; set; }
 
         public byte[] remaining_data = null;
+
+        public Topology Clone(string newName)
+        {
+            var dst = new Topology(newName);
+            dst.unknown1 = this.unknown1;
+            dst.facelist.Capacity = this.facelist.Count;
+            dst.facelist.AddRange(this.facelist.Select(f => new Face { a = f.a, b = f.b, c = f.c }));
+            dst.count2 = this.count2;
+            dst.items2 = (byte[])(this.items2.Clone());
+            return dst;
+        }
 
         public Topology(string objectName)
         {
