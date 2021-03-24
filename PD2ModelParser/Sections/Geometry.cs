@@ -8,13 +8,17 @@ namespace PD2ModelParser.Sections
 {
     public class GeometryWeightGroups
     {
-        public UInt16 Bones1;
-        public UInt16 Bones2;
-        public UInt16 Bones3;
-        public UInt16 Bones4;
+        public readonly ushort Bones1;
+        public readonly ushort Bones2;
+        public readonly ushort Bones3;
+        public readonly ushort Bones4;
 
-        public GeometryWeightGroups()
+        public GeometryWeightGroups(ushort b1, ushort b2, ushort b3, ushort b4)
         {
+            Bones1 = b1;
+            Bones2 = b2;
+            Bones3 = b3;
+            Bones4 = b4;
         }
 
         public GeometryWeightGroups(BinaryReader instream)
@@ -40,16 +44,12 @@ namespace PD2ModelParser.Sections
         }
     }
 
-    public class GeometryColor
+    public struct GeometryColor
     {
-        public Byte red = 0;
-        public Byte green = 0;
-        public Byte blue = 0;
-        public Byte alpha = 0;
-
-        public GeometryColor()
-        {
-        }
+        public readonly byte red;
+        public readonly byte green;
+        public readonly byte blue;
+        public readonly byte alpha;
 
         public GeometryColor(byte red, byte green, byte blue, byte alpha)
         {

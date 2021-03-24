@@ -593,13 +593,12 @@ namespace PD2ModelParser.Importers
                         {
                             Log.Default.Warn($"{prim.LogicalParent.Name} has a vertex with >3 weights at {vtx.pos}!");
                         }
-                        vtx.weightGroups = new DM.GeometryWeightGroups()
-                        {
-                            Bones1 = (ushort)wa[idx].X,
-                            Bones2 = (ushort)wa[idx].Y,
-                            Bones3 = (ushort)wa[idx].Z,
-                            Bones4 = (ushort)wa[idx].W
-                        };
+                        vtx.weightGroups = new DM.GeometryWeightGroups(
+                            (ushort)wa[idx].X,
+                            (ushort)wa[idx].Y,
+                            (ushort)wa[idx].Z,
+                            (ushort)wa[idx].W
+                        );
 
                         return vtx;
                     });
