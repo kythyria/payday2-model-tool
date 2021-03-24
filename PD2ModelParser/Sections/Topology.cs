@@ -6,25 +6,31 @@ using System.Linq;
 namespace PD2ModelParser.Sections
 {
     /** A triangular face */
-    public class Face
+    public struct Face
     {
         /** The index of the first vertex in this face */
-        public ushort a;
+        public readonly ushort a;
 
         /** The index of the second vertex in this face */
-        public ushort b;
+        public readonly ushort b;
 
         /** The index of the third (last) vertex in this face */
-        public ushort c;
+        public readonly ushort c;
+
+        public Face(ushort a, ushort b, ushort c)
+        {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+        }
 
         public Face OffsetBy(int offset)
         {
-            return new Face
-            {
-                a = (ushort) (a + offset),
-                b = (ushort) (b + offset),
-                c = (ushort) (c + offset)
-            };
+            return new Face(
+                (ushort) (a + offset),
+                (ushort) (b + offset),
+                (ushort) (c + offset)
+            );
         }
 
         public bool BoundsCheck(int vertlen)
@@ -54,7 +60,7 @@ namespace PD2ModelParser.Sections
             var dst = new Topology(newName);
             dst.unknown1 = this.unknown1;
             dst.facelist.Capacity = this.facelist.Count;
-            dst.facelist.AddRange(this.facelist.Select(f => new Face { a = f.a, b = f.b, c = f.c }));
+            dst.facelist.AddRange(this.facelist.Select(f => new Face(f.a, f.b, f.c )));
             dst.count2 = this.count2;
             dst.items2 = (byte[])(this.items2.Clone());
             return dst;
@@ -81,11 +87,10 @@ namespace PD2ModelParser.Sections
             uint count1 = instream.ReadUInt32();
             for (int x = 0; x < count1 / 3; x++)
             {
-                Face face = new Face();
-                face.a = instream.ReadUInt16();
-                face.b = instream.ReadUInt16();
-                face.c = instream.ReadUInt16();
-                this.facelist.Add(face);
+                var a = instream.ReadUInt16();
+                var b = instream.ReadUInt16();
+                var c = instream.ReadUInt16();
+                this.facelist.Add(new Face(a,b,c));
             }
 
             this.count2 = instream.ReadUInt32();

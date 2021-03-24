@@ -111,6 +111,7 @@ namespace PD2ModelParser.Sections
             {
                 cb(this, sections);
             }
+            postloadCallbacks = null;
         }
     }
 

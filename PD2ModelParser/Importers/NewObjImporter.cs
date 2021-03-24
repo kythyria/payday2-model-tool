@@ -149,16 +149,16 @@ namespace PD2ModelParser.Importers
                             String[] faces = line.Substring(2).Split(' ');
                             for (int x = 0; x < 3; x++)
                             {
-                                Face face = new Face();
+                                ushort fa = 0, fb = 0, fc = 0;
                                 if (obj.verts.Count > 0)
-                                    face.a = (ushort)(Convert.ToUInt16(faces[x].Split('/')[0]) - prevMaxVerts - 1);
+                                    fa = (ushort)(Convert.ToUInt16(faces[x].Split('/')[0]) - prevMaxVerts - 1);
                                 if (obj.uv.Count > 0)
-                                    face.b = (ushort)(Convert.ToUInt16(faces[x].Split('/')[1]) - prevMaxUvs - 1);
+                                    fb = (ushort)(Convert.ToUInt16(faces[x].Split('/')[1]) - prevMaxUvs - 1);
                                 if (obj.normals.Count > 0)
-                                    face.c = (ushort)(Convert.ToUInt16(faces[x].Split('/')[2]) - prevMaxNorms - 1);
-                                if (face.a < 0 || face.b < 0 || face.c < 0)
-                                    throw new Exception();
-                                obj.faces.Add(face);
+                                    fc = (ushort)(Convert.ToUInt16(faces[x].Split('/')[2]) - prevMaxNorms - 1);
+                                if (fa < 0 || fb < 0 || fc < 0)
+                                    throw new Exception("What the actual flapjack, something is *VERY* wrong");
+                                obj.faces.Add(new Face(fa, fb, fc));
                             }
                         }
                     }
@@ -272,19 +272,15 @@ namespace PD2ModelParser.Importers
                     }
                 }
 
-                Face new_face = new Face();
+                Face new_face;
                 if (replacedF > -1)
                 {
-                    new_face.a = obj.faces[replacedF].a;
-                    new_face.b = obj.faces[replacedF].b;
-                    new_face.c = obj.faces[dupe].c;
+                    new_face = new Face(obj.faces[replacedF].a, obj.faces[replacedF].b, obj.faces[dupe].c);
 
                 }
                 else
                 {
-                    new_face.a = (ushort)obj.verts.Count;
-                    new_face.b = obj.faces[dupe].b;
-                    new_face.c = obj.faces[dupe].c;
+                    new_face = new Face((ushort)obj.verts.Count, obj.faces[dupe].b, obj.faces[dupe].c);
                     obj.verts.Add(obj.verts[obj.faces[dupe].a]);
 
                     done_faces.Add(dupe, obj.faces[dupe]);
@@ -364,10 +360,7 @@ namespace PD2ModelParser.Importers
                     new_arranged_Normals[f3.a] = obj.normals[f3.c];
                 }
 
-                Face new_f = new Face();
-                new_f.a = f1.a;
-                new_f.b = f2.a;
-                new_f.c = f3.a;
+                Face new_f = new Face(f1.a, f2.a, f3.a);
 
                 new_faces.Add(new_f);
             }
@@ -581,16 +574,16 @@ namespace PD2ModelParser.Importers
                                 String[] faces = line.Substring(2).Split(' ');
                                 for (int x = 0; x < 3; x++)
                                 {
-                                    Face face = new Face();
+                                    ushort fa = 0, fb = 0, fc = 0;
                                     if (obj.verts.Count > 0)
-                                        face.a = (ushort)(Convert.ToUInt16(faces[x].Split('/')[0]) - prevMaxVerts - 1);
+                                        fa = (ushort)(Convert.ToUInt16(faces[x].Split('/')[0]) - prevMaxVerts - 1);
                                     if (obj.uv.Count > 0)
-                                        face.b = (ushort)(Convert.ToUInt16(faces[x].Split('/')[1]) - prevMaxUvs - 1);
+                                        fb = (ushort)(Convert.ToUInt16(faces[x].Split('/')[1]) - prevMaxUvs - 1);
                                     if (obj.normals.Count > 0)
-                                        face.c = (ushort)(Convert.ToUInt16(faces[x].Split('/')[2]) - prevMaxNorms - 1);
-                                    if (face.a < 0 || face.b < 0 || face.c < 0)
-                                        throw new Exception();
-                                    obj.faces.Add(face);
+                                        fc = (ushort)(Convert.ToUInt16(faces[x].Split('/')[2]) - prevMaxNorms - 1);
+                                    if (fa < 0 || fb < 0 || fc < 0)
+                                        throw new Exception("What the actual flapjack, something is *VERY* wrong");
+                                    obj.faces.Add(new Face(fa, fb, fc));
                                 }
 
                             }

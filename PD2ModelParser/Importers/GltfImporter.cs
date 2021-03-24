@@ -502,12 +502,11 @@ namespace PD2ModelParser.Importers
                             vertexIds[vtxC] = ms.AppendVertex(vtxC);
                         }
 
-                        var df = new DM.Face()
-                        {
-                            a = (ushort)vertexIds[vtxA],
-                            b = (ushort)vertexIds[vtxB],
-                            c = (ushort)vertexIds[vtxC]
-                        };
+                        var df = new DM.Face(
+                            (ushort)vertexIds[vtxA],
+                            (ushort)vertexIds[vtxB],
+                            (ushort)vertexIds[vtxC]
+                        );
 
                         ms.faces.Add(df);
                     }
