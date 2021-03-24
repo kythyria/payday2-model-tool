@@ -137,6 +137,7 @@ namespace PD2ModelParser
                         else
                         {
                             Log.Default.Error("Unknown export filetype {0}", v);
+                            Environment.Exit(1);
                         }
                     }
                 },

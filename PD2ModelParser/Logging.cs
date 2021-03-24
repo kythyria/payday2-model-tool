@@ -80,8 +80,7 @@ namespace PD2ModelParser
         void Warn(string message, params object[] value);
 
         /// <summary>
-        /// This operation has hit an unrecoverable error, and cannot continue. This
-        /// method does not return.
+        /// This operation has hit an unrecoverable error, and cannot continue.
         /// </summary>
         /// <param name="message">The format string to print</param>
         /// <param name="value">The parameters for the format string</param>
@@ -122,7 +121,6 @@ namespace PD2ModelParser
         public void Error(string message, params object[] value)
         {
             Log(LoggerLevel.Error, message, value);
-            throw new Exception(string.Format(message, value));
         }
     }
 }
