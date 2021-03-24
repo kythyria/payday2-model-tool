@@ -321,7 +321,7 @@ reuse the source's material list. It is unknown what happens if the wrong number
 Note that the parser will trim leading and trailing whitespace from each name, so don't use names where
 that's a problem.
 
-## `<merge>`
+## `<merge property-merge="..." model-merge="..." vertex-attributes="...">`
 **NOT YET IMPLEMENTED. This is just a spec.**
 
 Combine another model with the current one. Must have one child element, a `<modelscript>`
@@ -345,7 +345,7 @@ The `model-merge` attribute says what to do with mesh data:
 | `none`       | Don't do anything.                                         |
 | `recreate`   | Delete Geometry and Topology sections and create new ones. |
 | `vertexedit` | Copy data over existing vertices.                          |
-| `overwrite`  | Wipe and recreate vertices, triangles, and material slots. |
+| `overwrite`  | Wipe and recreate vertices, triangles, and material slots, without deleting any sections. |
 
 The `vertex-attributes` attribute specifies which data is copied across (comma-separated list):
 | Flag           | Effect                                                                   |
@@ -358,7 +358,7 @@ The `vertex-attributes` attribute specifies which data is copied across (comma-s
 | `weights`      | Joint IDs and weights                                                    |
 | `uv0` to `uv7` | UV layers 0 through 7                                                    |
 | `uvs`          | All the UV layers                                                        |
-| `vertices`     | Everything except `indices`                                              |
+| `vertices`     | Everything                                                               |
 
 If you want to copy a UV layer from one to another, `remap-uvs` takes a comma-separated list of
 integers, indicating which UV layer in the incoming model corresponds to which in the current
