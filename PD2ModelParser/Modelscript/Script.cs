@@ -334,8 +334,15 @@ namespace PD2ModelParser.Modelscript
             { typeof(string), (i => i, "") },
             { typeof(bool), (s => (object)(bool.Parse(s)), "must be either true or false") },
             { typeof(float), (s => (object)(float.Parse(s)), "must be a valid float according to System.Single.Parse") },
-            { typeof(FileTypeInfo), (FileTypeInfo.ParseName, "must be a supported filetype") }
+            { typeof(FileTypeInfo), (FileTypeInfo.ParseName, "must be a supported filetype") },
+            { typeof(string[]), (ParseStringArray, "") }
         };
+
+        private static object ParseStringArray(string s)
+        {
+            var sp = s.Split(',');
+            return sp.Select(i => i.Trim()).ToArray();
+        }
     }
 
     [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]

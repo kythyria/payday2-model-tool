@@ -318,6 +318,8 @@ buffers, otherwise copy them.
 
 If `newmaterials` is a comma-separated list of material names, set the list of materials to this, else
 reuse the source's material list. It is unknown what happens if the wrong number of materials is given.
+Note that the parser will trim leading and trailing whitespace from each name, so don't use names where
+that's a problem.
 
 ## `<merge>`
 **NOT YET IMPLEMENTED. This is just a spec.**
