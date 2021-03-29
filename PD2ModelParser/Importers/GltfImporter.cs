@@ -709,7 +709,7 @@ namespace PD2ModelParser.Importers
             var controller = new DM.LinearVector3Controller();
             foreach(var (ts, v) in sampler.GetLinearKeys())
             {
-                controller.Keyframes.Add(new DM.Keyframe<Vector3>(ts, v));
+                controller.Keyframes.Add(new DM.Keyframe<Vector3>(ts, v * scaleFactor));
             }
             controller.KeyframeLength = controller.Keyframes.Select(i => i.Timestamp).Max();
 
