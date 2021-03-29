@@ -71,6 +71,8 @@ namespace PD2ModelParser.Importers
             {
                 ImportSkin(i.node, i.model);
             }
+
+            ImportAnimations(root);
         }
 
         void ImportNode(GLTF.Node node, DM.Object3D parent)
@@ -653,6 +655,81 @@ namespace PD2ModelParser.Importers
                 hashCode = hashCode * -1521134295 + EqualityComparer<DM.GeometryWeightGroups>.Default.GetHashCode(weightGroups);
                 return hashCode;
             }
+        }
+
+        private void ImportAnimations(GLTF.ModelRoot root)
+        {
+            foreach(var anim in root.LogicalAnimations)
+            {
+                foreach(var chan in anim.Channels)
+                {
+                    var node = chan.TargetNode;
+                    var targetObject = objectsByNode[node];
+                    if(chan.TargetNodePath == GLTF.PropertyPath.rotation)
+                    {
+                        var sampler = chan.GetRotationSampler();
+                        AddRotationAnimation(targetObject, sampler);
+                    }
+                    else if(chan.TargetNodePath == GLTF.PropertyPath.translation)
+                    {
+                        var sampler = chan.GetTranslationSampler();
+                        AddTranslationAnimation(targetObject, sampler);
+                    }
+                }
+            }
+        }
+
+        private void AddRotationAnimation(DM.Object3D targetObject, GLTF.IAnimationSampler<Quaternion> sampler)
+        {
+            var controller = new DM.QuatLinearRotationController();
+            foreach(var (key, value) in sampler.GetLinearKeys())
+            {
+                controller.Keyframes.Add(new DM.Keyframe<Quaternion>(key, value));
+            }
+            controller.KeyframeLength = controller.Keyframes.Select(i => i.Timestamp).Max();
+
+            if(targetObject.Animations.Count == 0)
+            {
+                targetObject.Animations.Add(controller);
+                targetObject.Animations.Add(null);
+                targetObject.Animations.Add(null);
+            }
+            else if(targetObject.Animations.Count == 1 && (targetObject.Animations[0].GetType() == typeof(DM.LinearVector3Controller))) {
+                targetObject.Animations.Insert(0, controller);
+            }
+            else
+            {
+                throw new Exception($"Failed to insert animation in {targetObject.Name}: unrecognised controller list shape");
+            }
+            data.AddSection(controller);
+        }
+
+        private void AddTranslationAnimation(DM.Object3D target, GLTF.IAnimationSampler<Vector3> sampler)
+        {
+            var controller = new DM.LinearVector3Controller();
+            foreach(var (ts, v) in sampler.GetLinearKeys())
+            {
+                controller.Keyframes.Add(new DM.Keyframe<Vector3>(ts, v));
+            }
+            controller.KeyframeLength = controller.Keyframes.Select(i => i.Timestamp).Max();
+
+            if (target.Animations.Count == 0)
+            {
+                target.Animations.Add(controller);
+            }
+            else if(target.Animations.Count == 3
+                && target.Animations[0].GetType() == typeof(DM.QuatLinearRotationController)
+                && target.Animations[1] == null
+                && target.Animations[2] == null)
+            {
+                target.Animations.RemoveAt(2);
+                target.Animations[1] = controller;
+            }
+            else
+            {
+                throw new Exception($"Failed to insert animation in {target.Name}: unrecognised controller list shape");
+            }
+            data.AddSection(controller);
         }
     }
 }
