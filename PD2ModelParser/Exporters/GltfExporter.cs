@@ -22,7 +22,9 @@ namespace PD2ModelParser.Exporters
             }
             else
             {
-                gltfmodel.SaveGLTF(path, Newtonsoft.Json.Formatting.Indented);
+                gltfmodel.SaveGLTF(path, new GLTF.WriteSettings { 
+                    JsonIndented = true
+                });
             }
             return path;
         }
@@ -54,12 +56,12 @@ namespace PD2ModelParser.Exporters
             scene = root.UseScene(0);
 
             // Blender's GLTF importer cares about some extras.
-            var extras = scene.TryUseExtrasAsDictionary(true);
+            /*var extras = scene.TryUseExtrasAsDictionary(true);
             extras.Add("glTF2ExportSettings", new SharpGLTF.IO.JsonDictionary
             {
                 { "export_extras", 1 },
                 { "export_lights", 1 }
-            });
+            });*/
 
             foreach (var ms in data.parsed_sections.Where(i => i.Value is Material).Select(i => i.Value as Material))
             {
@@ -122,10 +124,10 @@ namespace PD2ModelParser.Exporters
                 }
                 else if (mod.version == 6)
                 {
-                    var extras = node.TryUseExtrasAsDictionary(true);
+                    /*var extras = node.TryUseExtrasAsDictionary(true);
                     extras.Add("diesel.modelv6.unk7", mod.v6_unknown7);
                     extras.Add("diesel.modelv6.bound_min", new float[] { mod.BoundsMin.X, mod.BoundsMin.Y, mod.BoundsMin.Z });
-                    extras.Add("diesel.modelv6.bound_max", new float[] { mod.BoundsMax.X, mod.BoundsMax.Y, mod.BoundsMax.Z });
+                    extras.Add("diesel.modelv6.bound_max", new float[] { mod.BoundsMax.X, mod.BoundsMax.Y, mod.BoundsMax.Z });*/
                 }
                 else
                 {
@@ -149,11 +151,11 @@ namespace PD2ModelParser.Exporters
 
                 lamp.Color = new Vector3(dl.Colour.R, dl.Colour.G, dl.Colour.B);
                 lamp.Range = dl.FarRange * scaleFactor;
-                var extras = lamp.TryUseExtrasAsDictionary(false);
+                /*var extras = lamp.TryUseExtrasAsDictionary(false);
                 extras = lamp.TryUseExtrasAsDictionary(true);
                 extras.Add("diesel.nearRange", dl.NearRange);
                 extras.Add("diesel.unknown_6", dl.unknown_6);
-                extras.Add("diesel.unknown_7", dl.unknown_7);
+                extras.Add("diesel.unknown_7", dl.unknown_7);*/
                 node.PunctualLight = lamp;
             }
 

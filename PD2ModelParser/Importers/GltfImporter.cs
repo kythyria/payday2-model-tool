@@ -84,12 +84,12 @@ namespace PD2ModelParser.Importers
 
             if (obj == null)
             {
-                var extras = node.TryUseExtrasAsDictionary(false);
+                /*var extras = node.TryUseExtrasAsDictionary(false);
                 if(createModels && extras != null && extras.ContainsKey("diesel.modelv6.unk7"))
                 {
                     obj = CreateNewModelv6(node, parent);
                 }
-                else if (createModels && node.Mesh == null)
+                else*/ if (createModels && node.Mesh == null)
                 {
                     obj = new DM.Object3D(hashname.String, parent);
                 }
@@ -190,8 +190,10 @@ namespace PD2ModelParser.Importers
 
         DM.Light CreateNewLamp(GLTF.PunctualLight gl, string name)
         {
-            var extras = gl.TryUseExtrasAsDictionary(false) ?? new SharpGLTF.IO.JsonDictionary();
-            float? maybeNearRange = extras["diesel.nearRange"] as float?;
+            throw new NotImplementedException("Lights are currently not implemented");
+            /*var extras = gl.Extras;
+            // how do you even do this without it throwing
+            float? maybeNearRange = extras.GetValue<float?>("diesel.nearRange");
             float nearRange = maybeNearRange ?? 0.0f;
             if(!maybeNearRange.HasValue)
             {
@@ -222,7 +224,7 @@ namespace PD2ModelParser.Importers
             {
                 if (ou7 is float ou7f) { dl.unknown_6 = ou7f; }
             }
-            return dl;
+            return dl;*/
         }
 
         DM.Model CreateNewModel(GLTF.Mesh gmesh, string name)
@@ -273,11 +275,12 @@ namespace PD2ModelParser.Importers
 
         DM.Model CreateNewModelv6(GLTF.Node node, DM.Object3D parent)
         {
-            var extras = node.TryUseExtrasAsDictionary(true);
+            throw new NotImplementedException("Creating v6 models is not currently supported");
+            var extras = node.Extras;
             object o_unk7, o_bmin, o_bmax;
             Vector3 v_bmin, v_bmax;
 
-            if(!extras.TryGetValue("diesel.modelv6.unk7", out o_unk7) || !(o_unk7 is float || o_unk7 is double))
+            /*if(!extras.TryGetValue("diesel.modelv6.unk7", out o_unk7) || !(o_unk7 is float || o_unk7 is double))
             {
                 throw new Exception($"Node {node.Name} doesn't contain extra \"diesel.modelv6.unk7\" or it's not a float");
             }
@@ -304,7 +307,7 @@ namespace PD2ModelParser.Importers
             else
             {
                 v_bmax = new Vector3(Convert.ToSingle(jl_bmax[0]), Convert.ToSingle(jl_bmax[1]), Convert.ToSingle(jl_bmax[2]));
-            }
+            }*/
 
             return new DM.Model(node.Name, Convert.ToSingle(o_unk7), v_bmin, v_bmax, parent);
         }
