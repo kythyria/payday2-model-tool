@@ -123,13 +123,15 @@ namespace PD2ModelParser.Misc {
                                 ((br.ReadUInt16() / 65535) * 200) - 100,
                                 ((br.ReadUInt16() / 65535) * 200) - 100
                             );
+                            br.ReadUInt16(); // Blank Unknown Skip
                             currentObject.PositionKeyframes.Add(new Keyframe<Vector3>(timestamp, vector3));
                             break;
                         case (295096242):
+                            Vector3 vector = new Vector3(br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
                             if (br.ReadUInt32() == 0) {
                                 currentObject.PositionKeyframes.Add(new Keyframe<Vector3>(
                                     timestamp,
-                                    new Vector3(br.ReadSingle(), br.ReadSingle(), br.ReadSingle())
+                                    vector
                                 ));
                             };
                             break;
