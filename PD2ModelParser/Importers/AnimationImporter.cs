@@ -4,11 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PD2ModelParser.Importers {
-	class AnimationImporter {
+    class AnimationImporter {
         public static void Import(FullModelData fmd, string path) {
             AnimationFile animationFile = new AnimationFile();
             animationFile.Read(path);
@@ -16,9 +14,9 @@ namespace PD2ModelParser.Importers {
             foreach(AnimationFileObject animationObject in animationFile.Objects) {
                 Object3D object3D = fmd.GetObject3DByHash(new HashName(animationObject.Name));
 
-				Log.Default.Info("Trying to add animation to " + object3D.Name);
-				if (object3D != null) {
-					Log.Default.Info("Found " + object3D.Name);
+                Log.Default.Info("Trying to add animation to " + object3D.Name);
+                if (object3D != null) {
+                    Log.Default.Info("Found " + object3D.Name);
 
                     if (animationObject.RotationKeyframes.Count > 0) {
                         QuatLinearRotationController quatLinearRotationController = AddRotations(object3D, animationObject.RotationKeyframes);

@@ -1,24 +1,19 @@
-﻿using Collada141;
-using PD2ModelParser.Misc.ZLib;
-using System;
+﻿using PD2ModelParser.Misc.ZLib;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Numerics;
 using PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Misc {
-	class AnimationFileObject {
-		public string Name;
-		public IList<Keyframe<Vector3>> PositionKeyframes = new List<Keyframe<Vector3>>();
-		public IList<Keyframe<Quaternion>> RotationKeyframes = new List<Keyframe<Quaternion>>();
+    class AnimationFileObject {
+        public string Name;
+        public IList<Keyframe<Vector3>> PositionKeyframes = new List<Keyframe<Vector3>>();
+        public IList<Keyframe<Quaternion>> RotationKeyframes = new List<Keyframe<Quaternion>>();
 
         public AnimationFileObject(string name) {
             this.Name = name;
-		}
+        }
     }
 
     class AnimationFile {
