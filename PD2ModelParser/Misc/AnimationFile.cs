@@ -1,24 +1,19 @@
-﻿using Collada141;
-using PD2ModelParser.Misc.ZLib;
-using System;
+﻿using PD2ModelParser.Misc.ZLib;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Numerics;
 using PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Misc {
-	class AnimationFileObject {
-		public string Name;
-		public IList<Keyframe<Vector3>> PositionKeyframes = new List<Keyframe<Vector3>>();
-		public IList<Keyframe<Quaternion>> RotationKeyframes = new List<Keyframe<Quaternion>>();
+    class AnimationFileObject {
+        public string Name;
+        public IList<Keyframe<Vector3>> PositionKeyframes = new List<Keyframe<Vector3>>();
+        public IList<Keyframe<Quaternion>> RotationKeyframes = new List<Keyframe<Quaternion>>();
 
         public AnimationFileObject(string name) {
             this.Name = name;
-		}
+        }
     }
 
     class AnimationFile {
@@ -123,13 +118,15 @@ namespace PD2ModelParser.Misc {
                                 ((br.ReadUInt16() / 65535) * 200) - 100,
                                 ((br.ReadUInt16() / 65535) * 200) - 100
                             );
+                            br.ReadUInt16(); // Blank Unknown Skip
                             currentObject.PositionKeyframes.Add(new Keyframe<Vector3>(timestamp, vector3));
                             break;
                         case (295096242):
+                            Vector3 vector = new Vector3(br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
                             if (br.ReadUInt32() == 0) {
                                 currentObject.PositionKeyframes.Add(new Keyframe<Vector3>(
                                     timestamp,
-                                    new Vector3(br.ReadSingle(), br.ReadSingle(), br.ReadSingle())
+                                    vector
                                 ));
                             };
                             break;
