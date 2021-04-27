@@ -14,9 +14,9 @@ namespace PD2ModelParser.Importers {
             foreach(AnimationFileObject animationObject in animationFile.Objects) {
                 Object3D object3D = fmd.GetObject3DByHash(new HashName(animationObject.Name));
 
-                Log.Default.Info("Trying to add animation to " + object3D.Name);
+                Log.Default.Info("Trying to add animation to " + animationObject.Name);
                 if (object3D != null) {
-                    Log.Default.Info("Found " + object3D.Name);
+                    Log.Default.Info("Found " + animationObject.Name);
 
                     if (animationObject.RotationKeyframes.Count > 0) {
                         QuatLinearRotationController quatLinearRotationController = AddRotations(object3D, animationObject.RotationKeyframes);
@@ -27,6 +27,8 @@ namespace PD2ModelParser.Importers {
                         LinearVector3Controller linearVector3Controller = AddPositions(object3D, animationObject.PositionKeyframes);
                         fmd.AddSection(linearVector3Controller);
                     }
+                } else {
+                    Log.Default.Info("Not Found " + animationObject.Name);
                 }
             }
         }
