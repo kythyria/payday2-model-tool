@@ -284,7 +284,19 @@ namespace PD2ModelParser.Exporters
             {
                 Func<Vector3, int, Vector4> makeTangent = (input, index) =>
                 {
-                    var tangent = input;
+                    var tangent = Vector3.Normalize(input);
+
+                    if(!tangent.IsFinite())
+                    {
+                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} has bogus tangent ({3})", index, geometry.SectionId, geometry.HashName.String, tangent);
+                        tangent = new Vector3(0, 1, 0);
+                    }
+                    if(!tangent.IsUnitLength())
+                    {
+                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} has bogus tangent length {4} ({3})", index, geometry.SectionId, geometry.HashName.String, tangent, tangent.Length());
+                        tangent = new Vector3(0, 1, 0);
+                    }
+
                     var binorm = geometry.binormals[index];
                     var normal = geometry.normals[index];
 
