@@ -41,20 +41,17 @@ namespace PD2ModelParser
         {
             this.label3 = new System.Windows.Forms.Label();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.mainTabs = new System.Windows.Forms.TabControl();
-            this.importTab = new System.Windows.Forms.TabPage();
-            this.exportTab = new System.Windows.Forms.TabPage();
             this.objectsTab = new System.Windows.Forms.TabPage();
-            this.settingsTab = new System.Windows.Forms.TabPage();
-            this.importPanel = new PD2ModelParser.UI.ImportPanel();
-            this.exportPanel1 = new PD2ModelParser.UI.ExportPanel();
             this.objectsPanel1 = new PD2ModelParser.UI.ObjectsPanel();
-            this.settingsPanel = new PD2ModelParser.UI.SettingsPanel();
-            this.mainTabs.SuspendLayout();
-            this.importTab.SuspendLayout();
-            this.exportTab.SuspendLayout();
+            this.exportTab = new System.Windows.Forms.TabPage();
+            this.exportPanel1 = new PD2ModelParser.UI.ExportPanel();
+            this.importTab = new System.Windows.Forms.TabPage();
+            this.importPanel = new PD2ModelParser.UI.ImportPanel();
+            this.mainTabs = new System.Windows.Forms.TabControl();
             this.objectsTab.SuspendLayout();
-            this.settingsTab.SuspendLayout();
+            this.exportTab.SuspendLayout();
+            this.importTab.SuspendLayout();
+            this.mainTabs.SuspendLayout();
             this.SuspendLayout();
             // 
             // label3
@@ -67,20 +64,43 @@ namespace PD2ModelParser
             this.label3.TabIndex = 6;
             this.label3.Text = "Credit to ZNixian, PoueT and I am not a spy...";
             // 
-            // mainTabs
+            // objectsTab
             // 
-            this.mainTabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.mainTabs.Controls.Add(this.importTab);
-            this.mainTabs.Controls.Add(this.exportTab);
-            this.mainTabs.Controls.Add(this.objectsTab);
-            this.mainTabs.Controls.Add(this.settingsTab);
-            this.mainTabs.Location = new System.Drawing.Point(12, 12);
-            this.mainTabs.Name = "mainTabs";
-            this.mainTabs.SelectedIndex = 0;
-            this.mainTabs.Size = new System.Drawing.Size(672, 329);
-            this.mainTabs.TabIndex = 14;
+            this.objectsTab.Controls.Add(this.objectsPanel1);
+            this.objectsTab.Location = new System.Drawing.Point(4, 22);
+            this.objectsTab.Name = "objectsTab";
+            this.objectsTab.Size = new System.Drawing.Size(664, 303);
+            this.objectsTab.TabIndex = 3;
+            this.objectsTab.Text = "Objects";
+            this.objectsTab.UseVisualStyleBackColor = true;
+            // 
+            // objectsPanel1
+            // 
+            this.objectsPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.objectsPanel1.Location = new System.Drawing.Point(0, 0);
+            this.objectsPanel1.Name = "objectsPanel1";
+            this.objectsPanel1.Size = new System.Drawing.Size(664, 303);
+            this.objectsPanel1.TabIndex = 0;
+            // 
+            // exportTab
+            // 
+            this.exportTab.Controls.Add(this.exportPanel1);
+            this.exportTab.Location = new System.Drawing.Point(4, 22);
+            this.exportTab.Name = "exportTab";
+            this.exportTab.Padding = new System.Windows.Forms.Padding(3);
+            this.exportTab.Size = new System.Drawing.Size(664, 303);
+            this.exportTab.TabIndex = 1;
+            this.exportTab.Text = "Export";
+            this.exportTab.UseVisualStyleBackColor = true;
+            // 
+            // exportPanel1
+            // 
+            this.exportPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.exportPanel1.Location = new System.Drawing.Point(3, 3);
+            this.exportPanel1.MinimumSize = new System.Drawing.Size(0, 141);
+            this.exportPanel1.Name = "exportPanel1";
+            this.exportPanel1.Size = new System.Drawing.Size(658, 297);
+            this.exportPanel1.TabIndex = 14;
             // 
             // importTab
             // 
@@ -93,38 +113,6 @@ namespace PD2ModelParser
             this.importTab.Text = "Import";
             this.importTab.UseVisualStyleBackColor = true;
             // 
-            // exportTab
-            // 
-            this.exportTab.Controls.Add(this.exportPanel1);
-            this.exportTab.Location = new System.Drawing.Point(4, 22);
-            this.exportTab.Name = "exportTab";
-            this.exportTab.Padding = new System.Windows.Forms.Padding(3);
-            this.exportTab.Size = new System.Drawing.Size(664, 294);
-            this.exportTab.TabIndex = 1;
-            this.exportTab.Text = "Export";
-            this.exportTab.UseVisualStyleBackColor = true;
-            // 
-            // objectsTab
-            // 
-            this.objectsTab.Controls.Add(this.objectsPanel1);
-            this.objectsTab.Location = new System.Drawing.Point(4, 22);
-            this.objectsTab.Name = "objectsTab";
-            this.objectsTab.Size = new System.Drawing.Size(664, 294);
-            this.objectsTab.TabIndex = 3;
-            this.objectsTab.Text = "Objects";
-            this.objectsTab.UseVisualStyleBackColor = true;
-            // 
-            // settingsTab
-            // 
-            this.settingsTab.Controls.Add(this.settingsPanel);
-            this.settingsTab.Location = new System.Drawing.Point(4, 22);
-            this.settingsTab.Name = "settingsTab";
-            this.settingsTab.Padding = new System.Windows.Forms.Padding(3);
-            this.settingsTab.Size = new System.Drawing.Size(664, 294);
-            this.settingsTab.TabIndex = 2;
-            this.settingsTab.Text = "Settings";
-            this.settingsTab.UseVisualStyleBackColor = true;
-            // 
             // importPanel
             // 
             this.importPanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -134,30 +122,19 @@ namespace PD2ModelParser
             this.importPanel.Size = new System.Drawing.Size(658, 549);
             this.importPanel.TabIndex = 0;
             // 
-            // exportPanel1
+            // mainTabs
             // 
-            this.exportPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.exportPanel1.Location = new System.Drawing.Point(3, 3);
-            this.exportPanel1.MinimumSize = new System.Drawing.Size(0, 141);
-            this.exportPanel1.Name = "exportPanel1";
-            this.exportPanel1.Size = new System.Drawing.Size(658, 288);
-            this.exportPanel1.TabIndex = 14;
-            // 
-            // objectsPanel1
-            // 
-            this.objectsPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.objectsPanel1.Location = new System.Drawing.Point(0, 0);
-            this.objectsPanel1.Name = "objectsPanel1";
-            this.objectsPanel1.Size = new System.Drawing.Size(664, 294);
-            this.objectsPanel1.TabIndex = 0;
-            // 
-            // settingsPanel
-            // 
-            this.settingsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.settingsPanel.Location = new System.Drawing.Point(3, 3);
-            this.settingsPanel.Name = "settingsPanel";
-            this.settingsPanel.Size = new System.Drawing.Size(658, 288);
-            this.settingsPanel.TabIndex = 0;
+            this.mainTabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.mainTabs.Controls.Add(this.importTab);
+            this.mainTabs.Controls.Add(this.exportTab);
+            this.mainTabs.Controls.Add(this.objectsTab);
+            this.mainTabs.Location = new System.Drawing.Point(12, 12);
+            this.mainTabs.Name = "mainTabs";
+            this.mainTabs.SelectedIndex = 0;
+            this.mainTabs.Size = new System.Drawing.Size(672, 329);
+            this.mainTabs.TabIndex = 14;
             // 
             // Form1
             // 
@@ -170,25 +147,23 @@ namespace PD2ModelParser
             this.ShowIcon = false;
             this.Text = "Diesel Model Tool v1.03";
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.mainTabs.ResumeLayout(false);
-            this.importTab.ResumeLayout(false);
-            this.exportTab.ResumeLayout(false);
             this.objectsTab.ResumeLayout(false);
-            this.settingsTab.ResumeLayout(false);
+            this.exportTab.ResumeLayout(false);
+            this.importTab.ResumeLayout(false);
+            this.mainTabs.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private TabControl mainTabs;
+
+        private TabPage objectsTab;
+        private UI.ObjectsPanel objectsPanel1;
         private TabPage exportTab;
         private UI.ExportPanel exportPanel1;
         private TabPage importTab;
         private UI.ImportPanel importPanel;
-        private TabPage settingsTab;
-        private UI.SettingsPanel settingsPanel;
-        private TabPage objectsTab;
-        private UI.ObjectsPanel objectsPanel1;
+        private TabControl mainTabs;
     }
 }

@@ -22,8 +22,6 @@ namespace PD2ModelParser
             if (!gui)
                 return;
 
-            Updates.Startup();
-
             Application.EnableVisualStyles();
             Form1 form = new Form1();
             Application.Run(form);

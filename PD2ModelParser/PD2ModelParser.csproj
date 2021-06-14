@@ -114,7 +114,6 @@
     <Compile Include="Misc\AnimationFile.cs" />
     <Compile Include="Misc\BulkFunctions.cs" />
     <Compile Include="Misc\SerializeUtils.cs" />
-    <Compile Include="Misc\Updates.cs" />
     <Compile Include="Misc\ZLib\Adler32.cs" />
     <Compile Include="Misc\ZLib\ZLibHeader.cs" />
     <Compile Include="Misc\ZLib\ZLIBStream.cs" />
@@ -127,11 +126,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Sections\Camera.cs" />
     <Compile Include="Sections\CustomHashlist.cs" />
@@ -159,12 +153,6 @@
     </Compile>
     <Compile Include="UI\ObjectsPanel.Designer.cs">
       <DependentUpon>ObjectsPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\SettingsPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UI\SettingsPanel.Designer.cs">
-      <DependentUpon>SettingsPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Utils.cs" />
     <Compile Include="FullModelData.cs" />
@@ -212,10 +200,6 @@
       <TargetPath>hashlist</TargetPath>
     </ContentWithTargetPath>
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -236,9 +220,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ObjectsPanel.resx">
       <DependentUpon>ObjectsPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\SettingsPanel.resx">
-      <DependentUpon>SettingsPanel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
