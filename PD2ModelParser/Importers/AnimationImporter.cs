@@ -18,6 +18,8 @@ namespace PD2ModelParser.Importers {
                 if (object3D != null) {
                     Log.Default.Info("Found " + animationObject.Name);
 
+                    object3D.Animations.Clear(); // Kill the old anims.
+
                     if (animationObject.RotationKeyframes.Count > 0) {
                         QuatLinearRotationController quatLinearRotationController = AddRotations(object3D, animationObject.RotationKeyframes);
                         fmd.AddSection(quatLinearRotationController);
