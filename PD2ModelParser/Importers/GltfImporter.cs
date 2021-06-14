@@ -460,6 +460,13 @@ namespace PD2ModelParser.Importers
 
             public static MeshData FromGltfMesh(GLTF.Mesh mesh)
             {
+
+                var vcount = mesh.Primitives.Select(prim => prim.VertexAccessors["POSITION"].Count).Sum();
+                if (vcount >= ushort.MaxValue)
+                {
+                    throw new Exception($"Too many vertices ({vcount}) in mesh {mesh.Name}. Limit is 65535");
+                }
+
                 var attribsUsed = mesh.Primitives.First().VertexAccessors.Select(i => i.Key).OrderBy(i => i);
                 var ok = mesh.Primitives.Select(i => i.VertexAccessors.Keys.OrderBy(j => j)).Aggregate(true, (acc, curr) => acc && curr.SequenceEqual(attribsUsed));
                 if (!ok)
