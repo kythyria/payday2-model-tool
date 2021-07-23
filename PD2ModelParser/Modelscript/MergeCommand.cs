@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using XmlAttributeAttribute = System.Xml.Serialization.XmlAttributeAttribute;
+
+using D = PD2ModelParser.Sections;
 
 namespace PD2ModelParser.Modelscript
 {
@@ -17,14 +17,18 @@ namespace PD2ModelParser.Modelscript
         Position = 0x4,
         Rotation = 0x8,
         Scale = 0x10,
+        Materials = 0x20,
+        Animations = 0x40,
         Transform = Position|Rotation|Scale,
+        Everything = NewObjects|Parents|Materials|Transform|Animations,
     }
 
     enum ModelDataMergeMode
     {
         None,
         Recreate,
-        Overwrite
+        Overwrite,
+        VertexEdit
     }
 
     [Flags]
@@ -50,20 +54,109 @@ namespace PD2ModelParser.Modelscript
         Vertices = Positions | Normals | Colors | Weights | UVs
     }
 
-    class Merge : IScriptItem 
+    class Merge : ScriptItem, IScriptItem 
     {
-        [XmlAttribute("property-merge")] public PropertyMergeFlags PropertyMerge { get; set; } = PropertyMergeFlags.None;
-        [XmlAttribute("model-merge")] public ModelDataMergeMode ModelMergeMode { get; set; } = ModelDataMergeMode.None;
-        [XmlAttribute("model-attributes")] public ModelAttributesMergeFlags AttributeMergeMode { get; set; } = ModelAttributesMergeFlags.None;
+        [XmlAttribute("property-merge")] public PropertyMergeFlags PropertyMerge { get; set; } = PropertyMergeFlags.Everything;
+        [XmlAttribute("model-merge")] public ModelDataMergeMode ModelMergeMode { get; set; } = ModelDataMergeMode.Overwrite;
+        [XmlAttribute("model-attributes")] public ModelAttributesMergeFlags AttributeMergeMode { get; set; } = ModelAttributesMergeFlags.Vertices;
+        [XmlAttribute("remap-uv")] public int[] RemapUV { get; set; } = new int[0];
+        [NotAttribute] public IList<IScriptItem> Script { get; set; } = new List<IScriptItem>();
 
-        public void Execute(ScriptState state)
+        public override void ParseXml(XElement elem)
         {
-            throw new NotImplementedException();
+            base.ParseXml(elem);
+            Script = Modelscript.Script.ParseXml(elem.Elements("modelscript").First());
         }
 
-        public void ParseXml(XElement elem)
+        public override void Execute(ScriptState state)
         {
-            throw new NotImplementedException();
+            var childData = Modelscript.Script.ExecuteItems(this.Script, state.WorkDir);
+
+            var rootObjects = childData.SectionsOfType<D.Object3D>().Where(i => i.Parent == null);
+            
+            foreach(var ro in rootObjects)
+            {
+                MergeObject(state.Data, ro);
+            }
+        }
+
+        private void MergeObject(FullModelData targetData, D.Object3D sourceObject)
+        {
+               
+        }
+    }
+
+    class TransplantAttributes : ScriptItem, IScriptItem
+    {
+        [XmlAttribute("model-names")] public string[] Models { get; set; } = new string[0];
+        [NotAttribute] public IList<IScriptItem> Script { get; set; } = new List<IScriptItem>();
+
+        public override void ParseXml(XElement elem)
+        {
+            base.ParseXml(elem);
+            Script = Modelscript.Script.ParseXml(elem.Elements("modelscript").First());
+        }
+
+        public override void Execute(ScriptState state)
+        {
+            var donor = Modelscript.Script.ExecuteItems(Script, state.WorkDir);
+            foreach(var name in Models)
+            {
+                var src_obj = GetModel(state, donor, name, "Source");
+                var dst_obj = GetModel(state, state.Data, name, "Destination");
+
+                var src_geo = src_obj.PassthroughGP.Geometry;
+                var dst_geo = dst_obj.PassthroughGP.Geometry;
+
+                dst_geo.Headers.Clear();
+                dst_geo.Headers.AddRange(src_geo.Headers);
+
+                TransplantAttribute(src_geo.verts, dst_geo.verts);
+                TransplantAttribute(src_geo.normals, dst_geo.normals);
+                TransplantAttribute(src_geo.vertex_colors, dst_geo.vertex_colors);
+                TransplantAttribute(src_geo.weight_groups, dst_geo.weight_groups);
+                TransplantAttribute(src_geo.weights, dst_geo.weights);
+                TransplantAttribute(src_geo.binormals, dst_geo.binormals);
+                TransplantAttribute(src_geo.tangents, dst_geo.tangents);
+                for(var i = 0; i < src_geo.UVs.Length; i++)
+                {
+                    TransplantAttribute(src_geo.UVs[i], dst_geo.UVs[i]);
+                }
+
+                var src_topo = src_obj.PassthroughGP.Topology;
+                var dst_topo = dst_obj.PassthroughGP.Topology;
+
+                TransplantAttribute(src_topo.facelist, dst_topo.facelist);
+
+                TransplantAttribute(src_obj.RenderAtoms, dst_obj.RenderAtoms);
+            }
+        }
+
+        private void TransplantAttribute<T>(List<T> src, List<T> dest)
+        {
+            dest.Clear();
+            dest.Capacity = src.Capacity;
+            dest.AddRange(src);
+        }
+
+        private D.Model GetModel(ScriptState state, FullModelData fmd, string name, string reponame)
+        {
+            var mod = fmd.GetObject3DByHash(HashName.FromNumberOrString(name)) as D.Model;
+            if(mod == null)
+            {
+                string message = string.Format("{1} object {0} is nonexistent or not a model", name, reponame);
+                state.Log.Error(message);
+                throw new Exception(message);
+            }
+
+            if (mod.PassthroughGP == null)
+            {
+                string message = string.Format("{1} model {0} has no geometry provider", name, reponame);
+                state.Log.Error(message);
+                throw new Exception(message);
+            }
+
+            return mod;
         }
     }
 }

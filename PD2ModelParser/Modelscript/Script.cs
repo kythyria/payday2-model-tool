@@ -69,13 +69,13 @@ namespace PD2ModelParser.Modelscript
             }
         }
 
-        public static IEnumerable<IScriptItem> ParseXml(TextReader tr)
+        public static IList<IScriptItem> ParseXml(TextReader tr)
         {
             var xe = XElement.Load(tr);
             return ParseXml(xe);
         }
 
-        public static IEnumerable<IScriptItem> ParseXml(XElement root)
+        public static IList<IScriptItem> ParseXml(XElement root)
         {
             if (root.Name != "modelscript")
                 throw new Exception("Script root node is not named \"modelscript\"");
@@ -109,6 +109,7 @@ namespace PD2ModelParser.Modelscript
                     "removeskin" => new RemoveSkin(),
                     "runscript" => new RunScript(),
                     "duplicate" => new Duplicate(),
+                    "transplant-attributes" => new TransplantAttributes(),
                     _ => throw new Exception($"Unknown command {element.Name}"),
                 };
                 si.ParseXml(element);
@@ -281,6 +282,10 @@ namespace PD2ModelParser.Modelscript
         {
             foreach (var prop in this.GetType().GetProperties())
             {
+                if (prop.GetCustomAttributes(typeof(NotAttributeAttribute), true).FirstOrDefault() != null) {
+                    continue;
+                }
+
                 var requiredattr = (RequiredAttribute)(prop.GetCustomAttributes(typeof(RequiredAttribute), true).FirstOrDefault());
                 var nameoverride = (XmlAttributeAttribute)(prop.GetCustomAttributes(typeof(XmlAttributeAttribute), true).FirstOrDefault());
                 var attrname = nameoverride?.AttributeName ?? prop.Name.ToLower();
@@ -329,13 +334,14 @@ namespace PD2ModelParser.Modelscript
             }
         }
 
-        private static Dictionary<Type, (Func<string, object>, string)> parsers = new Dictionary<Type, (Func<string, object>, string)>()
+        private static readonly Dictionary<Type, (Func<string, object>, string)> parsers = new Dictionary<Type, (Func<string, object>, string)>()
         {
             { typeof(string), (i => i, "") },
-            { typeof(bool), (s => (object)(bool.Parse(s)), "must be either true or false") },
-            { typeof(float), (s => (object)(float.Parse(s)), "must be a valid float according to System.Single.Parse") },
+            { typeof(bool), (s => bool.Parse(s), "must be either true or false") },
+            { typeof(float), (s => float.Parse(s), "must be a valid float according to System.Single.Parse") },
             { typeof(FileTypeInfo), (FileTypeInfo.ParseName, "must be a supported filetype") },
-            { typeof(string[]), (ParseStringArray, "") }
+            { typeof(string[]), (ParseStringArray, "") },
+            { typeof(int[]), (ParseIntArray, "must be a comma-separated list of integers") }
         };
 
         private static object ParseStringArray(string s)
@@ -343,8 +349,17 @@ namespace PD2ModelParser.Modelscript
             var sp = s.Split(',');
             return sp.Select(i => i.Trim()).ToArray();
         }
+
+        private static object ParseIntArray(string s)
+        {
+            var sp = s.Split(',');
+            return sp.Select(i => int.Parse(i.Trim())).ToArray();
+        }
     }
 
     [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     sealed class RequiredAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
+    sealed class NotAttributeAttribute : Attribute { }
 }
