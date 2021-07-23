@@ -88,7 +88,7 @@ namespace PD2ModelParser.Modelscript
 
     class TransplantAttributes : ScriptItem, IScriptItem
     {
-        [XmlAttribute("model-names")] public string[] Models { get; set; } = new string[0];
+        [XmlAttribute("models")] public string[] Models { get; set; } = new string[0];
         [NotAttribute] public IList<IScriptItem> Script { get; set; } = new List<IScriptItem>();
 
         public override void ParseXml(XElement elem)

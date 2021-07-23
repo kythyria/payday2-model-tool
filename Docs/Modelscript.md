@@ -321,6 +321,10 @@ reuse the source's material list. It is unknown what happens if the wrong number
 Note that the parser will trim leading and trailing whitespace from each name, so don't use names where
 that's a problem.
 
+## `<transplant-attributes models="...">`
+Execute the contained `<modelscript>` element then for each mesh named (comma-separated) in `models`, copy vertices,
+triangles, and material slot assignments from the resulting model to the current model.
+
 ## `<merge property-merge="..." model-merge="..." vertex-attributes="...">`
 **NOT YET IMPLEMENTED. This is just a spec.**
 
@@ -337,6 +341,9 @@ list of:
 | `rotation`   | Copy object rotations from the incoming model.     |
 | `scale`      | Copy object scale factors from the incoming model. |
 | `transform`  | Equivalent to `position,rotation,scale`.           |
+| `materials`  | Copy material names from the incoming model.       |
+| `everything` | All of the above.                                  |
+Animations are currently not supported. Default is `everything`.
 
 The `model-merge` attribute says what to do with mesh data:
 
@@ -346,6 +353,7 @@ The `model-merge` attribute says what to do with mesh data:
 | `recreate`   | Delete Geometry and Topology sections and create new ones. |
 | `vertexedit` | Copy data over existing vertices.                          |
 | `overwrite`  | Wipe and recreate vertices, triangles, and material slots, without deleting any sections. |
+Default is `overwrite`.
 
 The `vertex-attributes` attribute specifies which data is copied across (comma-separated list):
 | Flag           | Effect                                                                   |
@@ -359,8 +367,9 @@ The `vertex-attributes` attribute specifies which data is copied across (comma-s
 | `uv0` to `uv7` | UV layers 0 through 7                                                    |
 | `uvs`          | All the UV layers                                                        |
 | `vertices`     | Everything                                                               |
+Default is `vertices`.
 
 If you want to copy a UV layer from one to another, `remap-uvs` takes a comma-separated list of
 integers, indicating which UV layer in the incoming model corresponds to which in the current
-model, for instance `remap-uvs="0,0" vertex-attributes="uv1"` copies UV0 in the incoming model
-to UV1 in the current model.
+model, for instance `remap-uvs="1,0" vertex-attributes="uv0,uv1"` copies UV0 in the incoming model
+to UV1 in the current model, and UV1 to UV0.
