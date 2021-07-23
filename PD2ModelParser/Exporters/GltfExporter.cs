@@ -338,7 +338,18 @@ namespace PD2ModelParser.Exporters
 
             if (geometry.weights.Count > 0)
             {
-                Vector4 ConvertWeight(Vector3 weight) => new Vector4(weight, 0);
+                Vector4 ConvertWeight(Vector3 weight)
+                {
+                    // gltf spec requires weights sum to 1.0
+                    var total = weight.X + weight.Y + weight.Z;
+                    if (Math.Abs(1.0 - total) > 2e-7)
+                    {
+                        var largest = Math.Max(weight.X, Math.Max(weight.Y, weight.Z));
+                        var fac = 1 / total;
+                        weight *= fac;
+                    }
+                    return new Vector4(weight, 0);
+                }
 
                 var a_wght = MakeVertexAttributeAccessor("vweight", geometry.weights, 16, GLTF.DimensionType.VEC4, ConvertWeight, ma => ma.AsVector4Array());
                 result.Add(("WEIGHTS_0", a_wght));
