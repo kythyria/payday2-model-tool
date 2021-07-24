@@ -130,8 +130,8 @@ namespace PD2ModelParser.Modelscript
                 var dst_topo = dst_obj.PassthroughGP.Topology;
 
                 TransplantAttribute(src_topo.facelist, dst_topo.facelist);
-
                 TransplantAttribute(src_obj.RenderAtoms, dst_obj.RenderAtoms);
+                dst_geo.vert_count = src_geo.vert_count;
             }
         }
 
