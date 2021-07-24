@@ -99,9 +99,12 @@ namespace PD2ModelParser.Modelscript
 
         public override void Execute(ScriptState state)
         {
+            state.Log.Status("Run donor script");
             var donor = Modelscript.Script.ExecuteItems(Script, state.WorkDir);
+
             foreach(var name in Models)
             {
+                state.Log.Status("Transfer attributes for {0}", name);
                 var src_obj = GetModel(state, donor, name, "Source");
                 var dst_obj = GetModel(state, state.Data, name, "Destination");
 
