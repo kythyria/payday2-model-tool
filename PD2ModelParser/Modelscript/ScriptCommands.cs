@@ -73,32 +73,16 @@ namespace PD2ModelParser.Modelscript
     public class Import : ScriptItem
     {
         public string File { get; set; }
-        public FileTypeInfo ForceType { get; set; }
-        public string DefaultRootPoint { get; set; }
-        public Dictionary<string, string> Parents { get; set; } = new Dictionary<string, string>();
-        public Dictionary<string, string> ImporterOptions { get; set; } = new Dictionary<string, string>();
+        [XmlAttribute("type")] public FileTypeInfo ForceType { get; set; }
         public bool? CreateNewObjects { get; set; }
+
+        [NotAttribute] public string DefaultRootPoint { get; set; }
+        [NotAttribute] public Dictionary<string, string> Parents { get; set; } = new Dictionary<string, string>();
+        [NotAttribute] public Dictionary<string, string> ImporterOptions { get; set; } = new Dictionary<string, string>();
 
         public override void ParseXml(XElement element)
         {
-            this.File = ScriptXml.RequiredAttr(element, "file");
-
-            var strType = element.Attribute("type")?.Value;
-            if (FileTypeInfo.TryParseName(strType, out var type))
-            {
-                this.ForceType = type;
-            }
-            else { this.ForceType = null; }
-
-            var strCreateObjects = element.Attribute("create_objects")?.Value;
-            if (strCreateObjects != null && bool.TryParse(strCreateObjects, out var createObjects))
-            {
-                this.CreateNewObjects = createObjects;
-            }
-            else if (strCreateObjects != null)
-            {
-                throw new Exception($"create_objects must be boolean, \"{bool.TrueString}\" or \"{bool.FalseString}\"");
-            }
+            base.ParseXml(element);
 
             foreach (var child in element.Elements())
             {
@@ -194,6 +178,7 @@ namespace PD2ModelParser.Modelscript
                 opts.AddOption(kv.Key, kv.Value);
             }
 
+            state.Log.Status("CreateNewObjects: {0} ?? {1}", CreateNewObjects, state.CreateNewObjects);
             bool createObjects = CreateNewObjects ?? state.CreateNewObjects;
 
             effectiveType.Import(state.Data, filepath, createObjects, ParentFinder, opts);

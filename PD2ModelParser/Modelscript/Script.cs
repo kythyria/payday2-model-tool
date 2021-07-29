@@ -286,12 +286,16 @@ namespace PD2ModelParser.Modelscript
                     continue;
                 }
 
+                var underlying = Nullable.GetUnderlyingType(prop.PropertyType);
+
                 var requiredattr = (RequiredAttribute)(prop.GetCustomAttributes(typeof(RequiredAttribute), true).FirstOrDefault());
                 var nameoverride = (XmlAttributeAttribute)(prop.GetCustomAttributes(typeof(XmlAttributeAttribute), true).FirstOrDefault());
                 var attrname = nameoverride?.AttributeName ?? prop.Name.ToLower();
 
                 string attrvalue = elem.Attribute(attrname)?.Value;
-                if (requiredattr != null && attrvalue == null)
+                if (underlying != null && attrvalue == null)
+                    continue;
+                else if (requiredattr != null && attrvalue == null)
                     throw new Exception($"Missing \"{attrname}\" attribute for <{elem.Name}> element");
                 else if (requiredattr == null && attrvalue == null)
                     continue;
@@ -299,7 +303,7 @@ namespace PD2ModelParser.Modelscript
                 if (!prop.CanWrite)
                     continue;
 
-                var pt = prop.PropertyType;
+                var pt = underlying ?? prop.PropertyType;
 
                 Type typ; Func<string, object> parser; string errmsg;
                 if (pt.BaseType == typeof(Enum))
