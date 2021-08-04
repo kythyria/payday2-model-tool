@@ -330,8 +330,9 @@ namespace PD2ModelParser.Importers
             skinBones = new DM.SkinBones();
 
             skinBones.global_skin_transform = Matrix4x4.Identity;
+            var rootBoneName = node.Skin.Skeleton?.Name ?? node.Skin.Name;
             var parent = data.SectionsOfType<DM.Object3D>()
-                .FirstOrDefault(i => i.Name == node.Skin.Skeleton.Name);
+                .FirstOrDefault(i => i.Name == rootBoneName);
             skinBones.ProbablyRootBone = parent;
             // I have no idea if this is universal. It looks like it might be.
             // TODO: For skinned meshes, does mesh.Parent == mesh.SkinBones.probably_root_bone?
