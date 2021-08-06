@@ -107,6 +107,7 @@ namespace PD2ModelParser.Sections
 
         public virtual void PostLoad(uint id, Dictionary<uint, ISection> sections)
         {
+            if (postloadCallbacks == null) { return; }
             foreach (var cb in postloadCallbacks)
             {
                 cb(this, sections);
