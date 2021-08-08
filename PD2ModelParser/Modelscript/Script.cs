@@ -105,6 +105,7 @@ namespace PD2ModelParser.Modelscript
                     "dumpskins" => new DumpSkins(),
                     "import" => new Import(),
                     "animate" => new Animate(),
+                    "load-animation" => new LoadAnimation(),
                     "skin" => new Skin(),
                     "removeskin" => new RemoveSkin(),
                     "runscript" => new RunScript(),

@@ -140,7 +140,7 @@ must be one of `obj`, `fbx`, or `gltf`, if absent it will be guessed from the ex
     <object3d name="rp_testmodel" mode="add">
         <parent root="true" />
     </object3d>
-    <import file="testmodel.obj" type="obj" create_objects="true">
+    <import file="testmodel.obj" type="obj" createnewobjects="true">
         <rootpoint name="rp_testmodel">
             <default/>
         </rootpoint>
@@ -173,7 +173,7 @@ You can also attach different models to different objects:
     <object3d name="my_other_object" mode="add">
         <parent name="rp_testmodel" />
     </object3d>
-    <import file="testmodel.obj" type="obj" create_objects="true">
+    <import file="testmodel.obj" type="obj" createnewobjects="true">
         <rootpoint name="rp_testmodel">
             <default/> <!-- unless otherwise specified, models will be attached to this -->
             <object name="co_culling" /> <!-- also attach the culling box here, this could be
@@ -230,7 +230,7 @@ after the import tag, as the objects don't exist before that.
 Most of these exist to reflect command-line arguments or the GUI, but here they are.
 
 ## `<createnew create="bool"/>`
-Control the default setting of `import/@create_objects`. Has one attribute `create` which must
+Control the default setting of `import/@createnewobjects`. Has one attribute `create` which must
 be either `true` or `false`.
 
 ## `<rootpoint/>`
@@ -253,7 +253,7 @@ Write the current model to a file.
 
 ## `<import>`
 Import a model. `file` specifies the name, optionally `type` overrides the type (it will be
-guessed from the filename otherwise). Can contain `<rootpoint>` and `<option/>`. `create_objects`
+guessed from the filename otherwise). Can contain `<rootpoint>` and `<option/>`. `createnewobjects`
 if set to false causes the import to fail if a new Object3D/Model/etc has to be created.
 
 The latter gives the `name` of an option, and the value as the element content. The meaning of
@@ -324,6 +324,9 @@ that's a problem.
 ## `<transplant-attributes models="...">`
 Execute the contained `<modelscript>` element then for each mesh named (comma-separated) in `models`, copy vertices,
 triangles, and material slot assignments from the resulting model to the current model.
+
+## `<load-animation file="...">
+Import animation from a Diesel animation file.
 
 ## `<merge property-merge="..." model-merge="..." vertex-attributes="...">`
 **NOT YET IMPLEMENTED. This is just a spec.**
