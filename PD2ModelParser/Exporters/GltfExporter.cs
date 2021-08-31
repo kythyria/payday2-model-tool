@@ -109,6 +109,9 @@ namespace PD2ModelParser.Exporters
                 var mat = thing.Transform;
                 mat.Translation = mat.Translation * scaleFactor;
 
+                // Some models in the wild need this doing to them, god knows why
+                mat.M44 = 1;
+
                 node.LocalMatrix = isSkinned ? Matrix4x4.Identity : mat;
                 
             }
