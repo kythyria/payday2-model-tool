@@ -328,6 +328,10 @@ triangles, and material slot assignments from the resulting model to the current
 ## `<load-animation file="...">
 Import animation from a Diesel animation file.
 
+## `<delete target="object_name" recurse="bool"/>`
+Deletes `target`. If `recurse` is `"true"`, delete all children, otherwise error if there are children.
+This might leave orphan sections, which Diesel may or may not be unhappy about.
+
 ## `<merge property-merge="..." model-merge="..." vertex-attributes="...">`
 **NOT YET IMPLEMENTED. This is just a spec.**
 

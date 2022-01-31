@@ -111,6 +111,7 @@ namespace PD2ModelParser.Modelscript
                     "runscript" => new RunScript(),
                     "duplicate" => new Duplicate(),
                     "transplant-attributes" => new TransplantAttributes(),
+                    "delete" => new Delete(),
                     _ => throw new Exception($"Unknown command {element.Name}"),
                 };
                 si.ParseXml(element);

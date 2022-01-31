@@ -446,4 +446,43 @@ namespace PD2ModelParser.Modelscript
             state.Data.AddSection(newModel);
         }
     }
+
+    public class Delete : ScriptItem
+    {
+        [Required] public string Target { get; set; }
+        public bool Recurse { get; set; } = false;
+
+        public override void Execute(ScriptState state)
+        {
+            var target = state.Data.SectionsOfType<S.Object3D>()
+                    .Where(i => i.Name == Target)
+                    .FirstOrDefault();
+            if (target == null)
+            {
+                throw new Exception($"Object to delete not found: {Target}");
+            }
+
+            if(!Recurse && target.children.Count != 0)
+            {
+                throw new Exception($"Object {Target} has children but Recurse=\"false\" ");
+            }
+
+            void DoRecurse(S.Object3D curr)
+            {
+                foreach(var c in curr.children)
+                {
+                    DoRecurse(c);
+                }
+                curr.Parent = null;
+                state.Data.RemoveSection(curr.SectionId);
+            }
+
+            if (Recurse) { DoRecurse(target); }
+            else
+            {
+                target.Parent = null;
+                state.Data.RemoveSection(target.SectionId);
+            }
+        }
+    }
 }
