@@ -88,7 +88,11 @@ namespace PD2ModelParser.Sections
             {
                 oldParent.children.Remove(this);
             }
-            if (newParent != null)
+            if (newParent == this)
+            {
+                throw new Exception($"Object {Name}({SectionId}) attempted to have itself as parent");
+            }
+            else if (newParent != null)
             {
                 newParent.children.Add(this);
             }
@@ -146,7 +150,13 @@ namespace PD2ModelParser.Sections
 
             Transform = transform;
 
-            PostLoadRef<Object3D>(instream.ReadUInt32(), i => this.Parent = i);
+            var parent_id = instream.ReadUInt32();
+            if (parent_id == this.SectionId)
+            {
+                Log.Default.Warn("Object {}({}) has itself as parent", Name, SectionId);
+                parent_id = 0;
+            }
+            PostLoadRef<Object3D>(parent_id, i => this.Parent = i);
 
             this.remaining_data = null;
         }
@@ -195,18 +205,22 @@ namespace PD2ModelParser.Sections
         public override void PostLoad(uint id, Dictionary<uint, ISection> parsed_sections)
         {
             base.PostLoad(id, parsed_sections);
-            if (Parent.SectionId == parentID)
-            {
-                throw new Exception($"Object {Name}({id}) has itself as parent");
-            }
             if (Parent != null)
             {
-                if (!Parent.has_post_loaded)
-                    Parent.PostLoad(Parent.SectionId, parsed_sections);
-
-                if (!Parent.children.Contains(this))
+                if (Parent.SectionId == SectionId)
                 {
-                    Parent.children.Add(this);
+                    Log.Default.Warn("Object {}({}) has itself as parent", Name, SectionId);
+                    this.SetParent(null);
+                }
+                else
+                {
+                    if (!Parent.has_post_loaded)
+                        Parent.PostLoad(Parent.SectionId, parsed_sections);
+
+                    if (!Parent.children.Contains(this))
+                    {
+                        Parent.children.Add(this);
+                    }
                 }
             }
 
