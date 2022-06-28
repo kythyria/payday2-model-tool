@@ -195,6 +195,10 @@ namespace PD2ModelParser.Sections
         public override void PostLoad(uint id, Dictionary<uint, ISection> parsed_sections)
         {
             base.PostLoad(id, parsed_sections);
+            if (Parent.SectionId == parentID)
+            {
+                throw new Exception($"Object {Name}({id}) has itself as parent");
+            }
             if (Parent != null)
             {
                 if (!Parent.has_post_loaded)
