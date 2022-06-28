@@ -224,7 +224,7 @@ namespace PD2ModelParser
             if (level < minimumLevel)
                 return;
 
-            Console.WriteLine(level + @": " + GetCallerName(3) + @": " + string.Format(message, value));
+            Console.WriteLine("{0}: {1}: {2}", level, GetCallerName(3), string.Format(message, value));
         }
     }
 }

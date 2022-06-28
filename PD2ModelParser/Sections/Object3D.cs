@@ -150,13 +150,7 @@ namespace PD2ModelParser.Sections
 
             Transform = transform;
 
-            var parent_id = instream.ReadUInt32();
-            if (parent_id == this.SectionId)
-            {
-                Log.Default.Warn("Object {}({}) has itself as parent", Name, SectionId);
-                parent_id = 0;
-            }
-            PostLoadRef<Object3D>(parent_id, i => this.Parent = i);
+            PostLoadRef<Object3D>(instream.ReadUInt32(), i => this.Parent = i);
 
             this.remaining_data = null;
         }
@@ -209,7 +203,7 @@ namespace PD2ModelParser.Sections
             {
                 if (Parent.SectionId == SectionId)
                 {
-                    Log.Default.Warn("Object {}({}) has itself as parent", Name, SectionId);
+                    Log.Default.Warn("Object {0}({1}) has itself as parent", Name, SectionId);
                     this.SetParent(null);
                 }
                 else
