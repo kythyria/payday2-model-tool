@@ -177,17 +177,10 @@ namespace PD2ModelParser.Sections
 
         public override string ToString()
         {
-            var scale = new Vector3();
-            var rot = new System.Numerics.Quaternion();
-            var translation = new Vector3();
-            Matrix4x4.Decompose(this.Transform, out scale, out rot, out translation);
+            Matrix4x4.Decompose(this.Transform, out Vector3 scale, out Quaternion rot, out _);
             return base.ToString() +
-                   " size: " + this.size +
-                   " HashName: " + this.HashName.String +
-                   " animations: " + this.Animations.Count +
-                   " mat.scale: " + scale +
-                   " mat.rotation: [x: " + rot.X + " y: " + rot.Y + " z: " + rot.Z + " w: " + rot.W + "]" +
-                   " Parent ID: " + this.parentID +
+                   $" size: {this.size} HashName: {this.HashName} animations: {this.Animations.Count}" +
+                   $" mat.scale: {scale} mat.rotation: {rot} Parent ID: ${this.parentID}" +
                    (remaining_data != null ? " REMAINING DATA! " + remaining_data.Length + " bytes" : "");
         }
 

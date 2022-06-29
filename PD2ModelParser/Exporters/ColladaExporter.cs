@@ -64,7 +64,7 @@ namespace PD2ModelParser
 
                     model_i++;
 
-                    string model_id = model_i + "-" + model_data.HashName.String;
+                    string model_id = model_i + "-" + model_data.HashName;
 
                     PassthroughGP passthrough_section = model_data.PassthroughGP;
                     Geometry geometry_section = passthrough_section.Geometry;

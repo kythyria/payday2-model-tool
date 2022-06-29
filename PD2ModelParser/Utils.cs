@@ -253,6 +253,8 @@ namespace PD2ModelParser
             }
         }
 
+        public override string ToString() => this.String;
+
         [System.ComponentModel.NotifyParentProperty(true)]
         public ulong Hash
         {

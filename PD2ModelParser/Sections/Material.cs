@@ -84,10 +84,7 @@ namespace PD2ModelParser.Sections
             }
 
             return base.ToString() +
-                   " size: " + this.size +
-                   " HashName: " + this.HashName.String +
-                   " count: " + this.count +
-                   " items: [ " + items_string + " ] " +
+                   $" size: {this.size} HashName: {this.HashName} count: {this.count} items: [ {items_string} ] " +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
     }

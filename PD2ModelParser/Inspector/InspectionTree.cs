@@ -41,7 +41,7 @@ namespace PD2ModelParser.Inspector
             Label = $"<{typeof(TSection).Name}>";
             if(typeof(TSection).GetInterfaces().Contains(typeof(Sections.IHashNamed)))
             {
-                labeller = (sec) => $"{sec.SectionId} | {sec.GetType().Name} ({(sec as Sections.IHashNamed).HashName.String})";
+                labeller = (sec) => $"{sec.SectionId} | {sec.GetType().Name} ({(sec as Sections.IHashNamed).HashName})";
             }
             else
             {

@@ -124,11 +124,8 @@ namespace PD2ModelParser.Sections
         public override string ToString()
         {
             return base.ToString() +
-                   " unknown1: " + this.unknown1 +
-                   " facelist: " + this.facelist.Count +
-                   " count2: " + this.count2 +
-                   " items2: " + this.items2.Length +
-                   " HashName: " + this.HashName.String +
+                   $" unknown1: {unknown1} facelist: {facelist.Count} count2: {count2}" +
+                   $" items2: {items2.Length} HashName: {HashName}" +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
     }

@@ -107,7 +107,7 @@ namespace PD2ModelParser
                         var m = Regex.Match(candidateName.String, @"\.(\d+)$");
                         if(m == null)
                         {
-                            candidateName = new HashName(candidateName.String + ".001");
+                            candidateName = new HashName(candidateName + ".001");
                         }
                         else
                         {

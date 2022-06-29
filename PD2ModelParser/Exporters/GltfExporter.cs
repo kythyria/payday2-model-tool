@@ -231,7 +231,7 @@ namespace PD2ModelParser.Exporters
         IEnumerable<(GLTF.Accessor, GLTF.Material)> CreatePrimitiveIndices(Topology topo, IEnumerable<RenderAtom> atoms, MaterialGroup materialGroup)
         {
             var buf = new ArraySegment<byte>(new byte[topo.facelist.Count * 3 * 2]);
-            var mai = new MemoryAccessInfo($"indices_{topo.HashName.String}", 0, topo.facelist.Count * 3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
+            var mai = new MemoryAccessInfo($"indices_{topo.HashName}", 0, topo.facelist.Count * 3, 0, GLTF.DimensionType.SCALAR, GLTF.EncodingType.UNSIGNED_SHORT);
             var ma = new MemoryAccessor(buf, mai);
             var array = ma.AsIntegerArray();
             for (int i = 0; i < topo.facelist.Count; i++)
@@ -269,12 +269,12 @@ namespace PD2ModelParser.Exporters
                     var normalized = Vector3.Normalize(norm);
                     if(!normalized.IsFinite())
                     {
-                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} is bogus ({3})", idx, geometry.SectionId, geometry.HashName.String, norm);
+                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} is bogus ({3})", idx, geometry.SectionId, geometry.HashName, norm);
                         return new Vector3(1, 0, 0);
                     }
                     if(!normalized.IsUnitLength())
                     {
-                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} is bogus length {4} ({3})", idx, geometry.SectionId, geometry.HashName.String, norm, norm.Length());
+                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} is bogus length {4} ({3})", idx, geometry.SectionId, geometry.HashName, norm, norm.Length());
                         return new Vector3(1, 0, 0);
                     }
                     return normalized;
@@ -291,12 +291,12 @@ namespace PD2ModelParser.Exporters
 
                     if(!tangent.IsFinite())
                     {
-                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} has bogus tangent ({3})", index, geometry.SectionId, geometry.HashName.String, tangent);
+                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} has bogus tangent ({3})", index, geometry.SectionId, geometry.HashName, tangent);
                         tangent = new Vector3(0, 1, 0);
                     }
                     if(!tangent.IsUnitLength())
                     {
-                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} has bogus tangent length {4} ({3})", index, geometry.SectionId, geometry.HashName.String, tangent, tangent.Length());
+                        Log.Default.Warn("Vertex {0} of geometry {1}|{2} has bogus tangent length {4} ({3})", index, geometry.SectionId, geometry.HashName, tangent, tangent.Length());
                         tangent = new Vector3(0, 1, 0);
                     }
 
@@ -307,7 +307,7 @@ namespace PD2ModelParser.Exporters
                     var dot = Vector3.Dot(txn, binorm);
                     if(float.IsNaN(dot))
                     {
-                        Log.Default.Warn("Weird normals in vtx {3} of geom {4}|{5}, N={0}, T={1}, B={2}, (T cross N) dot B is NaN", normal, tangent, binorm, index, geometry.SectionId, geometry.HashName.String);
+                        Log.Default.Warn("Weird normals in vtx {3} of geom {4}|{5}, N={0}, T={1}, B={2}, (T cross N) dot B is NaN", normal, tangent, binorm, index, geometry.SectionId, geometry.HashName);
                         return new Vector4(tangent, 1);
                     }
                     var sgn = float.IsNaN(dot) ? 1 : Math.Sign(dot);

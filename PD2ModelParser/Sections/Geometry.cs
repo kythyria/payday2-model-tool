@@ -493,7 +493,7 @@ namespace PD2ModelParser.Sections
                 {
                     if (head.ItemSize == 4)
                     {
-                        Log.Default.Warn("Section {0} has four weights", this.HashName.String);
+                        Log.Default.Warn("Section {0} has four weights", this.HashName);
                     }
                     for (int x = 0; x < this.vert_count; x++)
                     {
@@ -544,7 +544,7 @@ namespace PD2ModelParser.Sections
             if (this.weight_groups.Count > 0 && this.binormals.Count > 0 && this.tangents.Count > 0 &&
                 this.weights.Count > 0)
             {
-                outstream.WriteLine("Printing weights table for " + this.HashName.String);
+                outstream.WriteLine("Printing weights table for " + this.HashName);
                 outstream.WriteLine("====================================================");
                 outstream.WriteLine(
                     "unkn15_1\tunkn15_2\tunkn15_3\tunkn15_4\tunkn17_X\tunkn17_Y\tunk17_Z\ttotalsum\tunk_20_X\tunk_20_Y\tunk_20_Z\tunk21_X\tunk21_Y\tunk21_Z");
@@ -596,7 +596,7 @@ namespace PD2ModelParser.Sections
                    " binormals: " + this.binormals.Count +
                    " tangents: " + this.tangents.Count +
                    " Geometry_unknown_item_data: " + this.unknown_item_data.Count +
-                   " unknown_hash: " + this.HashName.String +
+                   " unknown_hash: " + this.HashName +
                    (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
     }

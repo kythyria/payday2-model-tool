@@ -74,7 +74,7 @@ namespace PD2ModelParser.Sections
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)
             {
                 remaining_data = instream.ReadBytes((int)((section.offset + 12 + section.size) - instream.BaseStream.Position));
-                Log.Default.Info("Light {0}|{1} has {2} bytes of extraneous(?) data", section.id, HashName.String, remaining_data.Length);
+                Log.Default.Info("Light {0}|{1} has {2} bytes of extraneous(?) data", section.id, HashName, remaining_data.Length);
             }
         }
 

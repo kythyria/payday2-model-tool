@@ -89,15 +89,10 @@ namespace PD2ModelParser.Sections
             keyframes_string += string.Join(", ", this.Keyframes.Select(i => i.ToString()));
 
             return base.ToString() +
-                " size: " + this.size +
-                " HashName: " + this.HashName.String +
-                " flag0: " + this.Flag0 +
-                " flag1: " + this.Flag1 +
-                " flag2: " + this.Flag2 +
-                " flag3: " + this.Flag3 +
-                " unknown1: " + this.Unknown1 +
-                " keyframe_length: " + this.KeyframeLength +
-                " count: " + this.Keyframes.Count + " items: [ " + keyframes_string + " ] " +
+                $" size: {this.size} HashName: {this.HashName}" +
+                $" flag0: {this.Flag0} flag1: {this.Flag1} flag2: {this.Flag2} flag3: {this.Flag3}" +
+                $" unknown1: {this.Unknown1} keyframe_length: {this.KeyframeLength}" +
+                $" count: {this.Keyframes.Count} items: [ {keyframes_string} ] " +
                 (this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "");
         }
 
