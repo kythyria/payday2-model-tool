@@ -132,7 +132,7 @@ As an example though, this would rotate an object around the Z axis:
 # Importing models
 
 In a modelscript, you can also import models and object3ds from external files. The `type`
-must be one of `obj`, `fbx`, or `gltf`, if absent it will be guessed from the extension.
+must be one of `obj` or `gltf`, if absent it will be guessed from the extension.
 
 ```xml
 <?xml version="1.0" ?>
