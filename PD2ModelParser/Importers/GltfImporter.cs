@@ -596,20 +596,20 @@ namespace PD2ModelParser.Importers
                 if(joints != null && joints.Count > 0)
                 {
                     var ja = joints.AsVector4Array();
-                    var wa = joints.AsVector4Array();
+                    var wa = weights.AsVector4Array();
                     result = result.Select((vtx, idx) =>
                     {
-                        var gltfWeight = ja[idx];
+                        var gltfWeight = wa[idx];
                         vtx.weight = new Vector3(gltfWeight.X, gltfWeight.Y, gltfWeight.Z);
                         if(gltfWeight.W > 0)
                         {
                             Log.Default.Warn($"{prim.LogicalParent.Name} has a vertex with >3 weights at {vtx.pos}!");
                         }
                         vtx.weightGroups = new DM.GeometryWeightGroups(
-                            (ushort)wa[idx].X,
-                            (ushort)wa[idx].Y,
-                            (ushort)wa[idx].Z,
-                            (ushort)wa[idx].W
+                            (ushort)ja[idx].X,
+                            (ushort)ja[idx].Y,
+                            (ushort)ja[idx].Z,
+                            (ushort)ja[idx].W
                         );
 
                         return vtx;
