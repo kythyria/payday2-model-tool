@@ -72,7 +72,12 @@ namespace PD2ModelParser.Modelscript
         {
             var sb = new StringBuilder(4 * (4 * 17 + 2));
             for (var i = 0; i < 16; i++)
-                sb.AppendFormat("  {0,14:g9}{1}", ma.Index(i), i % 4 == 3 ? Environment.NewLine : "");
+            {
+                float value = ma.Index(i);
+                if (Math.Abs(value) < 0.000001)
+                    value = 0;
+                sb.AppendFormat("  {0,14:g5}{1}", value, i % 4 == 3 ? Environment.NewLine : "");
+            }
             return sb.ToString();
         }
     }
