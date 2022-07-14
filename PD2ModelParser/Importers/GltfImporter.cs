@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-
 using GLTF = SharpGLTF.Schema2;
 using DM = PD2ModelParser.Sections;
 //using PD2ModelParser.Sections;
@@ -30,6 +28,7 @@ namespace PD2ModelParser.Importers
         Dictionary<GLTF.Node, DM.Object3D> objectsByNode = new Dictionary<GLTF.Node, DM.Object3D>();
         bool createModels;
         List<(GLTF.Node node, DM.Model model)> toSkin = new List<(GLTF.Node node, DM.Model model)>();
+        List<(GLTF.Skin skin, DM.Model model)> toRemap = new List<(GLTF.Skin skin, DM.Model model)>();
 
         /// <summary>
         /// How much to embiggen incoming GLTF data.
@@ -72,6 +71,11 @@ namespace PD2ModelParser.Importers
                 ImportSkin(i.node, i.model);
             }
 
+            foreach (var i in toRemap)
+            {
+                RemapBoneIds(i.skin, i.model);
+            }
+
             ImportAnimations(root);
         }
 
@@ -104,6 +108,7 @@ namespace PD2ModelParser.Importers
                     if (node.Skin != null)
                     {
                         toSkin.Add((node, obj as DM.Model));
+                        toRemap.Add((node.Skin, obj as DM.Model));
                     }
                 }
                 else if (createModels && node.PunctualLight != null)
@@ -133,6 +138,11 @@ namespace PD2ModelParser.Importers
                 else if (node.Mesh != null && obj is DM.Model mod)
                 {
                     OverwriteModel(node.Mesh, mod);
+
+                    if (node.Skin != null)
+                    {
+                        toRemap.Add((node.Skin, obj as DM.Model));
+                    }
                 }
                 else if (node.PunctualLight != null)
                 {
@@ -331,17 +341,6 @@ namespace PD2ModelParser.Importers
             // I have no idea if this is universal. It looks like it might be.
             // TODO: For skinned meshes, does mesh.Parent == mesh.SkinBones.probably_root_bone?
             model.SetParent(parent);
-            
-            // Map between GLTF joint IDs and Object3Ds
-            List<DM.Object3D> jointToObj = new List<DM.Object3D>();
-            Dictionary<DM.Object3D, ushort> objToJoint = new Dictionary<DM.Object3D, ushort>();
-            for(ushort i = 0; i < node.Skin.JointsCount; i++)
-            {
-                (GLTF.Node jointNode, _) = node.Skin.GetJoint(i);
-                DM.Object3D obj = objectsByNode[jointNode];
-                jointToObj.Add(obj);
-                objToJoint[obj] = i;
-            }
 
             // Find out what joints are actually used. Note the SkinBones system in Diesel only uses
             // bones that have vertices weighed to them, so if a bone is used by vertices but it's
@@ -365,10 +364,6 @@ namespace PD2ModelParser.Importers
                 if (weights.Z > threshold)
                     usedBones.Add(group.Bones3);
             }
-            
-            // Track the IDs of the bones between GLTF and the bones structure, since we'll need to
-            // edit the model to use the new IDs.
-            Dictionary<ushort, ushort> idMapping = new Dictionary<ushort, ushort>();
 
             // Add the bones in the same order as they appear in the GLTF file to ease debugging
             List<ushort> sortedUsedBones = usedBones.ToList();
@@ -379,28 +374,15 @@ namespace PD2ModelParser.Importers
             {
                 var (jointNode, ibm) = node.Skin.GetJoint(gltfId);
                 ushort modelId = (ushort) skinBones.Objects.Count;
-                idMapping[gltfId] = modelId;
                 ibm.Translation *= scaleFactor;
                 skinBones.rotations.Add(ibm);
                 skinBones.Objects.Add(objectsByNode[jointNode]);
-                Debug.Assert(objectsByNode[jointNode] == jointToObj[gltfId]);
                 bmi.bones.Add(modelId);
             }
 
             // Looks stupid, but matching up the vanilla files this is supposed to
             // be here in addition to the later per-RenderAtom ones.
             skinBones.bone_mappings.Add(bmi);
-
-            // Remap the bone IDs in the geometry
-            for (int i = 0; i < geom.vert_count; i++)
-            {
-                DM.GeometryWeightGroups group = geom.weight_groups[i];
-                ushort id1 = idMapping[group.Bones1];
-                ushort id2 = idMapping[group.Bones2];
-                ushort id3 = idMapping[group.Bones3];
-                ushort id4 = idMapping[group.Bones4];
-                geom.weight_groups[i] = new DM.GeometryWeightGroups(id1, id2, id3, id4);
-            }
 
             // It makes no sense that diesel wants this, but diesel wants this.
             // And it's consistent with the FBX importer, which worked.
@@ -411,6 +393,67 @@ namespace PD2ModelParser.Importers
 
             data.AddSection(skinBones);
             model.SkinBones = skinBones;
+        }
+
+        /**
+         * Adjust all the geometry weight IDs of the mesh for use with a given SkinBones object.
+         *
+         * This is needed because the GLTF bone IDs won't necessarily match the order the bones appear
+         * in (if at all) in SkinBones. This maps the weights over to the correct new IDs, or does a
+         * bit of fallback work if a bone that doesn't exist in SkinBones is painted onto.
+         *
+         * This MUST NOT be called if ImportSkin is used to generate the skin, as that internally
+         * calls this function.
+         */
+        private void RemapBoneIds(GLTF.Skin src, DM.Model model)
+        {
+            DM.SkinBones skinBones = model.SkinBones;
+
+            // Build a mapping of the bone indices as they appear in the SkinBones. This is
+            // our 'target' - we'll switch everything over to using these IDs
+            Dictionary<DM.Object3D, ushort> sbIds = new Dictionary<DM.Object3D, ushort>();
+            for (ushort sbId = 0; sbId < skinBones.count; sbId++)
+            {
+                DM.Object3D bone = skinBones.Objects[sbId];
+                sbIds[bone] = sbId;
+            }
+
+            // Find what SkinBones ID should be used for any given bone. This might seem obvious, but what if
+            // the bone weights are painted to in the model doesn't actually exist in the SkinBones? The solution
+            // is to use the parent, since that's most likely to look right.
+            ushort? LookupNewBoneId(DM.Object3D bone)
+            {
+                ushort sbId;
+                bool found = sbIds.TryGetValue(bone, out sbId);
+                if (found)
+                    return sbId;
+
+                // Not found in SkinBones, does this bone have a parent we can try?
+                return bone.Parent != null ? LookupNewBoneId(bone.Parent) : null;
+            }
+
+            // Track the IDs of the bones between GLTF and the bones structure, since we'll need to
+            // edit the model to use the new IDs.
+            Dictionary<ushort, ushort> idMapping = new Dictionary<ushort, ushort>();
+            for (ushort gltfId = 0; gltfId < src.JointsCount; gltfId++)
+            {
+                (GLTF.Node jointNode, _) = src.GetJoint(gltfId);
+                DM.Object3D obj = objectsByNode[jointNode];
+                ushort? id = LookupNewBoneId(obj);
+                idMapping[gltfId] = id ?? 0;
+            }
+
+            // Remap the bone IDs in the geometry
+            DM.Geometry geom = model.PassthroughGP.Geometry;
+            for (int i = 0; i < geom.vert_count; i++)
+            {
+                DM.GeometryWeightGroups group = geom.weight_groups[i];
+                ushort id1 = idMapping[group.Bones1];
+                ushort id2 = idMapping[group.Bones2];
+                ushort id3 = idMapping[group.Bones3];
+                ushort id4 = idMapping[group.Bones4];
+                geom.weight_groups[i] = new DM.GeometryWeightGroups(id1, id2, id3, id4);
+            }
         }
 
         public class MeshSections
