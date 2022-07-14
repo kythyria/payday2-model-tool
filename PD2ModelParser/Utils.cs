@@ -134,7 +134,7 @@ namespace PD2ModelParser
                 throw new ArgumentOutOfRangeException(
                     "Column must be between 0-3 inclusive (real value " + column + ")");
             }
-            return new Vector4(self.Index(0, column), self.Index(1, column), self.Index(2, column), self.Index(3, column));
+            return new Vector4(self.Index(column, 0), self.Index(column, 1), self.Index(column, 2), self.Index(column, 3));
         }
 
         /**
@@ -149,10 +149,10 @@ namespace PD2ModelParser
                     "Column must be between 0-3 inclusive (real value " + column + ")");
             }
 
-            @this.Index(0, column) = value.X;
-            @this.Index(1, column) = value.Y;
-            @this.Index(2, column) = value.Z;
-            @this.Index(3, column) = value.W;
+            @this.Index(column, 0) = value.X;
+            @this.Index(column, 1) = value.Y;
+            @this.Index(column, 2) = value.Z;
+            @this.Index(column, 3) = value.W;
 
             return @this;
         }
