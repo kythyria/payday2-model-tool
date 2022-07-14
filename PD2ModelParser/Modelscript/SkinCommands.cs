@@ -202,7 +202,118 @@ namespace PD2ModelParser.Modelscript
             {
                 state.Data.RemoveSection(i);
             }
-            
+
+        }
+    }
+
+    /**
+     * Load the bones and skin weights from an existing Diesel model, and use them to overwrite
+     * the corresponding data in the currently loaded model.
+     *
+     * This correlates bones and models by name, so any bones and models that only exist in either
+     * the currently loaded model OR the specified Diesel file will be ignored.
+     *
+     * This is intended for use with resetting bones where Blender changed their transform matrices
+     * in a way that works fine in game with animations exported from Blender, but breaks any
+     * animations made on the in-built model.
+     */
+    class PortRigging : ScriptItem
+    {
+        [Required] public string File { get; set; }
+        public bool SetModelParents { get; set; } = true;
+
+        public override void Execute(ScriptState state)
+        {
+            string resolvedPath = state.ResolvePath(File);
+            state.Log.Status($"Loading model (for rigging port) from {resolvedPath}");
+            FullModelData srcData = ModelReader.Open(resolvedPath);
+
+            // Find all the objects and particularly those shared across both models
+            Dictionary<string, Object3D> destObjects = FindObjects(state.Data);
+            Dictionary<string, Object3D> srcObjects = FindObjects(srcData);
+
+            HashSet<string> sharedObjects = new HashSet<string>(destObjects.Keys);
+            sharedObjects.IntersectWith(srcObjects.Keys);
+
+            // Go through every object that's common and copy across it's transform
+            // For any models here, also copy across the bind poses
+            foreach (string name in sharedObjects)
+            {
+                Object3D destObj = destObjects[name];
+                Object3D srcObj = srcObjects[name];
+
+                destObj.Transform = srcObj.Transform;
+
+                // If this object is a model, also copy across the inverse bind transforms which
+                // need to be adjusted to match the new transform.
+                if (destObj is not Model destModel)
+                    continue;
+                Model srcModel = (Model)srcObj;
+
+                // If the user has selected it, parent the models to the same nodes as in the source model. This
+                // avoids the hassle of setting up root points.
+                if (SetModelParents)
+                {
+                    Object3D srcParent = srcModel.Parent;
+                    Object3D newDestParent = srcParent == null ? null : destObjects[srcParent.HashName.String];
+                    if (srcParent != null && newDestParent != null)
+                    {
+                        destModel.SetParent(newDestParent);
+                    }
+                }
+
+                // If the model isn't rigged then it should not come as a huge surprise that there's
+                // no need to copy any rigging data.
+                if (destModel.SkinBones == null)
+                    continue;
+
+                // We absolutely need to copy over the global skin transform. I'm not certain about the root
+                // bone, but that's probably necessary too.
+                destModel.SkinBones.global_skin_transform = srcModel.SkinBones.global_skin_transform;
+                destModel.SkinBones.ProbablyRootBone = destObjects[srcModel.SkinBones.ProbablyRootBone.HashName.String];
+
+                // In case the src and dest models have the bones in a different order, build a lookup
+                // table to find the ID (and thus inverse bind transform) for a given object from it's
+                // parsed object.
+                Dictionary<Object3D, int> srcIds = new Dictionary<Object3D, int>();
+                for (int i = 0; i < srcModel.SkinBones.count; i++)
+                {
+                    srcIds[srcModel.SkinBones.Objects[i]] = i;
+                }
+
+                // Go through each bone in the destination, find it's corresponding bone in the source, and
+                // copy the inverse bind transform over.
+                for (int i = 0; i < destModel.SkinBones.count; i++)
+                {
+                    Object3D destBone = destModel.SkinBones.Objects[i];
+                    Object3D srcBone = srcObjects.GetValueOrDefault(destBone.HashName.String, null);
+
+                    // Skip bones that only exist in one file, or exist in both files but are only
+                    // associated with the model's skin in one of the files.
+                    if (srcBone == null)
+                        continue;
+
+                    if (!srcIds.ContainsKey(srcBone))
+                        continue;
+                    int srcId = srcIds[srcBone];
+
+                    // Copy across the inverse bind transform
+                    destModel.SkinBones.rotations[i] = srcModel.SkinBones.rotations[srcId];
+                }
+            }
+        }
+
+        private Dictionary<string, Object3D> FindObjects(FullModelData data)
+        {
+            Dictionary<string, Object3D> objects = new Dictionary<string, Object3D>();
+            foreach (ISection section in data.parsed_sections.Values)
+            {
+                if (section is Object3D obj)
+                {
+                    objects[obj.HashName.String] = obj;
+                }
+            }
+            return objects;
         }
     }
 }

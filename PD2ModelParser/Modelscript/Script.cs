@@ -108,6 +108,7 @@ namespace PD2ModelParser.Modelscript
                     "load-animation" => new LoadAnimation(),
                     "skin" => new Skin(),
                     "removeskin" => new RemoveSkin(),
+                    "port-rigging" => new PortRigging(),
                     "runscript" => new RunScript(),
                     "duplicate" => new Duplicate(),
                     "transplant-attributes" => new TransplantAttributes(),
