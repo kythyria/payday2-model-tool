@@ -17,16 +17,25 @@ namespace PD2ModelParser.Importers
         /// <param name="fmd">Diesel model to add the contents to.</param>
         /// <param name="path">Path of the GLTF file to import</param>
         /// <param name="getParentByName">Callback to find the parent of a particular model.</param>
-        public static void Import(FullModelData fmd, string path, bool createModels, Func<string, DM.Object3D> parentFinder, IOptionReceiver _)
+        public static void Import(FullModelData fmd, string path, bool createModels, Func<string, DM.Object3D> parentFinder, IOptionReceiver opts)
         {
             var gltf = GLTF.ModelRoot.Load(path);
             var importer = new GltfImporter(fmd);
+
+            // While it's inadvisable to do so, let the user keep the old rigging
+            string preserveSkinsOpt = opts.GetOption("overwrite-rigging");
+            if (preserveSkinsOpt != null)
+            {
+                importer.overwriteRigging = bool.Parse(preserveSkinsOpt);
+            }
+
             importer.ImportTree(gltf, createModels, parentFinder);
         }
 
         FullModelData data;
         Dictionary<GLTF.Node, DM.Object3D> objectsByNode = new Dictionary<GLTF.Node, DM.Object3D>();
         bool createModels;
+        bool overwriteRigging;
         List<(GLTF.Node node, DM.Model model)> toSkin = new List<(GLTF.Node node, DM.Model model)>();
         List<(GLTF.Skin skin, DM.Model model)> toRemap = new List<(GLTF.Skin skin, DM.Model model)>();
 
@@ -141,6 +150,8 @@ namespace PD2ModelParser.Importers
 
                     if (node.Skin != null)
                     {
+                        if (overwriteRigging)
+                            toSkin.Add((node, mod));
                         toRemap.Add((node.Skin, obj as DM.Model));
                     }
                 }
