@@ -84,6 +84,8 @@ namespace PD2ModelParser.Importers
                 .Where(i => i != null)
                 .FirstOrDefault(i => i.HashName.Hash == hashname.Hash);
 
+            bool shouldSetParent = true;
+
             if (obj == null)
             {
                 /*var extras = node.TryUseExtrasAsDictionary(false);
@@ -136,11 +138,14 @@ namespace PD2ModelParser.Importers
                 {
                     throw new Exception("Can't overwrite lights yet.");
                 }
+
+                // Don't re-parent nodes that already exist in the tree
+                shouldSetParent = false;
             }
 
             objectsByNode.Add(node, obj);
 
-            if(parent != null)
+            if(parent != null && shouldSetParent)
             {
                 obj.SetParent(parent);
             }
