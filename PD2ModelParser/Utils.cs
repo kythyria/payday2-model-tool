@@ -176,62 +176,9 @@ namespace PD2ModelParser
          */
         public static Matrix4x4 MultDiesel(this Matrix4x4 a, Matrix4x4 b)
         {
-            // TODO cleanup
-            Matrix4x4 result = Matrix4x4.Identity;
-
-            for (int i = 0; i < 4; i++)
-            {
-                Vector4 bas = a.GetColumn(i);
-                /*Vector4D outcol = new Vector4D {
-                    X = bas[0] * b.GetColumn(0)[0] + bas[1] * b.GetColumn(1)[0] + bas[2] * b.GetColumn(2)[0],
-                    Y = bas[0] * b.GetColumn(0)[1] + bas[1] * b.GetColumn(1)[1] + bas[2] * b.GetColumn(2)[1],
-                    Z = bas[0] * b.GetColumn(0)[2] + bas[1] * b.GetColumn(1)[2] + bas[2] * b.GetColumn(2)[2],
-                    W = 0
-                };*/
-
-                Vector4 outcol;
-
-                if (i == 3)
-                {
-                    outcol = 
-                        (new Vector4(bas.Z) * b.GetColumn(2)) +
-                        (new Vector4(bas.Y) * b.GetColumn(1)) +
-                        (new Vector4(bas.X) * b.GetColumn(0)) +
-                        b.GetColumn(3);
-
-                    outcol.W = 1;
-                }
-                else
-                {
-                    outcol = 
-                        new Vector4(bas.Z) * b.GetColumn(2) +
-                        new Vector4(bas.Y) * b.GetColumn(1) +
-                        new Vector4(bas.X) * b.GetColumn(0)
-                        ;
-
-                    outcol.W = 0;
-                }
-
-                result = result.WithColumn(i, outcol);
-            }
-
-            return result;
-
-            // Old system:
-            /*Matrix3D result = Matrix3D.Identity;
-
-            for (int i = 0; i < 4; i++)
-            {
-                Vector4D vec = (a.GetColumn(0) * b[i, 2]) + (a.GetColumn(1) * b[i, 1]) + (a.GetColumn(2) * b[i, 0]);
-                if(i == 3)
-                {
-                    // Add the transform bit
-                    vec += a.GetColumn(3);
-                }
-                result = result.WithColumn(i, vec);
-            }
-
-            return result;*/
+            // Check the Git history if you're curious as to how we ended up with a function for this. I think it all
+            // un-broke itself when moving to the System.Numerics library.
+            return a * b;
         }
     }
 
