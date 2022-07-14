@@ -375,7 +375,6 @@ namespace PD2ModelParser.Importers
             sortedUsedBones.Sort();
 
             var bmi = new DM.BoneMappingItem();
-            skinBones.bone_mappings.Add(bmi);
             foreach (ushort gltfId in sortedUsedBones)
             {
                 var (jointNode, ibm) = node.Skin.GetJoint(gltfId);
@@ -387,6 +386,10 @@ namespace PD2ModelParser.Importers
                 Debug.Assert(objectsByNode[jointNode] == jointToObj[gltfId]);
                 bmi.bones.Add(modelId);
             }
+
+            // Looks stupid, but matching up the vanilla files this is supposed to
+            // be here in addition to the later per-RenderAtom ones.
+            skinBones.bone_mappings.Add(bmi);
 
             // Remap the bone IDs in the geometry
             for (int i = 0; i < geom.vert_count; i++)
