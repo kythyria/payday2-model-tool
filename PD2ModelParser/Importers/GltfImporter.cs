@@ -29,6 +29,13 @@ namespace PD2ModelParser.Importers
                 importer.overwriteRigging = bool.Parse(preserveSkinsOpt);
             }
 
+            // Let the user not import bone poses for compatibility with existing animations.
+            string importTransforms = opts.GetOption("import-transforms");
+            if (importTransforms != null)
+            {
+                importer.importTransforms = false;
+            }
+
             importer.ImportTree(gltf, createModels, parentFinder);
         }
 
@@ -36,6 +43,7 @@ namespace PD2ModelParser.Importers
         Dictionary<GLTF.Node, DM.Object3D> objectsByNode = new Dictionary<GLTF.Node, DM.Object3D>();
         bool createModels;
         bool overwriteRigging;
+        bool importTransforms = true;
         List<(GLTF.Node node, DM.Model model)> toSkin = new List<(GLTF.Node node, DM.Model model)>();
         List<(GLTF.Skin skin, DM.Model model)> toRemap = new List<(GLTF.Skin skin, DM.Model model)>();
 
@@ -171,9 +179,12 @@ namespace PD2ModelParser.Importers
                 obj.SetParent(parent);
             }
 
-            var lt = node.LocalTransform;
-            lt.Translation *= scaleFactor;
-            obj.Transform = lt.Matrix;
+            if (importTransforms)
+            {
+                var lt = node.LocalTransform;
+                lt.Translation *= scaleFactor;
+                obj.Transform = lt.Matrix;
+            }
 
             (obj as DM.Model)?.UpdateBounds();
 
