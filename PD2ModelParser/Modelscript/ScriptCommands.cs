@@ -309,7 +309,8 @@ namespace PD2ModelParser.Modelscript
                 }
             }
 
-            var obj = new S.Object3D(Name, parent);
+            var obj = new S.Object3D(Name, null);
+            obj.SetParent(parent); // Add obj to parent's list of children
             var tf = Matrix4x4.CreateScale(Scale) * Matrix4x4.CreateFromQuaternion(Rotation);
             tf.Translation = Position;
             obj.Transform = tf;
