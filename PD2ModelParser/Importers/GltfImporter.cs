@@ -212,9 +212,9 @@ namespace PD2ModelParser.Importers
 
             var matGroup = new DM.MaterialGroup(mats);
             data.AddSection(matGroup);
+            model.MaterialGroup = matGroup;
 
             var ms = new MeshSections();
-            ms.matg = matGroup;
             ms.topoip = model.TopologyIP;
             ms.passgp = model.PassthroughGP;
             ms.geom = ms.passgp.Geometry;
@@ -286,7 +286,6 @@ namespace PD2ModelParser.Importers
             data.AddSection(matGroup);
 
             var ms = new MeshSections();
-            ms.matg = matGroup;
 
             ms.geom = new DM.Geometry();
             data.AddSection(ms.geom);
@@ -306,7 +305,7 @@ namespace PD2ModelParser.Importers
             ms.PopulateFromMeshData(md);
             ms.Scale(this.scaleFactor);
 
-            var model = new DM.Model(name, (uint)ms.geom.verts.Count, (uint)ms.topo.facelist.Count, ms.passgp, ms.topoip, ms.matg, null);
+            var model = new DM.Model(name, (uint)ms.geom.verts.Count, (uint)ms.topo.facelist.Count, ms.passgp, ms.topoip, matGroup, null);
             model.RenderAtoms = md.renderAtoms;
 
             return model;
@@ -484,7 +483,6 @@ namespace PD2ModelParser.Importers
             public DM.Topology topo;
             public DM.TopologyIP topoip;
             public DM.PassthroughGP passgp;
-            public DM.MaterialGroup matg;
             public List<DM.RenderAtom> atoms = new List<DM.RenderAtom>();
 
             public void PopulateFromMeshData(MeshData md)
