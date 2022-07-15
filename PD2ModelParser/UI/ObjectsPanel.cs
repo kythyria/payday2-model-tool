@@ -10,7 +10,7 @@ namespace PD2ModelParser.UI
     public partial class ObjectsPanel : UserControl
     {
         private readonly Dictionary<uint, TreeNode> nodes = new Dictionary<uint, TreeNode>();
-        private readonly ContextMenu nodeRightclickMenu;
+        private readonly ContextMenuStrip nodeRightclickMenu;
         private TreeNode menuTarget;
         private FullModelData data;
 
@@ -20,11 +20,11 @@ namespace PD2ModelParser.UI
 
             treeView.Nodes.Clear();
 
-            nodeRightclickMenu = new ContextMenu();
+            nodeRightclickMenu = new ContextMenuStrip();
 
-            MenuItem properties = new MenuItem("Properties");
+            ToolStripButton properties = new ToolStripButton("Properties");
             properties.Click += optProperties_Click;
-            nodeRightclickMenu.MenuItems.Add(properties);
+            nodeRightclickMenu.Items.Add(properties);
         }
 
         /// <summary>

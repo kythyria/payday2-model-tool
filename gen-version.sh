@@ -7,7 +7,7 @@ cd PD2ModelParser/Properties
 cat << EOD > AssemblyInfo.cs
 // WARNING: This file is generated! Do not modify it, your
 // changes will be overwritten during the build process. Instead,
-// modify AssemblyInfo.i.cs, from which this file is generated.
+// modify AssemblyInfo.cs.in, from which this file is generated.
 //
 EOD
 
@@ -22,9 +22,9 @@ if [[ "$1" =~ "Release" ]]; then
 		#VPRE="1.0.0"
 	fi
 	VN="$VPRE.` git rev-list --count HEAD `"
-	sed "s/\"1.0.0.0\"/\"$VN\"/g;s/Debug Build/$VER/g" AssemblyInfo.i.cs >> AssemblyInfo.cs
+	sed "s/\"1.0.0.0\"/\"$VN\"/g;s/Debug Build/$VER/g" AssemblyInfo.cs.in >> AssemblyInfo.cs
 else
-	cat "AssemblyInfo.i.cs" >> "AssemblyInfo.cs"
+	cat "AssemblyInfo.cs.in" >> "AssemblyInfo.cs"
 fi
 
 dos2unix -q "AssemblyInfo.cs"

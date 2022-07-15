@@ -41,7 +41,7 @@ before_build:
 - cmd: >-
     nuget restore
 
-    copy .\PD2ModelParser\Properties\AssemblyInfo.i.cs .\PD2ModelParser\Properties\AssemblyInfo.cs
+    copy .\PD2ModelParser\Properties\AssemblyInfo.cs.in .\PD2ModelParser\Properties\AssemblyInfo.cs
 build:
   project: PD2ModelParser.sln
   verbosity: minimal

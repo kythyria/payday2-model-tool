@@ -25,9 +25,9 @@ namespace PD2ModelParser.UI {
             DragEnter += HandleDragEnter;
             DragDrop += HandleDragDrop;
 
-            ContextMenu cm = new ContextMenu();
-            ContextMenu = cm;
-            MenuItem clearItem = cm.MenuItems.Add("Clear");
+            ContextMenuStrip cm = new ContextMenuStrip();
+            ContextMenuStrip = cm;
+            ToolStripItem clearItem = cm.Items.Add("Clear");
             clearItem.Click += ClearFileSelected;
         }
 
