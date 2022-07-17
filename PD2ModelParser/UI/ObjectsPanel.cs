@@ -5,6 +5,8 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 
+using Directory = System.IO.Directory;
+
 namespace PD2ModelParser.UI
 {
     public partial class ObjectsPanel : UserControl
@@ -57,7 +59,7 @@ namespace PD2ModelParser.UI
             }
 
             // TODO: There must be a better way to deal with errors.
-            bool success = Modelscript.Script.ExecuteWithMsgBox(script, ref data);
+            bool success = Modelscript.Script.ExecuteWithMsgBox(script, Directory.GetCurrentDirectory(), ref data);
             if (!success)
                 return;
 
@@ -157,7 +159,7 @@ namespace PD2ModelParser.UI
                 new Modelscript.SaveModel() { File = modelFile.Selected }
             };
             // TODO: There must be a better way to deal with errors.
-            bool success = Modelscript.Script.ExecuteWithMsgBox(script, ref data);
+            bool success = Modelscript.Script.ExecuteWithMsgBox(script, Directory.GetCurrentDirectory(), ref data);
             if (!success)
                 return;
         }

@@ -17,7 +17,7 @@ namespace PD2ModelParser.Modelscript
             {
                 XElement root = XElement.Parse(File.ReadAllText(file));
                 var script = ParseXml(root);
-                data = ExecuteItems(script, Directory.GetCurrentDirectory(), data);
+                data = ExecuteItems(script, System.IO.Path.GetDirectoryName(file), data);
                 return true;
             }
             catch (Exception exc)
@@ -29,11 +29,11 @@ namespace PD2ModelParser.Modelscript
             }
         }
 
-        public static bool ExecuteWithMsgBox(IEnumerable<IScriptItem> items, ref FullModelData initialModel)
+        public static bool ExecuteWithMsgBox(IEnumerable<IScriptItem> items, string workDir, ref FullModelData initialModel)
         {
             try
             {
-                initialModel = ExecuteItems(items, Directory.GetCurrentDirectory(), initialModel);
+                initialModel = ExecuteItems(items, workDir, initialModel);
                 return true;
             }
             catch (Exception exc)
