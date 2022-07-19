@@ -144,86 +144,40 @@ namespace PD2ModelParser.UI {
 
             if (!MultiFile && files.Length != 1)
                 return;
-
-            string file = files[0];
-            if (!File.Exists(file))
-                return;
-
-            if (MultiFile) {
-                foreach (string leFile in files) {
-                    if (!File.Exists(leFile))
-                        return;
-                }
-            }
+                
+            if(!files.All(File.Exists)) { return; }
 
             // Check the file against the set filters.
             //
             // For each allowable filter:
-            bool failed = false;
 
             MatchCollection matches = filterRegex.Matches(Filter);
-            foreach (Match match in matches) {
-                // The name of the filter we're testing against - not used.
-                string name = match.Groups["Name"].Value;
-
-                // For each of the allowable extensions
-                foreach (string ext in match.Groups["Extension"].Value.Split(';')) {
-                    // If it allows anything, it matches
-                    if (ext != "*.*")
-                        failed = true;
-
-                    // Ensure the extension has two parts, and find the actual
-                    // extension we're looking for (trueExt) - eg '*.abc' goes into 'abc'
-                    string[] parts = ext.Split('.');
-                    if (parts.Length != 2)
-                        failed = true;
-                    string trueExt = parts[1];
-
-                    // Ensure the file doese have an extension
-                    parts = file.Split('.');
-                    if (parts.Length < 2)
-                        failed = true;
-
-                    // Check the extension matches
-                    // Note we use length-1 - this is so a file like 'a.b.c' has an extension of 'c'
-                    // (ie, for files with dots in their names)
-                    if (parts[parts.Length - 1] != trueExt)
-                        failed = true;
-
-                    if (MultiFile) {
-                        foreach (string leFile in files) {
-                            // Ensure the file doese have an extension
-                            parts = leFile.Split('.');
-                            if (parts.Length < 2)
-                                failed = true;
-
-                            // Check the extension matches
-                            // Note we use length-1 - this is so a file like 'a.b.c' has an extension of 'c'
-                            // (ie, for files with dots in their names)
-                            if (parts[parts.Length - 1] != trueExt)
-                                failed = true;
-                        }
-                    }
-                }
+            var extensions = matches
+                .SelectMany(match => match.Groups["Extension"].Value.Split(';'))
+                .Select(ext => ext.Split('.'))
+                .Select(ext => ext.Length == 2 ? ext[1] : "")
+                .Where(ext => ext != "")
+                .ToList();
+            
+            var success = extensions.Contains("*");
+            success |= files.Select(f => f.Split('.'))
+                .All(p => p.Length >= 2 && extensions.Contains(p.Last()));
+            
+            if(success) {
+                // We are effectively copying the file in
+                e.Effect = DragDropEffects.Copy;
             }
-
-            if (failed) {
-                return;
-            }
-
-            // We are effectively copying the file in
-            e.Effect = DragDropEffects.Copy;
         }
 
         private void HandleDragDrop(object sender, DragEventArgs e) {
             // This is only called if we set the effect in HandleDragEnter, so
             // this won't be called if the user is dragging in a directory or anything.
-            List<string> files = (List<string>)e.Data.GetData(DataFormats.FileDrop);
+            String[] files = (String[])e.Data.GetData(DataFormats.FileDrop);
 
-            if (!MultiFile && files.Count != 1)
+            if (!MultiFile && files.Length != 1)
                 return;
 
-            AllSelected = files;
+            AllSelected = files.ToList();
         }
 
         private void ClearFileSelected(object sender, EventArgs e) {
