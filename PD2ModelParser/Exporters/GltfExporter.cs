@@ -344,16 +344,37 @@ namespace PD2ModelParser.Exporters
                 Vector4 ConvertWeight(Vector3 weight)
                 {
                     // gltf spec requires weights sum to 1.0
+                    // shamelessly cribbed from SharpGLTF's validator, which we need to pass.
+
+                    float nonZero = 0;
+
+                    if(float.IsNaN(weight.X)) { weight.X = 0; }
+                    if(float.IsNaN(weight.Y)) { weight.Y = 0; }
+                    if(float.IsNaN(weight.Z)) { weight.Z = 0; }
+
+                    weight = Vector3.Max(weight, Vector3.Zero);
+                    
+                    if(weight.X > 0) { nonZero += 1; }
+                    if(weight.Y > 0) { nonZero += 1; }
+                    if(weight.Z > 0) { nonZero += 1; }
+
                     var total = weight.X + weight.Y + weight.Z;
-                    if (Math.Abs(1.0 - total) > 2e-7)
+                    if (Math.Abs(total - 1) > (2e-7f * nonZero))
                     {
-                        var largest = Math.Max(weight.X, Math.Max(weight.Y, weight.Z));
                         var fac = 1 / total;
                         weight *= fac;
                     }
+
+                    weight = Vector3.Min(weight, Vector3.One);
+
                     return new Vector4(weight, 0);
                 }
 
+                if(geometry.weights.Count >= 936) {
+                    Console.WriteLine("{0} => {1}", geometry.weights[936], ConvertWeight(geometry.weights[936]));
+                    System.Diagnostics.Debugger.Break();
+                }
+                
                 var a_wght = MakeVertexAttributeAccessor("vweight", geometry.weights, 16, GLTF.DimensionType.VEC4, ConvertWeight, ma => ma.AsVector4Array());
                 result.Add(("WEIGHTS_0", a_wght));
             }
