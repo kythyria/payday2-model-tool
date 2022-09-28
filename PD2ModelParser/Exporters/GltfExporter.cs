@@ -370,11 +370,6 @@ namespace PD2ModelParser.Exporters
                     return new Vector4(weight, 0);
                 }
 
-                if(geometry.weights.Count >= 936) {
-                    Console.WriteLine("{0} => {1}", geometry.weights[936], ConvertWeight(geometry.weights[936]));
-                    System.Diagnostics.Debugger.Break();
-                }
-                
                 var a_wght = MakeVertexAttributeAccessor("vweight", geometry.weights, 16, GLTF.DimensionType.VEC4, ConvertWeight, ma => ma.AsVector4Array());
                 result.Add(("WEIGHTS_0", a_wght));
             }
