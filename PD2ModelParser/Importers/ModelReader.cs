@@ -124,7 +124,10 @@ namespace PD2ModelParser
                     }
 
                     if (ms.Position != sh.End)
-                        throw new Exception(string.Format("Section of type {2} {0} read more than its length of {1} ", sh.id, sh.size, sh.type));
+                    {
+                        //throw new Exception(string.Format("Section of type {2} {0} read more than its length of {1} ", sh.id, sh.size, sh.type));
+                        Log.Default.Warn("Section {0} (type {2:X}) was too short ({1} bytes read)", sh.id, sh.size, sh.type);
+                    }
 
                     Log.Default.Debug("Section {0} at {1} length {2}",
                         section.GetType().Name, sh.offset, sh.size);
