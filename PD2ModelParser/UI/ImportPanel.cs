@@ -119,6 +119,7 @@ namespace PD2ModelParser.UI
         {
             baseModelFileBrowser.Enabled = !createNewModel.Checked;
             createNewObjectsBox.Enabled = !createNewModel.Checked;
+            importTransformsBox.Enabled = !createNewModel.Checked;
         }
 
         private void convert_Click(object sender, EventArgs e)
