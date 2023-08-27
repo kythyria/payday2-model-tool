@@ -33,7 +33,9 @@ namespace PD2ModelParser.Importers
             string importTransforms = opts.GetOption("import-transforms");
             if (importTransforms != null)
             {
-                importer.importTransforms = false;
+                // Previous default behavior was disabling importTransforms regardless of what value was provided
+                // Since people mostly used to set it to "false" via model script, make the default on parse fail "false"
+                bool.TryParse(importTransforms, out importer.importTransforms);
             }
 
             importer.ImportTree(gltf, createModels, parentFinder);

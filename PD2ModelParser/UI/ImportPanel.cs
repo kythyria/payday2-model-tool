@@ -35,6 +35,7 @@ namespace PD2ModelParser.UI
                     panel.labelPatternUV,
                     panel.labelAnimations,
                     null,
+                    null,
                     panel.labelRootPoint,
                     null,
                     panel.labelSaveTo
@@ -49,6 +50,7 @@ namespace PD2ModelParser.UI
                     panel.patternUVFile,
                     panel.animationFiles,
                     panel.createNewObjectsBox,
+                    panel.importTransformsBox,
                     panel.rootPoints,
                     panel.labelRootPointHint,
                     panel.outputBox
@@ -161,6 +163,8 @@ namespace PD2ModelParser.UI
                     RootPointItem item = root_point_items[rootPoints.SelectedIndex];
                     importDirective.DefaultRootPoint = item.Name;
                 }
+
+                importDirective.ImporterOptions.Add("import-transforms", importTransformsBox.Checked.ToString());
 
                 script.Add(importDirective);
             }

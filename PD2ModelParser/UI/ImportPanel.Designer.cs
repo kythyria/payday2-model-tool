@@ -1,318 +1,339 @@
-namespace PD2ModelParser.UI
-{
-    partial class ImportPanel
-    {
-        /// <summary> 
-        /// Required designer variable.
-        /// </summary>
-        private System.ComponentModel.IContainer components = null;
+namespace PD2ModelParser.UI {
+	partial class ImportPanel {
+		/// <summary> 
+		/// Required designer variable.
+		/// </summary>
+		private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+		/// <summary> 
+		/// Clean up any resources being used.
+		/// </summary>
+		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+		protected override void Dispose(bool disposing) {
+			if (disposing && (components != null)) {
+				components.Dispose();
+			}
+			base.Dispose(disposing);
+		}
 
-        #region Component Designer generated code
+		#region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-			this.lblScript = new System.Windows.Forms.Label();
-			this.labelSelBaseModel = new System.Windows.Forms.Label();
-			this.createNewModel = new System.Windows.Forms.CheckBox();
-			this.labelSaveTo = new System.Windows.Forms.Label();
-			this.labelObj = new System.Windows.Forms.Label();
-			this.labelPatternUV = new System.Windows.Forms.Label();
-			this.labelAnimations = new System.Windows.Forms.Label();
-			this.convert = new System.Windows.Forms.Button();
-			this.createNewObjectsBox = new System.Windows.Forms.CheckBox();
-			this.rootPoints = new System.Windows.Forms.ComboBox();
-			this.labelRootPoint = new System.Windows.Forms.Label();
-			this.labelRootPointHint = new System.Windows.Forms.Label();
-			this.scriptFile = new PD2ModelParser.UI.FileBrowserControl();
-			this.patternUVFile = new PD2ModelParser.UI.FileBrowserControl();
-			this.animationFiles = new PD2ModelParser.UI.FileBrowserControl();
-			this.objectFile = new PD2ModelParser.UI.FileBrowserControl();
-			this.outputBox = new PD2ModelParser.UI.FileBrowserControl();
-			this.baseModelFileBrowser = new PD2ModelParser.UI.FileBrowserControl();
-			this.SuspendLayout();
+		/// <summary> 
+		/// Required method for Designer support - do not modify 
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent() {
+			components = new System.ComponentModel.Container();
+			lblScript = new System.Windows.Forms.Label();
+			labelSelBaseModel = new System.Windows.Forms.Label();
+			createNewModel = new System.Windows.Forms.CheckBox();
+			labelSaveTo = new System.Windows.Forms.Label();
+			labelObj = new System.Windows.Forms.Label();
+			labelPatternUV = new System.Windows.Forms.Label();
+			labelAnimations = new System.Windows.Forms.Label();
+			convert = new System.Windows.Forms.Button();
+			createNewObjectsBox = new System.Windows.Forms.CheckBox();
+			rootPoints = new System.Windows.Forms.ComboBox();
+			labelRootPoint = new System.Windows.Forms.Label();
+			labelRootPointHint = new System.Windows.Forms.Label();
+			scriptFile = new FileBrowserControl();
+			patternUVFile = new FileBrowserControl();
+			animationFiles = new FileBrowserControl();
+			objectFile = new FileBrowserControl();
+			outputBox = new FileBrowserControl();
+			baseModelFileBrowser = new FileBrowserControl();
+			importTransformsBox = new System.Windows.Forms.CheckBox();
+			SuspendLayout();
 			// 
 			// lblScript
 			// 
-			this.lblScript.AutoSize = true;
-			this.lblScript.Location = new System.Drawing.Point(65, 60);
-			this.lblScript.Name = "lblScript";
-			this.lblScript.Size = new System.Drawing.Size(37, 13);
-			this.lblScript.TabIndex = 15;
-			this.lblScript.Text = "Script:";
-			this.lblScript.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			lblScript.AutoSize = true;
+			lblScript.Location = new System.Drawing.Point(76, 69);
+			lblScript.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			lblScript.Name = "lblScript";
+			lblScript.Size = new System.Drawing.Size(40, 15);
+			lblScript.TabIndex = 15;
+			lblScript.Text = "Script:";
+			lblScript.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelSelBaseModel
 			// 
-			this.labelSelBaseModel.AutoSize = true;
-			this.labelSelBaseModel.Location = new System.Drawing.Point(3, 8);
-			this.labelSelBaseModel.Name = "labelSelBaseModel";
-			this.labelSelBaseModel.Size = new System.Drawing.Size(99, 13);
-			this.labelSelBaseModel.TabIndex = 1;
-			this.labelSelBaseModel.Text = "Select Base Model:";
-			this.labelSelBaseModel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labelSelBaseModel.AutoSize = true;
+			labelSelBaseModel.Location = new System.Drawing.Point(4, 9);
+			labelSelBaseModel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labelSelBaseModel.Name = "labelSelBaseModel";
+			labelSelBaseModel.Size = new System.Drawing.Size(105, 15);
+			labelSelBaseModel.TabIndex = 1;
+			labelSelBaseModel.Text = "Select Base Model:";
+			labelSelBaseModel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// createNewModel
 			// 
-			this.createNewModel.AutoSize = true;
-			this.createNewModel.Location = new System.Drawing.Point(108, 32);
-			this.createNewModel.Name = "createNewModel";
-			this.createNewModel.Size = new System.Drawing.Size(133, 17);
-			this.createNewModel.TabIndex = 2;
-			this.createNewModel.Text = "Or create a new model";
-			this.createNewModel.UseVisualStyleBackColor = true;
-			this.createNewModel.CheckedChanged += new System.EventHandler(this.createNewModel_CheckedChanged);
+			createNewModel.AutoSize = true;
+			createNewModel.Location = new System.Drawing.Point(126, 37);
+			createNewModel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+			createNewModel.Name = "createNewModel";
+			createNewModel.Size = new System.Drawing.Size(145, 19);
+			createNewModel.TabIndex = 2;
+			createNewModel.Text = "Or create a new model";
+			createNewModel.UseVisualStyleBackColor = true;
+			createNewModel.CheckedChanged += createNewModel_CheckedChanged;
 			// 
 			// labelSaveTo
 			// 
-			this.labelSaveTo.AutoSize = true;
-			this.labelSaveTo.Location = new System.Drawing.Point(3, 275);
-			this.labelSaveTo.Name = "labelSaveTo";
-			this.labelSaveTo.Size = new System.Drawing.Size(51, 13);
-			this.labelSaveTo.TabIndex = 3;
-			this.labelSaveTo.Text = "Save To:";
-			this.labelSaveTo.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labelSaveTo.AutoSize = true;
+			labelSaveTo.Location = new System.Drawing.Point(4, 317);
+			labelSaveTo.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labelSaveTo.Name = "labelSaveTo";
+			labelSaveTo.Size = new System.Drawing.Size(49, 15);
+			labelSaveTo.TabIndex = 3;
+			labelSaveTo.Text = "Save To:";
+			labelSaveTo.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelObj
 			// 
-			this.labelObj.AutoSize = true;
-			this.labelObj.Location = new System.Drawing.Point(61, 89);
-			this.labelObj.Name = "labelObj";
-			this.labelObj.Size = new System.Drawing.Size(41, 13);
-			this.labelObj.TabIndex = 7;
-			this.labelObj.Text = "Object:";
-			this.labelObj.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labelObj.AutoSize = true;
+			labelObj.Location = new System.Drawing.Point(71, 103);
+			labelObj.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labelObj.Name = "labelObj";
+			labelObj.Size = new System.Drawing.Size(45, 15);
+			labelObj.TabIndex = 7;
+			labelObj.Text = "Object:";
+			labelObj.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelPatternUV
 			// 
-			this.labelPatternUV.AutoSize = true;
-			this.labelPatternUV.Location = new System.Drawing.Point(42, 118);
-			this.labelPatternUV.Name = "labelPatternUV";
-			this.labelPatternUV.Size = new System.Drawing.Size(62, 13);
-			this.labelPatternUV.TabIndex = 8;
-			this.labelPatternUV.Text = "Pattern UV:";
-			this.labelPatternUV.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labelPatternUV.AutoSize = true;
+			labelPatternUV.Location = new System.Drawing.Point(49, 136);
+			labelPatternUV.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labelPatternUV.Name = "labelPatternUV";
+			labelPatternUV.Size = new System.Drawing.Size(66, 15);
+			labelPatternUV.TabIndex = 8;
+			labelPatternUV.Text = "Pattern UV:";
+			labelPatternUV.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelAnimations
 			// 
-			this.labelAnimations.AutoSize = true;
-			this.labelAnimations.Location = new System.Drawing.Point(42, 147);
-			this.labelAnimations.Name = "labelAnimations";
-			this.labelAnimations.Size = new System.Drawing.Size(62, 13);
-			this.labelAnimations.TabIndex = 9;
-			this.labelAnimations.Text = "Animations:";
-			this.labelAnimations.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labelAnimations.AutoSize = true;
+			labelAnimations.Location = new System.Drawing.Point(49, 170);
+			labelAnimations.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labelAnimations.Name = "labelAnimations";
+			labelAnimations.Size = new System.Drawing.Size(71, 15);
+			labelAnimations.TabIndex = 9;
+			labelAnimations.Text = "Animations:";
+			labelAnimations.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// convert
 			// 
-			this.convert.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.convert.Location = new System.Drawing.Point(6, 299);
-			this.convert.Name = "convert";
-			this.convert.Size = new System.Drawing.Size(604, 23);
-			this.convert.TabIndex = 9;
-			this.convert.Text = "Convert";
-			this.convert.UseVisualStyleBackColor = true;
-			this.convert.Click += new System.EventHandler(this.convert_Click);
+			convert.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+			convert.Location = new System.Drawing.Point(7, 345);
+			convert.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+			convert.Name = "convert";
+			convert.Size = new System.Drawing.Size(705, 27);
+			convert.TabIndex = 9;
+			convert.Text = "Convert";
+			convert.UseVisualStyleBackColor = true;
+			convert.Click += convert_Click;
 			// 
 			// createNewObjectsBox
 			// 
-			this.createNewObjectsBox.AutoSize = true;
-			this.createNewObjectsBox.Location = new System.Drawing.Point(108, 170);
-			this.createNewObjectsBox.Name = "createNewObjectsBox";
-			this.createNewObjectsBox.Size = new System.Drawing.Size(163, 17);
-			this.createNewObjectsBox.TabIndex = 10;
-			this.createNewObjectsBox.Text = "Import objects not in base file";
-			this.createNewObjectsBox.UseVisualStyleBackColor = true;
+			createNewObjectsBox.AutoSize = true;
+			createNewObjectsBox.Location = new System.Drawing.Point(126, 196);
+			createNewObjectsBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+			createNewObjectsBox.Name = "createNewObjectsBox";
+			createNewObjectsBox.Size = new System.Drawing.Size(183, 19);
+			createNewObjectsBox.TabIndex = 10;
+			createNewObjectsBox.Text = "Import objects not in base file";
+			createNewObjectsBox.UseVisualStyleBackColor = true;
 			// 
 			// rootPoints
 			// 
-			this.rootPoints.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.rootPoints.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.rootPoints.FormattingEnabled = true;
-			this.rootPoints.Location = new System.Drawing.Point(108, 193);
-			this.rootPoints.Name = "rootPoints";
-			this.rootPoints.Size = new System.Drawing.Size(502, 21);
-			this.rootPoints.TabIndex = 11;
+			rootPoints.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+			rootPoints.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			rootPoints.FormattingEnabled = true;
+			rootPoints.Location = new System.Drawing.Point(126, 246);
+			rootPoints.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+			rootPoints.Name = "rootPoints";
+			rootPoints.Size = new System.Drawing.Size(585, 23);
+			rootPoints.TabIndex = 11;
 			// 
 			// labelRootPoint
 			// 
-			this.labelRootPoint.AutoSize = true;
-			this.labelRootPoint.Location = new System.Drawing.Point(44, 196);
-			this.labelRootPoint.Name = "labelRootPoint";
-			this.labelRootPoint.Size = new System.Drawing.Size(60, 13);
-			this.labelRootPoint.TabIndex = 12;
-			this.labelRootPoint.Text = "Root Point:";
-			this.labelRootPoint.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			labelRootPoint.AutoSize = true;
+			labelRootPoint.Location = new System.Drawing.Point(51, 249);
+			labelRootPoint.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labelRootPoint.Name = "labelRootPoint";
+			labelRootPoint.Size = new System.Drawing.Size(66, 15);
+			labelRootPoint.TabIndex = 12;
+			labelRootPoint.Text = "Root Point:";
+			labelRootPoint.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelRootPointHint
 			// 
-			this.labelRootPointHint.AutoSize = true;
-			this.labelRootPointHint.Location = new System.Drawing.Point(44, 217);
-			this.labelRootPointHint.Name = "labelRootPointHint";
-			this.labelRootPointHint.Size = new System.Drawing.Size(234, 13);
-			this.labelRootPointHint.TabIndex = 13;
-			this.labelRootPointHint.Text = "(which bone new objects should be attached to)";
+			labelRootPointHint.AutoSize = true;
+			labelRootPointHint.Location = new System.Drawing.Point(51, 273);
+			labelRootPointHint.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labelRootPointHint.Name = "labelRootPointHint";
+			labelRootPointHint.Size = new System.Drawing.Size(261, 15);
+			labelRootPointHint.TabIndex = 13;
+			labelRootPointHint.Text = "(which bone new objects should be attached to)";
 			// 
 			// scriptFile
 			// 
-			this.scriptFile.AllowDrop = true;
-			this.scriptFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.scriptFile.Filter = "Model Script (*.mscript)|*.mscript";
-			this.scriptFile.Location = new System.Drawing.Point(108, 55);
-			this.scriptFile.MinimumSize = new System.Drawing.Size(0, 23);
-			this.scriptFile.MultiFile = false;
-			this.scriptFile.Name = "scriptFile";
-			this.scriptFile.SaveMode = false;
-			this.scriptFile.Selected = null;
-			this.scriptFile.Size = new System.Drawing.Size(502, 23);
-			this.scriptFile.TabIndex = 14;
-			this.scriptFile.FileSelected += new System.EventHandler(this.scriptFile_FileSelected);
+			scriptFile.AllowDrop = true;
+			scriptFile.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+			scriptFile.Filter = "Model Script (*.mscript)|*.mscript";
+			scriptFile.Location = new System.Drawing.Point(126, 63);
+			scriptFile.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+			scriptFile.MinimumSize = new System.Drawing.Size(0, 27);
+			scriptFile.MultiFile = false;
+			scriptFile.Name = "scriptFile";
+			scriptFile.SaveMode = false;
+			scriptFile.Selected = null;
+			scriptFile.Size = new System.Drawing.Size(586, 27);
+			scriptFile.TabIndex = 14;
+			scriptFile.FileSelected += scriptFile_FileSelected;
 			// 
 			// patternUVFile
 			// 
-			this.patternUVFile.AllowDrop = true;
-			this.patternUVFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.patternUVFile.Filter = "Object File (*.obj)|*.obj";
-			this.patternUVFile.Location = new System.Drawing.Point(108, 113);
-			this.patternUVFile.MinimumSize = new System.Drawing.Size(0, 23);
-			this.patternUVFile.MultiFile = false;
-			this.patternUVFile.Name = "patternUVFile";
-			this.patternUVFile.SaveMode = false;
-			this.patternUVFile.Selected = null;
-			this.patternUVFile.Size = new System.Drawing.Size(502, 23);
-			this.patternUVFile.TabIndex = 6;
+			patternUVFile.AllowDrop = true;
+			patternUVFile.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+			patternUVFile.Filter = "Object File (*.obj)|*.obj";
+			patternUVFile.Location = new System.Drawing.Point(126, 130);
+			patternUVFile.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+			patternUVFile.MinimumSize = new System.Drawing.Size(0, 27);
+			patternUVFile.MultiFile = false;
+			patternUVFile.Name = "patternUVFile";
+			patternUVFile.SaveMode = false;
+			patternUVFile.Selected = null;
+			patternUVFile.Size = new System.Drawing.Size(586, 27);
+			patternUVFile.TabIndex = 6;
 			// 
 			// animationFiles
 			// 
-			this.animationFiles.AllowDrop = true;
-			this.animationFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.animationFiles.Filter = "Animation Files (*.animation)|*.animation";
-			this.animationFiles.Location = new System.Drawing.Point(108, 142);
-			this.animationFiles.MinimumSize = new System.Drawing.Size(0, 23);
-			this.animationFiles.MultiFile = true;
-			this.animationFiles.Name = "animationFiles";
-			this.animationFiles.SaveMode = false;
-			this.animationFiles.Selected = null;
-			this.animationFiles.Size = new System.Drawing.Size(502, 23);
-			this.animationFiles.TabIndex = 10;
+			animationFiles.AllowDrop = true;
+			animationFiles.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+			animationFiles.Filter = "Animation Files (*.animation)|*.animation";
+			animationFiles.Location = new System.Drawing.Point(126, 164);
+			animationFiles.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+			animationFiles.MinimumSize = new System.Drawing.Size(0, 27);
+			animationFiles.MultiFile = true;
+			animationFiles.Name = "animationFiles";
+			animationFiles.SaveMode = false;
+			animationFiles.Selected = null;
+			animationFiles.Size = new System.Drawing.Size(586, 27);
+			animationFiles.TabIndex = 10;
 			// 
 			// objectFile
 			// 
-			this.objectFile.AllowDrop = true;
-			this.objectFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.objectFile.Filter = "Model files (*.gltf, *.glb, *.obj)|*.gltf;*.glb;*.obj;|glTF files (*.gltf, *.glb)" +
-    "|*.gltf;*.glb|Wavefront OBJ files (*.obj)|*.obj";
-			this.objectFile.Location = new System.Drawing.Point(108, 84);
-			this.objectFile.MinimumSize = new System.Drawing.Size(0, 23);
-			this.objectFile.MultiFile = false;
-			this.objectFile.Name = "objectFile";
-			this.objectFile.SaveMode = false;
-			this.objectFile.Selected = null;
-			this.objectFile.Size = new System.Drawing.Size(502, 23);
-			this.objectFile.TabIndex = 5;
+			objectFile.AllowDrop = true;
+			objectFile.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+			objectFile.Filter = "Model files (*.gltf, *.glb, *.obj)|*.gltf;*.glb;*.obj;|glTF files (*.gltf, *.glb)|*.gltf;*.glb|Wavefront OBJ files (*.obj)|*.obj";
+			objectFile.Location = new System.Drawing.Point(126, 97);
+			objectFile.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+			objectFile.MinimumSize = new System.Drawing.Size(0, 27);
+			objectFile.MultiFile = false;
+			objectFile.Name = "objectFile";
+			objectFile.SaveMode = false;
+			objectFile.Selected = null;
+			objectFile.Size = new System.Drawing.Size(586, 27);
+			objectFile.TabIndex = 5;
 			// 
 			// outputBox
 			// 
-			this.outputBox.AllowDrop = true;
-			this.outputBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.outputBox.Filter = "Diesel Model (*.model)|*.model";
-			this.outputBox.Location = new System.Drawing.Point(108, 270);
-			this.outputBox.MinimumSize = new System.Drawing.Size(0, 23);
-			this.outputBox.MultiFile = false;
-			this.outputBox.Name = "outputBox";
-			this.outputBox.SaveMode = true;
-			this.outputBox.Selected = null;
-			this.outputBox.Size = new System.Drawing.Size(502, 23);
-			this.outputBox.TabIndex = 4;
+			outputBox.AllowDrop = true;
+			outputBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+			outputBox.Filter = "Diesel Model (*.model)|*.model";
+			outputBox.Location = new System.Drawing.Point(126, 312);
+			outputBox.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+			outputBox.MinimumSize = new System.Drawing.Size(0, 27);
+			outputBox.MultiFile = false;
+			outputBox.Name = "outputBox";
+			outputBox.SaveMode = true;
+			outputBox.Selected = null;
+			outputBox.Size = new System.Drawing.Size(586, 27);
+			outputBox.TabIndex = 4;
 			// 
 			// baseModelFileBrowser
 			// 
-			this.baseModelFileBrowser.AllowDrop = true;
-			this.baseModelFileBrowser.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.baseModelFileBrowser.Filter = "Diesel Model (*.model)|*.model";
-			this.baseModelFileBrowser.Location = new System.Drawing.Point(108, 3);
-			this.baseModelFileBrowser.MinimumSize = new System.Drawing.Size(0, 23);
-			this.baseModelFileBrowser.MultiFile = false;
-			this.baseModelFileBrowser.Name = "baseModelFileBrowser";
-			this.baseModelFileBrowser.SaveMode = false;
-			this.baseModelFileBrowser.Selected = null;
-			this.baseModelFileBrowser.Size = new System.Drawing.Size(502, 23);
-			this.baseModelFileBrowser.TabIndex = 0;
-			this.baseModelFileBrowser.FileSelected += new System.EventHandler(this.baseModelFileBrowser_FileSelected);
+			baseModelFileBrowser.AllowDrop = true;
+			baseModelFileBrowser.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+			baseModelFileBrowser.Filter = "Diesel Model (*.model)|*.model";
+			baseModelFileBrowser.Location = new System.Drawing.Point(126, 3);
+			baseModelFileBrowser.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+			baseModelFileBrowser.MinimumSize = new System.Drawing.Size(0, 27);
+			baseModelFileBrowser.MultiFile = false;
+			baseModelFileBrowser.Name = "baseModelFileBrowser";
+			baseModelFileBrowser.SaveMode = false;
+			baseModelFileBrowser.Selected = null;
+			baseModelFileBrowser.Size = new System.Drawing.Size(586, 27);
+			baseModelFileBrowser.TabIndex = 0;
+			baseModelFileBrowser.FileSelected += baseModelFileBrowser_FileSelected;
+			// 
+			// importTransformsBox
+			// 
+			importTransformsBox.AutoSize = true;
+			importTransformsBox.Checked = true;
+			importTransformsBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			importTransformsBox.Location = new System.Drawing.Point(126, 221);
+			importTransformsBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+			importTransformsBox.Name = "importTransformsBox";
+			importTransformsBox.Size = new System.Drawing.Size(122, 19);
+			importTransformsBox.TabIndex = 16;
+			importTransformsBox.Text = "Import transforms";
+			importTransformsBox.UseVisualStyleBackColor = true;
 			// 
 			// ImportPanel
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.Controls.Add(this.lblScript);
-			this.Controls.Add(this.scriptFile);
-			this.Controls.Add(this.labelRootPointHint);
-			this.Controls.Add(this.labelRootPoint);
-			this.Controls.Add(this.rootPoints);
-			this.Controls.Add(this.createNewObjectsBox);
-			this.Controls.Add(this.convert);
-			this.Controls.Add(this.labelPatternUV);
-			this.Controls.Add(this.labelAnimations);
-			this.Controls.Add(this.labelObj);
-			this.Controls.Add(this.patternUVFile);
-			this.Controls.Add(this.animationFiles);
-			this.Controls.Add(this.objectFile);
-			this.Controls.Add(this.outputBox);
-			this.Controls.Add(this.labelSaveTo);
-			this.Controls.Add(this.createNewModel);
-			this.Controls.Add(this.labelSelBaseModel);
-			this.Controls.Add(this.baseModelFileBrowser);
-			this.Name = "ImportPanel";
-			this.Size = new System.Drawing.Size(613, 325);
-			this.Load += new System.EventHandler(this.ImportPanel_Load);
-			this.ResumeLayout(false);
-			this.PerformLayout();
+			AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+			AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			Controls.Add(importTransformsBox);
+			Controls.Add(lblScript);
+			Controls.Add(scriptFile);
+			Controls.Add(labelRootPointHint);
+			Controls.Add(labelRootPoint);
+			Controls.Add(rootPoints);
+			Controls.Add(createNewObjectsBox);
+			Controls.Add(convert);
+			Controls.Add(labelPatternUV);
+			Controls.Add(labelAnimations);
+			Controls.Add(labelObj);
+			Controls.Add(patternUVFile);
+			Controls.Add(animationFiles);
+			Controls.Add(objectFile);
+			Controls.Add(outputBox);
+			Controls.Add(labelSaveTo);
+			Controls.Add(createNewModel);
+			Controls.Add(labelSelBaseModel);
+			Controls.Add(baseModelFileBrowser);
+			Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+			Name = "ImportPanel";
+			Size = new System.Drawing.Size(715, 375);
+			Load += ImportPanel_Load;
+			ResumeLayout(false);
+			PerformLayout();
+		}
 
-        }
+		#endregion
 
-        #endregion
-
-        private FileBrowserControl baseModelFileBrowser;
-        private System.Windows.Forms.Label labelSelBaseModel;
-        private System.Windows.Forms.CheckBox createNewModel;
-        private System.Windows.Forms.Label labelSaveTo;
-        private FileBrowserControl outputBox;
-        private FileBrowserControl objectFile;
-        private FileBrowserControl patternUVFile;
-        private FileBrowserControl animationFiles;
-        private System.Windows.Forms.Label labelObj;
-        private System.Windows.Forms.Label labelPatternUV;
+		private FileBrowserControl baseModelFileBrowser;
+		private System.Windows.Forms.Label labelSelBaseModel;
+		private System.Windows.Forms.CheckBox createNewModel;
+		private System.Windows.Forms.Label labelSaveTo;
+		private FileBrowserControl outputBox;
+		private FileBrowserControl objectFile;
+		private FileBrowserControl patternUVFile;
+		private FileBrowserControl animationFiles;
+		private System.Windows.Forms.Label labelObj;
+		private System.Windows.Forms.Label labelPatternUV;
 		private System.Windows.Forms.Label labelAnimations;
 		private System.Windows.Forms.Button convert;
-        private System.Windows.Forms.CheckBox createNewObjectsBox;
-        private System.Windows.Forms.ComboBox rootPoints;
-        private System.Windows.Forms.Label labelRootPoint;
-        private System.Windows.Forms.Label labelRootPointHint;
-        private FileBrowserControl scriptFile;
-        private System.Windows.Forms.Label lblScript;
+		private System.Windows.Forms.CheckBox createNewObjectsBox;
+		private System.Windows.Forms.ComboBox rootPoints;
+		private System.Windows.Forms.Label labelRootPoint;
+		private System.Windows.Forms.Label labelRootPointHint;
+		private FileBrowserControl scriptFile;
+		private System.Windows.Forms.Label lblScript;
+		private System.Windows.Forms.CheckBox importTransformsBox;
 	}
 }
