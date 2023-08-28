@@ -177,6 +177,7 @@ namespace PD2ModelParser.UI {
 			labelRootPointHint.Size = new System.Drawing.Size(261, 15);
 			labelRootPointHint.TabIndex = 13;
 			labelRootPointHint.Text = "(which bone new objects should be attached to)";
+			labelRootPointHint.AutoEllipsis = true;
 			// 
 			// scriptFile
 			// 
@@ -287,6 +288,7 @@ namespace PD2ModelParser.UI {
 			// 
 			AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowOnly;
 			Controls.Add(importTransformsBox);
 			Controls.Add(lblScript);
 			Controls.Add(scriptFile);

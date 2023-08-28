@@ -58,7 +58,7 @@ namespace PD2ModelParser
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(458, 344);
+            this.label3.Location = new System.Drawing.Point(458, 366);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(222, 13);
             this.label3.TabIndex = 6;
@@ -133,14 +133,15 @@ namespace PD2ModelParser
             this.mainTabs.Location = new System.Drawing.Point(12, 12);
             this.mainTabs.Name = "mainTabs";
             this.mainTabs.SelectedIndex = 0;
-            this.mainTabs.Size = new System.Drawing.Size(672, 329);
+            this.mainTabs.Size = new System.Drawing.Size(672, 351);
             this.mainTabs.TabIndex = 14;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(696, 366);
+            this.ClientSize = new System.Drawing.Size(696, 388);
+            this.MinimumSize = this.SizeFromClientSize(this.ClientSize);
             this.Controls.Add(this.mainTabs);
             this.Controls.Add(this.label3);
             this.Name = "Form1";

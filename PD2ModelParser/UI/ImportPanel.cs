@@ -13,68 +13,90 @@ namespace PD2ModelParser.UI
     {
         class ImportPanelLayoutEngine : LayoutEngine
         {
+            struct TableRow {
+                public Label label;
+                public Control field;
+                public int labelWidth;
+                public int minFieldWidth;
+                public int height;
+
+                public TableRow(Label label, Control field) {
+                    this.label = label;
+                    this.field = field;
+
+                    var labelSize = label?.GetPreferredSize(new Size(1,1)) ?? new Size(0,0);
+                    var fieldSize = this.field.GetPreferredSize(new Size(1,1));
+
+                    this.height = Math.Max(labelSize.Height + (label?.Margin.Vertical ?? 0), fieldSize.Height + this.field.Margin.Vertical);
+                    this.minFieldWidth = fieldSize.Width;
+                    this.labelWidth = labelSize.Width + (label?.Margin.Horizontal ?? 0);
+                }
+            }
+
             Label[] labels;
+            Control[] fields;
+            TableRow[] rows;
+
+            int maxLabelWidth;
+            int minFieldWidth;
 
             public ImportPanelLayoutEngine(ImportPanel panel)
             {
                 
             }
 
-            public override bool Layout(object container, LayoutEventArgs layoutEventArgs)
-            {
-                //return base.Layout(container, layoutEventArgs);
-                var panel = (ImportPanel)container;
+            private void InitialAnalysis(ImportPanel panel)
+            {   
+                if(this.rows != null) { return; }
 
-                //Console.WriteLine("Layout");
-
-                this.labels = new Label[] {
-                    panel.labelSelBaseModel,
-                    null,
-                    panel.lblScript,
-                    panel.labelObj,
-                    panel.labelPatternUV,
-                    panel.labelAnimations,
-                    null,
-                    null,
-                    panel.labelRootPoint,
-                    null,
-                    panel.labelSaveTo
+                this.rows = new TableRow[] {
+                    new TableRow(panel.labelSelBaseModel, panel.baseModelFileBrowser),
+                    new TableRow(null, panel.createNewModel),
+                    new TableRow(panel.lblScript, panel.scriptFile),
+                    new TableRow(panel.labelObj, panel.objectFile),
+                    new TableRow(panel.labelPatternUV, panel.patternUVFile),
+                    new TableRow(panel.labelAnimations, panel.animationFiles),
+                    new TableRow(null, panel.createNewObjectsBox),
+                    new TableRow(null, panel.importTransformsBox),
+                    new TableRow(panel.labelRootPoint, panel.rootPoints),
+                    new TableRow(null, panel.labelRootPointHint),
+                    new TableRow(panel.labelSaveTo, panel.outputBox)
                 };
+                
+                this.maxLabelWidth = this.rows.Select(i => i.labelWidth).Max();
 
-                var fields = new Control[]
-                {
-                    panel.baseModelFileBrowser,
-                    panel.createNewModel,
-                    panel.scriptFile,
-                    panel.objectFile,
-                    panel.patternUVFile,
-                    panel.animationFiles,
-                    panel.createNewObjectsBox,
-                    panel.importTransformsBox,
-                    panel.rootPoints,
-                    panel.labelRootPointHint,
-                    panel.outputBox
-                };
-
-                var maxLabelWidth = this.labels
-                    .Where(i => i != null)
-                    .Select(i => i.PreferredSize.Width + i.Margin.Horizontal ).Max();
                 var currY = 0;
-
-                for (var i = 0; i < fields.Length; i++)
+                for (var i = 0; i < rows.Length; i++)
                 {
-                    var label = labels[i];
+                    var label = rows[i].label;
                     var labelSize = label?.GetPreferredSize(new Size(1,1)) ?? new Size(0,0);
-                    var field = fields[i];
-                    var fieldSize = field.GetPreferredSize(new Size(1,1));
-
-                    var rowHeight = Math.Max(labelSize.Height + (label?.Margin.Vertical ?? 0), fieldSize.Height + field.Margin.Vertical);
-                    
+                    var rowHeight = this.rows[i].height;
                     if (label != null)
                     {
                         var labelOffsY = (rowHeight - labelSize.Height) / 2;
-                        label.SetBounds(maxLabelWidth - (labelSize.Width + label.Margin.Right), currY + labelOffsY, labelSize.Width, labelSize.Height);
+                        label.SetBounds(this.maxLabelWidth - (labelSize.Width + label.Margin.Right), currY + labelOffsY, labelSize.Width, labelSize.Height);
                     }
+                    currY += rowHeight;
+                }
+            }
+
+            public override bool Layout(object container, LayoutEventArgs layoutEventArgs)
+            {
+                //return base.Layout(container, layoutEventArgs);
+
+                //Console.WriteLine("Layout");
+
+                var panel = (ImportPanel)container;
+
+                this.InitialAnalysis(panel);
+
+                var currY = 0;
+                for (var i = 0; i < rows.Length; i++)
+                {
+                    var field = rows[i].field;
+                    var fieldSize = field.GetPreferredSize(new Size(1,1));
+
+                    var rowHeight = this.rows[i].height;
 
                     var fieldX = maxLabelWidth + field.Margin.Left;
                     var fieldOffsY = currY + (rowHeight - fieldSize.Height) / 2;
@@ -85,7 +107,7 @@ namespace PD2ModelParser.UI
 
                 var buttonSize = panel.convert.GetPreferredSize(new Size(1, 1));
                 panel.convert.SetBounds(panel.convert.Margin.Left, currY + panel.convert.Margin.Top, panel.Width - panel.convert.Margin.Horizontal, buttonSize.Height);
-                currY += panel.convert.Bounds.Bottom + panel.convert.Margin.Bottom;
+                currY = panel.convert.Bounds.Bottom + panel.convert.Margin.Bottom;
 
                 //Console.WriteLine("End Layout");
 
@@ -94,10 +116,10 @@ namespace PD2ModelParser.UI
                 return true;
             }
 
-            public Size GetMinimumSize()
-            {
-                throw new NotImplementedException();
-            }
+            //public Size GetMinimumSize()
+            //{
+            //    panel
+            //}
         }
 
         private List<RootPointItem> root_point_items = new List<RootPointItem>();
