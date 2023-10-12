@@ -109,7 +109,11 @@ namespace PD2ModelParser.Exporters
                 var mat = thing.Transform;
                 mat.Translation = mat.Translation * scaleFactor;
 
-                // Some models in the wild need this doing to them, god knows why
+                // Some models in the wild need this doing to them, god knows why,
+                // but bogus fourth rows are a thing.
+                mat.M14 = 0;
+                mat.M24 = 0;
+                mat.M34 = 0;
                 mat.M44 = 1;
 
                 node.LocalMatrix = isSkinned ? Matrix4x4.Identity : mat;
