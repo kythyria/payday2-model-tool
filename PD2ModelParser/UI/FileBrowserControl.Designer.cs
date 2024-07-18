@@ -28,49 +28,64 @@ namespace PD2ModelParser.UI
         /// </summary>
         private void InitializeComponent()
         {
-            this.inputFileBox = new System.Windows.Forms.TextBox();
-            this.browseBttn = new System.Windows.Forms.Button();
-            this.SuspendLayout();
+            inputFileBox = new System.Windows.Forms.TextBox();
+            browseBttn = new System.Windows.Forms.Button();
+            clearBttn = new System.Windows.Forms.Button();
+            SuspendLayout();
             // 
             // inputFileBox
             // 
-            this.inputFileBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.inputFileBox.Enabled = false;
-            this.inputFileBox.Location = new System.Drawing.Point(0, 2);
-            this.inputFileBox.Margin = new System.Windows.Forms.Padding(0);
-            this.inputFileBox.Name = "inputFileBox";
-            this.inputFileBox.Size = new System.Drawing.Size(197, 20);
-            this.inputFileBox.TabIndex = 14;
+            inputFileBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            inputFileBox.Enabled = false;
+            inputFileBox.Location = new System.Drawing.Point(0, 2);
+            inputFileBox.Margin = new System.Windows.Forms.Padding(0);
+            inputFileBox.Name = "inputFileBox";
+            inputFileBox.Size = new System.Drawing.Size(251, 23);
+            inputFileBox.TabIndex = 14;
             // 
             // browseBttn
             // 
-            this.browseBttn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseBttn.Location = new System.Drawing.Point(203, 0);
-            this.browseBttn.Margin = new System.Windows.Forms.Padding(0);
-            this.browseBttn.Name = "browseBttn";
-            this.browseBttn.Size = new System.Drawing.Size(75, 23);
-            this.browseBttn.TabIndex = 15;
-            this.browseBttn.Text = "Browse...";
-            this.browseBttn.UseVisualStyleBackColor = true;
-            this.browseBttn.Click += new System.EventHandler(this.browseBttn_Click);
+            browseBttn.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            browseBttn.Location = new System.Drawing.Point(251, 0);
+            browseBttn.Margin = new System.Windows.Forms.Padding(0);
+            browseBttn.Name = "browseBttn";
+            browseBttn.Size = new System.Drawing.Size(88, 27);
+            browseBttn.TabIndex = 15;
+            browseBttn.Text = "Browse...";
+            browseBttn.UseVisualStyleBackColor = true;
+            browseBttn.Click += browseBttn_Click;
+            // 
+            // clearBttn
+            // 
+            clearBttn.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            clearBttn.Location = new System.Drawing.Point(340, 0);
+            clearBttn.Margin = new System.Windows.Forms.Padding(0);
+            clearBttn.Name = "clearBttn";
+            clearBttn.Size = new System.Drawing.Size(44, 27);
+            clearBttn.TabIndex = 15;
+            clearBttn.Text = "Clear";
+            clearBttn.UseVisualStyleBackColor = true;
+            clearBttn.Click += ClearFileSelected;
             // 
             // FileBrowserControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.inputFileBox);
-            this.Controls.Add(this.browseBttn);
-            this.Name = "FileBrowserControl";
-            this.Size = new System.Drawing.Size(278, 23);
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            Controls.Add(inputFileBox);
+            Controls.Add(browseBttn);
+            Controls.Add(clearBttn);
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Name = "FileBrowserControl";
+            Size = new System.Drawing.Size(384, 27);
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
         private System.Windows.Forms.TextBox inputFileBox;
         private System.Windows.Forms.Button browseBttn;
+        private System.Windows.Forms.Button clearBttn;
+
     }
 }

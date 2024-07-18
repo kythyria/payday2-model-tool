@@ -14,11 +14,13 @@ using System.Collections.Generic;
 namespace PD2ModelParser.UI {
     [DefaultEvent("FileSelected")]
     [Designer(typeof(FileBrowserDesigner))]
-    public partial class FileBrowserControl : UserControl {
+    public partial class FileBrowserControl : UserControl
+    {
         // See https://stackoverflow.com/a/8531166
         private static Regex filterRegex = new Regex(@"(?<Name>[^|]*)\|(?<Extension>[^|]*)\|?");
 
-        public FileBrowserControl() {
+        public FileBrowserControl()
+        {
             InitializeComponent();
 
             AllowDrop = true;
@@ -35,11 +37,14 @@ namespace PD2ModelParser.UI {
 
         private bool _saveMode;
 
-        public bool SaveMode {
-            get {
+        public bool SaveMode
+        {
+            get
+            {
                 return _saveMode;
             }
-            set {
+            set
+            {
                 _saveMode = value;
 
                 // If we're in save mode, the user can edit the output box
@@ -51,44 +56,59 @@ namespace PD2ModelParser.UI {
 
         public string Filter { get; set; }
 
-        public string Selected {
-            get {
-                if (AllSelected.Count > 0) {
+        public string Selected
+        {
+            get
+            {
+                if (AllSelected.Count > 0)
+                {
                     return AllSelected[0];
                 }
                 return null;
             }
-            set {
+            set
+            {
                 AllSelected.Clear();
                 AllSelected.Add(value);
             }
         }
 
         private List<string> _allSelected = new List<string>();
-        public List<string> AllSelected {
-            get {
+        public List<string> AllSelected
+        {
+            get
+            {
                 string text = inputFileBox.Text;
-                if (text == "") {
+                if (text == "")
+                {
                     _allSelected.Clear();
                     return _allSelected;
                 }
 
-                if (SaveMode) {
+                if (SaveMode)
+                {
                     DirectoryInfo info = Directory.GetParent(text);
-                    if (!info.Exists) {
+                    if (!info.Exists)
+                    {
                         _allSelected.Clear();
                         return _allSelected;
                     }
-                } else {
-                    if (!MultiFile && !File.Exists(text)) {
+                }
+                else
+                {
+                    if (!MultiFile && !File.Exists(text))
+                    {
                         _allSelected.Clear();
                         return _allSelected;
                     }
 
-                    if (MultiFile) {
+                    if (MultiFile)
+                    {
                         _allSelected = inputFileBox.Text.Split(';').ToList();
-                        foreach (string filepath in _allSelected) {
-                            if (!File.Exists(filepath)) {
+                        foreach (string filepath in _allSelected)
+                        {
+                            if (!File.Exists(filepath))
+                            {
                                 _allSelected.Clear();
                                 return _allSelected;
                             }
@@ -98,8 +118,10 @@ namespace PD2ModelParser.UI {
 
                 return _allSelected;
             }
-            private set {
-                if (value == null) {
+            private set
+            {
+                if (value == null)
+                {
                     value = new List<string>();
                 }
 
@@ -109,15 +131,20 @@ namespace PD2ModelParser.UI {
             }
         }
 
-        private void browseBttn_Click(object sender, EventArgs e) {
+        private void browseBttn_Click(object sender, EventArgs e)
+        {
             FileDialog fileDialog;
-            if (SaveMode) {
+            if (SaveMode)
+            {
                 fileDialog = new SaveFileDialog();
-            } else {
+            }
+            else
+            {
                 fileDialog = new OpenFileDialog();
                 fileDialog.CheckFileExists = true;
 
-                if (MultiFile) {
+                if (MultiFile)
+                {
                     ((OpenFileDialog)fileDialog).Multiselect = true;
                 }
             }
@@ -129,7 +156,8 @@ namespace PD2ModelParser.UI {
             AllSelected = fileDialog.FileNames.ToList();
         }
 
-        private void HandleDragEnter(object sender, DragEventArgs e) {
+        private void HandleDragEnter(object sender, DragEventArgs e)
+        {
             // Can't drag a file into a save box, since I can't be bothered to
             // write the 'are you sure you want to overwrite this file?' code.
             if (SaveMode)
@@ -144,8 +172,8 @@ namespace PD2ModelParser.UI {
 
             if (!MultiFile && files.Length != 1)
                 return;
-                
-            if(!files.All(File.Exists)) { return; }
+
+            if (!files.All(File.Exists)) { return; }
 
             // Check the file against the set filters.
             //
@@ -158,18 +186,20 @@ namespace PD2ModelParser.UI {
                 .Select(ext => ext.Length == 2 ? ext[1] : "")
                 .Where(ext => ext != "")
                 .ToList();
-            
+
             var success = extensions.Contains("*");
             success |= files.Select(f => f.Split('.'))
                 .All(p => p.Length >= 2 && extensions.Contains(p.Last()));
-            
-            if(success) {
+
+            if (success)
+            {
                 // We are effectively copying the file in
                 e.Effect = DragDropEffects.Copy;
             }
         }
 
-        private void HandleDragDrop(object sender, DragEventArgs e) {
+        private void HandleDragDrop(object sender, DragEventArgs e)
+        {
             // This is only called if we set the effect in HandleDragEnter, so
             // this won't be called if the user is dragging in a directory or anything.
             String[] files = (String[])e.Data.GetData(DataFormats.FileDrop);
@@ -180,23 +210,30 @@ namespace PD2ModelParser.UI {
             AllSelected = files.ToList();
         }
 
-        private void ClearFileSelected(object sender, EventArgs e) {
-            AllSelected = null;
+        private void ClearFileSelected(object sender, EventArgs e)
+        {
+            AllSelected.Clear();
+            this.inputFileBox.Clear();
         }
 
-        protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified) {
+        protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified)
+        {
             base.SetBoundsCore(x, y, width, Math.Max(inputFileBox.Height, browseBttn.Height), specified);
         }
 
-        class FileBrowserDesigner : ControlDesigner {
-            public FileBrowserDesigner() {
+        class FileBrowserDesigner : ControlDesigner
+        {
+            public FileBrowserDesigner()
+            {
                 base.AutoResizeHandles = true;
             }
 
             public override SelectionRules SelectionRules => SelectionRules.LeftSizeable | SelectionRules.RightSizeable | SelectionRules.Moveable;
 
-            public override IList SnapLines {
-                get {
+            public override IList SnapLines
+            {
+                get
+                {
                     // https://stackoverflow.com/questions/93541/baseline-snaplines-in-custom-winforms-controls
                     // This isn't pretty, but it works.
 
@@ -207,12 +244,15 @@ namespace PD2ModelParser.UI {
                     var designer = TypeDescriptor.CreateDesigner(fbc.inputFileBox, typeof(IDesigner));
                     designer.Initialize(fbc.inputFileBox);
 
-                    using (designer) {
+                    using (designer)
+                    {
                         var boxDesigner = designer as ControlDesigner;
                         if (boxDesigner == null) { return snaplines; }
 
-                        foreach (SnapLine i in boxDesigner.SnapLines) {
-                            if (i.SnapLineType == SnapLineType.Baseline) {
+                        foreach (SnapLine i in boxDesigner.SnapLines)
+                        {
+                            if (i.SnapLineType == SnapLineType.Baseline)
+                            {
                                 snaplines.Add(new SnapLine(SnapLineType.Baseline, i.Offset + fbc.inputFileBox.Top, i.Filter, i.Priority));
                             }
                         }
